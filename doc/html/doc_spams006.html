@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<META name="GENERATOR" content="hevea 1.10">
+
+<META name="Author" content="Julien Mairal">
+<link rel="stylesheet" href="doc_spams.css">
+<LINK rel="stylesheet" type="text/css" href="doc_spams.css">
+<TITLE>Miscellaneous Functions</TITLE>
+</HEAD>
+<BODY >
+<A HREF="doc_spams005.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
+<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
+<A HREF="doc_spams007.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
+<HR>
+<H2 CLASS="section"><A NAME="htoc33">6</A>  Miscellaneous Functions</H2><UL>
+<LI><A HREF="doc_spams006.html#toc22">Function mexConjGrad</A>
+</LI><LI><A HREF="doc_spams006.html#toc23">Function mexBayer</A>
+</LI><LI><A HREF="doc_spams006.html#toc24">Function mexCalcAAt</A>
+</LI><LI><A HREF="doc_spams006.html#toc25">Function mexCalcXAt</A>
+</LI><LI><A HREF="doc_spams006.html#toc26">Function mexCalcXY</A>
+</LI><LI><A HREF="doc_spams006.html#toc27">Function mexCalcXYt</A>
+</LI><LI><A HREF="doc_spams006.html#toc28">Function mexCalcXtY</A>
+</LI><LI><A HREF="doc_spams006.html#toc29">Function mexInvSym</A>
+</LI><LI><A HREF="doc_spams006.html#toc30">Function mexNormalize</A>
+</LI><LI><A HREF="doc_spams006.html#toc31">Function mexSort</A>
+</LI><LI><A HREF="doc_spams006.html#toc32">Function mexDisplayPatches</A>
+</LI></UL>
+<H3 CLASS="subsection"><A NAME="toc22"></A><A NAME="htoc34">6.1</A>  Function mexConjGrad</H3><P>Implementation of a conjugate gradient for solving a linear system <B><I>Ax</I></B>=<I><B>b</B></I>
+when <I><B>A</B></I> is positive definite. In some cases, it is faster than the Matlab
+function <CODE>pcg</CODE>, especially when the library uses the Intel Math Kernel Library.
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   x =mexConjGrad(A,b,x0,tol,itermax)
+%
+% Name: mexConjGrad
+%
+% Description: Conjugate gradient algorithm, sometimes faster than the 
+%    equivalent Matlab function pcg. In order to solve Ax=b;
+%
+% Inputs: A:  double square n x n matrix. HAS TO BE POSITIVE DEFINITE
+%         b:  double vector of length n.
+%         x0: double vector of length n. (optional) initial guess.
+%         tol: (optional) tolerance.
+%         itermax: (optional) maximum number of iterations.
+%
+% Output: x: double vector of length n.
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc23"></A><A NAME="htoc35">6.2</A>  Function mexBayer</H3><P>Apply a Bayer pattern to an input image
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   Y =mexBayer(X,offset);
+%
+% Name: mexBayer applies a Bayer pattern to an image X.
+%       There are four possible offsets.
+%
+% Description: 
+%
+% Inputs: X:  double m x n matrix   
+%         offset: scalar, 0,1,2 or 3   
+%
+% Output: Y: double m x m matrix 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc24"></A><A NAME="htoc36">6.3</A>  Function mexCalcAAt</H3><P>For an input sparse matrix <I><B>A</B></I>, this function returns <I><B>AA</B><SUP>T</SUP></I>. For some reasons, when <I><B>A</B></I> has a lot more columns than rows, this function can be much faster than the equivalent matlab command <CODE>X*A'</CODE>. 
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   AAt =mexCalcAAt(A);
+%
+% Name: mexCalcAAt
+%
+% Description: Compute efficiently AAt = A*A', when A is sparse 
+%   and has a lot more columns than rows. In some cases, it is
+%   up to 20 times faster than the equivalent Matlab expression
+%   AAt=A*A';
+%
+% Inputs: A:  double sparse m x n matrix   
+%
+% Output: AAt: double m x m matrix 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc25"></A><A NAME="htoc37">6.4</A>  Function mexCalcXAt</H3><P>
+For an input sparse matrix <I><B>A</B></I> and a matrix <I><B>X</B></I>, this function returns <I><B>XA</B><SUP>T</SUP></I>. For some reasons, when <I><B>A</B></I> has a lot more columns than rows, this function can be much faster than the equivalent matlab command <CODE>X*A'</CODE>. 
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   XAt =mexCalcXAt(X,A);
+%
+% Name: mexCalcXAt
+%
+% Description: Compute efficiently XAt = X*A', when A is sparse and has a 
+%   lot more columns than rows. In some cases, it is up to 20 times 
+%   faster than the equivalent Matlab expression XAt=X*A';
+%
+% Inputs: X:  double m x n matrix
+%         A:  double sparse p x n matrix   
+%
+% Output: XAt: double m x p matrix 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc26"></A><A NAME="htoc38">6.5</A>  Function mexCalcXY</H3><P>
+For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function returns <B><I>XY</I></B>. 
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   Z =mexCalcXY(X,Y);
+%
+% Name: mexCalcXY
+%
+% Description: Compute Z=XY using the BLAS library used by SPAMS.
+%
+% Inputs: X:  double m x n matrix
+%         Y:  double n x p matrix   
+%
+% Output: Z: double m x p matrix 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc27"></A><A NAME="htoc39">6.6</A>  Function mexCalcXYt</H3><P>
+For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function returns <I><B>XY</B><SUP>T</SUP></I>.
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   Z =mexCalcXYt(X,Y);
+%
+% Name: mexCalcXYt
+%
+% Description: Compute Z=XY' using the BLAS library used by SPAMS.
+%
+% Inputs: X:  double m x n matrix
+%         Y:  double p x n matrix   
+%
+% Output: Z: double m x p matrix 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc28"></A><A NAME="htoc40">6.7</A>  Function mexCalcXtY</H3><P>
+For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function returns <I><B>X</B><SUP>T</SUP><B>Y</B></I>.
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   Z =mexCalcXtY(X,Y);
+%
+% Name: mexCalcXtY
+%
+% Description: Compute Z=X'Y using the BLAS library used by SPAMS.
+%
+% Inputs: X:  double n x m matrix
+%         Y:  double n x p matrix   
+%
+% Output: Z: double m x p matrix 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc29"></A><A NAME="htoc41">6.8</A>  Function mexInvSym</H3><P>
+For an input symmetric matrices <I><B>A</B></I> in ℝ<SUP><I>n</I> × <I>n</I></SUP>, this function returns <I><B>A</B></I><SUP>−1</SUP>.
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   B =mexInvSym(A);
+%
+% Name: mexInvSym
+%
+% Description: returns the inverse of a symmetric matrix A
+%
+% Inputs: A:  double n x n matrix   
+%
+% Output: B: double n x n matrix 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc30"></A><A NAME="htoc42">6.9</A>  Function mexNormalize</H3><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   Y =mexNormalize(X);
+%
+% Name: mexNormalize
+%
+% Description: rescale the columns of X so that they have
+%        unit l2-norm.
+%
+% Inputs: X:  double m x n matrix   
+%
+% Output: Y: double m x n matrix 
+%
+% Author: Julien Mairal, 2010
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc31"></A><A NAME="htoc43">6.10</A>  Function mexSort</H3><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   Y =mexSort(X);
+%
+% Name: mexSort
+%
+% Description: sort the elements of X using quicksort
+%
+% Inputs: X:  double vector of size n
+%
+% Output: Y: double  vector of size n
+%
+% Author: Julien Mairal, 2010
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc32"></A><A NAME="htoc44">6.11</A>  Function mexDisplayPatches</H3><P>
+Print to the screen a matrix containing as columns image patches.</P><HR>
+<A HREF="doc_spams005.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
+<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
+<A HREF="doc_spams007.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
+</BODY>
+</HTML>

@@ -1,0 +1,737 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<META name="GENERATOR" content="hevea 1.10">
+
+<META name="Author" content="Julien Mairal">
+<link rel="stylesheet" href="doc_spams.css">
+<LINK rel="stylesheet" type="text/css" href="doc_spams.css">
+<TITLE>Sparse Decomposition Toolbox</TITLE>
+</HEAD>
+<BODY >
+<A HREF="doc_spams003.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
+<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
+<A HREF="doc_spams005.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
+<HR>
+<H2 CLASS="section"><A NAME="htoc8">4</A>  Sparse Decomposition Toolbox</H2><UL>
+<LI><A HREF="doc_spams004.html#toc5">Function mexOMP</A>
+</LI><LI><A HREF="doc_spams004.html#toc6">Function mexOMPMask</A>
+</LI><LI><A HREF="doc_spams004.html#toc7">Function mexLasso</A>
+</LI><LI><A HREF="doc_spams004.html#toc8">Function mexLassoWeighted</A>
+</LI><LI><A HREF="doc_spams004.html#toc9">Function mexLassoMask</A>
+</LI><LI><A HREF="doc_spams004.html#toc10">Function mexCD</A>
+</LI><LI><A HREF="doc_spams004.html#toc11">Function mexSOMP</A>
+</LI><LI><A HREF="doc_spams004.html#toc12">Function mexL1L2BCD</A>
+</LI><LI><A HREF="doc_spams004.html#toc13">Function mexSparseProject</A>
+</LI></UL>
+<P>
+This toolbox implements several algorithms for solving signal reconstruction problems. It is mostly adapted for solving a large number of small/medium scale problems, but can be also efficient sometimes with large scale ones.
+</P><H3 CLASS="subsection"><A NAME="toc5"></A><A NAME="htoc9">4.1</A>  Function mexOMP</H3><P>
+This is a fast implementation of the Orthogonal Matching Pursuit algorithm (or forward selection) [<A HREF="doc_spams008.html#mallat4">21</A>, <A HREF="doc_spams008.html#weisberg">28</A>]. Given a matrix of signals <I><B>X</B></I>=[<I><B>x</B></I><SUP>1</SUP>,…,<I><B>x</B><SUP>n</SUP></I>] in ℝ<SUP><I>m</I> × <I>n</I></SUP> and a dictionary <I><B>D</B></I>=[<I><B>d</B></I><SUP>1</SUP>,…,<I><B>d</B><SUP>p</SUP></I>] in ℝ<SUP><I>m</I> × <I>p</I></SUP>, the algorithm computes a matrix <I><B>A</B></I>=[α<SUP>1</SUP>,…,α<I><SUP>n</SUP></I>] in ℝ<SUP><I>p</I> × <I>n</I></SUP>,
+where for each column <I><B>x</B></I> of <I><B>X</B></I>, it returns a coefficient vector α which is an approximate solution of the following NP-hard problem
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP>   s.t.   ||α||<SUB>0</SUB> ≤ <I>L</I>.
+    (2)</TD></TR>
+</TABLE><P>
+or 
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">  ||α||<SUB>0</SUB>   s.t.   ||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP> ≤ ε.
+    (3)</TD></TR>
+</TABLE><P>
+For efficienty reasons, the method first computes the covariance matrix
+<I><B>D</B><SUP>T</SUP><B>D</B></I>, then for each signal, it computes <I><B>D</B><SUP>T</SUP><B>x</B></I> and performs the
+decomposition with a Cholesky-based algorithm (see [<A HREF="doc_spams008.html#cotter">6</A>] for instance).</P><P>Note that mexOMP can return the “greedy” regularization path if needed (see below):
+</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   A=mexOMP(X,D,param);
+% or       [A path]=mexOMP(X,D,param);
+%
+% Name: mexOMP
+%
+% Description: mexOMP is an efficient implementation of the
+%     Orthogonal Matching Pursuit algorithm. It is optimized
+%     for solving a large number of small or medium-sized 
+%     decomposition problem (and not for a single large one).
+%     It first computes the Gram matrix D'D and then perform
+%     a Cholesky-based OMP of the input signals in parallel.
+%     X=[x^1,...,x^n] is a matrix of signals, and it returns
+%     a matrix A=[alpha^1,...,alpha^n] of coefficients.
+%     
+%     it addresses for all columns x of X, 
+%         min_{alpha} ||alpha||_0  s.t  ||x-Dalpha||_2^2 &lt;= eps
+%         or
+%         min_{alpha} ||x-Dalpha||_2^2  s.t. ||alpha||_0 &lt;= L
+%         
+%
+% Inputs: X:  double m x n matrix   (input signals)
+%            m is the signal size
+%            n is the number of signals to decompose
+%         D:  double m x p matrix   (dictionary)
+%            p is the number of elements in the dictionary
+%            All the columns of D should have unit-norm !
+%         param: struct
+%            param.L (maximum number of elements in each decomposition)
+%            param.eps (threshold on the squared l2-norm of the residual
+%            param.numThreads (optional, number of threads for exploiting
+%            multi-core / multi-cpus. By default, it takes the value -1,
+%            which automatically selects all the available CPUs/cores).
+%
+% Output: A: double sparse p x n matrix (output coefficients)
+%         path (optional): double dense p x L matrix (regularization path of the first signal)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%      - single precision setting (even though the output alpha is double 
+%        precision)
+%      - Passing an int32 vector of length n to param.L allows to provide
+%        a different parameter L for each input signal x_i
+%      - Passing a double vector of length n to param.eps allows to provide
+%        a different parameter eps for each input signal x_i
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc6"></A><A NAME="htoc10">4.2</A>  Function mexOMPMask</H3><P>
+This is a variant of mexOMP with the possibility of handling a binary mask. 
+Given a binary mask <I><B>B</B></I>=[β<SUP>1</SUP>,…,β<I><SUP>n</SUP></I>] in {0,1}<SUP><I>m</I> × <I>n</I></SUP>, it returns a matrix <I><B>A</B></I>=[α<SUP>1</SUP>,…,α<I><SUP>n</SUP></I>] such that for every column <I><B>x</B></I> of <I><B>X</B></I>, β of <I><B>B</B></I>, it computes a column α of <I><B>A</B></I> by addressing
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||diag(β)(<I><B>x</B></I>−<I><B>D</B></I>α)||<SUB>2</SUB><SUP>2</SUP>   s.t.   ||α||<SUB>0</SUB> ≤ <I>L</I>,
+    (4)</TD></TR>
+</TABLE><P>
+or 
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">  ||α||<SUB>0</SUB>   s.t.   ||diag(β)(<I><B>x</B></I>−<I><B>D</B></I>α)||<SUB>2</SUB><SUP>2</SUP> ≤ ε</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">||β||<SUB>0</SUB></TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I>m</I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">,
+    (5)</TD></TR>
+</TABLE><P>
+where diag(β) is a diagonal matrix with the entries of β on the diagonal.</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   A=mexOMPMask(X,D,B,param);
+% or       [A path]=mexOMPMask(X,D,B,param);
+%
+% Name: mexOMPMask
+%
+% Description: mexOMPMask is a variant of mexOMP that allow using
+%     a binary mask B
+%     
+%     for all columns x of X, and columns beta of B, it computes a column 
+%         alpha of A by addressing
+%         min_{alpha} ||alpha||_0  s.t  ||diag(beta)*(x-Dalpha)||_2^2 
+%                                                               &lt;= eps*||beta||_0/m
+%         or
+%         min_{alpha} ||diag(beta)*(x-Dalpha)||_2^2  s.t. ||alpha||_0 &lt;= L
+%         
+%
+% Inputs: X:  double m x n matrix   (input signals)
+%            m is the signal size
+%            n is the number of signals to decompose
+%         D:  double m x p matrix   (dictionary)
+%            p is the number of elements in the dictionary
+%            All the columns of D should have unit-norm !
+%         B:  boolean m x n matrix   (mask)
+%               p is the number of elements in the dictionary
+%         param: struct
+%            param.L (maximum number of elements in each decomposition)
+%            param.eps (threshold on the squared l2-norm of the residual
+%            param.numThreads (optional, number of threads for exploiting
+%            multi-core / multi-cpus. By default, it takes the value -1,
+%            which automatically selects all the available CPUs/cores).
+%
+% Output: A: double sparse p x n matrix (output coefficients)
+%         path (optional): double dense p x L matrix 
+%                                     (regularization path of the first signal)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%      - single precision setting (even though the output alpha is double 
+%        precision)
+%      - Passing an int32 vector of length n to param.L allows to provide
+%        a different parameter L for each input signal x_i
+%      - Passing a double vector of length n to param.eps allows to provide
+%        a different parameter eps for each input signal x_i
+%
+% Author: Julien Mairal, 2010
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc7"></A><A NAME="htoc11">4.3</A>  Function mexLasso</H3><P>
+This is a fast implementation of the LARS algorithm [<A HREF="doc_spams008.html#efron">8</A>] (variant for solving the Lasso) for solving the Lasso or Elastic-Net. Given a matrix of signals <I><B>X</B></I>=[<I><B>x</B></I><SUP>1</SUP>,…,<I><B>x</B><SUP>n</SUP></I>] in ℝ<SUP><I>m</I> × <I>n</I></SUP> and a dictionary <I><B>D</B></I> in ℝ<SUP><I>m</I> × <I>p</I></SUP>, depending on the input parameters, the algorithm returns a matrix of coefficients <I><B>A</B></I>=[α<SUP>1</SUP>,…,α<I><SUP>n</SUP></I>] in ℝ<SUP><I>p</I> × <I>n</I></SUP> such that for every column <I><B>x</B></I> of <I><B>X</B></I>, the corresponding column α of <I><B>A</B></I> is the solution of
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP>   s.t.   ||α||<SUB>1</SUB> ≤ λ,
+    (6)</TD></TR>
+</TABLE><P>
+or 
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">  ||α||<SUB>1</SUB>   s.t.   ||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP> ≤ λ, <A NAME="eq:lasso2"></A>
+    (7)</TD></TR>
+</TABLE><P>
+or
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
+</TABLE></TD><TD CLASS="dcell">||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP> + λ ||α||<SUB>1</SUB> + </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">λ<SUB>2</SUB></TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
+</TABLE></TD><TD CLASS="dcell">||α||<SUB>2</SUB><SUP>2</SUP>. <A NAME="eq:lasso"></A>
+    (8)</TD></TR>
+</TABLE><P>
+For efficiency reasons, the method first compute the covariance matrix <I><B>D</B><SUP>T</SUP><B>D</B></I>, then
+for each signal, it computes <I><B>D</B><SUP>T</SUP><B>x</B></I> and performs the decomposition with a
+Cholesky-based algorithm (see [<A HREF="doc_spams008.html#efron">8</A>] for instance). The implementation
+has also an option to add <B>positivity constraints</B> on the solutions
+α. When the solution is very sparse and the problem size is
+reasonable, this approach can be very efficient. Moreover, it gives the
+solution with an exact precision, and its performance does not depend on the
+correlation of the dictionary elements, except when the solution is not unique
+(the algorithm breaks in this case).</P><P>Note that mexLasso can return the whole regularization path of the first signal <I><B>x</B></I><SUB>1</SUB> 
+and can handle implicitely the matrix <I><B>D</B></I> if the quantities <I><B>D</B><SUP>T</SUP><B>D</B></I> and <I><B>D</B><SUP>T</SUP><B>x</B></I> are passed
+as an argument, see below:</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:  [A [path]]=mexLasso(X,D,param);
+%  or:    [A [path]]=mexLasso(X,Q,q,param);
+%
+% Name: mexLasso
+%
+% Description: mexLasso is an efficient implementation of the
+%     homotopy-LARS algorithm for solving the Lasso. 
+%     
+%     if the function is called this way [A [path]]=mexLasso(X,D,param),
+%     it aims at addressing the following problems
+%     for all columns x of X, it computes one column alpha of A
+%     that solves
+%       1) when param.mode=0
+%         min_{alpha} ||x-Dalpha||_2^2 s.t. ||alpha||_1 &lt;= lambda
+%       2) when param.mode=1
+%         min_{alpha} ||alpha||_1 s.t. ||x-Dalpha||_2^2 &lt;= lambda
+%       3) when param.mode=2
+%         min_{alpha} 0.5||x-Dalpha||_2^2 + lambda||alpha||_1 +0.5 lambda2||alpha||_2^2
+%
+%     if the function is called this way [A [path]]=mexLasso(X,Q,q,param),
+%     it solves the above optimisation problem, when Q=D'D and q=D'x.
+%
+%     Possibly, when param.pos=true, it solves the previous problems
+%     with positivity constraints on the vectors alpha
+%
+% Inputs: X:  double m x n matrix   (input signals)
+%               m is the signal size
+%               n is the number of signals to decompose
+%         D:  double m x p matrix   (dictionary)
+%               p is the number of elements in the dictionary
+%         param: struct
+%               param.lambda  (parameter)
+%               param.lambda2  (optional parameter for solving the Elastic-Net)
+%                              for mode=0 and mode=1, it adds a ridge on the Gram Matrix
+%               param.L (optional), maximum number of steps of the homotopy algorithm (can
+%                        be used as a stopping criterion)
+%               param.pos (optional, adds non-negativity constraints on the
+%                 coefficients, false by default)
+%               param.mode (see above, by default: 2)
+%               param.numThreads (optional, number of threads for exploiting
+%                 multi-core / multi-cpus. By default, it takes the value -1,
+%                 which automatically selects all the available CPUs/cores).
+%               param.cholesky (optional, default false),  choose between Cholesky 
+%                 implementation or one based on the matrix inversion Lemma
+%               param.ols (optional, default false), perform an orthogonal projection
+%                 before returning the solution.
+%               param.max_length_path (optional) maximum length of the path.
+%
+% Output: A: double sparse p x n matrix (output coefficients)
+%         path: optional,  returns the regularisation path for the first signal
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%         - single precision setting (even though the output alpha is double 
+%           precision)
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc8"></A><A NAME="htoc12">4.4</A>  Function mexLassoWeighted</H3><P>
+This is a fast implementation of a weighted version of LARS [<A HREF="doc_spams008.html#efron">8</A>]. Given a matrix of signals <I><B>X</B></I>=[<I><B>x</B></I><SUP>1</SUP>,…,<I><B>x</B><SUP>n</SUP></I>] in ℝ<SUP><I>m</I> × <I>n</I></SUP>, a matrix of weights <I><B>W</B></I>=[<I><B>w</B></I><SUP>1</SUP>,…,<I><B>w</B><SUP>n</SUP></I>] ∈ ℝ<SUP><I>p</I> × <I>n</I></SUP>, and a dictionary <I><B>D</B></I> in ℝ<SUP><I>m</I> × <I>p</I></SUP>, depending on the input parameters, the algorithm returns a matrix of coefficients <I><B>A</B></I>=[α<SUP>1</SUP>,…,α<I><SUP>n</SUP></I>] in ℝ<SUP><I>p</I> × <I>n</I></SUP>,
+such that for every column <I><B>x</B></I> of <I><B>X</B></I>, <I><B>w</B></I> of <I><B>W</B></I>, it computes a column α of <I><B>A</B></I>, which is the solution of
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP>   s.t.   ||diag(<I><B>w</B></I>)α||<SUB>1</SUB> ≤ λ,
+    (9)</TD></TR>
+</TABLE><P>
+or 
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">  ||diag(<I><B>w</B></I>)α||<SUB>1</SUB>   s.t.   ||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP> ≤ λ,
+    (10)</TD></TR>
+</TABLE><P>
+or
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
+</TABLE></TD><TD CLASS="dcell">||<I><B>x</B></I>−<I><B>D</B></I>α||<SUB>2</SUB><SUP>2</SUP> + λ ||diag(<I><B>w</B></I>)α||<SUB>1</SUB>.
+    (11)</TD></TR>
+</TABLE><P>
+The implementation has also an option to add <B>positivity constraints</B> on
+the solutions α. This function is potentially useful for
+implementing efficiently the randomized Lasso of [<A HREF="doc_spams008.html#meinshausen">22</A>], or reweighted-ℓ<SUB>1</SUB> schemes [<A HREF="doc_spams008.html#candes4">4</A>].</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:  A=mexLassoWeighted(X,D,W,param);
+%
+% Name: mexLassoWeighted.  
+%
+% WARNING: This function has not been tested intensively
+%
+% Description: mexLassoWeighted is an efficient implementation of the
+%     LARS algorithm for solving the weighted Lasso. It is optimized
+%     for solving a large number of small or medium-sized 
+%     decomposition problem (and not for a single large one).
+%     It first computes the Gram matrix D'D and then perform
+%     a Cholesky-based OMP of the input signals in parallel.
+%     For all columns x of X, and w of W, it computes one column alpha of A
+%     which is the solution of
+%       1) when param.mode=0
+%         min_{alpha} ||x-Dalpha||_2^2   s.t.  
+%                                     ||diag(w)alpha||_1 &lt;= lambda
+%       2) when param.mode=1
+%         min_{alpha} ||diag(w)alpha||_1  s.t.
+%                                        ||x-Dalpha||_2^2 &lt;= lambda
+%       3) when param.mode=2
+%         min_{alpha} 0.5||x-Dalpha||_2^2  +  
+%                                         lambda||diag(w)alpha||_1 
+%     Possibly, when param.pos=true, it solves the previous problems
+%     with positivity constraints on the vectors alpha
+%
+% Inputs: X:  double m x n matrix   (input signals)
+%               m is the signal size
+%               n is the number of signals to decompose
+%         D:  double m x p matrix   (dictionary)
+%               p is the number of elements in the dictionary
+%         W:  double p x n matrix   (weights)
+%         param: struct
+%            param.lambda  (parameter)
+%            param.L (optional, maximum number of elements of each 
+%            decomposition)
+%            param.pos (optional, adds positivity constraints on the
+%            coefficients, false by default)
+%            param.mode (see above, by default: 2)
+%            param.numThreads (optional, number of threads for exploiting
+%            multi-core / multi-cpus. By default, it takes the value -1,
+%            which automatically selects all the available CPUs/cores).
+%
+% Output:  A: double sparse p x n matrix (output coefficients)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%         - single precision setting (even though the output alpha is double 
+%           precision)
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc9"></A><A NAME="htoc13">4.5</A>  Function mexLassoMask</H3><P>
+This is a variant of mexLasso with the possibility of adding a mask <I><B>B</B></I>=[β<SUP>1</SUP>,…,β<I><SUP>n</SUP></I>], as in mexOMPMask. 
+For every column <I><B>x</B></I> of <I><B>X</B></I>, β of <I><B>B</B></I>, it computes a column α of <I><B>A</B></I>, which is the solution of
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||diag(β)(<I><B>x</B></I>−<I><B>D</B></I>α)||<SUB>2</SUB><SUP>2</SUP>   s.t.   ||α||<SUB>1</SUB> ≤ λ,
+    (12)</TD></TR>
+</TABLE><P>
+or 
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">  ||α||<SUB>1</SUB>   s.t.   ||diag(β)(<I><B>x</B></I>−<I><B>D</B></I>α)||<SUB>2</SUB><SUP>2</SUP> ≤ λ</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">||β||<SUB>0</SUB></TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I>m</I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">, 
+    (13)</TD></TR>
+</TABLE><P>
+or
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">α ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
+</TABLE></TD><TD CLASS="dcell">||diag(β)(<I><B>x</B></I>−<I><B>D</B></I>α)||<SUB>2</SUB><SUP>2</SUP> + λ </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">||β||<SUB>0</SUB></TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I>m</I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">||α||<SUB>1</SUB> + </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">λ<SUB>2</SUB></TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
+</TABLE></TD><TD CLASS="dcell">||α||<SUB>2</SUB><SUP>2</SUP>. 
+    (14)</TD></TR>
+</TABLE><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   A=mexLassoMask(X,D,B,param);
+%
+% Name: mexLassoMask
+%
+% Description: mexLasso is a variant of mexLasso that handles
+%     binary masks. It aims at addressing the following problems
+%     for all columns x of X, and beta of B, it computes one column alpha of A
+%     that solves
+%       1) when param.mode=0
+%         min_{alpha} ||diag(beta)(x-Dalpha)||_2^2 s.t. ||alpha||_1 &lt;= lambda
+%       2) when param.mode=1
+%         min_{alpha} ||alpha||_1 s.t. ||diag(beta)(x-Dalpha)||_2^2 
+%                                                              &lt;= lambda*||beta||_0/m
+%       3) when param.mode=2
+%         min_{alpha} 0.5||diag(beta)(x-Dalpha)||_2^2 +
+%                                                 lambda*(||beta||_0/m)*||alpha||_1 
+%     Possibly, when param.pos=true, it solves the previous problems
+%     with positivity constraints on the vectors alpha
+%
+% Inputs: X:  double m x n matrix   (input signals)
+%               m is the signal size
+%               n is the number of signals to decompose
+%         D:  double m x p matrix   (dictionary)
+%               p is the number of elements in the dictionary
+%         B:  boolean m x n matrix   (mask)
+%               p is the number of elements in the dictionary
+%         param: struct
+%               param.lambda  (parameter)
+%               param.L (optional, maximum number of elements of each 
+%                 decomposition)
+%               param.pos (optional, adds positivity constraints on the
+%                 coefficients, false by default)
+%               param.mode (see above, by default: 2)
+%               param.numThreads (optional, number of threads for exploiting
+%                 multi-core / multi-cpus. By default, it takes the value -1,
+%                 which automatically selects all the available CPUs/cores).
+%
+% Output: A: double sparse p x n matrix (output coefficients)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%         - single precision setting (even though the output alpha is double 
+%           precision)
+%
+% Author: Julien Mairal, 2010
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc10"></A><A NAME="htoc14">4.6</A>  Function mexCD</H3><P>
+Coordinate-descent approach for solving Eq. (<A HREF="#eq:lasso">8</A>) and
+Eq. (<A HREF="#eq:lasso2">7</A>). Note that unlike mexLasso, it is not implemented to solve the Elastic-Net formulation.
+To solve Eq. (<A HREF="#eq:lasso2">7</A>), the algorithm solves a
+sequence of problems of the form (<A HREF="#eq:lasso">8</A>) using simple heuristics.
+Coordinate descent is very simple and in practice very powerful. It performs
+better when the correlation between the dictionary elements is small. </P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   A=mexCD(X,D,A0,param);
+%
+% Name: mexCD
+%
+% Description: mexCD addresses l1-decomposition problem with a 
+%     coordinate descent type of approach.
+%     It is optimized for solving a large number of small or medium-sized 
+%     decomposition problem (and not for a single large one).
+%     It first computes the Gram matrix D'D.
+%     This method is particularly well adapted when there is low 
+%     correlation between the dictionary elements and when one can benefit 
+%     from a warm restart.
+%     It aims at addressing the two following problems
+%     for all columns x of X, it computes a column alpha of A such that
+%       2) when param.mode=1
+%         min_{alpha} ||alpha||_1 s.t. ||x-Dalpha||_2^2 &lt;= lambda
+%         For this constraint setting, the method solves a sequence of 
+%         penalized problems (corresponding to param.mode=2) and looks
+%         for the corresponding Lagrange multplier with a simple but
+%         efficient heuristic.
+%       3) when param.mode=2
+%         min_{alpha} 0.5||x-Dalpha||_2^2 + lambda||alpha||_1 
+%
+% Inputs: X:  double m x n matrix   (input signals)
+%               m is the signal size
+%               n is the number of signals to decompose
+%         D:  double m x p matrix   (dictionary)
+%               p is the number of elements in the dictionary
+%               All the columns of D should have unit-norm !
+%         A0:  double sparse p x n matrix   (initial guess)
+%         param: struct
+%            param.lambda  (parameter)
+%            param.mode (optional, see above, by default 2)
+%            param.itermax (maximum number of iterations)
+%            param.tol (tolerance parameter)
+%            param.numThreads (optional, number of threads for exploiting
+%            multi-core / multi-cpus. By default, it takes the value -1,
+%            which automatically selects all the available CPUs/cores).
+%
+% Output: A: double sparse p x n matrix (output coefficients)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%         - single precision setting (even though the output alpha 
+%           is double precision)
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc11"></A><A NAME="htoc15">4.7</A>  Function mexSOMP</H3><P>
+This is a fast implementation of the Simultaneous Orthogonal Matching Pursuit algorithm. Given a set of matrices <I><B>X</B></I>=[<I><B>X</B></I><SUP>1</SUP>,…,<I><B>X</B><SUP>n</SUP></I>] in ℝ<SUP><I>m</I> × <I>N</I></SUP>, where the <I><B>X</B><SUP>i</SUP></I>’s are in ℝ<SUP><I>m</I> × <I>n<SUB>i</SUB></I></SUP>, and a dictionary <I><B>D</B></I> in ℝ<SUP><I>m</I> × <I>p</I></SUP>, the algorithm returns a matrix of coefficients <I><B>A</B></I>=[<I><B>A</B></I><SUP>1</SUP>,…,<I><B>A</B><SUP>n</SUP></I>] in ℝ<SUP><I>p</I> × <I>N</I></SUP> which is an approximate solution of the following NP-hard problem
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+∀ <I>i</I>   </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>A</B><SUP>i</SUP></I> ∈ ℝ<SUP><I>p</I> × <I>n<SUB>i</SUB></I></SUP></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>X</B><SUP>i</SUP></I>−<I><B>DA</B><SUP>i</SUP></I>||<I><SUB>F</SUB></I><SUP>2</SUP>   s.t.   ||<I><B>A</B><SUP>i</SUP></I>||<SUB>0,∞</SUB> ≤ <I>L</I>.
+    (15)</TD></TR>
+</TABLE><P>
+or 
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+∀ <I>i</I>   </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>A</B><SUP>i</SUP></I> ∈ ℝ<SUP><I>p</I> × <I>n<SUB>i</SUB></I></SUP></TD></TR>
+</TABLE></TD><TD CLASS="dcell">  ||<I><B>A</B><SUP>i</SUP></I>||<SUB>0,∞</SUB>   s.t.   ||<I><B>X</B><SUP>i</SUP></I>−<I><B>DA</B><SUP>i</SUP></I>||<I><SUB>F</SUB></I><SUP>2</SUP> ≤ ε <I>n<SUB>i</SUB></I>.
+    (16)</TD></TR>
+</TABLE><P>
+To be efficient, the method first compute the covariance matrix <I><B>D</B><SUP>T</SUP><B>D</B></I>, then for each signal, it computes <I><B>D</B><SUP>T</SUP><B>X</B><SUP>i</SUP></I> and performs the decomposition with a Cholesky-based algorithm.</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   alpha=mexSOMP(X,D,list_groups,param);
+%
+% Name: mexSOMP
+%     (this function has not been intensively tested).
+%
+% Description: mexSOMP is an efficient implementation of a
+%     Simultaneous Orthogonal Matching Pursuit algorithm. It is optimized
+%     for solving a large number of small or medium-sized 
+%     decomposition problem (and not for a single large one).
+%     It first computes the Gram matrix D'D and then perform
+%     a Cholesky-based OMP of the input signals in parallel.
+%     It aims at addressing the following NP-hard problem
+%
+%     X is a matrix structured in groups of signals, which we denote
+%     by X=[X_1,...,X_n]
+%     
+%     for all matrices X_i of X, 
+%         min_{A_i} ||A_i||_{0,infty}  s.t  ||X_i-D A_i||_2^2 &lt;= eps*n_i
+%         where n_i is the number of columns of X_i
+%
+%         or
+%
+%         min_{A_i} ||X_i-D A_i||_2^2  s.t. ||A_i||_{0,infty} &lt;= L
+%         
+%
+% Inputs: X:  double m x N matrix   (input signals)
+%            m is the signal size
+%            N is the total number of signals 
+%         D:  double m x p matrix   (dictionary)
+%            p is the number of elements in the dictionary
+%            All the columns of D should have unit-norm !
+%         list_groups : int32 vector containing the indices (starting at 0)
+%            of the first elements of each groups.
+%         param: struct
+%            param.L (maximum number of elements in each decomposition)
+%            param.eps (threshold on the squared l2-norm of the residual
+%            param.numThreads (optional, number of threads for exploiting
+%            multi-core / multi-cpus. By default, it takes the value -1,
+%            which automatically selects all the available CPUs/cores).
+%
+% Output: alpha: double sparse p x N matrix (output coefficients)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%      - single precision setting (even though the output alpha is double 
+%        precision)
+%
+% Author: Julien Mairal, 2010
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc12"></A><A NAME="htoc16">4.8</A>  Function mexL1L2BCD</H3><P>
+This is a fast implementation of a simultaneous signal decomposition formulation. Given a set of matrices <I><B>X</B></I>=[<I><B>X</B></I><SUP>1</SUP>,…,<I><B>X</B><SUP>n</SUP></I>] in ℝ<SUP><I>m</I> × <I>N</I></SUP>, where the <I><B>X</B><SUP>i</SUP></I>’s are in ℝ<SUP><I>m</I> × <I>n<SUB>i</SUB></I></SUP>, and a dictionary <I><B>D</B></I> in ℝ<SUP><I>m</I> × <I>p</I></SUP>, the algorithm returns a matrix of coefficients <I><B>A</B></I>=[<I><B>A</B></I><SUP>1</SUP>,…,<I><B>A</B><SUP>n</SUP></I>] in ℝ<SUP><I>p</I> × <I>N</I></SUP> which is an approximate solution of the following NP-hard problem
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+∀ <I>i</I>   </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>A</B><SUP>i</SUP></I> ∈ ℝ<SUP><I>p</I> × <I>n<SUB>i</SUB></I></SUP></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>X</B><SUP>i</SUP></I>−<I><B>DA</B><SUP>i</SUP></I>||<I><SUB>F</SUB></I><SUP>2</SUP>   s.t.   ||<I><B>A</B><SUP>i</SUP></I>||<SUB>1,2</SUB> ≤ </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">λ</TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I>n<SUB>i</SUB></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell">.
+    (17)</TD></TR>
+</TABLE><P>
+or 
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+∀ <I>i</I>   </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>A</B><SUP>i</SUP></I> ∈ ℝ<SUP><I>p</I> × <I>n<SUB>i</SUB></I></SUP></TD></TR>
+</TABLE></TD><TD CLASS="dcell">  ||<I><B>A</B><SUP>i</SUP></I>||<SUB>1,2</SUB>   s.t.   ||<I><B>X</B><SUP>i</SUP></I>−<I><B>DA</B><SUP>i</SUP></I>||<I><SUB>F</SUB></I><SUP>2</SUP> ≤ λ <I>n<SUB>i</SUB></I>.
+    (18)</TD></TR>
+</TABLE><P>
+To be efficient, the method first compute the covariance matrix <I><B>D</B><SUP>T</SUP><B>D</B></I>, then for each signal, it computes <I><B>D</B><SUP>T</SUP><B>X</B><SUP>i</SUP></I> and performs the decomposition with a Cholesky-based algorithm.</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:   alpha=mexL1L2BCD(X,D,alpha0,list_groups,param);
+%
+% Name: mexL1L2BCD
+%     (this function has not been intensively tested).
+%
+% Description: mexL1L2BCD is a solver for a 
+%     Simultaneous signal decomposition formulation based on block 
+%     coordinate descent.
+%
+%     X is a matrix structured in groups of signals, which we denote
+%     by X=[X_1,...,X_n]
+%     
+%     if param.mode=2, it solves
+%         for all matrices X_i of X, 
+%         min_{A_i} 0.5||X_i-D A_i||_2^2 + lambda/sqrt(n_i)||A_i||_{1,2}  
+%         where n_i is the number of columns of X_i
+%     if param.mode=1, it solves
+%         min_{A_i} ||A_i||_{1,2} s.t. ||X_i-D A_i||_2^2  &lt;= n_i lambda
+%         
+%
+% Inputs: X:  double m x N matrix   (input signals)
+%            m is the signal size
+%            N is the total number of signals 
+%         D:  double m x p matrix   (dictionary)
+%            p is the number of elements in the dictionary
+%         alpha0: double dense p x N matrix (initial solution)
+%         list_groups : int32 vector containing the indices (starting at 0)
+%            of the first elements of each groups.
+%         param: struct
+%            param.lambda (regularization parameter)
+%            param.mode (see above, by default 2)
+%            param.itermax (maximum number of iterations, by default 100)
+%            param.tol (tolerance parameter, by default 0.001)
+%            param.numThreads (optional, number of threads for exploiting
+%            multi-core / multi-cpus. By default, it takes the value -1,
+%            which automatically selects all the available CPUs/cores).
+%
+% Output: alpha: double sparse p x N matrix (output coefficients)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%      - single precision setting (even though the output alpha is double 
+%        precision)
+%
+% Author: Julien Mairal, 2010
+
+
+</FONT></PRE><H3 CLASS="subsection"><A NAME="toc13"></A><A NAME="htoc17">4.9</A>  Function mexSparseProject</H3><P>
+This is a multi-purpose function, implementing fast algorithms for projecting
+on convex sets, but it also solves the fused lasso signal approximation
+problem. The proposed method is detailed in [<A HREF="doc_spams008.html#mairal9">19</A>]. The main problems
+addressed by this function are the following: Given a matrix
+<I><B>U</B></I>=[<I><B>u</B></I><SUB>1</SUB>,…,<I><B>u</B><SUB>n</SUB></I>] in ℝ<SUP><I>m</I> × <I>n</I></SUP>, it finds a matrix
+<I><B>V</B></I>=[<I><B>v</B></I><SUB>1</SUB>,…,<I><B>v</B><SUB>n</SUB></I>] in ℝ<SUP><I>m</I> × <I>n</I></SUP> so that for all column <I><B>u</B></I> of <I><B>U</B></I>,
+it computes a column <I><B>v</B></I> of <I><B>V</B></I> solving
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>v</B></I> ∈ ℝ<I><SUP>m</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>u</B></I>−<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>    s.t.   ||<I><B>v</B></I>||<SUB>1</SUB> ≤ τ,
+    (19)</TD></TR>
+</TABLE><P>
+or
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>v</B></I> ∈ ℝ<I><SUP>m</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>u</B></I>−<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>    s.t.   λ<SUB>1</SUB>||<I><B>v</B></I>||<SUB>1</SUB> +λ<SUB>2</SUB>||<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>≤ τ,
+    (20)</TD></TR>
+</TABLE><P>
+or
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>v</B></I> ∈ ℝ<I><SUP>m</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>u</B></I>−<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>    s.t.   λ<SUB>1</SUB>||<I><B>v</B></I>||<SUB>1</SUB> +λ<SUB>2</SUB>||<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>+ λ<SUB>3</SUB> <I>FL</I>(<I><B>v</B></I>) ≤ τ,
+    (21)</TD></TR>
+</TABLE><P>
+or
+</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
+</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center"><I><B>v</B></I> ∈ ℝ<I><SUP>m</SUP></I></TD></TR>
+</TABLE></TD><TD CLASS="dcell"> </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
+</TABLE></TD><TD CLASS="dcell">||<I><B>u</B></I>−<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP> + λ<SUB>1</SUB>||<I><B>v</B></I>||<SUB>1</SUB> +λ<SUB>2</SUB>||<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>+ λ<SUB>3</SUB> <I>FL</I>(<I><B>v</B></I>).
+    (22)</TD></TR>
+</TABLE><P>
+Note that for the two last cases, the method performs a small approximation.
+The method follows the regularization path, goes from one kink to another, and 
+stop whenever the constraint is not satisfied anymore. The solution returned 
+by the algorithm is the one obtained at the last kink of the regularization path,
+which is in practice close, but not exactly the same as the solution.
+This will be corrected in a future release of the toolbox.</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
+% Usage:  U=mexSparseProject(B,param);
+%
+% Name: mexSparseProject
+%
+% Description: mexSparseProject solves various optimization 
+%     problems, including projections on a few convex sets.
+%     It aims at addressing the following problems
+%     for all columns u of U in parallel
+%       1) when param.mode=1 (projection on the l1-ball)
+%           min_v ||u-v||_2^2  s.t.  ||v||_1 &lt;= thrs
+%       2) when param.mode=2
+%           min_v ||u-v||_2^2  s.t. ||v||_2^2 + lamuda1||v||_1 &lt;= thrs
+%       3) when param.mode=3
+%           min_v ||u-v||_2^2  s.t  ||v||_1 + 0.5lamuda1||v||_2^2 &lt;= thrs 
+%       4) when param.mode=4
+%           min_v 0.5||u-v||_2^2 + lamuda1||v||_1  s.t  ||v||_2^2 &lt;= thrs
+%       5) when param.mode=5
+%           min_v 0.5||u-v||_2^2 + lamuda1||v||_1 +lamuda2 FL(v) + ... 
+%                                                   0.5lamuda_3 ||v||_2^2
+%          where FL denotes a "fused lasso" regularization term.
+%       6) when param.mode=6
+%          min_v ||u-v||_2^2 s.t lamuda1||v||_1 +lamuda2 FL(v) + ...
+%                                             0.5lamuda3||v||_2^2 &lt;= thrs
+%           
+%        When param.pos=true and param.mode &lt;= 4,
+%        it solves the previous problems with positivity constraints 
+%
+% Inputs: U:  double m x n matrix   (input signals)
+%               m is the signal size
+%               n is the number of signals to project
+%         param: struct
+%           param.thrs (parameter)
+%           param.lambda1 (parameter)
+%           param.lambda2 (parameter)
+%           param.lambda3 (parameter)
+%           param.mode (see above)
+%           param.pos (optional, false by default)
+%           param.numThreads (optional, number of threads for exploiting
+%             multi-core / multi-cpus. By default, it takes the value -1,
+%             which automatically selects all the available CPUs/cores).
+%
+% Output: V: double m x n matrix (output matrix)
+%
+% Note: this function admits a few experimental usages, which have not
+%     been extensively tested:
+%         - single precision setting 
+%
+% Author: Julien Mairal, 2009
+
+
+</FONT></PRE><HR>
+<A HREF="doc_spams003.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
+<A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
+<A HREF="doc_spams005.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
+</BODY>
+</HTML>

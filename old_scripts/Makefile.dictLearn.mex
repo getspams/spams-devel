@@ -1,0 +1,27 @@
+mexobjects=mexTrainDL.$(MEXEXT) \
+	   mexTrainDL_Memory.$(MEXEXT) \
+
+headers=../../linalg/misc.h ../../linalg/cblas_template.h \
+	../../linalg/misc.h ../../linalg/linalg.h ../../linalg/mexutils.h \
+       	../dicts.h ../../decomp/decomp.h 
+
+INCLUDE+=-I../ -I../../linalg/ -I../../decomp/ 
+
+all:
+	$(MAKE) $(mexobjects)
+
+%.o : %.cpp $(headers)
+	$(CXX) -c $(CFLAGS) $(INCLUDE) $(NAME)$@ $<
+
+%.$(MEXEXT): %.cpp $(headers)
+ifeq ($(VER),linuxmac)
+	$(MAKE) $*.o
+	$(CXX) $(MEXLINK) $*.o $(INCLUDELIB) $(LIBS) -o $@ 
+	cp $@ ../../build/
+else
+	$(MAKE) $*.o
+	$(CXX) $*.o $(MEXLINK) $(NAME2)$@ $(INCLUDELIB) $(LIBS)
+	$(MT) -outputresource:"$*.$(MEXEXT);2" -manifest "$*.$(MEXEXT).manifest"
+	cp $*.$(MEXEXT) ../../build/
+endif
+

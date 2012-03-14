@@ -1,0 +1,34 @@
+mexobjects=mexNormalize.$(MEXEXT) \
+	   mexSparseProject.$(MEXEXT) \
+	   mexConjGrad.$(MEXEXT) \
+	   mexCalcAAt.$(MEXEXT) \
+	   mexCalcXAt.$(MEXEXT) \
+	   mexCalcXYt.$(MEXEXT) \
+	   mexCalcXtY.$(MEXEXT) \
+	   mexCalcXY.$(MEXEXT) \
+	   mexInvSym.$(MEXEXT) \
+	   mexSort.$(MEXEXT) \
+	   mexBayer.$(MEXEXT) \
+
+headers=../misc.h ../cblas_template.h ../misc.h ../linalg.h ../mexutils.h
+
+INCLUDE+=-I../
+
+all:
+	$(MAKE) $(mexobjects)
+
+%.o : %.cpp $(headers)
+	$(CXX) -c $(CFLAGS) $(INCLUDE) $(NAME)$@ $<
+
+%.$(MEXEXT): %.cpp $(headers)
+ifeq ($(VER),linuxmac)
+	$(MAKE) $*.o
+	$(CXX) $(MEXLINK) $*.o $(INCLUDELIB) $(LIBS) -o $@ 
+	cp $@ ../../build/
+else
+	$(MAKE) $*.o
+	$(CXX) $*.o $(MEXLINK) $(NAME2)$@ $(INCLUDELIB) $(LIBS)
+	$(MT) -outputresource:"$*.$(MEXEXT);2" -manifest "$*.$(MEXEXT).manifest"
+	cp $*.$(MEXEXT) ../../build/
+endif
+
