@@ -29,6 +29,9 @@ static char no='N';
 static char reduced='S';
 static char allV='V';
 
+#ifdef REMOVE_
+#define _( (
+#endif
 
 /// external functions
 #ifdef HAVE_MKL
@@ -203,25 +206,25 @@ template <typename T> void syev( char& jobz, char& uplo, INTT n,
 template <> inline double cblas_nrm2<double>( INTT n,  double* X, 
        INTT incX) {
    //return cblas_dnrm2(n,X,incX);
-   return dnrm2(&n,X,&incX);
+   return dnrm2_(&n,X,&incX);
 };
 /// Implementation of the INTTerface for cblas_snrm2
 template <> inline float cblas_nrm2<float>( INTT n,  float* X, 
        INTT incX) {
    //return cblas_snrm2(n,X,incX);
-   return snrm2(&n,X,&incX);
+   return snrm2_(&n,X,&incX);
 };
 /// Implementation of the INTTerface for cblas_dcopy
 template <> inline void cblas_copy<double>( INTT n,  double* X, 
        INTT incX, double* Y,  INTT incY) {
    //cblas_dcopy(n,X,incX,Y,incY);
-   dcopy(&n,X,&incX,Y,&incY);
+   dcopy_(&n,X,&incX,Y,&incY);
 };
 /// Implementation of the INTTerface for cblas_scopy
 template <> inline void cblas_copy<float>( INTT n,  float* X,  INTT incX, 
       float* Y,  INTT incY) {
    //cblas_scopy(n,X,incX,Y,incY);
-   scopy(&n,X,&incX,Y,&incY);
+   scopy_(&n,X,&incX,Y,&incY);
 };
 /// Implementation of the INTTerface for cblas_scopy
 template <> inline void cblas_copy<int>( INTT n,  int* X,  INTT incX, 
@@ -240,13 +243,13 @@ template <> inline void cblas_copy<bool>( INTT n,  bool* X,  INTT incX,
 template <> inline void cblas_axpy<double>( INTT n,  double a,  double* X, 
        INTT incX, double* Y,  INTT incY) {
    //cblas_daxpy(n,a,X,incX,Y,incY);
-   daxpy(&n,&a,X,&incX,Y,&incY);
+   daxpy_(&n,&a,X,&incX,Y,&incY);
 };
 /// Implementation of the INTTerface for cblas_saxpy
 template <> inline void cblas_axpy<float>( INTT n,  float a,  float* X,
        INTT incX, float* Y,  INTT incY) {
    //cblas_saxpy(n,a,X,incX,Y,incY);
-   saxpy(&n,&a,X,&incX,Y,&incY);
+   saxpy_(&n,&a,X,&incX,Y,&incY);
 };
 
 /// Implementation of the INTTerface for cblas_saxpy
@@ -268,13 +271,13 @@ template <> inline void cblas_axpy<bool>( INTT n,  bool a,  bool* X,
 template <> inline void cblas_scal<double>( INTT n,  double a, double* X,
        INTT incX) {
    //cblas_dscal(n,a,X,incX);
-   dscal(&n,&a,X,&incX);
+   dscal_(&n,&a,X,&incX);
 };
 /// Implementation of the INTTerface for cblas_sscal
 template <> inline void cblas_scal<float>( INTT n,  float a, float* X, 
        INTT incX) {
    //cblas_sscal(n,a,X,incX);
-   sscal(&n,&a,X,&incX);
+   sscal_(&n,&a,X,&incX);
 };
 /// Implementation of the INTTerface for cblas_sscal
 template <> inline void cblas_scal<int>( INTT n,  int a, int* X, 
@@ -301,13 +304,13 @@ template <> inline float cblas_asum<float>( INTT n,  float* X,  INTT incX) {
 template <> inline double cblas_dot<double>( INTT n,  double* X,
        INTT incX,  double* Y, INTT incY) {
    //return cblas_ddot(n,X,incX,Y,incY);
-   return ddot(&n,X,&incX,Y,&incY);
+   return ddot_(&n,X,&incX,Y,&incY);
 };
 /// Implementation of the INTTerface for cblas_sdot
 template <> inline float cblas_dot<float>( INTT n,  float* X,
        INTT incX,  float* Y, INTT incY) {
    //return cblas_sdot(n,X,incX,Y,incY);
-   return sdot(&n,X,&incX,Y,&incY);
+   return sdot_(&n,X,&incX,Y,&incY);
 };
 template <> inline int cblas_dot<int>( INTT n,  int* X,
        INTT incX,  int* Y, INTT incY) {
@@ -336,7 +339,7 @@ template <> inline void cblas_gemv<double>( CBLAS_ORDER order,
        double *X,  INTT incX,  double beta,
       double *Y,  INTT incY) {
    //cblas_dgemv(order,TransA,M,N,alpha,A,lda,X,incX,beta,Y,incY);
-   dgemv(cblas_transpose(TransA),&M,&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+   dgemv_(cblas_transpose(TransA),&M,&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
 };
 ///  Implementation of the INTTerface for cblas_sgemv
 template <> inline void cblas_gemv<float>( CBLAS_ORDER order,
@@ -345,7 +348,7 @@ template <> inline void cblas_gemv<float>( CBLAS_ORDER order,
        float *X,  INTT incX,  float beta,
       float *Y,  INTT incY) {
    //cblas_sgemv(order,TransA,M,N,alpha,A,lda,X,incX,beta,Y,incY);
-   sgemv(cblas_transpose(TransA),&M,&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+   sgemv_(cblas_transpose(TransA),&M,&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
 };
 ///  Implementation of the INTTerface for cblas_sgemv
 template <> inline void cblas_gemv<int>( CBLAS_ORDER order,
@@ -369,28 +372,28 @@ template <> inline void cblas_ger<double>( CBLAS_ORDER order,
        INTT M,  INTT N,  double alpha,  double *X,  INTT incX,
        double* Y,  INTT incY, double *A,  INTT lda) {
    //cblas_dger(order,M,N,alpha,X,incX,Y,incY,A,lda);
-   dger(&M,&N,&alpha,X,&incX,Y,&incY,A,&lda);
+   dger_(&M,&N,&alpha,X,&incX,Y,&incY,A,&lda);
 };
 ///  Implementation of the INTTerface for cblas_sger
 template <> inline void cblas_ger<float>( CBLAS_ORDER order, 
        INTT M,  INTT N,  float alpha,  float *X,  INTT incX,
        float* Y,  INTT incY, float *A,  INTT lda) {
    //cblas_sger(order,M,N,alpha,X,incX,Y,incY,A,lda);
-   sger(&M,&N,&alpha,X,&incX,Y,&incY,A,&lda);
+   sger_(&M,&N,&alpha,X,&incX,Y,&incY,A,&lda);
 };
 ///  Implementation of the INTTerface for cblas_dtrmv
 template <> inline void cblas_trmv<double>( CBLAS_ORDER order,  CBLAS_UPLO Uplo,
        CBLAS_TRANSPOSE TransA,  CBLAS_DIAG Diag,  INTT N,
        double *A,  INTT lda, double *X,  INTT incX) {
    //cblas_dtrmv(order,Uplo,TransA,Diag,N,A,lda,X,incX);
-   dtrmv(cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&N,A,&lda,X,&incX);
+   dtrmv_(cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&N,A,&lda,X,&incX);
 };
 ///  Implementation of the INTTerface for cblas_strmv
 template <> inline void cblas_trmv<float>( CBLAS_ORDER order,  CBLAS_UPLO Uplo,
        CBLAS_TRANSPOSE TransA,  CBLAS_DIAG Diag,  INTT N,
        float *A,  INTT lda, float *X,  INTT incX) {
    //cblas_strmv(order,Uplo,TransA,Diag,N,A,lda,X,incX);
-   strmv(cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&N,A,&lda,X,&incX);
+   strmv_(cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&N,A,&lda,X,&incX);
 };
 /// Implementation of cblas_dsyr
 template <> inline void cblas_syr( CBLAS_ORDER order, 
@@ -398,7 +401,7 @@ template <> inline void cblas_syr( CBLAS_ORDER order,
        INTT N,  double alpha,  double*X,
        INTT incX, double *A,  INTT lda) {
    //cblas_dsyr(order,Uplo,N,alpha,X,incX,A,lda);
-   dsyr(cblas_uplo(Uplo),&N,&alpha,X,&incX,A,&lda);
+   dsyr_(cblas_uplo(Uplo),&N,&alpha,X,&incX,A,&lda);
 };
 /// Implementation of cblas_ssyr
 template <> inline void cblas_syr( CBLAS_ORDER order, 
@@ -406,7 +409,7 @@ template <> inline void cblas_syr( CBLAS_ORDER order,
        INTT N,  float alpha,  float*X,
        INTT incX, float *A,  INTT lda) {
    //cblas_ssyr(order,Uplo,N,alpha,X,incX,A,lda);
-   ssyr(cblas_uplo(Uplo),&N,&alpha,X,&incX,A,&lda);
+   ssyr_(cblas_uplo(Uplo),&N,&alpha,X,&incX,A,&lda);
 };
 /// Implementation of cblas_ssymv
 template <> inline void cblas_symv( CBLAS_ORDER order,
@@ -414,7 +417,7 @@ template <> inline void cblas_symv( CBLAS_ORDER order,
        float alpha,  float *A,  INTT lda,  float *X, 
        INTT incX,  float beta,float *Y,   INTT incY) {
    //cblas_ssymv(order,Uplo,N,alpha,A,lda,X,incX,beta,Y,incY);
-   ssymv(cblas_uplo(Uplo),&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+   ssymv_(cblas_uplo(Uplo),&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
 }
 /// Implementation of cblas_dsymv
 template <> inline void cblas_symv( CBLAS_ORDER order,
@@ -422,7 +425,7 @@ template <> inline void cblas_symv( CBLAS_ORDER order,
        double alpha,  double *A,  INTT lda,  double *X, 
        INTT incX,  double beta,double *Y,   INTT incY) {
    //cblas_dsymv(order,Uplo,N,alpha,A,lda,X,incX,beta,Y,incY);
-   dsymv(cblas_uplo(Uplo),&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
+   dsymv_(cblas_uplo(Uplo),&N,&alpha,A,&lda,X,&incX,&beta,Y,&incY);
 }
 
 
@@ -434,7 +437,7 @@ template <> inline void cblas_gemm<double>( CBLAS_ORDER order,
        double *A,  INTT lda,  double *B,  INTT ldb,
        double beta, double *C,  INTT ldc) {
    //cblas_dgemm(Order,TransA,TransB,M,N,K,alpha,A,lda,B,ldb,beta,C,ldc);
-   dgemm(cblas_transpose(TransA),cblas_transpose(TransB),&M,&N,&K,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
+   dgemm_(cblas_transpose(TransA),cblas_transpose(TransB),&M,&N,&K,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
 };
 ///  Implementation of the INTTerface for cblas_sgemm
 template <> inline void cblas_gemm<float>( CBLAS_ORDER order, 
@@ -443,7 +446,7 @@ template <> inline void cblas_gemm<float>( CBLAS_ORDER order,
        float *A,  INTT lda,  float *B,  INTT ldb,
        float beta, float *C,  INTT ldc) {
    //cblas_sgemm(Order,TransA,TransB,M,N,K,alpha,A,lda,B,ldb,beta,C,ldc);
-   sgemm(cblas_transpose(TransA),cblas_transpose(TransB),&M,&N,&K,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
+   sgemm_(cblas_transpose(TransA),cblas_transpose(TransB),&M,&N,&K,&alpha,A,&lda,B,&ldb,&beta,C,&ldc);
 };
 template <> inline void cblas_gemm<int>( CBLAS_ORDER order, 
        CBLAS_TRANSPOSE TransA,  CBLAS_TRANSPOSE TransB, 
@@ -467,7 +470,7 @@ template <> inline void cblas_syrk<double>( CBLAS_ORDER order,
        double alpha,  double *A,  INTT lda,
        double beta, double *C,  INTT ldc) {
    //cblas_dsyrk(Order,Uplo,Trans,N,K,alpha,A,lda,beta,C,ldc);
-   dsyrk(cblas_uplo(Uplo),cblas_transpose(Trans),&N,&K,&alpha,A,&lda,&beta,C,&ldc);
+   dsyrk_(cblas_uplo(Uplo),cblas_transpose(Trans),&N,&K,&alpha,A,&lda,&beta,C,&ldc);
 };
 ///  Implementation of the INTTerface for cblas_ssyrk
 template <> inline void cblas_syrk<float>( CBLAS_ORDER order, 
@@ -475,7 +478,7 @@ template <> inline void cblas_syrk<float>( CBLAS_ORDER order,
        float alpha,  float *A,  INTT lda,
        float beta, float *C,  INTT ldc) {
    //cblas_ssyrk(Order,Uplo,Trans,N,K,alpha,A,lda,beta,C,ldc);
-   ssyrk(cblas_uplo(Uplo),cblas_transpose(Trans),&N,&K,&alpha,A,&lda,&beta,C,&ldc);
+   ssyrk_(cblas_uplo(Uplo),cblas_transpose(Trans),&N,&K,&alpha,A,&lda,&beta,C,&ldc);
 };
 ///  Implementation of the INTTerface for cblas_ssyrk
 template <> inline void cblas_syrk<int>( CBLAS_ORDER order, 
@@ -499,7 +502,7 @@ template <> inline void cblas_trmm<double>( CBLAS_ORDER order,
        INTT M,  INTT N,  double alpha, 
        double *A,  INTT lda,double *B,  INTT ldb) {
    //cblas_dtrmm(Order,Side,Uplo,TransA,Diag,M,N,alpha,A,lda,B,ldb);
-   dtrmm(cblas_side(Side),cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&M,&N,&alpha,A,&lda,B,&ldb);
+   dtrmm_(cblas_side(Side),cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&M,&N,&alpha,A,&lda,B,&ldb);
 };
 ///  Implementation of the INTTerface for cblas_strmm
 template <> inline void cblas_trmm<float>( CBLAS_ORDER order, 
@@ -508,19 +511,19 @@ template <> inline void cblas_trmm<float>( CBLAS_ORDER order,
        INTT M,  INTT N,  float alpha, 
        float *A,  INTT lda,float *B,  INTT ldb) {
    //cblas_strmm(Order,Side,Uplo,TransA,Diag,M,N,alpha,A,lda,B,ldb);
-   strmm(cblas_side(Side),cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&M,&N,&alpha,A,&lda,B,&ldb);
+   strmm_(cblas_side(Side),cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&M,&N,&alpha,A,&lda,B,&ldb);
 };
 ///  Implementation of the interface for cblas_idamax
 template <> inline int cblas_iamax<double>( INTT n,  double* X,
        INTT incX) {
    //return cblas_idamax(n,X,incX);
-   return static_cast<int>(idamax(&n,X,&incX)-1);
+   return static_cast<int>(idamax_(&n,X,&incX)-1);
 };
 ///  Implementation of the interface for cblas_isamax
 template <> inline int cblas_iamax<float>( INTT n,  float* X, 
        INTT incX) {
    //return cblas_isamax(n,X,incX);
-   return static_cast<int>(isamax(&n,X,&incX)-1);
+   return static_cast<int>(isamax_(&n,X,&incX)-1);
 };
 
 // Implementations of the interfaces, LAPACK
@@ -528,13 +531,13 @@ template <> inline int cblas_iamax<float>( INTT n,  float* X,
 template <> inline void trtri<double>(char& uplo, char& diag, 
       INTT n, double * a, INTT lda) {
    //dtrtri_(&uplo,&diag,&n,a,&lda,&info);
-   dtrtri(&uplo,&diag,&n,a,&lda,&info);
+   dtrtri_(&uplo,&diag,&n,a,&lda,&info);
 };
 /// Implemenation of the interface for strtri
 template <> inline void trtri<float>(char& uplo, char& diag, 
       INTT n, float* a, INTT lda) {
    //strtri_(&uplo,&diag,&n,a,&lda,&info);
-   strtri(&uplo,&diag,&n,a,&lda,&info);
+   strtri_(&uplo,&diag,&n,a,&lda,&info);
 };
 
 /// Implemenation of the interface for dsytri
@@ -545,14 +548,14 @@ template <> inline void sytri<double>(char& uplo, INTT n, double* a, INTT lda) {
    INTT* ipiv= new INTT[n];
    double* query, *work;
    query = new double[1];
-   dsytrf(&uplo,&n,a,&lda,ipiv,query,&lwork,&info);
+   dsytrf_(&uplo,&n,a,&lda,ipiv,query,&lwork,&info);
    lwork=static_cast<INTT>(*query); 
    delete[](query);
    work = new double[static_cast<int>(lwork)];
-   dsytrf(&uplo,&n,a,&lda,ipiv,work,&lwork,&info);
+   dsytrf_(&uplo,&n,a,&lda,ipiv,work,&lwork,&info);
    delete[](work);
    work = new double[static_cast<int>(2*n)];
-   dsytri(&uplo,&n,a,&lda,ipiv,work,&info);
+   dsytri_(&uplo,&n,a,&lda,ipiv,work,&info);
    delete[](work);
    delete[](ipiv);
 };
@@ -562,26 +565,26 @@ template <> inline void sytri<float>(char& uplo, INTT n, float* a, INTT lda) {
    INTT* ipiv= new INTT[n];
    float* query, *work;
    query = new float[1];
-   ssytrf(&uplo,&n,a,&lda,ipiv,query,&lwork,&info);
+   ssytrf_(&uplo,&n,a,&lda,ipiv,query,&lwork,&info);
    lwork=static_cast<INTT>(*query); 
    delete[](query);
    work = new float[static_cast<int>(lwork)];
-   ssytrf(&uplo,&n,a,&lda,ipiv,work,&lwork,&info);
+   ssytrf_(&uplo,&n,a,&lda,ipiv,work,&lwork,&info);
    delete[](work);
    work = new float[static_cast<int>(2*n)];
-   ssytri(&uplo,&n,a,&lda,ipiv,work,&info);
+   ssytri_(&uplo,&n,a,&lda,ipiv,work,&info);
    delete[](work);
    delete[](ipiv);
 };
 /// interaface to *lasrt
 template <> inline void lasrt(char& id, INTT n, double *d) {
    //dlasrt_(&id,const_cast<int*>(&n),d,&info);
-   dlasrt(&id,&n,d,&info);
+   dlasrt_(&id,&n,d,&info);
 };
 /// interaface to *lasrt
 template <> inline void lasrt(char& id, INTT n, float *d) {
    //slasrt_(&id,const_cast<int*>(&n),d,&info);
-   slasrt(&id,&n,d,&info);
+   slasrt_(&id,&n,d,&info);
 };
 //template <> inline void lasrt2(char& id, INTT& n, double *d,int* key) {
 //   //dlasrt2_(&id,const_cast<int*>(&n),d,key,&info);
@@ -597,12 +600,12 @@ template <> void inline gesvd( char& jobu, char& jobvt, INTT m,
       double* u, INTT ldu, double* vt, INTT ldvt) {
    double* query = new double[1];
    INTT lwork=-1;
-   dgesvd(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
+   dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
          query, &lwork, &info );
    lwork=static_cast<INTT>(*query); 
    delete[](query);
    double* work = new double[static_cast<int>(lwork)];
-   dgesvd(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
+   dgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
          work, &lwork, &info );
    delete[](work);
 }
@@ -611,12 +614,12 @@ template <> void inline gesvd( char& jobu, char& jobvt, INTT m,
       float* u, INTT ldu, float* vt, INTT ldvt) {
    float* query = new float[1];
    INTT lwork=-1;
-   sgesvd(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
+   sgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
          query, &lwork, &info );
    lwork=static_cast<INTT>(*query); 
    delete[](query);
    float* work = new float[static_cast<int>(lwork)];
-   sgesvd(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
+   sgesvd_(&jobu, &jobvt, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt,
          work, &lwork, &info );
    delete[](work);
 }
@@ -625,11 +628,11 @@ template <> void syev( char& jobz, char& uplo, INTT n,
          float* a, INTT lda, float* w) {
    float* query = new float[1];
    INTT lwork=-1;
-   ssyev(&jobz,&uplo,&n,a,&lda,w,query,&lwork,&info);
+   ssyev_(&jobz,&uplo,&n,a,&lda,w,query,&lwork,&info);
    lwork=static_cast<INTT>(*query); 
    delete[](query);
    float* work = new float[static_cast<int>(lwork)];
-   ssyev(&jobz,&uplo,&n,a,&lda,w,work,&lwork,&info);
+   ssyev_(&jobz,&uplo,&n,a,&lda,w,work,&lwork,&info);
    delete[](work);
 };
 
@@ -637,11 +640,11 @@ template <> void syev( char& jobz, char& uplo, INTT n,
          double* a, INTT lda, double* w) {
    double* query = new double[1];
    INTT lwork=-1;
-   dsyev(&jobz,&uplo,&n,a,&lda,w,query,&lwork,&info);
+   dsyev_(&jobz,&uplo,&n,a,&lda,w,query,&lwork,&info);
    lwork=static_cast<INTT>(*query); 
    delete[](query);
    double* work = new double[static_cast<int>(lwork)];
-   dsyev(&jobz,&uplo,&n,a,&lda,w,work,&lwork,&info);
+   dsyev_(&jobz,&uplo,&n,a,&lda,w,work,&lwork,&info);
    delete[](work);
 };
 
