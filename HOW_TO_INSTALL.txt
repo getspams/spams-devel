@@ -17,7 +17,8 @@ Thei best way to compile the library is to open the file compile.m and follow in
 After all the mex-files are compiled, a script run_matlab.sh is also created,
 at least for the Linux and/or Mac OS version. Depending on your configuration,
 it might be necessary to launch matlab with the script in order to use the
-toolbox.
+toolbox (in order to preload multi-threading libraries).
+Otherwise, just type "start_spams;" and use the SPAMS library.
 
 
 

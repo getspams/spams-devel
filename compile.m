@@ -4,8 +4,8 @@ get_architecture;
 %%%%%%%%%%%%% COMPILER CONFIGURATION %%%%%%%%%%%%%%%%
 % set up the compiler you want to use. Possible choices are
 %   - 'mex' (default matlab compiler), this is the easy choice if your matlab
-%           is correctly configured. Note that this choice is not compatible
-%           with the option 'use_multithread=true',
+%           is correctly configured. Note that this choice might not compatible
+%           with the option 'use_multithread=true'. 
 %   - 'icc' (intel compiler), usually produces the fastest code, but the
 %           compiler is not free and not installed by default.
 %   - 'gcc' (gnu compiler), good choice (for Mac, use gcc >= 4.6 for
@@ -14,7 +14,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='icc';
+compiler='mex';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -24,12 +24,12 @@ compiler='icc';
 %   - acml: (AMD Core math library), optimized for opteron cpus
 %   - blas: (netlib at atlas version of blas/lapack), free
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='mkl';
+blas='builtin';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
 % need an appropriate compiler for that (intel compiler, most recent gcc, or visual studio pro)
-use_multithread=true;   % (not compatible with compiler=mex)
+use_multithread=true;   % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
@@ -74,7 +74,7 @@ elseif strcmp(compiler,'mex')
    % leave it blank when compiler='mex'
    path_to_compiler_libraries='';
    path_to_compiler='';
-   use_multithread=false;
+%   use_multithread=false;
 end
 
 % set up the path to the blas/lapack libraries. 
@@ -99,7 +99,7 @@ elseif strcmp(blas,'acml')
    end
 elseif strcmp(blas,'builtin')
     % leave it to /usr/lib/ for built-in:
-    path_to_blas='/usr/lib/';
+    path_to_blas='/';
 end
    
 %%%%%%%%%%%% END OF THE CONFIGURATION %%%%%%%%%%%%%%
@@ -188,7 +188,7 @@ if ~verLessThan('matlab','7.9.0')
    DEFBLAS=[DEFBLAS ' -DNEW_MATLAB'];
 end
 
-links_lib=['-L/usr/lib/ -L/usr/lib64 ' blas_link];
+links_lib=[blas_link];
 link_flags=' -O ';
 
 if strcmp(compiler,'icc')
@@ -267,13 +267,19 @@ elseif strcmp(compiler,'mex')
    DEFCOMP='';
    compile_flags=' -O';
    fprintf(fid,sprintf('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s\n',path_to_blas));
+   if use_multithread 
+      if (linux || mac)
+         compile_flags=[compile_flags ' -fopenmp']; % we assume gcc
+         links_lib=[links_lib ' -lgomp'];
+      end
+   end
 else
     'unknown compiler'
     return;
 end
 
 if ~windows
-   fprintf(fid,'matlab $* -r \"addpath(''./src_release/''); addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1'');"\n'); 
+   fprintf(fid,'matlab $* -r \"addpath(''./src_release/''); addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n'); 
    fclose(fid);
    !chmod +x run_matlab.sh
 end
