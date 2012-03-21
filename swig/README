@@ -1,0 +1,7 @@
+python and R interfaces are build with swig
+
+- python interface : see README in ./python
+- R interface : see README in ./R
+
+Files spams.h, spams.i, spamstools.i are used to build both interfaces
+

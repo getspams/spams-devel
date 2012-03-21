@@ -1,0 +1,49 @@
+Build locally (development test only)
+./mkpy spams
+input : spams.h, spams.i, spamstools.i, py_typemaps.i, numpy.i
+output : _spams_wrap.so spams_wrap.py
+NB : the scipt mkpy is for linux, it must be modified (see comments) for MacOS
+
+Normal build (with setup)
+mkdir inst
+swig -c++ -python -o spams_wrap.cpp spams.i
+python setup.py install --prefix=inst
+
+--------------------
+Tests:
+
+python test_spams.py -h : to get help
+python test_spams.py  : will run all the tests
+python test_spams.py linalg : test of linalg functions
+python test_spams.py name1 name2 ... : run named tests
+
+-----------------
+Using the interface :
+install spams.py and spams_wrap.so in some location
+and import spams
+
+The spams functions accept only numpy dense vectors or "Fortran" matrices and
+scipy sparce matrices of csc type.
+
+Examples :
+
+-----
+import numpy as np
+import spams
+X = np.asfortranarray(np.random.random((64,200)))
+Y = np.asfortranarray(np.random.random((200,20000)))
+Z = spams.CalcXY(X,Y)
+----
+import numpy as np
+import scipy
+import scipy.sparse
+import spams
+
+if not ('rand' in scipy.sparse.__dict__):
+    import myscipy as ssp
+else:
+    import scipy.sparse as ssp
+    m=200; n = 200000; d= 0.05
+    A = ssp.rand(m,n,density=d,format='csc',dtype=np.float64)
+    B = spams.CalcAAt(A)
+-----

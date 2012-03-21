@@ -1,0 +1,73 @@
+#!/bin/bash
+case $1 in -x) set -x;shift;;esac
+
+debug=0
+
+INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn"
+# on MacOS, use following definition instead.
+#INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn -I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include/"
+die () {
+    echo "$1"
+    exit 1
+}
+usage () {
+    echo "Usage $0 [-cl][-ns][-g] nom+"
+    echo "  -cl : clear"
+    die "   -ns : don't redo swig"
+}
+
+flg_clear=0
+flg_swig=1
+lst=""
+optc="-O"
+#CXX=g++-4.2
+CXX=g++
+while [ $# -gt 0 ]; do
+    case $1 in
+	-cl) flg_clear=1;;
+	-ns) flg_swig=0;;
+	-g) optc="-g";;
+	-*) usage;;
+	*) lst="$lst $1";;
+    esac
+    shift
+done
+
+if [ $flg_clear -gt 0 ]; then
+    for nom in $lst; do
+	/bin/rm -f $nom.o ${nom}_wrap.o ${nom}_wrap.py ${nom}_wrap.pyc $nom.pyc ${nom}_wrap.cpp _${nom}_wrap.so
+    done
+    exit 0
+fi
+if [ $debug -eq 0 ]; then
+    OPT_DBG=""
+else
+    OPT_DBG=-DDEBUG
+fi    
+
+err=0
+for nom in $lst; do
+    [ $flg_swig -ne 0 ] && {
+	swig -c++ -python $INC $OPT_DBG -o ${nom}_wrap.cpp $nom.i
+	[ $? -ne 0 ] && exit
+    }
+    if [ -e $nom.cpp ]; then
+	src="$nom.cpp ${nom}_wrap.cpp"
+	obj="$nom.o ${nom}_wrap.o"
+    else
+	src=${nom}_wrap.cpp
+	obj=${nom}_wrap.o
+    fi
+    $CXX -c -fPIC $optc -DUSE_BLAS_LIB -fopenmp $OPT_DBG -I/usr/include/python2.6 $INC $src
+# on MacOS, use following definition instead.
+#    $CXX -c -fPIC $optc -fopenmp $OPT_DBG -I/usr/include/python2.6 $INC $src -m32
+    err=$?;[ $err -eq 0 ] || break
+    $CXX -fopenmp -shared $obj -o _${nom}_wrap.so -lstdc++ -lblas -llapack
+# on MacOS, use following definition instead.
+#    $CXX -fopenmp -shared $obj -o _${nom}_wrap.so -lstdc++ -lblas -llapack -m32 -framework Python
+    err=$?;[ $err -eq 0 ] || break
+ #   /bin/rm -f $nom.o ${nom}_wrap.o
+done
+[ $err -ne 0 ] && die "ERROR"
+    
+exit 0

@@ -1,0 +1,23 @@
+Test sur place :
+./mybuild
+export R_LIBS=`/bin/pwd`/lib
+Rscript test_spams.R
+
+package:
+# fabrication de man/
+./docmatlab2R r_spams
+# cretaion package
+./mybuild -nb
+# check
+R CMD check pkg/spams
+# install (par ex avec R_LIBS=$HOME/R
+
+R CMD INSTALL --html -l $R_LIBS pkg/spams
+
+
+tests : (mettre debug a 1 dans mybuild pour avoir spams.{tst,xtst,ztst}
+./mybuild
+
+distrib:
+./mkdist -f /tmp
+  => /tmp/spams-R-<date>.tgz

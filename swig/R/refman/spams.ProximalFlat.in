@@ -1,0 +1,14 @@
+begin repl Usage
+      alpha <- spams.ProximalFlat(U,param,return_val_loss = FALSE)
+      list(alpha,val_loss) <- spams.ProximalFlat(U,param,return_val_loss = TRUE)
+end
+begin addlast Inputs
+return_val_loss:     
+		      if true the function will return 2 matrices in a list.
+end
+begin addlast Output
+val_loss:        vector of size ncol(U)
+      v <- spams.ProximalFlat(U,param,TRUE)
+      alpha <- v[[1]]
+      val_loss <- v[[2]]
+end

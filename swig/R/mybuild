@@ -1,0 +1,71 @@
+#!/bin/sh
+case $1 in -x) set -x;shift;; esac
+
+debug=0
+
+nswg=0
+build=1
+case $1 in 
+    -ns) nswg=1;shift;; 
+    -nb) build=0;shift;; 
+    -*) echo "BAD OPTION";exit 2;;
+esac
+nom=spams
+pkdir=pkg/$nom
+INC="-I../linalg"
+rfiles="zzz.R r_$nom.R ${nom}.R"
+if [ $debug -eq 0 ]; then
+    OPT_DBG=""
+else
+    OPT_DBG=-DDEBUG
+    rfiles="$rfiles r_debug.R"
+    export OPT_DBG
+fi    
+#export PKG_CXXFLAGS=$INC
+export PKG_LIBS="-lblas -llapack"
+rm -rf $pkdir
+if [ $nswg -eq 0 ]; then
+    swig -c++ -r $INC $OPT_DBG -o ${nom}.cpp $nom.i
+    [ $? -ne 0 ] && exit 1
+fi
+[ -d $pkdir ] || mkdir -p $pkdir/R
+[ -d $pkdir/src ] || mkdir $pkdir/src
+[ -d $pkdir/R ] || mkdir $pkdir/R
+
+cp -p NAMESPACE DESCRIPTION $pkdir
+cp -p ../../COPYING $pkdir/LICENSE
+/bin/rm -rf $pkdir/man;cp -a man $pkdir
+
+rfiles="zzz.R r_$nom.R ${nom}.R"
+cfiles="$nom.h ${nom}.cpp Makevars"
+if [ $debug -ne 0 ]; then
+    rfiles="$rfiles r_debug.R"
+    cfiles="$cfiles spams-tst.h"
+fi
+cp $rfiles $pkdir/R
+cp $cfiles $pkdir/src
+mkdir -p $pkdir/inst/test $pkdir/inst/doc $pkdir/inst/extdata
+cp -p test_*.R $pkdir/inst/test
+cp -p ../doc_spams.pdf $pkdir/inst/doc
+cp -p ../extdata/*   $pkdir/inst/extdata
+
+cdir=`/bin/pwd`
+if [ ! -d $pkdir/src/spams ]; then
+   cd $pkdir/src;mkdir spams;cd spams;
+   for d in decomp  dictLearn  linalg  prox;do
+       ln -s ../../../../../../$d .
+   done
+   cd $cdir
+fi
+[ $build -eq 0 ] && exit 0
+htmldir=$pkdir/inst/html
+mkdir -p $htmldir
+for f in man/*.Rd; do
+    file=`basename $f .Rd`
+    R CMD Rdconv -t html $f -o $htmldir/$file.html
+done
+R CMD build --binary --no-docs pkg/spams
+[ $? -ne 0 ] && exit 1
+rm -rf lib;mkdir lib
+cd lib
+tar zxf ../spams_1.0_R_x86_64-pc-linux-gnu.tar.gz

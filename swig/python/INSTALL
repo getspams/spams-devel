@@ -1,0 +1,54 @@
+This directory contains files to build the python interfaces
+to the functions of SPAMS library already interfaced with matlab.
+
+The interface consists of 4 files : spams.py myscipy_rand.py spams_wrap.py _spams_wrap.so
+Note: myscipy_rand.py supplies a random generator for sparse matrix
+      for some old scipy distributions
+
+----------------------------------
+Interface building :
+python setup.py build
+
+python setup.py install --prefix=<your-prefix>
+
+--------------------
+Testing the interface :
+If $idir is the prefix used above :
+export PYTHONPATH=$idir/lib/python2.6/site-packages
+cd $idir/test
+python test_spams.py -h : to get help
+python test_spams.py  : will run all the tests
+python test_spams.py linalg : test of linalg functions
+python test_spams.py name1 name2 ... : run named tests
+
+-----------------
+Using the interface :
+setup your PYTHONPATH
+
+import spams
+
+The spams functions accept only numpy dense vectors or "Fortran" matrices and
+scipy sparce matrices of csc type.
+
+Examples :
+
+-----
+import numpy as np
+import spams
+X = np.asfortranarray(np.random.random((64,200)))
+Y = np.asfortranarray(np.random.random((200,20000)))
+Z = spams.CalcXY(X,Y)
+----
+import numpy as np
+import scipy
+import scipy.sparse
+import spams
+
+if not ('rand' in scipy.sparse.__dict__):
+    import myscipy as ssp
+else:
+    import scipy.sparse as ssp
+    m=200; n = 200000; d= 0.05
+    A = ssp.rand(m,n,density=d,format='csc',dtype=np.float64)
+    B = spams.CalcAAt(A)
+-----

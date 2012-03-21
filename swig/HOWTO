@@ -1,0 +1,37 @@
+Ce package fournit une interface python de certaines fonctions de SPAMS :
+les mêmes que dans l'interface matlab.
+Pour l'instant seules les fonctions du module linalg sont disponibles.
+Les objets manipulés sont ceux de numpy et scipy.
+Les matrices doivent être rangées par colonnes, et les matrices sparses
+
+Le packaqge est composé des 3 fichiers __spams.so, _spams.py et spams.py,
+qui doivent se trouver dans le "path" de l'interprète python
+(par exemple le répertoire courant).
+
+Les fonctions appelables en python sont dans spams.py
+Elles sont documentées (copie de la doc de Julien estraite des .m)
+
+Les fichiers test_*.py servent aux tests.
+python test_spams.py -h   => doc
+python test_spams.py    => exécute tous les tests
+python test_spams.py Sort CalcAAt
+.....
+
+
+Exemple d'utilisation de CalcAAt :
+(le fichier myscipy.py est là parce que scipy.sparse de la version ubuntu courante
+n'a pas la fonction rand)
+
+import numpy as np
+import scipy
+import scipy.sparse
+import spams
+
+if not ('rand' in scipy.sparse.__dict__):
+    import myscipy as ssp
+else:
+    import scipy.sparse as ssp
+    m=200; n = 200000; d= 0.05
+    A = ssp.rand(m,n,density=d,format='csc',dtype=np.float64)
+    B = spams.CalcAAt(A)
+

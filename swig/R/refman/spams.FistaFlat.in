@@ -1,0 +1,14 @@
+begin repl Usage
+      W <- spams.FistaFlat(Y,X,W0,param,return_optim_info = FALSE)
+      list(W,optim_info) <- spams.FistaFlat(Y,X,W0,param,return_optim_info = TRUE)
+end
+begin addlast Inputs
+return_optim_info:     
+		      if true the function will return 2 matrices in a list.
+end
+begin addlast Output
+optim_info:        vector of size 4, containing information of the optimization.
+      v <- spams.FistaFlat(Y,X,W0,param,TRUE)
+      W <- v[[1]]
+      optim_info <- v[[2]]
+end

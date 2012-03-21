@@ -1,0 +1,26 @@
+#!/bin/sh
+case $1 in -x) set -x;shift;;esac
+
+nom=spams
+/bin/rm -rf dist
+swig -c++ -python -o ${nom}_wrap.cpp $nom.i
+python setup.py sdist
+cdir=`/bin/pwd`
+cd dist
+tar zxf *.tar.gz
+/bin/rm -f *.tar.gz
+dir=`/bin/ls | head -1`
+tmpd=dist/$dir
+cd $cdir
+cp -p spams.h $tmpd
+./extract-docm $tmpd/spams
+mv $tmpd/spams.new.py $tmpd/spams.py
+cp -p ../extdata/* $tmpd
+cp -p INSTALL $tmpd
+rm -f $tmpd/README
+
+cd dist
+name=spams-python
+mv $dir $name
+tar zcf $name-`date +%Y-%m-%d`.tgz $name
+exit 0

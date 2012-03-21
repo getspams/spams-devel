@@ -1,0 +1,99 @@
+#!/usr/bin/perl -w
+use strict;
+
+my $dir = "../../src_release";
+my $indent = "    ";
+sub usage {
+    print "Usage : $0 file.py\n";
+    exit 1;
+}
+
+my @lst= ();
+my %docs = ();
+my %progs = ();
+my @spams = ();
+my $i = -1;
+my ($x,$prog);
+my @indx = ();
+
+my $file = "";
+while($#ARGV >= 0) {
+    $_ = shift(@ARGV);
+    (/^-/) && usage();
+    ("$file") && usage();
+    $file = $_;
+}
+("$file") || usage();
+open(IN,"<$file.py") || die "$file.py open err $!\n";
+while(<IN>) {
+    chomp;
+    $i++;
+    if(/^def\s+([^\(]+)\s*\(.*:/) {
+	$prog = $1;
+	push(@indx,$i);
+	$progs{$i} = $prog;
+    }
+    push(@spams,$_);
+}
+close(IN);
+
+#exit 0;
+open(OUT,">$file.new.py") || die "spams.py.new create err $!\n";
+my $j = 0;
+foreach $i (@indx) {
+    $prog = $progs{$i};
+    ($prog =~ /^_/) && next;  # hidden funcs
+    print "$i : $prog\n";
+    while($j <= $i) {
+	$_ = $spams[$j++];
+	print OUT "$_\n";
+    }
+    my $f = "$dir/mex$prog.m";
+    if(! open(IN,"<$f") ) {
+	print "ERR $f open err $!\n";
+	next;
+    }
+    my $stat = 0;
+    my @tmp = ();
+    while(<IN>) {
+	chomp;
+	s/mex$prog/$prog/g;
+	s/\sdouble\s/ float or double /g;
+	if(! $stat) {
+	    (s/^%\s*Usage/    Usage/) || next;
+	    $stat = 1;
+	    push(@tmp,$_);
+	    next;
+	}
+	if(/^%\s*Author/) {
+	    push(@tmp,"    Authors : Julien MAIRAL, 2010 (spams, matlab interface and documentation)");
+	    push(@tmp,"             Jean-Paul CHIEZE, 2011 (python interface)");
+	    last;
+	}
+	if(/^\s*$/) {push(@tmp,$_);next;}
+	if(! s/^%\s*/    /) {
+	    print "Ligne inattendue <$_>\n";
+	    next;
+	}
+	s/param\.([^\s=]+)/param[\'$1\']/;
+	push(@tmp,$_);
+		
+    }
+    close(IN);
+    if($#tmp >= 0) {
+    # enlever ancienne doc si necessaire
+	if($spams[$j] =~ /^\s+"""/) {
+	    $j++;
+	    while(! ($spams[$j++] =~ /^\s+"""/)) {}
+	}
+	print OUT "$indent\"\"\"\n";
+	print OUT join("\n",@tmp), "\n$indent\"\"\"\n\n";
+    }
+}
+while($j <= $#spams) {
+    $_ = $spams[$j++];
+    print OUT "$_\n";
+}
+
+close(OUT);
+exit 0;

@@ -1,0 +1,19 @@
+begin repl Usage
+D <- spams.TrainDL(X,param,model,return_model= FALSE)
+list(D,model) <- spams.TrainDL(X,param,model,return_model= TRUE)
+end
+begin addlast Inputs
+return_model:     
+		      if true the function will return the model
+		      as a named list ('A' = A, 'B' = B, 'iter' = n)
+end
+begin repl Output
+D:     double m x p matrix   (dictionary)
+model:  
+      v <- spams.TrainDL(X,param,TRUE,model)
+      D <- v[[1]]
+      model <- v[[2]]
+      A = model[['A']]
+      B = model[['B']]
+      iter = model[''iter']]
+end

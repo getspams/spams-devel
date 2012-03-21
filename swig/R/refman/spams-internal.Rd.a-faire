@@ -1,0 +1,6 @@
+\name{spams-internal}
+\title{Internal spams objects}
+\alias{.onLoad}
+\description{Internal spams objects.}
+\details{These are not to be called by the user.}
+\keyword{internal}

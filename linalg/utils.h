@@ -23,7 +23,7 @@
 //#include "cblas.h"
 #endif
 #ifdef USE_BLAS_LIB
-#include "blas.h"
+//#include "blas.h"
 #else
 #include "cblas.h"  // dependency upon cblas libraries has been removed in a recent version
 #endif

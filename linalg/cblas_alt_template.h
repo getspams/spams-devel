@@ -350,12 +350,12 @@ template <> inline void cblas_scal<bool>( INTT n,  bool a, bool* X,
 /// Implementation of the INTTerface for cblas_dasum
 template <> inline double cblas_asum<double>( INTT n,  double* X,  INTT incX) {
    //return cblas_dasum(n,X,1);
-   return dasum(&n,X,&incX);
+   return dasum_(&n,X,&incX);
 };
 /// Implementation of the INTTerface for cblas_sasum
 template <> inline float cblas_asum<float>( INTT n,  float* X,  INTT incX) {
    //return cblas_sasum(n,X,1);
-   return sasum(&n,X,&incX);
+   return sasum_(&n,X,&incX);
 };
 /// Implementation of the INTTerface for cblas_ddot
 template <> inline double cblas_dot<double>( INTT n,  double* X,
