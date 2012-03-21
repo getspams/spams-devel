@@ -1,5 +1,5 @@
 % 
-% Usage:  U=mexSparseProject(B,param);
+% Usage:  V=mexSparseProject(U,param);
 %
 % Name: mexSparseProject
 %
