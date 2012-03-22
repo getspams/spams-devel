@@ -3,7 +3,7 @@ to the functions of spams library already interfaced with matlab.
 
 This file describes how to build R interface from sources.
 
-To install the SPAMS R package you can just use spams-R.tar.gz
+To install the SPAMS R package you can also just untar spams-R.tar.gz
 (see INSTALL-package)
 
 ----------------------------------
