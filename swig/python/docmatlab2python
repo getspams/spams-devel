@@ -17,6 +17,7 @@ my ($x,$prog);
 my @indx = ();
 
 my $file = "";
+my %undocumented = ("mult",1,"im2col_sliding",1);
 while($#ARGV >= 0) {
     $_ = shift(@ARGV);
     (/^-/) && usage();
@@ -42,7 +43,7 @@ open(OUT,">$file.new.py") || die "spams.py.new create err $!\n";
 my $j = 0;
 foreach $i (@indx) {
     $prog = $progs{$i};
-    ($prog =~ /^_/) && next;  # hidden funcs
+    (($prog =~ /^_/) || defined($undocumented{$prog}) ) && next;  # hidden funcs
     print "$i : $prog\n";
     while($j <= $i) {
 	$_ = $spams[$j++];

@@ -244,7 +244,7 @@ using namespace FISTA;
   param.max_iter_backtracking = max_iter_backtracking;
   param.loss = loss_from_string(name_loss);
   if (param.loss==INCORRECT_LOSS)
-    throw("FISTA::solver: Unknown loss");
+    throw("FistaFlat: Unknown loss");
   param.compute_gram = compute_gram;
   param.lin_admm = lin_admm;
   param.admm = admm;
@@ -253,7 +253,7 @@ using namespace FISTA;
   param.regul = regul_from_string(name_regul);
 
   if (param.regul==INCORRECT_REG) {
-      throw("Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+      throw("FistaFlat: Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
   }
   strncpy(param.name_regul,name_regul,param.length_names);
   strncpy(param.name_loss,name_loss,param.length_names);
@@ -264,7 +264,7 @@ using namespace FISTA;
   if(param.log = log) {
     int n = strlen(logName);
     if(n == 0) 
-      throw("FISTA::solver : missing field logName");
+      throw("FistaFlat : missing field logName");
     param.logName = new char[n+1];
     strcpy(param.logName,logName);
   }
@@ -274,7 +274,7 @@ using namespace FISTA;
 
   if(is_inner_weights) {
     if(inner_weights == NULL)
-      throw("FISTA::solver : missing inner_heights ");
+      throw("FistaFlat : missing inner_heights ");
     param.inner_weights = inner_weights->rawX();
   }
 
@@ -284,22 +284,22 @@ using namespace FISTA;
   param.transpose = transpose;
 
   if ((param.loss != CUR && param.loss != MULTILOG) && (pAlpha != p || nAlpha != n || mD != m)) { 
-      throw("FISTA::solver : Argument sizes are not consistent");
+      throw("FistaFlat : Argument sizes are not consistent");
    } else if (param.loss == MULTILOG) {
     Vector<T> Xv;
     X->toVect(Xv);
     int maxval = static_cast<int>(Xv.maxval());
     int minval = static_cast<int>(Xv.minval());
     if (minval != 0)
-      throw("FISTA::solver : smallest class should be 0");
+      throw("FistaFlat : smallest class should be 0");
     if (maxval*X->n() > nAlpha || mD != m) {
       cerr << "Number of classes: " << maxval << endl;
       //cerr << "Alpha: " << pAlpha << " x " << nAlpha << endl;
          //cerr << "X: " << X.m() << " x " << X.n() << endl;
-      throw("FISTA::solver : Argument sizes are not consistent");
+      throw("FistaFlat : Argument sizes are not consistent");
     }
   } else if (param.loss == CUR && (pAlpha != D->n() || nAlpha != D->m())) {
-      throw("FISTA::solver : Argument sizes are not consistent");
+      throw("FistaFlat : Argument sizes are not consistent");
    }
    if (param.num_threads == -1) {
       param.num_threads=1;
@@ -341,10 +341,10 @@ using namespace FISTA;
   FISTA::ParamFISTA<T> param;
   param.regul = regul_from_string(name_regul);
   if (param.regul==INCORRECT_REG)
-    throw("Unknown regularization");
+    throw("ProximalFlat : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
   strncpy(param.name_regul,name_regul,param.length_names);
   if (param.regul==GRAPH || param.regul==GRAPHMULT) 
-    throw("Error: mexFistaGraph should be used instead");
+    throw("ProximalFlat : FistaGraph should be used instead");
   param.num_threads = (num_threads < 0) ? 1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;

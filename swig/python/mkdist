@@ -18,7 +18,7 @@ dir=`/bin/ls | head -1`
 tmpd=dist/$dir
 cd $cdir
 cp -p spams.h $tmpd
-./extract-docm $tmpd/spams
+./docmatlab2python $tmpd/spams
 mv $tmpd/spams.new.py $tmpd/spams.py
 cp -p ../extdata/* $tmpd
 cp -p INSTALL-package ../../doc/doc_spams.pdf $tmpd
