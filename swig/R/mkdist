@@ -5,31 +5,60 @@ die () {
     echo $*
     exit 1
 }
-ext=src;force=0
-case $1 in -f) force=1;shift;;esac
-name=spams-R
-[ $# -eq 1 ] || die "Usage: $0 [-f] work-dir"
+mktar=0
+case $1 in
+    -tar) mktar=1;shift;;
+esac
 
-wdir=$1
-dir=$wdir/$name
+ext=src;
+pkg=spams-R
+nom=spams
+/bin/rm -rf dist
+cdir=`/bin/pwd`
+wdir=$cdir/dist
+dir=$wdir/$pkg
+mkdir $wdir
 [ -d $wdir ] || die "No dir $wdir"
 [ -x ./mkdist ] || die "Il faut etre dans le directoty original"
-cur_dir=`/bin/pwd`
-[ $force -gt 0 ] && /bin/rm -rf $dir
 [ -d $dir ] && die "$dir existe deja"
 mkdir $dir
 [ -d $dir ] || die "cannot create $dir"
-rdir=$dir
+pkdir=$dir/$nom
+
 ./docmatlab2R r_spams
-./mybuild -nb
-cp INSTALL $rdir
+swig -c++ -r -o ${nom}.cpp $nom.i
+[ $? -ne 0 ] && exit 1
+mkdir -p $pkdir/R $pkdir/src
+cp -p NAMESPACE DESCRIPTION $pkdir
+cp -p ../../COPYING $pkdir/LICENSE
+cp -a man $pkdir
+rfiles="zzz.R r_$nom.R ${nom}.R"
+cfiles="$nom.h ${nom}.cpp Makevars"
+cp $rfiles $pkdir/R
+cp $cfiles $pkdir/src
+mkdir -p $pkdir/inst/test $pkdir/inst/doc $pkdir/inst/extdata
+cp -p test_*.R $pkdir/inst/test
+cp -p ../../doc/doc_spams.pdf $pkdir/inst/doc
+cp -p ../extdata/*   $pkdir/inst/extdata
+cp INSTALL-package $dir
 pngpkg=png_0.1-4.tar.gz
 if [ -r $pngpkg ]; then
-    cp -p $pngpkg $rdir
+    cp -p $pngpkg $dir
 fi
-cd pkg
-tar chf - spams | (cd $rdir;tar xf -)
+cd $pkdir/src;mkdir spams;cd spams
+for d in decomp  dictLearn  linalg  prox;do
+    mkdir $d
+    cp -p ../../../../../../../$d/*.h $d
+done
+cd $cdir
+
+if [ $mktar -eq 0 ]; then
+    /bin/rm -rf pkg/spams
+    exit 0
+fi
 cd $wdir
-tar zcf $name-`date +%Y-%m-%d`.tgz $name
+tgz=$pkg-`date +%Y-%m-%d`.tar.gz
+tar zcf $tgz $pkg
+cp -p $tgz ../$pkg.tar.gz
 exit 0
 

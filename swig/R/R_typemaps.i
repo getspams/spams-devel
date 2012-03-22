@@ -32,6 +32,11 @@ SEXP appendOutput(SEXP value,SEXP result) {
 #define myerr(msg,n) {Rf_error(msg,n); return R_NilValue;}
 #define MYADD_OUTPUT_ARG(result, value)  r_ans = appendOutput(value, R_OutputValues);
 
+%typemap(throws) const char * %{
+	Rf_error("Runtime Error %s",$1); 
+	return R_NilValue;
+%}
+
 
 /* One dimensional input arrays */
 %define %vector_typemaps(R_TYPE,R_CAST,DATA_TYPE)

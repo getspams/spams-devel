@@ -16,6 +16,11 @@ extern "C" {
 //#endif
 %include "numpy.i"
 
+%typemap(throws) const char * %{
+  PyErr_SetString(PyExc_RuntimeError, $1);
+  SWIG_fail;
+%}
+
 %define %vector_typemaps(DATA_TYPE,DATA_TYPECODE)
 
 %typecheck(SWIG_TYPECHECK_DOUBLE_ARRAY,

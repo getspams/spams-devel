@@ -253,7 +253,7 @@ using namespace FISTA;
   param.regul = regul_from_string(name_regul);
 
   if (param.regul==INCORRECT_REG) {
-      throw("Unknown regularization.\n For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+      throw("Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
   }
   strncpy(param.name_regul,name_regul,param.length_names);
   strncpy(param.name_loss,name_loss,param.length_names);

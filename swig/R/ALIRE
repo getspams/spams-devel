@@ -15,8 +15,8 @@ R CMD check pkg/spams
 R CMD INSTALL --html -l $R_LIBS pkg/spams
 
 
-tests : (mettre debug a 1 dans mybuild pour avoir spams.{tst,xtst,ztst}
-./mybuild
+tests : (option -D de mybuild pour avoir spams.{tst,xtst,ztst}
+./mybuild -D
 
 distrib:
 ./mkdist -f /tmp

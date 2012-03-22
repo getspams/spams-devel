@@ -26,6 +26,7 @@ setup (name = 'spams',
        py_modules = ['spams', 'spams_wrap', 'myscipy_rand'],
 #       scripts = ['test_spams.py'],
        data_files = [('test',['test_spams.py', 'test_decomp.py', 'test_dictLearn.py', 'test_linalg.py', 'test_prox.py', 'test_utils.py']),
+                     ('doc',['doc_spams.pdf']),
 ('extdata',['boat.png', 'lena.png'])
 ],
 )

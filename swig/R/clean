@@ -4,5 +4,5 @@ case $1 in -x) set -x;shift;;esac
 nom=spams
 /bin/rm -f r_${nom}.o ${nom}.o ${nom}.R ${nom}.cpp ${nom}.so
 /bin/rm -rf html man pkg/spams spams.Rcheck
-/bin/rm -rf lib spams_*.tar.gz
+/bin/rm -rf dist lib spams_*.tar.gz
 exit 0

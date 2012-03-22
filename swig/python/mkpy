@@ -11,7 +11,7 @@ die () {
     exit 1
 }
 usage () {
-    echo "Usage $0 [-cl][-ns][-g] nom+"
+    echo "Usage $0 [-cl][-ns][-g][-D] nom+"
     echo "  -cl : clear"
     die "   -ns : don't redo swig"
 }
@@ -27,6 +27,7 @@ while [ $# -gt 0 ]; do
 	-cl) flg_clear=1;;
 	-ns) flg_swig=0;;
 	-g) optc="-g";;
+	-D) debug=1;;
 	-*) usage;;
 	*) lst="$lst $1";;
     esac

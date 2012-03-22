@@ -7,21 +7,30 @@ Note: myscipy_rand.py supplies a random generator for sparse matrix
 
 ----------------------------------
 Interface building :
+tar zxf spams-python.tar.gz
+cd spams-python
 python setup.py build
 
-python setup.py install --prefix=<your-prefix>
+inst=<your-python-install-dir>
+python setup.py install --prefix=$inst
 
---------------------
+----------------------------------------
 Testing the interface :
-If $idir is the prefix used above :
-export PYTHONPATH=$idir/lib/python2.6/site-packages
-cd $idir/test
+export PYTHONPATH=$inst/lib/python2.6/site-packages
+cd $inst/test
 python test_spams.py -h : to get help
 python test_spams.py  : will run all the tests
 python test_spams.py linalg : test of linalg functions
 python test_spams.py name1 name2 ... : run named tests
 
------------------
+Warning : for now the python interface is only available for a subset of the functions
+	described in the documentation of SPAMS.
+toolbox linalg : all functions
+toolbox decomp : spams.SparseProject spams.Lasso 
+toolbox prox : spams.FistaFlat spams.ProximalFlat
+toolbox dictLearn : spams.TrainDL spams.TrainDL_Memory
+
+----------------------------------------
 Using the interface :
 setup your PYTHONPATH
 

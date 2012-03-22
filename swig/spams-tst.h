@@ -1,9 +1,12 @@
 #ifndef SPAMS_TST_H
 #define SPAMS_TST_H
+#include <cstdlib>
+
 /* TESTS */
 double v[6] = {1,3,5,2,4,8};
 int indptr[4] = {0,1,3,5};
 int r[5] = {0,1,2,0,1};
+
 
 Matrix<double> *tst(Matrix<double> **path,bool return_path,AbstractMatrixB<double> *D) throw(const char *)
 {

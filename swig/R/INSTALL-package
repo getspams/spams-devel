@@ -1,30 +1,33 @@
-tar zxf spams-R-xxxxxx.tgz
+tar zxf spams-R.tar.gz
 cd spams-R
 # rlib=install-directory
 export R_LIBS=$rlib
 R CMD INSTALL --html -l $R_LIBS spams
 
 This should work on linux and MacOS.
-However, if you have undefined symbols like cblas_...,
-you need to install libcblas (generally aprt of libatlas), and replace
-in spams/Makevars the line
+However, if you have undefined symbols, you can add extra libraries
+by modifying, in spams/src/Makevars the line
 EXTRA_LIBS=
-by something like
-EXTRA_LIBS= -lcblas
-In a future version of SPAMS the dependency upon libcbals will be removed.
 
 # tests
 Note : to run test_TrainDL and test_TrainDL_Memory you need the R package png
      (a version of this package can be found in the current directory).
 
-export R_LIBS=$rlib
-cd $rlib/spams/test
+We suppose that environment variable R_LIBS is set:
+cd $R_LIB/spams/test
 Rscript test_spams.R -help
 Rscript test_spams.R
+
+Warning : for now the R interface is only available for a subset of the functions
+	described in the documentation of SPAMS.
+toolbox linalg : all functions
+toolbox decomp : spams.SparseProject spams.Lasso 
+toolbox prox : spams.FistaFlat spams.ProximalFlat
+toolbox dictLearn : spams.TrainDL spams.TrainDL_Memory
 
 # Notes:
 As the C++ interface is built by Swig, I must add
 dummy documentations for 3 class S4 methods
 (I could not avoid warnings in R CMD check).
-If you have a version of R lower tah 2.13, there will remain
+If you have a version of R lower than 2.13, there will remain
 one warning with R CMD check, because SHLIB_OPENMP_CXXFLAGS must be manually defined.
