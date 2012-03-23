@@ -1177,7 +1177,7 @@ stop whenever the constraint is not satisfied anymore. The solution returned
 by the algorithm is the one obtained at the last kink of the regularization path,
 which is in practice close, but not exactly the same as the solution.
 This will be corrected in a future release of the toolbox.</P><PRE CLASS="verbatim"><FONT SIZE=2>% 
-% Usage:  U=mexSparseProject(B,param);
+% Usage:  V=mexSparseProject(U,param);
 %
 % Name: mexSparseProject
 %
@@ -2305,10 +2305,8 @@ function <CODE>pcg</CODE>, especially when the library uses the Intel Math Kerne
 </P><PRE CLASS="verbatim"><FONT SIZE=2>% 
 % Usage:   Y =mexBayer(X,offset);
 %
-% Name: mexBayer applies a Bayer pattern to an image X.
+% Description: mexBayer applies a Bayer pattern to an image X.
 %       There are four possible offsets.
-%
-% Description: 
 %
 % Inputs: X:  double m x n matrix   
 %         offset: scalar, 0,1,2 or 3   
