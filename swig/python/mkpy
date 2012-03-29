@@ -3,9 +3,21 @@ case $1 in -x) set -x;shift;;esac
 
 debug=0
 
+macos=0
+
 INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn"
+XCCFLAGS=""
+XLINKFLAGS=""
 # on MacOS, use following definition instead.
-#INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn -I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include/"
+
+if [ -d /System/Library/Frameworks ]; then  
+ # MacOs
+    macos=1
+    INC="$INC -I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include"
+    XCCFLAGS="-m32"
+    XLINKFLAGS="-m32 -framework Python"
+fi
+
 die () {
     echo "$1"
     exit 1
@@ -59,13 +71,9 @@ for nom in $lst; do
 	src=${nom}_wrap.cpp
 	obj=${nom}_wrap.o
     fi
-    $CXX -c -fPIC $optc -DUSE_BLAS_LIB -fopenmp $OPT_DBG -I/usr/include/python2.6 $INC $src
-# on MacOS, use following definition instead.
-#    $CXX -c -fPIC $optc -fopenmp $OPT_DBG -I/usr/include/python2.6 $INC $src -m32
+    $CXX -c -fPIC $optc -DUSE_BLAS_LIB -fopenmp $OPT_DBG -I/usr/include/python2.6 $INC $src $XCCFLAGS
     err=$?;[ $err -eq 0 ] || break
-    $CXX -fopenmp -shared $obj -o _${nom}_wrap.so -lstdc++ -lblas -llapack
-# on MacOS, use following definition instead.
-#    $CXX -fopenmp -shared $obj -o _${nom}_wrap.so -lstdc++ -lblas -llapack -m32 -framework Python
+    $CXX -fopenmp -shared $obj -o _${nom}_wrap.so -lstdc++ -lblas -llapack $XLINKFLAGS
     err=$?;[ $err -eq 0 ] || break
  #   /bin/rm -f $nom.o ${nom}_wrap.o
 done

@@ -23,7 +23,7 @@ def test_SparseProject():
              'thrs' : 2}
     print "\n  Projection on the l1 ball"
     tic = time.time()
-    X1 = spams.SparseProject(X,param)
+    X1 = spams.SparseProject(X,**param)
     tac = time.time()
     t = tac - tic
     print "  Time : ", t
@@ -36,7 +36,7 @@ def test_SparseProject():
     param['mode'] = 2  # projection on the Elastic-Net
     param['lambda1'] = 0.15
     tic = time.time()
-    X1 = spams.SparseProject(X,param)
+    X1 = spams.SparseProject(X,**param)
     tac = time.time()
     t = tac - tic
     print "  Time : ", t
@@ -54,7 +54,7 @@ def test_SparseProject():
     # matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
     tic = time.time()
-    X1 = spams.SparseProject(X,param)
+    X1 = spams.SparseProject(X,**param)
     tac = time.time()
     t = tac - tic
     print "  Time : ", t
@@ -86,13 +86,13 @@ def test_Lasso():
     # parameter of the optimization procedure are chosen
 #param.L=20; # not more than 20 non-zeros coefficients (default: min(size(D,1),size(D,2)))
     param = {
-        'lambda' : 0.15, # not more than 20 non-zeros coefficients
+        'lambda1' : 0.15, # not more than 20 non-zeros coefficients
         'numThreads' : -1, # number of processors/cores to use; the default choice is -1
         # and uses all the cores of the machine
         'mode' : 2}        # penalized formulation
 
     tic = time.time()
-    alpha = spams.Lasso(X,D,param,return_reg_path = False)
+    alpha = spams.Lasso(X,D = D,return_reg_path = False,**param)
     tac = time.time()
     t = tac - tic
     print "%f signals processed per second\n" %(float(X.shape[1]) / t)
@@ -102,7 +102,7 @@ def test_Lasso():
     X = np.asfortranarray(np.random.normal(size=(64,1)))
     D = np.asfortranarray(np.random.normal(size=(64,10)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
-    (alpha,path) = spams.Lasso(X,D,param,return_reg_path = True)
+    (alpha,path) = spams.Lasso(X,D = D,return_reg_path = True,**param)
     return None
 
 def test_LassoMask():
