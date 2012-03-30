@@ -67,7 +67,7 @@ sub get_doc {
 	    $key = $x;
 	    if ($x eq "Author") {
 		push(@$tmp,"Julien MAIRAL, 2010 (spams, matlab interface and documentation);");
-		push(@$tmp,"        Jean-Paul CHIEZE, 2011 (R interface)");
+		push(@$tmp,"        Jean-Paul CHIEZE, 2011-2012 (R interface)");
 		$$doc{$x} = $tmp;
 		last;
 	    }
@@ -83,12 +83,17 @@ sub get_doc {
 	    s/(param\.[^\s:]+)\s*:/$1/;
 	    if($key eq "Param") {
 		s/^(\s+)param\.([^\s]+)\s/$1$2: /;
-	    } else {
-		s/param\.//g;
 	    }
-	    s/Matlab\s+function\s+pcg/R function solve/;
-	    s/Matlab\s+expression\s+XAt[^\s\;]+/R expression/;
-	    s/Matlab/R/;
+	    s/param\.//g;
+	    if($r_mode) {
+		s/Matlab\s+function\s+pcg/R function solve/;
+		s/Matlab\s+expression\s+XAt[^\s\;]+/R expression/;
+		s/Matlab/R/;
+	    } else {
+		s/Matlab\s+function\s+pcg/python function solve/;
+		s/Matlab\s+expression\s+XAt[^\s\;]+/python expression/;
+		s/Matlab/python/;
+	    }
 	    if($key eq "Usage") {
 		s/\s*=\s*/ <- /;
 	    }

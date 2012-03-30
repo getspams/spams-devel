@@ -140,7 +140,7 @@ spams.SparseProject <- function(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.
 # (A,path) = Lasso(X,D,param,return_reg_path = True):
 # A = Lasso(X,Q,q,param,return_reg_path = False):
 # (A,path) = Lasso(X,Q,q,param,return_reg_path = True):
-spams.Lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = True,L= -1,lambda1= NULL,lambda2= 0.,
+spams.Lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -1,lambda1= NULL,lambda2= 0.,
                         mode= 'PENALTY',pos= FALSE,ols= FALSE,numThreads= -1,
                  length_path= -1,verbose=TRUE,cholesky= FALSE) {
 #  require('Matrix')
