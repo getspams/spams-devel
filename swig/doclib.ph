@@ -66,7 +66,7 @@ sub get_doc {
 	    $tmp = [($_)];
 	    $key = $x;
 	    if ($x eq "Author") {
-		push(@$tmp,"Julien MAIRAL, 2010 (spams, matlab interface and documentation)");
+		push(@$tmp,"Julien MAIRAL, 2010 (spams, matlab interface and documentation);");
 		push(@$tmp,"        Jean-Paul CHIEZE, 2011 (R interface)");
 		$$doc{$x} = $tmp;
 		last;
@@ -100,18 +100,29 @@ sub get_doc {
 }
 
 sub get_modifs {
-    my($f,$modifs) = @_;
+    my($r_mode,$f,$modifs) = @_;
     my $inblock = 0;
     my ($tmp,$key,$op);
+    my $expr = "";
     open(IN,"<$f") || return;
     while(<IN>) {
 	chomp;
 	(/^\s*$/) && next;
 	(/^\s*\#/) && next;
+	if(s/^\[([PR])\]//) {  # this line is only for R or python
+	    my $x = ($1 eq "P") ? 0 : 1;
+	    ($x == $r_mode) || next;
+	}
+	if(! $r_mode) { s/<-/=/;}
 	if($inblock) {
 	    if(/^end/) {
 		$inblock = 0;
 		$$modifs{$key} = { 'op' => $op, 'data' => $tmp};
+		if("$expr") {
+		    my $x = $$modifs{$key};
+		    $$x{'subst'} = $expr;
+		    $expr = "";
+		}
 		next;
 	    }
 	    push(@$tmp,$_);
@@ -126,7 +137,7 @@ sub get_modifs {
     close(IN);
 }
 
-# try to split Description into short description end detail
+# try to split Description into short description and detail
 sub split_description {
     my($doc) = @_;
     my $tmp = $$doc{'Description'};
@@ -161,26 +172,43 @@ sub apply_modifs {
 	    (defined($$format{$key})) || next;
 	    my $lst = (defined($$doc{$key})) ? $$doc{$key} : [()];
 	    if ( $op eq "addfirst") {
+		die "Addfirst not implemented\n";
 	    } elsif ( $op eq "addlast") {
 		push(@$lst,@$tmp);
 		$$doc{$key} = $lst;
+	    } elsif ( $op eq "subst") {
+		my $e = $$tmp[0];
+		$e =~ s/^\s+//;
+		for(my$i = 0;$i <= $#$lst;$i++) {
+		    my $s = $$lst[$i];
+		    eval("\$s =~ $e");
+		    $$lst[$i] = $s;
+		}
 	    } else {
-		print "Unknown op $op\n";
+		die "Unknown op $op\n";
 	    }
 	}
     }
 }
 
+# IN: $r_mode = 0/1 for python/R
+# $mlab_prog = prog name in matlab
+# $myprog = prog name for python or R
+# $doc : empty doc hash table
+# $format : hash table describing format of the different parts of doc
+# Out : $doc of the function
 sub prepare_doc {
-    my($mlab_prog,$myprog,$doc,$format) = @_;
+    my($r_mode,$mlab_prog,$myprog,$doc,$format) = @_;
     my $f = "$main::mlab_dir/mex$mlab_prog.m";
-    my $fref = "./refman/$myprog.in";
+    my $x = $myprog;
+    $x =~ s/^spams\.//;
+    my $fref = "./refman/$x.in";
     my %modifs = ();
-    get_doc($f,1,$mlab_prog,$myprog,$doc) || return;
-    get_modifs($fref,\%modifs);
+    get_doc($f,$r_mode,$mlab_prog,$myprog,$doc) || return;
+    split_description($doc);
+    get_modifs($r_mode,$fref,\%modifs);
     # apply modifs
     apply_modifs($doc,$format,\%modifs);
-    split_description($doc);
 }
 
     

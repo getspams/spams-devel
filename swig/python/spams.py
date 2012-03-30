@@ -7,20 +7,6 @@ import spams_wrap
 import numpy as np
 import scipy.sparse as ssp
 
-##################################################
-# tool to handle param structures
-def __param_struct(param_list,params_in):
-    params = []
-    for (k,defv) in param_list:
-        if k in params_in:
-            p = params_in[k]
-        else:
-            p = defv
-        if p == None:
-            raise ValueError("ERROR: param %s must be initialized" %k)
-        params.append(p)
-    return params
-
 ###########  linalg ##############
 
 def Sort(X,mode=True):
@@ -105,7 +91,7 @@ def  SparseProject(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,lambda3 = 0
 #    paramlist = [('thrs',1.0),('mode',1),('lambda1',0.0),('lambda2',0.0),('lambda3',0.0),('pos',0),('numThreads',-1)]
     V = np.empty((m,n),dtype=U.dtype,order="FORTRAN")
     params = (thrs,mode,lambda1,lambda2,lambda3,pos,numThreads)
-    spams_wrap.sparseProject(U,V,thrs,mode,lambda1,lambda2,lambda3,pos,numThreads);
+    spams_wrap.sparseProject(U,V,thrs,mode,lambda1,lambda2,lambda3,pos,numThreads)
     return V
 
 # A = Lasso(X,D,param,return_reg_path = False):

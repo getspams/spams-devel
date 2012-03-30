@@ -1,9 +1,12 @@
 #!/usr/bin/perl -w
 use strict;
 
+require "doclib.ph";
+
 # fabrique dans man les docs spams.<nom>.Rd, a partir des mex*,
 # pour les fonctions definies dans un fichier R (r_spams.R par ex)
-my $dir = "../../src_release";
+my $dir = $main::mlab_dir;
+
 my $indent = "    ";
 sub usage {
     print "Usage : $0 R-filename\n",
@@ -16,8 +19,6 @@ system "rm -rf man"; mkdir "man";
 (-d "man") || die "No dir man!\n";
 ##(-d "html") || die "No dir html!\n";
 
-my ($x,$prog);
-my @progs = ();
 
 my $file = "";
 while($#ARGV >= 0) {
@@ -27,24 +28,23 @@ while($#ARGV >= 0) {
     $file = $_;
 }
 ("$file") || usage();
-open(IN,"<$file.R") || die "$file.R open err $!\n";
-while(<IN>) {
-    chomp;
-    if(/^spams\.([^\s<]+)\s*<-/) {
-	$prog = $1;
-	push(@progs,$prog);
-    }
-}
-close(IN);
 
+my %progs = ();
+my @indx = ();
+my @spams = ();
 
-@main::keys = ('Name','Description','Usage','Inputs','detail','Output','Author','Note','Examples');
-$main::rdformat = {
+if(! ($file =~ /\.R$/)) {$file .= ".R";}
+read_spams($file,\&find_Rdef,\@indx,\%progs,\@spams);
+
+@main::keys = ('Name','Description','Usage','Inputs','Param','detail','Output','Author','Note','Examples');
+
+my $rdformat = {
     'Name' => {'tag' => 'title'},
     'Description' => {'tag' => 'description'},
     'Usage' => {'tag' => 'usage'},
     'Inputs' => {'tag' => 'arguments','prog' => \&parse_args},
     'detail' => {'tag' => 'details', 'optional' => 1,'prog' => \&set_verb},
+    'Param' => {'tag' => 'Kwargs', 'optional' => 1,'prog' => \&parse_args},
     'Output' => {'tag' => 'value','prog' => \&parse_args},
     'Author' => {'tag' => 'author'},
     'Note' => {'tag' => 'note', 'optional' => 1},
@@ -52,18 +52,13 @@ $main::rdformat = {
 };
 ##@progs = ("SparseProject");
 
-foreach $prog (@progs) {
-    my $f = "$dir/mex$prog.m";
-    my $fref = "./refman/spams.$prog.in";
+foreach my $i (@indx) {
+    my $mlab_prog = $progs{$i};
+    my $myprog = "spams.$mlab_prog";
     my %doc = ();
-    my %modifs = ();
-    get_doc($f,$prog,\%doc) || next;
-    get_modifs($fref,\%modifs);
-    # apply modifs
-    apply_modifs(\%doc,\%modifs);
-    split_description(\%doc);
-    print "++ $prog\n";
-    write_man("man/spams.$prog.Rd",$prog,\%doc);
+    prepare_doc(1,$mlab_prog,$myprog,\%doc,$rdformat);
+    print "++ $myprog\n";
+    write_man("man/$myprog.Rd",$myprog,\%doc,$rdformat);
     # make html version
 ##    system "R CMD Rdconv -t html man/spams.$prog.Rd -o html/spams.$prog.html";
 #    print_man("man/spams.$prog.Rd",$prog,\%doc);
@@ -73,146 +68,27 @@ system "cp ./refman/*.Rd man";
 
 exit 0;
 
-sub get_doc {
-    my($f,$prog,$doc) = @_;
-    if(! open(IN,"<$f") ) {
-	print "ERR $f open err $!\n";
-	return 0;
-    }
-    my $stat = 0;
-    my $tmp = [()];
-    my $key = "";
-    while(<IN>) {
-	chomp;
-	s/mex$prog/spams.$prog/g;
-	if(! $stat) {
-	    (s/^%\s*Usage\s*:\s*//) || next;
-	    $stat = 1;
-	    s/\s*=\s*/ <- /;
-	    push(@$tmp,$_);
-	    $key = 'Usage';
-	    next;
+# $flag : 0 if search for begining of def
+# out : ($prog,$found) 
+#     $prog : progname if 1st line of def, "" else
+# $found : 0 : not a function def, -1 : unfinished def, 1 = end of def
+sub find_Rdef {
+    my ($s,$flag) = @_;
+    my $prog = "";
+    my $found = 0;
+    if(! $flag) {
+	if($s =~ /^spams\.([^\s<]+)\s*<-/) {
+	    $prog = $1;
+	    $found = -1;
+	    if(/\{\s*$/) {$found = 1;}
 	}
-	if(s/^%\s([^\s:]+)\s*:\s*//) {
-	    my $x = $1;
-	    my $i = $#$tmp;
-	    # remove last empty lines
-	    while($i >= 0) {
-		($$tmp[$i] =~ /^\s*$/) || last;
-		$i--;
-	    }
-	    $#$tmp = $i;
-	    $$doc{$key} = $tmp;
-	    $tmp = [($_)];
-	    $key = $x;
-	    if ($x eq "Author") {
-		push(@$tmp,"Julien MAIRAL, 2010 (spams, matlab interface and documentation)");
-		push(@$tmp,"        Jean-Paul CHIEZE, 2011 (R interface)");
-		$$doc{$x} = $tmp;
-		last;
-	    }
-	} else {
-	    s/^%\s?//;
-	    s/param\.([^\s=,]+)/param[\'$1\']/g;
-	    s/Matlab\s+function\s+pcg/R function solve/;
-	    s/Matlab\s+expression\s+XAt[^\s\;]+/R expression/;
-	    s/Matlab/R/;
-	    if($key eq "Usage") {
-		s/\s*=\s*/ <- /;
-	    }
-	    push(@$tmp,$_);
-	}
+    } else {
+	$found = -1;
+	if(/\{\s*$/) {$found = 1;}
     }
-    close(IN);
-    1;
-}
-sub get_modifs {
-    my($f,$modifs) = @_;
-    my $inblock = 0;
-    my ($tmp,$key,$op);
-    open(IN,"<$f") || return;
-    while(<IN>) {
-	chomp;
-	(/^\s*$/) && next;
-	(/^\s*\#/) && next;
-	if($inblock) {
-	    if(/^end/) {
-		$inblock = 0;
-		$$modifs{$key} = { 'op' => $op, 'data' => $tmp};
-		next;
-	    }
-	    push(@$tmp,$_);
-	} else {
-	    (/^begin\s+([^\s]+)\s+([^\s]+)$/) || next;
-	    $op = $1;
-	    $key = $2;
-	    $tmp = [()];
-	    $inblock = 1;
-	}
-    }
-    close(IN);
-}
-sub apply_modifs {
-    my($doc,$modifs) = @_;
-    my($op,$tmp);
-    while(my ($key,$x) = each(%$modifs)) {
-	$op = $$x{'op'};
-	$tmp = $$x{'data'};
-	if($op eq "repl") {
-	    $$doc{$key} = $tmp;
-	
-	} else {
-	    (defined($$main::rdformat{$key})) || next;
-	    my $lst = (defined($$doc{$key})) ? $$doc{$key} : [()];
-	    if ( $op eq "addfirst") {
-	    } elsif ( $op eq "addlast") {
-		push(@$lst,@$tmp);
-		$$doc{$key} = $lst;
-	    } else {
-		print "Unknown op $op\n";
-	    }
-	}
-    }
+    return($prog,$found);
 }
 
-# try to split Description into short description end detail
-sub split_description {
-    my($doc) = @_;
-    my $tmp = $$doc{'Description'};
-    my $det = [()];
-    ($#$tmp < 3) && return;
-    for(my $i = 0;$i <= $#$tmp;$i++) {
-	my $s = $$tmp[$i];
-	if(($s =~ /^\s*$/) || ($s =~ /\.$/)) {
-	    my $j = $i;
-	    $i++;
-	    while($i <= $#$tmp) {
-		push(@$det,$$tmp[$i++]);
-	    }
-	    $$doc{'detail'} = $det;
-	    $#$tmp = $j;
-	    last;
-	}
-		
-    }
-}
-
-
-sub print_man {
-    my($f,$prog,$doc) = @_;
-    my($key,$i,$tmp);
-    print "** $f\n";
-    for($i = 0;$i <= $#main::keys;$i++) {
-	$key = $main::keys[$i];
-	if(! defined($$doc{$key})) {
-	    ($key eq "Note") && next;
-	    print STDERR "!! $prog : $key MISSING\n";
-	    next;
-	}
-	$tmp = $$doc{$key};
-	print "$key : ", join("\n",@$tmp), "\n";
-    }
-}
 
 # format value
 sub parse_value {
@@ -267,13 +143,19 @@ sub parse_args {
 }
 
 sub write_man {
-    my($f,$prog,$doc) = @_;
+    my($f,$prog,$doc,$rdformat) = @_;
     my($rdf,$i,$key,$tmp);
     open(OUT,">$f") || die "$f create err $!\n";
-    print OUT "\\name{spams.$prog}\n\\alias{spams.$prog}\n";
+    print OUT "\\name{$prog}\n\\alias{$prog}\n";
+    if(defined($$doc{'Param'})) {
+	my $docp = $$doc{'Param'};
+	my $doci = $$doc{'Inputs'};
+	push(@$doci,@$docp);
+	undef($$doc{'Param'});
+    }
     foreach $key (@main::keys) {
-	(defined($$main::rdformat{$key})) || next;
-	$rdf = $$main::rdformat{$key};
+	(defined($$rdformat{$key})) || next;
+	$rdf = $$rdformat{$key};
 	if(! defined($$doc{$key})) {
 	    if(! defined($$rdf{'optional'})) {
 		print STDERR "!! $prog : $key MISSING.\n";

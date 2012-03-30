@@ -72,7 +72,7 @@ foreach $i (@indx) {
     my $mlab_prog = $progs{$i};
     my $myprog = $mlab_prog;
     my %doc = ();
-    prepare_doc($mlab_prog,$myprog,\%doc,$docformat);
+    prepare_doc(0,$mlab_prog,$myprog,\%doc,$docformat);
     print "$i : $myprog\n";
     while($j <= $i) {
 	$_ = $spams[$j++];
