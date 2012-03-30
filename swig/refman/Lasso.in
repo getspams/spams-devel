@@ -1,0 +1,46 @@
+begin repl Usage
+A <- spams.Lasso(X,D = D, Q = NULL,q = NULL,return_reg_path = FALSE,L= -1,lambda1= NULL,lambda2= 0.,
+                        mode= 'PENALTY',pos= FALSE,ols= FALSE,numThreads= -1,
+                 length_path= -1,verbose=TRUE,cholesky= FALSE)
+list(A,path) <- spams.Lasso(X,D = D, Q = NULL,q = NULL,return_reg_path = TRUE, ...)
+A <- spams.Lasso(X,D = NULL,Q = Q,q = q,return_reg_path = FALSE,....)
+list(A,path) <- spams.Lasso(X,D = NULL,Q = Q,q = q,return_reg_path = TRUE, ...)
+end
+begin addlast Inputs
+return_reg_path:     
+[R]		      if true the function will return 2 matrices in a list.
+[P]                   if true the function will return a tuple of matrices.
+end
+begin addlast Output
+#path:        regularization path
+[P]     A = spams.Lasso(X,return_reg_path = False,...)
+[P]	(A,path) = spams.Lasso(X,return_reg_path = True,...)
+[R]      A <- spams.Lasso(X,return_reg_path = False,...)
+[R]      v <- spams.Lasso(X,return_reg_path = TRUE,...)
+[R]      A <- v[[1]]
+[R]      path <- v[[2]]
+end
+begin subst detail
+[P] s/\s*if\s.*called this way.*$/    If the function is called this way spams.Lasso(X,D = D, Q = None,...),/
+[R] s/\s*if\s.*called this way.*$/    If the function is called this way spams.Lasso(X,D = D, Q = NULL,...),/
+end
+
+[R]begin addlast Examples
+      m <- 5;n <- 10;nD <- 5
+      set.seed(0)
+      X = matrix(rnorm(m * n),nrow = m,ncol = n,byrow = FALSE)
+      X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+      D = matrix(rnorm(m * nD),nrow = m,ncol = nD,byrow = FALSE)
+      D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+      alpha = spams.Lasso(X,D = D,param,return_reg_path = FALSE,lambda1 = 0.15)
+end
+[P]begin addlast Examples
+      import numpy as np
+      m = 5;n = 10;nD = 5
+      np.random.seed(0)
+      X = np.asfortranarray(np.random.normal(size=(m,n)))
+      X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
+      D = np.asfortranarray(np.random.normal(size=(100,200)))
+      D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+      alpha = spams.Lasso(X,D = D,return_reg_path = FALSE,lambda1 = 0.15)
+end

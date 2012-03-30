@@ -1,0 +1,24 @@
+begin repl Usage
+D <- spams.TrainDL(X,return_model= FALSE,model= NULL,D = matrix(c(0.),nrow = 0,ncol=0),numThreads = -1,batchsize = -1,
+            K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
+                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='')
+list(D,model) <- spams.TrainDL(X,return_model= TRUE,model= NULL,...)
+end
+begin addlast Inputs
+return_model:     
+		      if true the function will return the model
+		      as a named list ('A' = A, 'B' = B, 'iter' = n)
+end
+begin repl Output
+D:     double m x p matrix   (dictionary)
+model:  the model as A B iter
+[P]	D = spams.Traindl(X,return_model = False,...)
+[P]	(D,model) = spams.Traindl(X,return_model = True,...)
+[R]	D <- spams.Traindl(X,return_model = FALSE,...)
+[R]      v <- spams.TrainDL(X,return_model = TRUE,...)
+[R]      D <- v[[1]]
+[R]      model <- v[[2]]
+[R]      A = model[['A']]
+[R]      B = model[['B']]
+[R]      iter = model[['iter']]
+end
