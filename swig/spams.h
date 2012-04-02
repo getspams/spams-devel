@@ -100,7 +100,7 @@ throw(const char *)
   int K = D->n();
   int nD = D->m();
   if (n != nD)
-    throw("Lasso : incompatible matrix dimensions");
+    throw("lasso : incompatible matrix dimensions");
   if(L < 0) L = K;
   if(length_path < 0) length_path = 4 * L;
   if (L> n && !(mode == PENALTY && isZero(constraint) && !pos && lambda2 > 0)) {
@@ -141,12 +141,12 @@ throw(const char *)
   int K1 = Q->m();
   int K2 = Q->n();
   if(K1 != K2)
-    throw("Lasso : Q must be square");
+    throw("lasso : Q must be square");
   int K = K1;
   int K3 = q->m();
   int M2 = q->n();
   if (K1 != K3 || M != M2)
-    throw("Lasso : incompatible matrix dimensions");
+    throw("lasso : incompatible matrix dimensions");
 
   if(L < 0) L = K1;
   if(length_path < 0) length_path = 4 * L;
@@ -244,7 +244,7 @@ using namespace FISTA;
   param.max_iter_backtracking = max_iter_backtracking;
   param.loss = loss_from_string(name_loss);
   if (param.loss==INCORRECT_LOSS)
-    throw("FistaFlat: Unknown loss");
+    throw("fistaFlat: Unknown loss");
   param.compute_gram = compute_gram;
   param.lin_admm = lin_admm;
   param.admm = admm;
@@ -253,7 +253,7 @@ using namespace FISTA;
   param.regul = regul_from_string(name_regul);
 
   if (param.regul==INCORRECT_REG) {
-      throw("FistaFlat: Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+      throw("fistaFlat: Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
   }
   strncpy(param.name_regul,name_regul,param.length_names);
   strncpy(param.name_loss,name_loss,param.length_names);
@@ -264,7 +264,7 @@ using namespace FISTA;
   if(param.log = log) {
     int n = strlen(logName);
     if(n == 0) 
-      throw("FistaFlat : missing field logName");
+      throw("fistaFlat : missing field logName");
     param.logName = new char[n+1];
     strcpy(param.logName,logName);
   }
@@ -274,7 +274,7 @@ using namespace FISTA;
 
   if(is_inner_weights) {
     if(inner_weights == NULL)
-      throw("FistaFlat : missing inner_heights ");
+      throw("fistaFlat : missing inner_heights ");
     param.inner_weights = inner_weights->rawX();
   }
 
@@ -284,22 +284,22 @@ using namespace FISTA;
   param.transpose = transpose;
 
   if ((param.loss != CUR && param.loss != MULTILOG) && (pAlpha != p || nAlpha != n || mD != m)) { 
-      throw("FistaFlat : Argument sizes are not consistent");
+      throw("fistaFlat : Argument sizes are not consistent");
    } else if (param.loss == MULTILOG) {
     Vector<T> Xv;
     X->toVect(Xv);
     int maxval = static_cast<int>(Xv.maxval());
     int minval = static_cast<int>(Xv.minval());
     if (minval != 0)
-      throw("FistaFlat : smallest class should be 0");
+      throw("fistaFlat : smallest class should be 0");
     if (maxval*X->n() > nAlpha || mD != m) {
       cerr << "Number of classes: " << maxval << endl;
       //cerr << "Alpha: " << pAlpha << " x " << nAlpha << endl;
          //cerr << "X: " << X.m() << " x " << X.n() << endl;
-      throw("FistaFlat : Argument sizes are not consistent");
+      throw("fistaFlat : Argument sizes are not consistent");
     }
   } else if (param.loss == CUR && (pAlpha != D->n() || nAlpha != D->m())) {
-      throw("FistaFlat : Argument sizes are not consistent");
+      throw("fistaFlat : Argument sizes are not consistent");
    }
    if (param.num_threads == -1) {
       param.num_threads=1;
@@ -309,9 +309,9 @@ using namespace FISTA;
    }
 
    if (param.regul==GRAPH || param.regul==GRAPHMULT) 
-    throw("Error: mexFistaGraph should be used instead");
+    throw("Error: fistaGraph should be used instead");
   if (param.regul==TREE_L0 || param.regul==TREEMULT || param.regul==TREE_L2 || param.regul==TREE_LINF) 
-      throw("Error: mexFistaTree should be used instead");
+      throw("Error: fistaTree should be used instead");
 
   Matrix<T> *duality_gap = new Matrix<T>();
   FISTA::solver((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*duality_gap));
@@ -341,10 +341,10 @@ using namespace FISTA;
   FISTA::ParamFISTA<T> param;
   param.regul = regul_from_string(name_regul);
   if (param.regul==INCORRECT_REG)
-    throw("ProximalFlat : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+    throw("proximalFlat : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
   strncpy(param.name_regul,name_regul,param.length_names);
   if (param.regul==GRAPH || param.regul==GRAPHMULT) 
-    throw("ProximalFlat : FistaGraph should be used instead");
+    throw("proximalFlat : FistaGraph should be used instead");
   param.num_threads = (num_threads < 0) ? 1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
@@ -408,19 +408,19 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   if (in_memory) return_model = false;
   if (batch_size < 0) batch_size = 256 * (num_threads + 1);
   if (iter < 0)
-    throw("TrainDL : bad iter param\n");
+    throw("trainDL : bad iter param\n");
   int n = X->m();
   int M = X->n();
   Trainer<T>* trainer;
   if(D1->n() == 0) { // D1 is not given
     if (K < 0)
-      throw("TrainDL : bad parameter K\n");
+      throw("trainDL : bad parameter K\n");
     trainer = new Trainer<T>(K,batch_size,num_threads);
   } else {
     int nD = D1->m();
     K = D1->n();
     if (n != nD)
-      throw("TrainDL : sizes of D are not consistent\n");
+      throw("trainDL : sizes of D are not consistent\n");
     if ((m_A->n() == 0) || in_memory) {
       trainer = new Trainer<T>((Matrix<T> &)(*D1),batch_size,num_threads);
     } else {  // model given
@@ -449,7 +449,7 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   if(param.log = log) {
     int n = strlen(logName);
     if(n == 0) 
-      throw("TrainDL : missing field logName");
+      throw("trainDL : missing field logName");
     param.logName = new char[n+1];
     strcpy(param.logName,logName);
   }

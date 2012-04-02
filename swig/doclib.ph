@@ -4,7 +4,63 @@ $main::mlab_dir = "../../src_release";
 
 my %undocumented = ("mult",1,"im2col_sliding",1);
 
+%main::conv_names = (
+    "Sort", "sort",
+    "CalcAAt", "calcAAt",
+    "CalcXAt", "calcXAt",
+    "CalcXY", "calcXY",
+    "CalcXYt", "calcXYt",
+    "CalcXtY", "calcXtY",
+    "Bayer", "bayer",
+    "ConjGrad", "conjGrad",
+    "InvSym", "invSym",
+    "Normalize", "normalize",
+    "SparseProject", "sparseProject",
+    "Lasso", "lasso",
+    "FistaFlat", "fistaFlat",
+    "ProximalFlat", "proximalFlat",
+    "TrainDL", "trainDL",
+    "TrainDL_Memory", "trainDL_Memory",
+    "CD", "cd",
+    "LassoMask", "lassoMask",
+    "LassoWeighted", "lassoWeighted",
+    "OMP", "omp",
+    "OMPMask", "ompMask",
+    "SOMP", "somp",
+    "FistaGraph", "fistaGraph",
+    "FistaTree", "fistaTree",
+    "ProximalGraph", "proximalGraph",
+    "ProximalTree", "proximalTree",
+);
 
+%main::tomlab = ();
+while( my($k,$v) = each(%main::conv_names)) {
+    $main::tomlab{$v} = $k;
+}
+
+sub mlab_name {
+    my($name) = @_;
+    my $mlab_name = "";
+    if(defined($main::tomlab{$name})) {
+	$mlab_name = $main::tomlab{$name};
+    } else {
+	print STDERR "Cannot convert name <$name>\n";
+	$mlab_name = $name;
+    }
+    $mlab_name;
+}
+
+sub newname {
+    my($mlab_name) = @_;
+    my $name = "";
+    if(defined($main::conv_names{$mlab_name})) {
+	$name = $main::conv_names{$mlab_name};
+    } else {
+	print STDERR "Cannot convert name <$mlab_name>\n";
+	$name = $mlab_name;
+    }
+    $name;
+}
 sub read_spams {
     my($file,$find_func,$indx,$progs,$spams) = @_;
     open(IN,"<$file") || die "$file open err $!\n";
@@ -42,9 +98,15 @@ sub get_doc {
     my $stat = 0;
     my $tmp = [()];
     my $key = "";
+    my $prefix = $r_mode ? "spams." : "";
     while(<IN>) {
 	chomp;
-	s/mex$mlab_prog/$myprog/g;
+	if(/mex([A-Z][_A-z]+)/) {
+	    my $s = $1;
+	    (defined($main::conv_names{$s}) ) || die "Inconnu : $s\n";
+	    my $s1 = $main::conv_names{$s};
+	    s/mex$s/$prefix$s1/g;
+	}
 	if(! $stat) {
 	    (s/^%\s*Usage\s*:\s*//) || next;
 	    $stat = 1;
@@ -56,18 +118,20 @@ sub get_doc {
 	if(s/^%\s([^\s:]+)\s*:\s*//) {
 	    my $x = $1;
 	    my $i = $#$tmp;
-	    # remove last empty lines
-	    while($i >= 0) {
-		($$tmp[$i] =~ /^\s*$/) || last;
-		$i--;
-	    }
-	    $#$tmp = $i;
+#	    # remove last empty lines
+#	    while($i >= 0) {
+#		($$tmp[$i] =~ /^\s*$/) || last;
+#		$i--;
+#	    }
+#	    $#$tmp = $i;
 	    $$doc{$key} = $tmp;
 	    $tmp = [($_)];
 	    $key = $x;
 	    if ($x eq "Author") {
-		push(@$tmp,"Julien MAIRAL, 2010 (spams, matlab interface and documentation);");
-		push(@$tmp,"        Jean-Paul CHIEZE, 2011-2012 (R interface)");
+		$tmp = [()];
+		push(@$tmp,"Julien MAIRAL (spams, matlab interface and documentation);");
+		push(@$tmp,"Jean-Paul CHIEZE (R interface)");
+		push(@$tmp,"");
 		$$doc{$x} = $tmp;
 		last;
 	    }
@@ -82,7 +146,8 @@ sub get_doc {
 	    s/param\.lambda([^\w])/param.lambda1$1/;
 	    s/(param\.[^\s:]+)\s*:/$1/;
 	    if($key eq "Param") {
-		s/^(\s+)param\.([^\s]+)\s/$1$2: /;
+		s/^\s*param\.([\w]+)\s*,\s*param\.([\w]+)\s*/    $1, $2: /;
+		s/^\s*param\.([^\s]+)\s/    $1: /;
 	    }
 	    s/param\.//g;
 	    if($r_mode) {
@@ -205,9 +270,7 @@ sub apply_modifs {
 sub prepare_doc {
     my($r_mode,$mlab_prog,$myprog,$doc,$format) = @_;
     my $f = "$main::mlab_dir/mex$mlab_prog.m";
-    my $x = $myprog;
-    $x =~ s/^spams\.//;
-    my $fref = "./refman/$x.in";
+    my $fref = "./refman/$myprog.in";
     my %modifs = ();
     get_doc($f,$r_mode,$mlab_prog,$myprog,$doc) || return;
     split_description($doc);
