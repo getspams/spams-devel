@@ -25,7 +25,7 @@ def _extract_lasso_param(f_param):
             l_param[x] = f_param[x]
     return l_param
     
-def test_TrainDL():
+def test_trainDL():
     img_file = '../extdata/boat.png'
     try:
         img = Image.open(img_file)
@@ -51,7 +51,7 @@ def test_TrainDL():
 
     ########## FIRST EXPERIMENT ###########
     tic = time.time()
-    D = spams.TrainDL(X,**param)
+    D = spams.trainDL(X,**param)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
@@ -59,7 +59,7 @@ def test_TrainDL():
     ##param['approx'] = 0
     print 'Evaluating cost function...'
     lparam = _extract_lasso_param(param)
-    alpha = spams.Lasso(X,D = D,**lparam)
+    alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     # display ????
@@ -73,12 +73,12 @@ def test_TrainDL():
     X2 = X[:,X.shape[1]/2 -1:]
     param['iter'] = 500
     tic = time.time()
-    (D,model) = spams.TrainDL(X1,return_model = True,**param)
+    (D,model) = spams.trainDL(X1,return_model = True,**param)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f\n' %t
     print 'Evaluating cost function...'
-    alpha = spams.Lasso(X,D = D,**lparam)
+    alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
@@ -87,12 +87,12 @@ def test_TrainDL():
     param2 = param
     param2['D'] = D
     tic = time.time()
-    (D,model) = spams.TrainDL(X2,return_model = True,model = model,**param2)
+    (D,model) = spams.trainDL(X2,return_model = True,model = model,**param2)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
     print 'Evaluating cost function...'
-    alpha = spams.Lasso(X,D = D,**lparam)
+    alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
@@ -107,12 +107,12 @@ def test_TrainDL():
     param['modeD'] = 1
 
     tic = time.time()
-    D = spams.TrainDL(X,**param)
+    D = spams.trainDL(X,**param)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
     print 'Evaluating cost function...'
-    alpha = spams.Lasso(X,D = D,**lparam)
+    alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
@@ -125,12 +125,12 @@ def test_TrainDL():
     param['modeD'] = 3
 
     tic = time.time()
-    D = spams.TrainDL(X,**param)
+    D = spams.trainDL(X,**param)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
     print 'Evaluating cost function...'
-    alpha = spams.Lasso(X,D = D,**lparam)
+    alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
@@ -138,7 +138,7 @@ def test_TrainDL():
     
     return None
 
-def test_TrainDL_Memory():
+def test_trainDL_Memory():
     img_file = '../extdata/lena.png'
     try:
         img = Image.open(img_file)
@@ -166,14 +166,14 @@ def test_TrainDL_Memory():
 
     ############# FIRST EXPERIMENT  ##################
     tic = time.time()
-    D = spams.TrainDL_Memory(X,**param)
+    D = spams.trainDL_Memory(X,**param)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
 
     print 'Evaluating cost function...'
     lparam = _extract_lasso_param(param)
-    alpha = spams.Lasso(X,D = D,**lparam)
+    alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
@@ -181,12 +181,12 @@ def test_TrainDL_Memory():
 
     ############# SECOND EXPERIMENT  ##################
     tic = time.time()
-    D = spams.TrainDL(X,**param)
+    D = spams.trainDL(X,**param)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
     print 'Evaluating cost function...'
-    alpha = spams.Lasso(X,D = D,**lparam)
+    alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
@@ -197,6 +197,6 @@ def test_TrainDL_Memory():
 
 
 tests = {
-    'TrainDL' : test_TrainDL,
-    'TrainDL_Memory' : test_TrainDL_Memory,
+    'trainDL' : test_trainDL,
+    'trainDL_Memory' : test_trainDL_Memory,
 }

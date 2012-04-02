@@ -5,13 +5,13 @@ require "doclib.ph";
 
 my $dir = $main::mlab_dir;
 sub usage {
-    print "Usage : $0 file.py\n";
+    print "Usage : $0 [-sphinx] file.py\n";
     exit 1;
 }
 #@main::keys = ('Usage','Name','Description','detail','Inputs','Output','Author','Note','Examples');
 @main::keys = ('Description','detail','Inputs','Param','Output','Author','Note','Examples');
 
-my $docformat = {
+my $py_docformat = {
     'Name' => {'tag' => 'Name'},
     'Description' => {},
     'Usage' => {'tag' => 'Usage'},
@@ -23,6 +23,18 @@ my $docformat = {
     'Note' => {'tag' => 'Note', 'optional' => 1},
     'Examples' => {'tag' => 'Examples', 'optional' => 1},
 };
+my $spx_docformat = {
+    'Name' => {'tag' => 'Name'},
+    'Description' => {'prog' => \&align_text},
+    'Usage' => {'tag' => 'Usage'},
+    'Inputs' => {'prog' => \&parse_spx_args},
+    'Param' => {'optional' => 1,'prog' => \&parse_spx_args},
+    'detail' => { 'optional' => 1},
+    'Output' => {'tag' => ':returns', 'indent' => 1,'prog' => \&parse_spx_returns},
+    'Author' => {'tag' => ':authors','prog' => \&parse_authors},
+    'Note' => {'tag' => '.. note:', 'optional' => 1,'prog' => \&align_note},
+    'Examples' => {'tag' => '**Examples**', 'optional' => 1},
+};
 
 my @lst= ();
 my %docs = ();
@@ -33,15 +45,19 @@ my ($x,$prog);
 my @indx = ();
 
 my $file = "";
-
+my $flg_spx = 0;
 while($#ARGV >= 0) {
     $_ = shift(@ARGV);
+    if(/^-sphinx$/) {$flg_spx = 1;next;}
     (/^-/) && usage();
     ("$file") && usage();
     $file = $_;
 }
 ("$file") || usage();
+my $docformat = $flg_spx ? $spx_docformat : $py_docformat;
+
 $file =~ s/\.py$//;
+
 read_spams("$file.py",\&find_pydef,\@indx,\%progs,\@spams);
 
 #exit 0;
@@ -66,14 +82,27 @@ sub find_pydef {
     return($prog,$found);
 }
 
-open(OUT,">$file.new.py") || die "spams.py.new create err $!\n";
+my $f = $flg_spx ? "DOC/$file.py" : "$file.new.py";
+open(OUT,">$f") || die "$f create err $!\n";
 my $j = 0;
+if($flg_spx) {
+    foreach $i (@indx) {
+	my $myprog = $progs{$i};
+	print "    $myprog\n";
+    }
+    print "\n\n";
+}
 foreach $i (@indx) {
-    my $mlab_prog = $progs{$i};
-    my $myprog = $mlab_prog;
+    my $myprog = $progs{$i};
+    my $mlab_prog = mlab_name($myprog);
     my %doc = ();
     prepare_doc(0,$mlab_prog,$myprog,\%doc,$docformat);
-    print "$i : $myprog\n";
+    if($flg_spx) {
+	print "$myprog\n----\n\n";
+	print ".. autofunction:: $myprog\n\n";
+    } else {
+	print "$i : $myprog\n";
+    }
     while($j <= $i) {
 	$_ = $spams[$j++];
 	print OUT "$_\n";
@@ -83,19 +112,21 @@ foreach $i (@indx) {
 	$j++;
 	while(! ($spams[$j++] =~ /^\s+"""/)) {}
     }
-    write_doc(*OUT,$myprog,\%doc,$docformat);
+    write_doc(*OUT,$flg_spx,$myprog,\%doc,$docformat);
 }
 while($j <= $#spams) {
     $_ = $spams[$j++];
     print OUT "$_\n";
 }
 close(OUT);
+   
+
 exit(0);
 
 sub write_doc {
-    my($fh,$prog,$doc,$format) = @_;
+    my($fh,$flg_spx,$prog,$doc,$format) = @_;
     my $indent00 = "    ";
-    my $indent0 = "$indent00  ";
+    my $indent0 = "$indent00";
     my $indent;
     print $fh "$indent00\"\"\"\n";
     foreach my $key (@main::keys) {
@@ -111,6 +142,7 @@ sub write_doc {
 	my $tmp = $$doc{$key};
 	if(defined($$fmt{'tag'})) {
 	    print $fh "$indent00$$fmt{'tag'}:\n";
+	    if($key eq "Examples") {print $fh "        ::\n\n";}
 	}
 	if (defined($$fmt{'indent'}))  {
 ##	    print $fh "\n";
@@ -125,6 +157,7 @@ sub write_doc {
 	} else {
 	    print $fh $indent, join("\n$indent",@$tmp), "\n";
 	}
+#	if($flg_spx) {print $fh "\n";}
     }
     print $fh "$indent00\"\"\"\n\n";
      
@@ -133,25 +166,83 @@ sub write_doc {
 # format  args
 sub parse_args {
     my ($lines) = @_;
-    my $in_var = 0;
     my @res = ();
     my $rmblk = "";
     for(my $i = 0;$i <= $#$lines;$i++) {
 	my $s = $$lines[$i];
 	if($s =~ s/^\s*([^\s:]+)\s*:\s*//) {
 	    my $v = $1;
-	    if($in_var) {
-#		push(@res,"}}");
-	    }
-	    $in_var = 1;
 	    push(@res,"$v: $s");
 	    next;
 	}
-	if(! ($s =~ s/^\s*param\[/param[/)) {
-	    $s =~ s/^\s+/  /;
+	$s =~ s/^\s+/  /;
+	push(@res,$s);
+    }
+    return @res;
+}
+sub parse_spx_args {
+    my ($lines) = @_;
+    my @res = ();
+    my $rmblk = "";
+    for(my $i = 0;$i <= $#$lines;$i++) {
+	my $s = $$lines[$i];
+	if($s =~ s/^\s*([^\s:]+)\s*:\s*//) {
+	    my $v = $1;
+	    push(@res,":param **$v**: $s");
+	    next;
+	}
+	$s =~ s/^\s+/  /;
+	push(@res,$s);
+    }
+    return @res;
+}
+sub parse_spx_returns {
+    my ($lines) = @_;
+    my @res = ();
+    my $rmblk = "";
+    for(my $i = 0;$i <= $#$lines;$i++) {
+	my $s = $$lines[$i];
+	if($s =~ s/^\s*([^\s:]+)\s*:\s*//) {
+	    my $v = $1;
+	    push(@res,"- **$v**: $s");
+	    next;
+	}
+	$s =~ s/^\s+/  /;
+	push(@res,$s);
+    }
+    return @res;
+}
+sub parse_authors {
+    my ($lines) = @_;
+    my @res = ();
+    my $rmblk = "";
+    for(my $i = 0;$i <= $#$lines;$i++) {
+	my $s = $$lines[$i];
+	if( "$s") {
+	    $s = "    - $s";
 	}
 	push(@res,$s);
     }
-#    if($in_var) {push(@res,"}}");}
+    return @res;
+}
+sub align_note {
+    my ($lines) = @_;
+    my @res = ();
+    for(my $i = 0;$i <= $#$lines;$i++) {
+	my $s = $$lines[$i];
+	$s =~ s/^\s+//;
+	$s =~ s/^/    /;
+	push(@res,$s);
+    }
+    return @res;
+}
+sub align_text {
+    my ($lines) = @_;
+    my @res = ();
+    for(my $i = 0;$i <= $#$lines;$i++) {
+	my $s = $$lines[$i];
+	$s =~ s/    //;
+	push(@res,$s);
+    }
     return @res;
 }

@@ -12,7 +12,7 @@ if not ('rand' in scipy.sparse.__dict__):
 else:
     import scipy.sparse as ssp
 
-def test_SparseProject():
+def test_sparseProject():
     np.random.seed(0)
     X = np.asfortranarray(np.random.normal(size = (20000,100)))
     # matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
@@ -23,7 +23,7 @@ def test_SparseProject():
              'thrs' : 2}
     print "\n  Projection on the l1 ball"
     tic = time.time()
-    X1 = spams.SparseProject(X,**param)
+    X1 = spams.sparseProject(X,**param)
     tac = time.time()
     t = tac - tic
     print "  Time : ", t
@@ -36,7 +36,7 @@ def test_SparseProject():
     param['mode'] = 2  # projection on the Elastic-Net
     param['lambda1'] = 0.15
     tic = time.time()
-    X1 = spams.SparseProject(X,**param)
+    X1 = spams.sparseProject(X,**param)
     tac = time.time()
     t = tac - tic
     print "  Time : ", t
@@ -54,7 +54,7 @@ def test_SparseProject():
     # matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
     tic = time.time()
-    X1 = spams.SparseProject(X,**param)
+    X1 = spams.sparseProject(X,**param)
     tac = time.time()
     t = tac - tic
     print "  Time : ", t
@@ -65,13 +65,13 @@ def test_SparseProject():
     print 'Checking constraint: %f, %f (Projection is approximate : stops at a kink)' %(min(constraints),max(constraints))
     return None
 
-def test_CD():
+def test_cd():
     return None
 
 def test_L1L2BCD():
     return None
 
-def test_Lasso():
+def test_lasso():
     np.random.seed(0)
     print "test Lasso"
 ##############################################
@@ -92,7 +92,7 @@ def test_Lasso():
         'mode' : 2}        # penalized formulation
 
     tic = time.time()
-    alpha = spams.Lasso(X,D = D,return_reg_path = False,**param)
+    alpha = spams.lasso(X,D = D,return_reg_path = False,**param)
     tac = time.time()
     t = tac - tic
     print "%f signals processed per second\n" %(float(X.shape[1]) / t)
@@ -102,33 +102,33 @@ def test_Lasso():
     X = np.asfortranarray(np.random.normal(size=(64,1)))
     D = np.asfortranarray(np.random.normal(size=(64,10)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
-    (alpha,path) = spams.Lasso(X,D = D,return_reg_path = True,**param)
+    (alpha,path) = spams.lasso(X,D = D,return_reg_path = True,**param)
     return None
 
-def test_LassoMask():
+def test_lassoMask():
     return None
 
-def test_LassoWeighted():
+def test_lassoWeighted():
     return None
 
-def test_OMP():
+def test_omp():
     return None
 
-def test_OMPMask():
+def test_ompMask():
     return None
 
-def test_SOMP():
+def test_somp():
     return None
 
 
 tests = {
-    'SparseProject' : test_SparseProject,
-    'CD' : test_CD,
+    'sparseProject' : test_sparseProject,
+    'cd' : test_cd,
     'L1L2BCD' : test_L1L2BCD,
-    'Lasso' : test_Lasso,
-    'LassoMask' : test_LassoMask,
-    'LassoWeighted' : test_LassoWeighted,
-    'OMP' : test_OMP,
-    'OMPMask' : test_OMPMask,
-    'SOMP' : test_SOMP,
+    'lasso' : test_lasso,
+    'lassoMask' : test_lassoMask,
+    'lassoWeighted' : test_lassoWeighted,
+    'omp' : test_omp,
+    'ompMask' : test_ompMask,
+    'somp' : test_somp,
     }

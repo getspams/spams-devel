@@ -25,7 +25,7 @@ def usage():
         print '  %s' %(' '.join(lstm.keys()))
     print '\nExamples:'
     print '%s linalg' %sys.argv[0]
-    print '%s Sort CalcAAt' %sys.argv[0]
+    print '%s sort calcAAt' %sys.argv[0]
     sys.exit(1)
 
 def run_test(testname,prog):
