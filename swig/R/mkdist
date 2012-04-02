@@ -59,6 +59,6 @@ fi
 cd $wdir
 tgz=$pkg-`date +%Y-%m-%d`.tar.gz
 tar zcf $tgz $pkg
-cp -p $tgz ../$pkg.tar.gz
+cp -p $tgz ../$pkg_svn.tar.gz
 exit 0
 

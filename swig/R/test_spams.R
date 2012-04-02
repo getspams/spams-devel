@@ -27,7 +27,7 @@ usage <- function() {
   }
   .printf("\nExamples:\n")
   .printf("  Rscript %s linalg\n",name)
-  .printf("  Rscript %s Sort CalcAAt\n",name)
+  .printf("  Rscript %s sort calcAAt\n",name)
   quit()
 }
 

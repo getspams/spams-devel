@@ -53,12 +53,12 @@ my $rdformat = {
 ##@progs = ("SparseProject");
 
 foreach my $i (@indx) {
-    my $mlab_prog = $progs{$i};
-    my $myprog = "spams.$mlab_prog";
+    my $myprog = $progs{$i};
+    my $mlab_prog = mlab_name($myprog);
     my %doc = ();
     prepare_doc(1,$mlab_prog,$myprog,\%doc,$rdformat);
     print "++ $myprog\n";
-    write_man("man/$myprog.Rd",$myprog,\%doc,$rdformat);
+    write_man("man/spams.$myprog.Rd",$myprog,\%doc,$rdformat);
     # make html version
 ##    system "R CMD Rdconv -t html man/spams.$prog.Rd -o html/spams.$prog.html";
 #    print_man("man/spams.$prog.Rd",$prog,\%doc);

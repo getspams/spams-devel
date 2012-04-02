@@ -1,47 +1,47 @@
-test_Sort <- function() {
+test_sort <- function() {
    x = rnorm(2000000,0,1)
-   return(Xtest(quote(sort(x)),quote(spams.Sort(x,TRUE))))
+   return(Xtest(quote(sort(x)),quote(spams.sort(x,TRUE))))
 }
 
-test_CalcAAt <- function () {
+test_calcAAt <- function () {
   m = 200;n = 200000; d= 0.05
   A = rSpMatrix(m,n,floor(m * n * d))
-  return(Xtest(quote(A %*% t(A)),quote(spams.CalcAAt(A))))
+  return(Xtest(quote(A %*% t(A)),quote(spams.calcAAt(A))))
 }
 
-test_CalcXAt <- function () {
+test_calcXAt <- function () {
   m = 200;n = 200000; d= 0.05
   A = rSpMatrix(m,n,floor(m * n * d))
   X = matrix(rnorm(64 * n),nrow = 64,ncol = n)
-  return(Xtest(quote(X %*% t(A)),quote(spams.CalcXAt(X,A))))
+  return(Xtest(quote(X %*% t(A)),quote(spams.calcXAt(X,A))))
 }
 matprod <- function(x,y) "%*%"(x,y)
-test_CalcXY <- function() {
+test_calcXY <- function() {
     X = matrix(rnorm(64 * 200),nrow = 64,ncol = 200,byrow = FALSE)
     Y = matrix(rnorm(200 * 20000),nrow = 200,ncol = 20000,byrow = FALSE)
-    return(Xtest(quote(X %*% Y),quote(spams.CalcXY(X,Y))))
+    return(Xtest(quote(X %*% Y),quote(spams.calcXY(X,Y))))
 }
 
-test_CalcXYt <- function () {
+test_calcXYt <- function () {
     X = matrix(rnorm(64 * 200),nrow = 64,ncol = 200,byrow = FALSE)
     Y = matrix(rnorm(200 * 20000),nrow = 20000,ncol = 200,byrow = FALSE)
-    return(Xtest(quote(X %*% t(Y)),quote(spams.CalcXYt(X,Y))))
+    return(Xtest(quote(X %*% t(Y)),quote(spams.calcXYt(X,Y))))
   
 }
 
-test_CalcXtY <- function () {
+test_calcXtY <- function () {
     X = matrix(rnorm(64 * 200),nrow = 200,ncol = 64,byrow = FALSE)
     Y = matrix(rnorm(200 * 20000),nrow = 200,ncol = 20000,byrow = FALSE)
-    return(Xtest(quote(t(X) %*% Y),quote(spams.CalcXtY(X,Y))))
+    return(Xtest(quote(t(X) %*% Y),quote(spams.calcXtY(X,Y))))
 }
 
-test_Bayer <- function () {
+test_bayer <- function () {
   X = rnorm(2000000,0,1)
-  y2 = Xtest1('spams',quote(spams.Bayer(X,0)),n=1)
+  y2 = Xtest1('spams',quote(spams.bayer(X,0)),n=1)
   return(NULL)
 }
 
-test_ConjGrad <- function () {
+test_conjGrad <- function () {
   A = matrix(rnorm(500 * 5000),nrow = 5000,ncol = 500)
   A = t(A) %*% A
   b = as.vector(rep(1,ncol(A)))
@@ -59,30 +59,30 @@ test_ConjGrad <- function () {
     return(y)
   }
   y2 = CGtest("R",quote(solve(A,b)))
-  y1 = CGtest("spams",quote(spams.ConjGrad(A,b,x0,tol,itermax)))
-  ## y1 = CGtest("spams",quote(spams.ConjGrad(A,b)))
+  y1 = CGtest("spams",quote(spams.conjGrad(A,b,x0,tol,itermax)))
+  ## y1 = CGtest("spams",quote(spams.conjGrad(A,b)))
   return(max(abs(y1 - y2)))
 }
 
-test_InvSym <- function() {
+test_invSym <- function() {
     A = matrix(runif(1000 * 1000,0,1),nrow = 1000,ncol = 1000,byrow = FALSE)
     A = t(A) %*% A
-    return(Xtest(quote(solve(A)),quote(spams.InvSym(A))))
+    return(Xtest(quote(solve(A)),quote(spams.invSym(A))))
 }
-test_Normalize <- function() {
+test_normalize <- function() {
     A = matrix(runif(100 * 1000,0,1),nrow = 100,ncol = 1000)
-    y2 = Xtest1("spams",quote(spams.Normalize(A)),n=1)
+    y2 = Xtest1("spams",quote(spams.normalize(A)),n=1)
     return(NULL)
 }
 
-test_linalg.tests =list( 'Sort' = test_Sort,
-  'CalcAAt' = test_CalcAAt,
-  'CalcXAt' = test_CalcXAt,
-  'CalcXY' = test_CalcXY,
-  'CalcXYt' = test_CalcXYt,
-  'CalcXtY' = test_CalcXtY,
-  'Bayer' = test_Bayer,
-  'ConjGrad' = test_ConjGrad,
-  'InvSym' = test_InvSym,
-  'Normalize' = test_Normalize
+test_linalg.tests =list( 'sort' = test_sort,
+  'calcAAt' = test_calcAAt,
+  'calcXAt' = test_calcXAt,
+  'calcXY' = test_calcXY,
+  'calcXYt' = test_calcXYt,
+  'calcXtY' = test_calcXtY,
+  'bayer' = test_bayer,
+  'conjGrad' = test_conjGrad,
+  'invSym' = test_invSym,
+  'normalize' = test_normalize
   )

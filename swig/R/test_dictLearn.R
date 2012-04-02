@@ -3,7 +3,7 @@ if (! (library(png,logical.return= TRUE))) {
   LOADED <- FALSE
 }
 .imagesDir = "../extdata"
-test_TrainDL <- function() {
+test_trainDL <- function() {
   I = readPNG(paste(.imagesDir,'boat.png',sep= '/'))
   if (length(dim(I)) == 3) {
     A = matrix(I,nrow = nrow(I),ncol = 3 * ncol(I))
@@ -21,13 +21,13 @@ test_TrainDL <- function() {
 
 ########## FIRST EXPERIMENT ###########
   tic = proc.time()
-  D = spams.TrainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000)
+  D = spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
   .printf("Evaluating cost function...\n")
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
   R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
   .printf("objective function: %f\n",R)
 
@@ -38,7 +38,7 @@ test_TrainDL <- function() {
   X2 = X[,as.integer(ncol(X) / 2):ncol(X)]
 
   tic = proc.time()
-  res = spams.TrainDL(X1,return_model = TRUE,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 500)
+  res = spams.trainDL(X1,return_model = TRUE,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 500)
   tac = proc.time()
   D = res[[1]]
   model = res[[2]]
@@ -46,7 +46,7 @@ test_TrainDL <- function() {
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
   .printf("Evaluating cost function...\n")
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
 
   R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
   .printf("objective function: %f\n",R)
@@ -54,7 +54,7 @@ test_TrainDL <- function() {
                                         # Then reuse the learned model to retrain a few iterations more.
 
   tic = proc.time()
-  res = spams.TrainDL(X2,model = model,return_model = TRUE,D = D,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 500)
+  res = spams.trainDL(X2,model = model,return_model = TRUE,D = D,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 500)
   tac = proc.time()
   D = res[[1]]
   model = res[[2]]
@@ -62,7 +62,7 @@ test_TrainDL <- function() {
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
   .printf("Evaluating cost function...\n")
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
 
   R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
   .printf("objective function: %f\n",R)
@@ -74,13 +74,13 @@ test_TrainDL <- function() {
   .printf('*********** THIRD EXPERIMENT ***********\n')
 
   tic = proc.time()
-  D = spams.TrainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000,modeParam = 0,gamma1 = 0.3,modeD = 'L1L2')
+  D = spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000,modeParam = 0,gamma1 = 0.3,modeD = 'L1L2')
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
   .printf("Evaluating cost function...\n")
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
 
   R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
   .printf("objective function: %f\n",R)
@@ -88,13 +88,13 @@ test_TrainDL <- function() {
   .printf('*********** FOURTH EXPERIMENT ***********\n')
 
   tic = proc.time()
-  D = spams.TrainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000,modeParam = 0,gamma1 = 0.3,modeD = 'L1L2MU')
+  D = spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000,modeParam = 0,gamma1 = 0.3,modeD = 'L1L2MU')
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
   .printf("Evaluating cost function...\n")
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
 
   R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
   .printf("objective function: %f\n",R)
@@ -105,7 +105,7 @@ test_TrainDL <- function() {
 #
 
 
-test_TrainDL_Memory <- function() {
+test_trainDL_Memory <- function() {
   I = readPNG(paste(.imagesDir,'lena.png',sep= '/'))
   if (length(dim(I)) == 3) {
     A = matrix(I,nrow = nrow(I),ncol = 3 * ncol(I))
@@ -124,26 +124,26 @@ test_TrainDL_Memory <- function() {
   
   ############# FIRST EXPERIMENT  ##################
   tic = proc.time()
-  D = spams.TrainDL_Memory(X,K = 100,lambda1 = lambda1, numThreads = 4,iter = 100)
+  D = spams.trainDL_Memory(X,K = 100,lambda1 = lambda1, numThreads = 4,iter = 100)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
   .printf("Evaluating cost function...\n")
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
 
   R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
   .printf("objective function: %f\n\n",R)
 
 #### SECOND EXPERIMENT ####
   tic = proc.time()
-  D = spams.TrainDL(X,K = 100,lambda1 = lambda1, numThreads = 4,iter = 100)
+  D = spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4,iter = 100)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
   .printf("Evaluating cost function...\n")
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
 
   R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
   .printf("objective function: %f\n",R)
@@ -153,6 +153,6 @@ test_TrainDL_Memory <- function() {
 
 #
 
-test_dictLearn.tests = list('TrainDL' = test_TrainDL,
-  'TrainDL_Memory' = test_TrainDL_Memory
+test_dictLearn.tests = list('trainDL' = test_trainDL,
+  'trainDL_Memory' = test_trainDL_Memory
   )

@@ -1,32 +1,4 @@
-# builds a list of values from a list of given named parameters
-# and a list of default values
-.param_struct <- function (param_list,params_in)
-{
-  params = list()
-  for (k in names(param_list)) {
-    n = length(params)
-    if (! is.null(params_in[[k]])) {
-      p <- params_in[[k]]
-    } else {
-      p <- param_list[[k]]
-    }
-    if(is.null(p))
-      stop("ERROR : param <",k,"> must be defined!")
- # the list will be evaluated by .mycall
-    if(is.character(p))
-      p = paste("'",p,"'",sep='')
-    params[[n + 1]] <- p
-  }
-  return(params)
-}
-# do.call does not work for matrix args of kind output (makes a copy)
-# ... and adds more overhead!
-.mycall <- function(prog,l) {
-#  require('methods')
-  s = paste(l,collapse=',')
-  eval.parent(parse(text = sprintf("%s(%s)",prog,s)))
-}
-
+#################
 .verif_enum <- function(arg,ename,msg) {
   defName = paste(".__E___", ename, sep = "")
   l = eval.parent(parse(text = sprintf("l <- %s",defName)))
@@ -35,13 +7,13 @@
 }
 ###########  linalg ##############
 
-spams.Sort <- function(v,mode=T) {
+spams.sort <- function(v,mode=T) {
      x = c(v)
      sort(x,mode)
      return(x)
 }
 
-spams.CalcAAt <- function(A) {
+spams.calcAAt <- function(A) {
   m = nrow(A)
 # the matrix creation is about 10 times faster wtih c(0)
 #  AAt = matrix(rep(0,m * m),nrow = m,ncol = m)
@@ -49,7 +21,7 @@ spams.CalcAAt <- function(A) {
   AAt(A,AAt)
   return(AAt)
 }
-spams.CalcXAt <- function(X,A) {
+spams.calcXAt <- function(X,A) {
   m = nrow(X)
   n = nrow(A)
 #  XAt = matrix(rep(0,m * n),nrow = m,ncol = n)
@@ -76,24 +48,24 @@ spams.mult <- function(X,Y,transX = FALSE, transY = FALSE) {
     return(XY)
 }
 
-spams.CalcXY <- function(X,Y) {
+spams.calcXY <- function(X,Y) {
     return(spams.mult(X,Y,F,F))
 }
-spams.CalcXYt <- function(X,Y) {
+spams.calcXYt <- function(X,Y) {
     return(spams.mult(X,Y,F,T))
 }
-spams.CalcXtY <- function(X,Y) {
+spams.calcXtY <- function(X,Y) {
     return(spams.mult(X,Y,T,F))
 }
 
 
-spams.Bayer <- function(X,offset) {
+spams.bayer <- function(X,offset) {
   y =c(X)
   applyBayerPattern(y,offset)
   return(y)
 }
 
-spams.ConjGrad <- function(A,b,x0 = NULL,tol = 1e-10,itermax = NULL) {
+spams.conjGrad <- function(A,b,x0 = NULL,tol = 1e-10,itermax = NULL) {
   n = ncol(A)
   if(is.null(x0)) {
     x = as.vector(matrix(c(0),ncol = n))
@@ -107,13 +79,13 @@ spams.ConjGrad <- function(A,b,x0 = NULL,tol = 1e-10,itermax = NULL) {
   return(x)
 }
 
-spams.InvSym <- function(A) {
+spams.invSym <- function(A) {
       B = matrix(A,nrow = nrow(A),ncol = ncol(A))
       invSym(B)
       return(B)
 }
 
-spams.Normalize <- function(A) {
+spams.normalize <- function(A) {
       B = matrix(A,nrow = nrow(A),ncol = ncol(A))
       normalize(B)
       return(B)
@@ -123,7 +95,7 @@ spams.Normalize <- function(A) {
 
 ###########  decomp ##################
 
-spams.SparseProject <- function(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,lambda3 = 0.0,pos = FALSE,numThreads = -1) {
+spams.sparseProject <- function(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,lambda3 = 0.0,pos = FALSE,numThreads = -1) {
   m = nrow(U)
   n = ncol(U)
 ##  paramlist = list('thrs' = 1.0,'mode' = 1,'lambda1' = 0.0,'lambda2' = 0.0,'lambda3' = 0.0,'pos' = FALSE,'numThreads' = -1)
@@ -140,7 +112,7 @@ spams.SparseProject <- function(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.
 # (A,path) = Lasso(X,D,param,return_reg_path = True):
 # A = Lasso(X,Q,q,param,return_reg_path = False):
 # (A,path) = Lasso(X,Q,q,param,return_reg_path = True):
-spams.Lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -1,lambda1= NULL,lambda2= 0.,
+spams.lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -1,lambda1= NULL,lambda2= 0.,
                         mode= 'PENALTY',pos= FALSE,ols= FALSE,numThreads= -1,
                  length_path= -1,verbose=TRUE,cholesky= FALSE) {
 #  require('Matrix')
@@ -149,15 +121,15 @@ spams.Lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -
 
   if (! is.null(Q)) {
     if (is.null(q)) {
-      stop("ERROR Lasso : q is needed when Q is given\n")
+      stop("ERROR lasso : q is needed when Q is given\n")
     }
   } else {
     if(is.null(D)) {
-      stop("ERROR Lasso : you must give D or Q and q\n")
+      stop("ERROR lasso : you must give D or Q and q\n")
     }
   }
   if(is.null(lambda1)) {
-    stop("ERROR Lasso : lambda1 must be defined\n")
+    stop("ERROR lasso : lambda1 must be defined\n")
   }
   .verif_enum(mode,'constraint_type','mode in Lasso')
   path = NULL
@@ -193,7 +165,7 @@ spams.Lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -
 ###########  prox ##################
 # W = FistaFlat(Y,X,W0,param,return_optim_info = False)
 # (W,optim_info) = FistaFlat(Y,X,W0,param,return_optim_info = True)
-spams.FistaFlat <- function(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_it =1000,L0=1.0,
+spams.fistaFlat <- function(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_it =1000,L0=1.0,
               fixed_step=FALSE,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
               a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
               compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
@@ -215,7 +187,7 @@ spams.FistaFlat <- function(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_
 }
 
 
-spams.ProximalFlat <- function(alpha0,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
+spams.proximalFlat <- function(alpha0,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
                  pos=FALSE,clever=TRUE,eval= NULL,size_group=1,transpose=FALSE) {
 
@@ -242,7 +214,7 @@ spams.ProximalFlat <- function(alpha0,return_val_loss = FALSE,numThreads =-1,lam
   # We can only have simple objects in the param list of .mycall
 
   if(is.null(lambda1)) {
-    stop("ERROR TrainDL : lambda1 must be defined\n")
+    stop("ERROR trainDL : lambda1 must be defined\n")
   }
   
   .verif_enum(modeD,'constraint_type_D','modeD in TrainDL')
@@ -276,14 +248,14 @@ spams.ProximalFlat <- function(alpha0,return_val_loss = FALSE,numThreads =-1,lam
   
 }
 
-spams.TrainDL <- function(X,return_model= FALSE,model= NULL,D = matrix(c(0.),nrow = 0,ncol=0),numThreads = -1,batchsize = -1,
+spams.trainDL <- function(X,return_model= FALSE,model= NULL,D = matrix(c(0.),nrow = 0,ncol=0),numThreads = -1,batchsize = -1,
             K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
                  posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
   
   return (.TrainDL(X,return_model,model,FALSE,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
 }
 
-spams.TrainDL_Memory <- function(X,D = matrix(c(0.),nrow = 0,ncol=0),numThreads = -1,batchsize = -1,
+spams.trainDL_Memory <- function(X,D = matrix(c(0.),nrow = 0,ncol=0),numThreads = -1,batchsize = -1,
             K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
                  posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
   

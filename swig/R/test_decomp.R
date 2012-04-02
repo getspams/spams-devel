@@ -1,11 +1,11 @@
 
-test_SparseProject <- function () {
+test_sparseProject <- function () {
   set.seed(0)
   X = matrix(rnorm(20000 * 100),nrow = 20000,ncol = 100,byrow = FALSE)
   X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
   .printf( "\n  Projection on the l1 ball\n")
   tic = proc.time()
-  X1 = spams.SparseProject(X,numThreads = -1, pos = FALSE,mode= 1,thrs = 2)
+  X1 = spams.sparseProject(X,numThreads = -1, pos = FALSE,mode= 1,thrs = 2)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("  Time : %f\n", t)
@@ -17,7 +17,7 @@ test_SparseProject <- function () {
   .printf("\n  Projection on the Elastic-Net\n")
   lambda1 = 0.15
   tic = proc.time()
-  X1 = spams.SparseProject(X,numThreads = -1, pos = FALSE,mode= 2,thrs = 2,lambda1= lambda1)
+  X1 = spams.sparseProject(X,numThreads = -1, pos = FALSE,mode= 2,thrs = 2,lambda1= lambda1)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("  Time : %f\n", t)
@@ -34,7 +34,7 @@ test_SparseProject <- function () {
   X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
  # matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
   tic = proc.time()
-  X1 = spams.SparseProject(X,numThreads = -1, pos = FALSE,mode= 6,thrs = 2,lambda1= lambda1,lambda2= lambda2,lambda3= lambda3)
+  X1 = spams.sparseProject(X,numThreads = -1, pos = FALSE,mode= 6,thrs = 2,lambda1= lambda1,lambda2= lambda2,lambda3= lambda3)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("  Time : %f\n", t)
@@ -46,7 +46,7 @@ test_SparseProject <- function () {
   return(NULL)
 }
 
-test_Lasso <- function() {
+test_lasso <- function() {
   set.seed(0)
   .printf("test Lasso\n")
 ##############################################
@@ -58,7 +58,7 @@ test_Lasso <- function() {
   D = matrix(rnorm(100 * 200),nrow = 100,ncol = 200,byrow = FALSE)
   D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
   tic = proc.time()
-  alpha = spams.Lasso(X,D,return_reg_path = FALSE,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY' )
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY' )
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
@@ -68,7 +68,7 @@ test_Lasso <- function() {
   X = matrix(rnorm(64),nrow = 64,ncol = 1,byrow = FALSE)
   D = matrix(rnorm(64 * 10),nrow = 64,ncol = 10,byrow = FALSE)
   D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
-  res = spams.Lasso(X,D,return_reg_path = TRUE,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY' )
+  res = spams.lasso(X,D,return_reg_path = TRUE,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY' )
   alpha = res[[1]]
   path = res[[2]]
   return(NULL)
@@ -77,5 +77,5 @@ test_Lasso <- function() {
 
 #
 test_decomp.tests =list( 
-  'SparseProject' = test_SparseProject,
-  'Lasso' = test_Lasso)
+  'sparseProject' = test_sparseProject,
+  'lasso' = test_lasso)
