@@ -1,0 +1,29 @@
+begin repl Usage
+      alpha <- spams.proximalFlat(U,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
+                 lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
+                 pos=FALSE,clever=TRUE,eval= NULL,size_group=1,transpose=FALSE)
+      list(alpha,val_loss) <- spams.proximalFlat(U,return_val_loss = TRUE,...)
+end
+begin addlast Inputs
+return_val_loss:     
+[R]		      if true the function will return 2 matrices in a list.
+[P]		      if true the function will return a tuple of matrices.
+end
+begin addlast Output
+val_loss:        vector of size ncol(U)
+[P]	 alpha = spams.proximalFlat(U,return_val_loss = False,...)
+[P]	 (alpha,val_loss) = spams.proximalFlat(U,return_val_loss = True,...)
+[R]      alpha <- spams.proximalFlat(U,return_val_loss = FALSE, ...)
+[R]      v <- spams.proximalFlat(U,return_val_loss = TRUE, ...)
+[R]      alpha <- v[[1]]
+[R]      val_loss <- v[[2]]
+end
+begin addlast Note
+   Valid values for the regularization parameter (regul) are:
+    "l0", "l1", "l2", "linf", "l2-not-squared", "elastic-net", "fused-lasso",
+    "group-lasso-l2", "group-lasso-linf", "sparse-group-lasso-l2",
+     "sparse-group-lasso-linf", "l1l2", "l1linf", "l1l2+l1", "l1linf+l1",
+    "tree-l0", "tree-l2", "tree-linf", "graph", "graph-ridge", "graph-l2",
+    "multi-task-tree", "multi-task-graph", "l1linf-row-column", "trace-norm",
+    "trace-norm-vec", "rank", "rank-vec", "none"
+end

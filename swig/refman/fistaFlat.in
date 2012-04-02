@@ -1,0 +1,33 @@
+begin repl Usage
+      W <- spams.fistaFlat(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_it =1000,L0=1.0,
+              fixed_step=FALSE,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
+              a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
+              compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
+              resetflow=FALSE,regul="",loss="",verbose=FALSE,pos=FALSE,clever=FALSE,
+              log=FALSE,ista=FALSE,subgrad=FALSE,logName="",is_inner_weights=FALSE,
+              inner_weights=c(0.),eval=FALSE,size_group=1,sqrt_step=TRUE,transpose=FALSE)
+      list(W,optim_info) <- spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
+end
+begin addlast Inputs
+return_optim_info:     
+[R]		      if true the function will return 2 matrices in a list.
+[P]		      if true the function will return a tuple of matrices.
+end
+begin addlast Output
+optim_info:        vector of size 4, containing information of the optimization.
+[P]      W = spams.fistaFlat(Y,X,W0,return_optim_info = False,...)
+[P]      (W,optim_info) = spams.fistaFlat(Y,X,W0,return_optim_info = True,...)
+[R]      W <- spams.fistaFlat(Y,X,W0,return_optim_info = FALSE,...)
+[R]      v <- spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
+[R]      W <- v[[1]]
+[R]      optim_info <- v[[2]]
+end
+begin addlast Note
+   Valid values for the regularization parameter (regul) are:
+    "l0", "l1", "l2", "linf", "l2-not-squared", "elastic-net", "fused-lasso",
+    "group-lasso-l2", "group-lasso-linf", "sparse-group-lasso-l2",
+     "sparse-group-lasso-linf", "l1l2", "l1linf", "l1l2+l1", "l1linf+l1",
+    "tree-l0", "tree-l2", "tree-linf", "graph", "graph-ridge", "graph-l2",
+    "multi-task-tree", "multi-task-graph", "l1linf-row-column", "trace-norm",
+    "trace-norm-vec", "rank", "rank-vec", "none"
+end
