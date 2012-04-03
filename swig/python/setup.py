@@ -8,10 +8,10 @@ import numpy
 # python setup.py install --prefix=dist, 
 incs = ['.'] + map(lambda x: os.path.join('spams',x),[ 'linalg', 'prox', 'decomp', 'dictLearn']) + [numpy.get_include()]
 
-os = distutils.util.get_platform()
+osname = distutils.util.get_platform()
 cc_flags = []
 link_flags = []
-if os.startswith("macosx"):
+if osname.startswith("macosx"):
     cc_flags = ['-m32']
     link_flags = ['-m32', '-framework', 'Python']
 
@@ -26,6 +26,24 @@ spams_wrap = Extension(
     depends = ['spams.h'],
 )
 
+def mkhtml(d = None):
+    if d == None:
+        d = "html"
+    else:
+        d = os.path.join("html",d)
+    if not os.path.isdir("html"):
+        return []
+    hdir = d
+
+    l1 = os.listdir(hdir)
+    l = []
+    for s in l1:
+        s = os.path.join(d,s)
+        if not os.path.isdir(s):
+            l.append(s)
+    return l
+
+
 setup (name = 'spams',
        version= '0.1',
        description='Python interface for SPAMS',
@@ -35,8 +53,12 @@ setup (name = 'spams',
        ext_modules = [spams_wrap,],
        py_modules = ['spams', 'spams_wrap', 'myscipy_rand'],
 #       scripts = ['test_spams.py'],
-       data_files = [('test',['test_spams.py', 'test_decomp.py', 'test_dictLearn.py', 'test_linalg.py', 'test_prox.py', 'test_utils.py']),
-                     ('doc',['doc_spams.pdf']),
-('extdata',['boat.png', 'lena.png'])
-],
+       data_files = [
+        ('test',['test_spams.py', 'test_decomp.py', 'test_dictLearn.py', 'test_linalg.py', 'test_prox.py', 'test_utils.py']),
+        ('doc',['doc_spams.pdf', 'SPAMS.pdf']), 
+        ('doc/html/_sources',mkhtml('_sources')),
+        ('doc/html/_static',mkhtml('_static')),
+        ('doc/html',mkhtml()),
+        ('extdata',['boat.png', 'lena.png'])
+        ],
 )

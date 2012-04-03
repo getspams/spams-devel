@@ -5,7 +5,7 @@ require "doclib.ph";
 
 my $dir = $main::mlab_dir;
 sub usage {
-    print "Usage : $0 [-sphinx] file.py\n";
+    print "Usage : $0 [-sphinx doc-dir] file.py\n";
     exit 1;
 }
 #@main::keys = ('Usage','Name','Description','detail','Inputs','Output','Author','Note','Examples');
@@ -46,9 +46,15 @@ my @indx = ();
 
 my $file = "";
 my $flg_spx = 0;
+my $doc_dir = ".";
 while($#ARGV >= 0) {
     $_ = shift(@ARGV);
-    if(/^-sphinx$/) {$flg_spx = 1;next;}
+    if(/^-sphinx$/) {
+	($#ARGV >= 0) || usage();
+	$doc_dir = shift(@ARGV);
+	$flg_spx = 1;
+	next;
+    }
     (/^-/) && usage();
     ("$file") && usage();
     $file = $_;
@@ -57,7 +63,10 @@ while($#ARGV >= 0) {
 my $docformat = $flg_spx ? $spx_docformat : $py_docformat;
 
 $file =~ s/\.py$//;
-
+if($flg_spx) {
+    (-d $doc_dir) || die "No dir $doc_dir!\n";
+    (-d "$doc_dir/source") || die "Doc dir not initialized : dir source missing.\n";
+}
 read_spams("$file.py",\&find_pydef,\@indx,\%progs,\@spams);
 
 #exit 0;
@@ -82,15 +91,24 @@ sub find_pydef {
     return($prog,$found);
 }
 
-my $f = $flg_spx ? "DOC/$file.py" : "$file.new.py";
+my $f = $flg_spx ? "$doc_dir/$file.py" : "$file.new.py";
+my $indx_hdr = ".. SPAMS documentation created by docmatlab2python\n\
+SPAMS's python interface documentation\
+======================================\n\nContents:\n\n\
+.. currentmodule:: spams\n\n.. autosummary::\n\n";
+
+if($flg_spx) {
+    open(INDX,">$doc_dir/source/index.rst")  || die "Cannot create $doc_dir/source/index.rst: $!\n";
+    print INDX $indx_hdr;
+}
 open(OUT,">$f") || die "$f create err $!\n";
 my $j = 0;
 if($flg_spx) {
     foreach $i (@indx) {
 	my $myprog = $progs{$i};
-	print "    $myprog\n";
+	print INDX "    $myprog\n";
     }
-    print "\n\n";
+    print INDX "\n\n";
 }
 foreach $i (@indx) {
     my $myprog = $progs{$i};
@@ -98,8 +116,9 @@ foreach $i (@indx) {
     my %doc = ();
     prepare_doc(0,$mlab_prog,$myprog,\%doc,$docformat);
     if($flg_spx) {
-	print "$myprog\n----\n\n";
-	print ".. autofunction:: $myprog\n\n";
+	my $n = length($myprog);
+	print INDX "$myprog\n", "-" x $n, "\n";
+	print INDX ".. autofunction:: $myprog\n\n";
     } else {
 	print "$i : $myprog\n";
     }
@@ -114,12 +133,19 @@ foreach $i (@indx) {
     }
     write_doc(*OUT,$flg_spx,$myprog,\%doc,$docformat);
 }
+
 while($j <= $#spams) {
     $_ = $spams[$j++];
     print OUT "$_\n";
 }
+
 close(OUT);
-   
+if($flg_spx) { 
+    print INDX "\nIndices and tables\n==================\n\n\
+* :ref:`genindex`\n* :ref:`modindex`\n* :ref:`search`\n\n";
+    close(INDX);
+}
+
 
 exit(0);
 
