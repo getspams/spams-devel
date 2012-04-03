@@ -99,6 +99,7 @@ sub get_doc {
     my $tmp = [()];
     my $key = "";
     my $prefix = $r_mode ? "spams." : "";
+    my $lang = $r_mode ? "R" : "python";
     while(<IN>) {
 	chomp;
 	if(/mex([A-Z][_A-z]+)/) {
@@ -130,7 +131,7 @@ sub get_doc {
 	    if ($x eq "Author") {
 		$tmp = [()];
 		push(@$tmp,"Julien MAIRAL (spams, matlab interface and documentation);");
-		push(@$tmp,"Jean-Paul CHIEZE (R interface)");
+		push(@$tmp,"Jean-Paul CHIEZE ($lang interface)");
 		push(@$tmp,"");
 		$$doc{$x} = $tmp;
 		last;
@@ -150,15 +151,9 @@ sub get_doc {
 		s/^\s*param\.([^\s]+)\s/    $1: /;
 	    }
 	    s/param\.//g;
-	    if($r_mode) {
-		s/Matlab\s+function\s+pcg/R function solve/;
-		s/Matlab\s+expression\s+XAt[^\s\;]+/R expression/;
-		s/Matlab/R/;
-	    } else {
-		s/Matlab\s+function\s+pcg/python function solve/;
-		s/Matlab\s+expression\s+XAt[^\s\;]+/python expression/;
-		s/Matlab/python/;
-	    }
+	    s/Matlab\s+function\s+pcg/$lang function solve/;
+	    s/Matlab\s+expression\s+XAt[^\s\;]+/$lang expression/;
+	    s/Matlab/$lang/;
 	    if($key eq "Usage") {
 		s/\s*=\s*/ <- /;
 	    }
