@@ -29,14 +29,17 @@ cp -p spams.h $tmpd
 ./docmatlab2python $tmpd/spams
 mv $tmpd/spams.new.py $tmpd/spams.py
 cp -p ../extdata/* $tmpd
-cp -p INSTALL-package ../../doc/doc_spams.pdf $tmpd
+cp -p INSTALL-package $tmpd
 rm -f $tmpd/README
 # doc
 cd $cdir
-./mkdoc
+../mkdoc
 doc=tmp-doc
-cp -a $doc/build/html $tmpd
-cp -p $doc/build/latex/SPAMS.pdf $tmpd
+mkdir $tmpd/sphinx
+cp -a $doc/build/html/* $tmpd/sphinx
+cp -a $doc/html $tmpd
+cp -p $doc/doc_spams.pdf $tmpd
+cp -p $doc/build/latex/SPAMS.pdf $tmpd/python-interface.pdf
 cd dist
 name=spams-python
 mv $dir $name

@@ -7,35 +7,6 @@ require "doclib.ph";
 # pour les fonctions definies dans un fichier R (r_spams.R par ex)
 my $dir = $main::mlab_dir;
 
-my $indent = "    ";
-sub usage {
-    print "Usage : $0 R-filename\n",
-    "   Ex: $0 r_spams\n";
-    exit 1;
-}
-
-(-d $dir) || die "No dir $dir!\n";
-system "rm -rf man"; mkdir "man";
-(-d "man") || die "No dir man!\n";
-##(-d "html") || die "No dir html!\n";
-
-
-my $file = "";
-while($#ARGV >= 0) {
-    $_ = shift(@ARGV);
-    (/^-/) && usage();
-    ("$file") && usage();
-    $file = $_;
-}
-("$file") || usage();
-
-my %progs = ();
-my @indx = ();
-my @spams = ();
-
-if(! ($file =~ /\.R$/)) {$file .= ".R";}
-read_spams($file,\&find_Rdef,\@indx,\%progs,\@spams);
-
 @main::keys = ('Name','Description','Usage','Inputs','Param','detail','Output','Author','Note','Examples');
 
 my $rdformat = {
@@ -50,13 +21,65 @@ my $rdformat = {
     'Note' => {'tag' => 'note', 'optional' => 1},
     'Examples' => {'tag' => 'examples', 'optional' => 1},
 };
-##@progs = ("SparseProject");
+
+my $indent = "    ";
+sub usage {
+    print "Usage : $0 [-tex doc-dir] R-filename\n",
+    "   Ex: $0 r_spams\n";
+    exit 1;
+}
+
+(-d $dir) || die "No dir $dir!\n";
+system "rm -rf man"; mkdir "man";
+(-d "man") || die "No dir man!\n";
+##(-d "html") || die "No dir html!\n";
+
+
+my $file = "";
+my $flg_out = 0; # 0 doc std, 1 : latex pour doc_spams
+my $doc_dir = ".";
+
+while($#ARGV >= 0) {
+    $_ = shift(@ARGV);
+    if(/^-tex$/) {
+	($#ARGV >= 0) || usage();
+	$doc_dir = shift(@ARGV);
+	$flg_out = 2;
+	next;
+    }
+    (/^-/) && usage();
+    ("$file") && usage();
+    $file = $_;
+}
+("$file") || usage();
+
+my %iprogs = ();
+my %progdefs = ();
+my @spams = ();
+
+$file =~ s/\.R$//;
+if($flg_out) {
+    (-d $doc_dir) || die "No dir $doc_dir!\n";
+}
+read_spams("$file.R",\&find_Rdef,\%progdefs,\%iprogs,\@spams);
+
+##@iprogs = ("SparseProject");
+my @idx = ();
+while(my ($k,$ix) = each(%progdefs)) {
+    push(@idx,$$ix[1]);
+}
+my @indx = sort {$a <=> $b} @idx;
+if($flg_out > 0) {
+    make_tex_doc(1,$doc_dir,\@indx,\%iprogs,\@spams,\%progdefs);
+    exit 0;
+}
+
 
 foreach my $i (@indx) {
-    my $myprog = $progs{$i};
+    my $myprog = $iprogs{$i};
     my $mlab_prog = mlab_name($myprog);
     my %doc = ();
-    prepare_doc(1,$mlab_prog,$myprog,\%doc,$rdformat);
+    prepare_doc(1,$mlab_prog,$myprog,\%doc,$rdformat,\@spams,\%progdefs);
     print "++ $myprog\n";
     write_man("man/spams.$myprog.Rd",$myprog,\%doc,$rdformat);
     # make html version

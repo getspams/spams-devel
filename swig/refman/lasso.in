@@ -1,10 +1,9 @@
 begin repl Usage
-A <- spams.lasso(X,D = D, Q = NULL,q = NULL,return_reg_path = FALSE,L= -1,lambda1= NULL,lambda2= 0.,
-                        mode= 'PENALTY',pos= FALSE,ols= FALSE,numThreads= -1,
-                 length_path= -1,verbose=TRUE,cholesky= FALSE)
-list(A,path) <- spams.lasso(X,D = D, Q = NULL,q = NULL,return_reg_path = TRUE, ...)
+A <- %DEF%
+[R]list(A,path) <- spams.lasso(X,D = D, Q = NULL,q = NULL,return_reg_path = TRUE, ...)
 A <- spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = FALSE,....)
-list(A,path) <- spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = TRUE, ...)
+[R]list(A,path) <- spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = TRUE, ...)
+[P](A,path) = spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = TRUE, ...)
 end
 begin addlast Inputs
 return_reg_path:     

@@ -1,9 +1,5 @@
 begin repl Usage
-D <- spams.trainDL_Memory(X,D = matrix(c(0.),nrow = 0,ncol=0),numThreads = -1,batchsize = -1,
-       K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
-       posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,
-       verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,
-       stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='')
+D <- %DEF%
 end
 begin repl Output
 D:     double m x p matrix   (dictionary)

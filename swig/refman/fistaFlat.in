@@ -1,12 +1,7 @@
 begin repl Usage
-      W <- spams.fistaFlat(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_it =1000,L0=1.0,
-              fixed_step=FALSE,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
-              a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
-              compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
-              resetflow=FALSE,regul="",loss="",verbose=FALSE,pos=FALSE,clever=FALSE,
-              log=FALSE,ista=FALSE,subgrad=FALSE,logName="",is_inner_weights=FALSE,
-              inner_weights=c(0.),eval=FALSE,size_group=1,sqrt_step=TRUE,transpose=FALSE)
-      list(W,optim_info) <- spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
+W <- %DEF%
+[R]list(W,optim_info) <- spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
+[P](W,optim_info) = spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
 end
 begin addlast Inputs
 return_optim_info:     

@@ -26,12 +26,12 @@ spams_wrap = Extension(
     depends = ['spams.h'],
 )
 
-def mkhtml(d = None):
+def mkhtml(d = None,base = 'sphinx'):
     if d == None:
-        d = "html"
+        d = base
     else:
-        d = os.path.join("html",d)
-    if not os.path.isdir("html"):
+        d = os.path.join(base,d)
+    if not os.path.isdir(base):
         return []
     hdir = d
 
@@ -55,10 +55,11 @@ setup (name = 'spams',
 #       scripts = ['test_spams.py'],
        data_files = [
         ('test',['test_spams.py', 'test_decomp.py', 'test_dictLearn.py', 'test_linalg.py', 'test_prox.py', 'test_utils.py']),
-        ('doc',['doc_spams.pdf', 'SPAMS.pdf']), 
-        ('doc/html/_sources',mkhtml('_sources')),
-        ('doc/html/_static',mkhtml('_static')),
-        ('doc/html',mkhtml()),
+        ('doc',['doc_spams.pdf', 'python-interface.pdf']), 
+        ('doc/sphinx/_sources',mkhtml('_sources')),
+        ('doc/sphinx/_static',mkhtml('_static')),
+        ('doc/sphinx',mkhtml()),
+        ('doc/html',mkhtml(base = 'html')),
         ('extdata',['boat.png', 'lena.png'])
         ],
 )

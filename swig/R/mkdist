@@ -26,6 +26,8 @@ mkdir $dir
 pkdir=$dir/$nom
 
 ./docmatlab2R r_spams
+../mkdoc
+doc=tmp-doc
 swig -c++ -r -o ${nom}.cpp $nom.i
 [ $? -ne 0 ] && exit 1
 mkdir -p $pkdir/R $pkdir/src
@@ -38,7 +40,8 @@ cp $rfiles $pkdir/R
 cp $cfiles $pkdir/src
 mkdir -p $pkdir/inst/test $pkdir/inst/doc $pkdir/inst/extdata
 cp -p test_*.R $pkdir/inst/test
-cp -p ../../doc/doc_spams.pdf $pkdir/inst/doc
+cp -p $doc/doc_spams.pdf $pkdir/inst/doc
+cp -a $doc/html $pkdir/inst/doc
 cp -p ../extdata/*   $pkdir/inst/extdata
 cp INSTALL-package $dir
 pngpkg=png_0.1-4.tar.gz
@@ -59,6 +62,6 @@ fi
 cd $wdir
 tgz=$pkg-`date +%Y-%m-%d`.tar.gz
 tar zcf $tgz $pkg
-cp -p $tgz ../$pkg_svn.tar.gz
+cp -p $tgz ../${pkg}_svn.tar.gz
 exit 0
 
