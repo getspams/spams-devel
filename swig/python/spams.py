@@ -85,7 +85,8 @@ def normalize(A):
 
 ###########  decomp ##################
 
-def  sparseProject(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,lambda3 = 0.0,pos = 0,numThreads = -1):
+def  sparseProject(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,
+                   lambda3 = 0.0,pos = 0,numThreads = -1):
     m = U.shape[0];
     n = U.shape[1];
 #    paramlist = [('thrs',1.0),('mode',1),('lambda1',0.0),('lambda2',0.0),('lambda3',0.0),('pos',0),('numThreads',-1)]
@@ -139,13 +140,14 @@ def lasso(X,D= None,Q = None,q = None,return_reg_path = True,L= -1,lambda1= None
 ###########  prox ##################
 # W = FistaFlat(Y,X,W0,param,return_optim_info = False)
 # (W,optim_info) = FistaFlat(Y,X,W0,param,return_optim_info = True)
-def fistaFlat(Y,X,W0,return_optim_info = False,numThreads =-1,max_it =1000,L0=1.0,
-              fixed_step=False,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
-              a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
-              compute_gram=False,lin_admm=False,admm=False,intercept=False,
-              resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
-              log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-              inner_weights=np.array([0.]),eval=False,size_group=1,sqrt_step=True,transpose=False):
+def fistaFlat(
+    Y,X,W0,return_optim_info = False,numThreads =-1,max_it =1000,L0=1.0,
+    fixed_step=False,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
+    a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
+    compute_gram=False,lin_admm=False,admm=False,intercept=False,
+    resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
+    log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
+    inner_weights=np.array([0.]),eval=False,size_group=1,sqrt_step=True,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ("max_it" , 1000),('L0',1.0),
 #                 ('fixed_step',False),
@@ -193,9 +195,12 @@ def proximalFlat(alpha0,return_val_loss = False,numThreads =-1,lambda1=1.0,lambd
 ##################################################
 
 ###########  dictLearn ##################
-def __allTrainDL(X,return_model= None,model= None,in_memory= False,D = np.array([[],[]],dtype=np.float64,order="FORTRAN"),numThreads = -1,batchsize = -1,
-                 K= -1,lambda1= None,lambda2= 10e-10,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,
-                 posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
+def __allTrainDL(X,return_model= None,model= None,in_memory= False,
+                 D = np.array([[],[]],dtype=np.float64,order="FORTRAN"),numThreads = -1,
+                 batchsize = -1,K= -1,lambda1= None,lambda2= 10e-10,iter=-1,t0=1e-5,
+                 mode=spams_wrap.PENALTY,posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,
+                 whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,
+                 stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
 
 #    paramlist = [("D",np.array([[],[]],dtype=np.float64,order="FORTRAN")),("numThreads" ,-1),("batchsize", -1),
 #                 ("K", -1),('lambda', None),('lambda2', 10e-10),
@@ -232,9 +237,13 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,D = np.array(
     else:
         return x
 
-def trainDL(X,return_model= False,model= None,D = np.array([[],[]],dtype=np.float64,order="FORTRAN"),numThreads = -1,batchsize = -1,
-            K= -1,lambda1= None,lambda2= 10e-10,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,
-            posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
+def trainDL(
+    X,return_model= False,model= None,D = np.array([[],[]],dtype=np.float64,
+    order="FORTRAN"),numThreads = -1,batchsize = -1,K= -1,lambda1= None,
+    lambda2= 10e-10,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,posAlpha=False,posD=False,
+    expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,
+    rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,
+    log_deprecated=False,logName=''):
 
     return __allTrainDL(X,return_model,model,False,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 

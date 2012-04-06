@@ -9,9 +9,49 @@ die () {
 [ -x ./mkdoc ] || die "You must be in the directory containing this script"
 export PYTHONPATH=""
 
-doc=tmp-doc
+flg_doc=0  # 0 = all, 1 = sphinx, 2 = tex
+
 cdir=`/bin/pwd`
+doc=tmp-doc
+
+case $cdir in
+    */R) r_mode=1;lang=R;dprog="./docmatlab2R -tex $doc spams";;
+    */python) r_mode=0;lang=python;dprog="./docmatlab2python -tex $doc spams";;
+    *) die "Unexpected current dir";;
+esac
+
+if [ $r_mode -eq 0 ];then
+    while [ $# -gt 0 ];do
+	case $1 in
+	    -s) flg_doc=1;;
+	    -t) flg_doc=2;;
+	    *) die "Usage: $0 [-s|-t]";;
+	esac
+	shift
+    done
+else
+    flg_doc=2
+fi
+
 /bin/rm -rf $doc
+if [ $flg_doc -ne 1 ]; then
+    mkdir -p $doc/functions $doc/html
+    cat >$doc/functions/missing.in <<EOF
+#
+# The $lang function is not yet implemented.
+#
+EOF
+
+    cd ../../doc
+    cp -p Makefile macrocss.hva macros.tex main.bib style.css $cdir/$doc
+    cd $cdir
+    $dprog
+    cd $doc
+    make hevea
+    make
+fi
+[ $flg_doc -eq 2 ] && exit 0
+
 mkdir -p $doc/source/_static $doc/source/_templates $doc/build
 [ -d $doc/source ] || die "Cannot create doc directory"
 
