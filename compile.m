@@ -221,7 +221,9 @@ if strcmp(compiler,'icc')
       else
          compile_flags=[compile_flags ' -openmp'];
          links_lib=[links_lib ' -liomp5'];
-         fprintf(fid,'export KMP_DUPLICATE_LIB_OK=true\n');
+         if mac || linux
+            fprintf(fid,'export KMP_DUPLICATE_LIB_OK=true\n');
+         end
       end
    end
 elseif strcmp(compiler,'open64')
@@ -266,7 +268,9 @@ elseif strcmp(compiler,'vs')
 elseif strcmp(compiler,'mex')
    DEFCOMP='';
    compile_flags=' -O';
-   fprintf(fid,sprintf('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s\n',path_to_blas));
+   if mac || linux
+      fprintf(fid,sprintf('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s\n',path_to_blas));
+   end
    if use_multithread 
       if (linux || mac)
          compile_flags=[compile_flags ' -fopenmp']; % we assume gcc
