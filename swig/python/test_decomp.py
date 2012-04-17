@@ -73,7 +73,7 @@ def test_L1L2BCD():
 
 def test_lasso():
     np.random.seed(0)
-    print "test Lasso"
+    print "test lasso"
 ##############################################
 # Decomposition of a large number of signals
 ##############################################
@@ -106,15 +106,98 @@ def test_lasso():
     return None
 
 def test_lassoMask():
+    np.random.seed(0)
+    print "test lassoMask"
+##############################################
+# Decomposition of a large number of signals
+##############################################
+# data generation
+    X = np.asfortranarray(np.random.normal(size=(100,100)))
+    # X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
+    D = np.asfortranarray(np.random.normal(size=(100,20)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    mask = np.asfortranarray((X > 0))  # generating a binary mask
+    param = {
+        'lambda1' : 0.15, # not more than 20 non-zeros coefficients
+        'numThreads' : -1, # number of processors/cores to use; the default choice is -1
+        # and uses all the cores of the machine
+        'mode' : 2}        # penalized formulation
+    tic = time.time()
+    alpha = spams.lassoMask(X,D,mask,**param)
+    tac = time.time()
+    t = tac - tic
+    print "%f signals processed per second\n" %(float(X.shape[1]) / t)
+   
     return None
 
 def test_lassoWeighted():
+    np.random.seed(0)
+    print "test lasso weighted"
+##############################################
+# Decomposition of a large number of signals
+##############################################
+# data generation
+    X = np.asfortranarray(np.random.normal(size=(64,10000)))
+    X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
+    D = np.asfortranarray(np.random.normal(size=(64,256)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    param = { 'L' : 20,
+        'lambda1' : 0.15, 'numThreads' : 8, 'mode' : 2} 
+    W = np.asfortranarray(np.random.random(size = (D.shape[1],X.shape[1])))
+    tic = time.time()
+    alpha = spams.lassoWeighted(X,D,W,**param)
+    tac = time.time()
+    t = tac - tic
+    print "%f signals processed per second\n" %(float(X.shape[1]) / t)
+    
     return None
 
 def test_omp():
+    np.random.seed(0)
+    print 'test omp'
+    X = np.asfortranarray(np.random.normal(size=(64,100000)))
+    D = np.asfortranarray(np.random.normal(size=(64,200)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    L = 10
+    eps = 0.1
+    numThreads = -1
+    tic = time.time()
+    alpha = spams.omp(X,D,L,eps,False,numThreads)
+    tac = time.time()
+    t = tac - tic
+    print "%f signals processed per second\n" %(float(X.shape[1]) / t)
+########################################
+# Regularization path of a single signal 
+########################################
+    X = np.asfortranarray(np.random.normal(size=(64,1)))
+    D = np.asfortranarray(np.random.normal(size=(64,10)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    L = 5
+    (alpha,path) = spams.omp(X,D,L,eps,True,numThreads)
     return None
 
 def test_ompMask():
+    np.random.seed(0)
+    print 'test ompMask'
+
+########################################    
+# Decomposition of a large number of signals
+########################################    
+    X = np.asfortranarray(np.random.normal(size=(100,100)))
+    X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
+    D = np.asfortranarray(np.random.normal(size=(100,20)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    mask = np.asfortranarray((X > 0))  # generating a binary mask
+    L = 20
+    eps = 0.1
+    numThreads=-1
+    tic = time.time()
+    alpha = spams.ompMask(X,D,mask,L,eps,False,numThreads)
+    tac = time.time()
+    t = tac - tic
+    print "%f signals processed per second\n" %(float(X.shape[1]) / t)
+    
     return None
 
 def test_somp():

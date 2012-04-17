@@ -33,6 +33,7 @@ cp -p INSTALL-package $tmpd
 rm -f $tmpd/README
 # doc
 cd $cdir
+[ $mktar -ne 0 ] && /bin/rm -rf tmp-doc
 ../mkdoc
 doc=tmp-doc
 mkdir $tmpd/sphinx

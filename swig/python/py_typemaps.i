@@ -199,19 +199,19 @@ extern "C" {
         /* check that types are OK */
 	if (check_array(indptr,NPY_INT))
         {
-            PyErr_SetString(PyExc_TypeError,"indptr array should be 1d int's");
+            PyErr_SetString(PyExc_TypeError,"spmatrix arg$argnum: indptr array should be 1d int's");
             return NULL;
         }
 
 	  if check_array(indices,NPY_INT)
         {
-            PyErr_SetString(PyExc_TypeError,"indices array should be 1d int's");
+            PyErr_SetString(PyExc_TypeError,"spmatrix arg$argnum: indices array should be 1d int's");
             return NULL;
         }
 
 	    if check_array(data, DATA_TYPECODE)
         {
-            PyErr_SetString(PyExc_TypeError,"data array should be 1d and match datatype");
+            PyErr_SetString(PyExc_TypeError,"spmatrix arg$argnum: data array should be 1d and match datatype");
             return NULL;
         }
 
@@ -410,9 +410,11 @@ extern "C" {
 
 %matrix_typemaps(float, NPY_FLOAT)
 %matrix_typemaps(double, NPY_DOUBLE)
+%matrix_typemaps(bool, NPY_BOOL)
 
 %spmatrix_typemaps(float, NPY_FLOAT)
 %spmatrix_typemaps(double, NPY_DOUBLE)
+%spmatrix_typemaps(bool, NPY_BOOL)
 
 %dspmatrix_typemaps(float, NPY_FLOAT)
 %dspmatrix_typemaps(double, NPY_DOUBLE)
