@@ -11,8 +11,20 @@ One should call CalcXY, CalcXYt or CalcXtY
 \usage{
 AAt <- spams.mult(X,Y,transX = FALSE, transY = FALSE);
 }
-\arguments{}
-\value{}
+\arguments{
+  \item{X}{%
+  first input matrix (double)}.
+  \item{Y}{%
+  second input matrix (double).}
+  \item{transX}{%
+  transpose X if TRUE.}
+  \item{transY}{%
+  transpose Y if TRUE.}
+}
+\value{
+  \item{Z}{%
+    product matrix (double).}
+  }
 \author{
 Julien Mairal, 2009
 Julien MAIRAL, 2010 (spams, matlab interface and documentation)

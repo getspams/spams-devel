@@ -1,0 +1,8 @@
+begin repl Usage
+%DEF%
+end
+begin addlast Inputs
+lambda2:  (optional parameter for solving the Elastic-Net)
+          for mode=0 and mode=1, it adds a ridge on the Gram Matrix
+verbose:       verbose mode
+end

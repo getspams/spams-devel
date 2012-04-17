@@ -1,6 +1,7 @@
 begin repl Usage
-D <- %DEF%
+%DEF%
 end
+include traindl.inc
 begin repl Output
 D:     double m x p matrix   (dictionary)
 model:  the model as A B iter

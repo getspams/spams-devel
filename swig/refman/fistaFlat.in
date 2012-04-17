@@ -1,13 +1,9 @@
 begin repl Usage
-W <- %DEF%
-[R]list(W,optim_info) <- spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
+[R]%DEF%
+[P]W = %DEF%
 [P](W,optim_info) = spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
 end
-begin addlast Inputs
-return_optim_info:     
-[R]		      if true the function will return 2 matrices in a list.
-[P]		      if true the function will return a tuple of matrices.
-end
+include fista.inc
 begin addlast Output
 optim_info:        vector of size 4, containing information of the optimization.
 [P]      W = spams.fistaFlat(Y,X,W0,return_optim_info = False,...)
@@ -18,11 +14,5 @@ optim_info:        vector of size 4, containing information of the optimization.
 [R]      optim_info <- v[[2]]
 end
 begin addlast Note
-   Valid values for the regularization parameter (regul) are:
-    "l0", "l1", "l2", "linf", "l2-not-squared", "elastic-net", "fused-lasso",
-    "group-lasso-l2", "group-lasso-linf", "sparse-group-lasso-l2",
-     "sparse-group-lasso-linf", "l1l2", "l1linf", "l1l2+l1", "l1linf+l1",
-    "tree-l0", "tree-l2", "tree-linf", "graph", "graph-ridge", "graph-l2",
-    "multi-task-tree", "multi-task-graph", "l1linf-row-column", "trace-norm",
-    "trace-norm-vec", "rank", "rank-vec", "none"
+include regul.inc
 end

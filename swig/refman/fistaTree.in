@@ -1,0 +1,18 @@
+begin repl Usage
+[R]%DEF%
+[P]W = %DEF%
+[P](W,optim_info) = spams.fistaTree(Y,X,W0,tree,return_optim_info = TRUE,...)
+end
+include fista.inc
+begin addlast Output
+optim_info:        vector of size 4, containing information of the optimization.
+[P]      W = spams.fistaTree(Y,X,W0,tree,return_optim_info = False,...)
+[P]      (W,optim_info) = spams.fistaTree(Y,X,W0,tree,return_optim_info = True,...)
+[R]      W <- spams.fistaTree(Y,X,W0,tree,return_optim_info = FALSE,...)
+[R]      v <- spams.fistaTree(Y,X,W0,tree,return_optim_info = TRUE,...)
+[R]      W <- v[[1]]
+[R]      optim_info <- v[[2]]
+end
+begin addlast Note
+include regul.inc
+end

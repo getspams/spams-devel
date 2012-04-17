@@ -1,11 +1,11 @@
 begin repl Usage
-A <- %DEF%
-[R]list(A,path) <- spams.lasso(X,D = D, Q = NULL,q = NULL,return_reg_path = TRUE, ...)
-A <- spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = FALSE,....)
-[R]list(A,path) <- spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = TRUE, ...)
-[P](A,path) = spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = TRUE, ...)
+%DEF%
+[P]spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = FALSE,....)
 end
 begin addlast Inputs
+Q:    	       p x p double matrix (Q = D'D)
+q:	       p x n double matrix (q = D'X)
+verbose:       verbose mode
 return_reg_path:     
 [R]		      if true the function will return 2 matrices in a list.
 [P]                   if true the function will return a tuple of matrices.
@@ -14,7 +14,7 @@ begin addlast Output
 #path:        regularization path
 [P]     A = spams.lasso(X,return_reg_path = False,...)
 [P]	(A,path) = spams.lasso(X,return_reg_path = True,...)
-[R]      A <- spams.lasso(X,return_reg_path = False,...)
+[R]      A <- spams.lasso(X,return_reg_path = FALSE,...)
 [R]      v <- spams.lasso(X,return_reg_path = TRUE,...)
 [R]      A <- v[[1]]
 [R]      path <- v[[2]]
@@ -28,9 +28,9 @@ end
       m <- 5;n <- 10;nD <- 5
       set.seed(0)
       X = matrix(rnorm(m * n),nrow = m,ncol = n,byrow = FALSE)
-      X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+      X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=TRUE)
       D = matrix(rnorm(m * nD),nrow = m,ncol = nD,byrow = FALSE)
-      D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+      D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=TRUE)
       alpha = spams.lasso(X,D = D,return_reg_path = FALSE,lambda1 = 0.15)
 end
 [P]begin addlast Examples
