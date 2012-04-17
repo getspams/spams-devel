@@ -91,18 +91,18 @@ template <typename T>
 SpMatrix<T> *_lassoD(Matrix<T> *X, Matrix<T> *D,Matrix<T> **path,bool return_reg_path,
 		    int L, const T constraint, const T lambda2, constraint_type mode,
       const bool pos, const bool ols, const int numThreads,
-		    int length_path,const bool verbose, bool cholevsky) 
+		    int max_length_path,const bool verbose, bool cholevsky) 
 throw(const char *) 
 {
   SpMatrix<T> *alpha = new SpMatrix<T>();
   int n = X->m();
   int M = X->n();
-  int K = D->n();
   int nD = D->m();
+  int K = D->n();
   if (n != nD)
     throw("lasso : incompatible matrix dimensions");
   if(L < 0) L = K;
-  if(length_path < 0) length_path = 4 * L;
+  if(max_length_path < 0) max_length_path = 4 * L;
   if (L> n && !(mode == PENALTY && isZero(constraint) && !pos && lambda2 > 0)) {
     if (verbose)
       printf("L is changed to %d\n",n);
@@ -114,15 +114,14 @@ throw(const char *)
     L=K;
   }
   if(return_reg_path)
-    *path = new Matrix<T>(K,length_path);
+    *path = new Matrix<T>(K,max_length_path);
   else
     *path = NULL;
   if(ols) cholevsky = ols;
   if (cholevsky) {
-    cout << "CHOL\n";
-    lasso((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),L,constraint,lambda2,mode,pos,ols,numThreads,*path,length_path);
+    lasso((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),L,constraint,lambda2,mode,pos,ols,numThreads,*path,max_length_path);
   } else {
-    lasso2((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),L,constraint,lambda2,mode,pos,numThreads,*path,length_path);
+    lasso2((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),L,constraint,lambda2,mode,pos,numThreads,*path,max_length_path);
   }
   return alpha;
 }
@@ -131,7 +130,7 @@ template <typename T>
 SpMatrix<T> *_lassoQq(Matrix<T> *X, Matrix<T> *Q, Matrix<T> *q,Matrix<T> **path,bool return_reg_path,
 		      int L, const T constraint, const T lambda2, constraint_type mode,
 		      const bool pos, const bool ols, const int numThreads,
-		      int length_path,const bool verbose, bool cholevsky) 
+		      int max_length_path,const bool verbose, bool cholevsky) 
 throw(const char *) 
 // lambda2 is ignored
 {
@@ -149,7 +148,7 @@ throw(const char *)
     throw("lasso : incompatible matrix dimensions");
 
   if(L < 0) L = K1;
-  if(length_path < 0) length_path = 4 * L;
+  if(max_length_path < 0) max_length_path = 4 * L;
   if (L> n && !(mode == PENALTY && isZero(constraint) && !pos && lambda2 > 0)) {
     if (verbose)
       printf("L is changed to %d\n",n);
@@ -161,15 +160,144 @@ throw(const char *)
     L=K;
   }
   if(return_reg_path)
-    *path = new Matrix<T>(K,length_path);
+    *path = new Matrix<T>(K,max_length_path);
   else
     *path = NULL;
   if(ols) cholevsky = ols;
   if (cholevsky)
-    lasso((Data<T> &)(*X),(AbstractMatrix<T> &)(*Q),(AbstractMatrix<T> &)(*q),(SpMatrix<T> &)(*alpha),L,constraint,mode,pos,ols,numThreads,*path,length_path);
+    lasso((Data<T> &)(*X),(AbstractMatrix<T> &)(*Q),(AbstractMatrix<T> &)(*q),(SpMatrix<T> &)(*alpha),L,constraint,mode,pos,ols,numThreads,*path,max_length_path);
   else
-    lasso2((Data<T> &)(*X),(AbstractMatrix<T> &)(*Q),(AbstractMatrix<T> &)(*q),(SpMatrix<T> &)(*alpha),L,constraint,mode,pos,numThreads,*path,length_path);
+    lasso2((Data<T> &)(*X),(AbstractMatrix<T> &)(*Q),(AbstractMatrix<T> &)(*q),(SpMatrix<T> &)(*alpha),L,constraint,mode,pos,numThreads,*path,max_length_path);
   return alpha;
+}
+
+template <typename T>
+SpMatrix<T> *_lassoMask(Matrix<T> *X, Matrix<T> *D,Matrix<bool> *B,
+		    int L, const T constraint, const T lambda2, constraint_type mode,
+			const bool pos, const int numThreads,bool verbose) 
+throw(const char *) 
+{
+  SpMatrix<T> *alpha = new SpMatrix<T>();
+  int n = X->m();
+  int M = X->n();
+  int nD = D->m();
+  int K = D->n();
+  if (n != nD)
+    throw("lassoMask : incompatible matrix dimensions");
+  if(L < 0) L = K;
+  if (L> n && !(mode == PENALTY && isZero(constraint) && !pos && lambda2 > 0)) {
+    if (verbose)
+      printf("L is changed to %d\n",n);
+    L=n;
+  }
+  if (L > K) {
+    if (verbose)
+      printf("L is changed to %d\n",K);
+    L=K;
+  }
+  lasso_mask((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),(Matrix<bool> &)(*B),L,constraint,lambda2,mode,pos,numThreads);
+  return alpha;
+}
+
+template <typename T>
+SpMatrix<T> *_lassoWeighted(Matrix<T> *X, Matrix<T> *D,Matrix<T> *W,
+		    int L, const T constraint, constraint_type mode,
+			const bool pos, const int numThreads,bool verbose) 
+throw(const char *) 
+{
+  SpMatrix<T> *alpha = new SpMatrix<T>();
+  int n = X->m();
+  int M = X->n();
+  int nD = D->m();
+  int K = D->n();
+  if (n != nD)
+    throw("lassoWeighted : incompatible matrix dimensions");
+  if(L < 0) L = K;
+  if (L> n ) {
+    if (verbose)
+      printf("L is changed to %d\n",n);
+    L=n;
+  }
+  if (L > K) {
+    if (verbose)
+      printf("L is changed to %d\n",K);
+    L=K;
+  }
+  int KK = W->m();
+  int MM = W->n();
+  if (K != KK || M != MM)
+    throw("lassoWeighted : inconsistent dimensions of matrix W");
+
+  lassoWeight((Matrix<T> &)(*X),(Matrix<T> &)(*D),(Matrix<T> &)(*W),(SpMatrix<T> &)(*alpha),L,constraint,mode,pos,numThreads);
+  return alpha;
+}
+
+template <typename T>
+SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_path,Vector<int>*L,Vector<T>*eps,const int numThreads) {
+  SpMatrix<T> *alpha = new SpMatrix<T>();
+    int n = X->m();
+    int M = X->n();
+    int nD = D->m();
+    int K = D->n();
+    if (n != nD)
+      throw("omp : incompatible matrix dimensions");
+    int sizeL = L->n();
+    int sizeE = eps->n();
+    T *pE = eps->rawX();
+    int *pL = L->rawX();
+    bool vecL = false;
+    bool vecEps = false;
+    if(return_reg_path) {
+      int scalar_L = MIN(n,MIN(*pL,K));
+      *path = new Matrix<T>(K,scalar_L);
+      (*path)->setZeros();
+      pL = &scalar_L;
+      omp((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),pL,pE,numThreads,vecL,vecEps,*path);
+    } else {
+      *path = NULL;
+      if (sizeL != 1) 
+	vecL = true;
+      if (sizeE != 1) 
+	vecEps = true;
+      omp((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),pL,pE,numThreads,vecL,vecEps);
+    }
+    return alpha;
+}
+
+template <typename T>
+SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path,bool return_reg_path,Vector<int>*L,Vector<T>*eps,const int numThreads) {
+  SpMatrix<T> *alpha = new SpMatrix<T>();
+    int n = X->m();
+    int M = X->n();
+    int nD = D->m();
+    int K = D->n();
+    int nM = B->m();
+    int mM = B->n();
+    if (n != nD )
+      throw("ompMask : incompatible matrix dimensions");
+    if (nM != n || mM != M)
+      throw("ompMask : Mash has non acceptable dimensions");
+    int sizeL = L->n();
+    int sizeE = eps->n();
+    T *pE = eps->rawX();
+    int *pL = L->rawX();
+    bool vecL = false;
+    bool vecEps = false;
+    if(return_reg_path) {
+      int scalar_L = MIN(n,MIN(*pL,K));
+      *path = new Matrix<T>(K,scalar_L);
+      (*path)->setZeros();
+      pL = &scalar_L;
+      omp_mask((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),(Matrix<bool> &)(*B),pL,pE,numThreads,vecL,vecEps,*path);
+    } else {
+      *path = NULL;
+      if (sizeL != 1) 
+	vecL = true;
+      if (sizeE != 1) 
+	vecEps = true;
+      omp_mask((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),(Matrix<bool> &)(*B),pL,pE,numThreads,vecL,vecEps);
+    }
+    return alpha;
 }
 
 /* end decomp */
@@ -311,10 +439,176 @@ using namespace FISTA;
    if (param.regul==GRAPH || param.regul==GRAPHMULT) 
     throw("Error: fistaGraph should be used instead");
   if (param.regul==TREE_L0 || param.regul==TREEMULT || param.regul==TREE_L2 || param.regul==TREE_LINF) 
-      throw("Error: fistaTree should be used instead");
+      throw("Error: fistaFlat should be used instead");
 
   Matrix<T> *duality_gap = new Matrix<T>();
   FISTA::solver((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*duality_gap));
+  if (param.log) delete[](param.logName);
+  return duality_gap;
+}
+
+template<typename T> 
+Matrix<T> *_fistaTree(
+	     Matrix<T> *X,AbstractMatrixB<T> *D,Matrix<T> *alpha0,
+	     Matrix<T> *alpha, // tree :
+	     Vector<double> *eta_g,SpMatrix<bool> *groups,Vector<int> *own_variables,
+	     Vector<int> *N_own_variables, // params :
+	     int num_threads,
+	     int max_it,
+	     T L0,
+	     bool fixed_step,
+	     T gamma,
+	     T _lambda,
+	     T delta,
+	     T lambda2,
+	     T lambda3,
+	     T a,
+	     T b,
+	     T c,
+	     T tol,
+	     int it0,
+	     int max_iter_backtracking,
+	     bool compute_gram,
+	     bool lin_admm,
+	     bool admm,
+	     bool intercept,
+	     bool resetflow,
+	     char* name_regul,
+	     char* name_loss,
+	     bool verbose,
+	     bool pos,
+	     bool clever,
+	     bool log,
+	     bool ista,
+	     bool subgrad,
+	     char* logName,
+	     bool is_inner_weights,
+	     Vector<T> *inner_weights,
+	     bool eval,
+	     int size_group,
+	     bool sqrt_step,
+	     bool transpose
+)
+throw(const char *) 
+{
+using namespace FISTA;
+ int mD = D->m();
+ int p = D->n();
+ int m = X->m();
+ int n = X->n();
+ int pAlpha = alpha0->m();
+ int nAlpha = alpha0->n();
+  FISTA::ParamFISTA<T> param;
+  param.max_it = max_it;
+  param.L0 = L0;
+  param.fixed_step = fixed_step;
+  param.gamma = gamma;
+  param.lambda = _lambda;
+  param.delta = delta;
+  param.lambda2 = lambda2;
+  param.lambda3 = lambda3;
+  param.a = a;
+  param.b = b;
+  param.c = c;
+  param.tol = tol;
+  param.it0 = it0;
+  param.max_iter_backtracking = max_iter_backtracking;
+  param.loss = loss_from_string(name_loss);
+  if (param.loss==INCORRECT_LOSS)
+    throw("fistaTree: Unknown loss");
+  param.compute_gram = compute_gram;
+  param.lin_admm = lin_admm;
+  param.admm = admm;
+  param.intercept = intercept;
+  param.resetflow = resetflow;
+  param.regul = regul_from_string(name_regul);
+
+  if (param.regul==INCORRECT_REG) {
+      throw("fistaTree: Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+  }
+  strncpy(param.name_regul,name_regul,param.length_names);
+  strncpy(param.name_loss,name_loss,param.length_names);
+  param.verbose = verbose;
+  param.pos = pos;
+  param.clever = clever;
+
+  if(param.log = log) {
+    int n = strlen(logName);
+    if(n == 0) 
+      throw("fistaTree : missing field logName");
+    param.logName = new char[n+1];
+    strcpy(param.logName,logName);
+  }
+  param.ista = ista;
+  param.subgrad = subgrad;
+  param.is_inner_weights = is_inner_weights;
+
+  if(is_inner_weights) {
+    if(inner_weights == NULL)
+      throw("fistaTree : missing inner_heights ");
+    param.inner_weights = inner_weights->rawX();
+  }
+
+  param.eval = eval;
+  param.size_group = size_group;
+  param.sqrt_step = sqrt_step;
+  param.transpose = transpose;
+
+  if ((param.loss != CUR && param.loss != MULTILOG) && (pAlpha != p || nAlpha != n || mD != m)) { 
+      throw("fistaTree : Argument sizes are not consistent");
+   } else if (param.loss == MULTILOG) {
+    Vector<T> Xv;
+    X->toVect(Xv);
+    int maxval = static_cast<int>(Xv.maxval());
+    int minval = static_cast<int>(Xv.minval());
+    if (minval != 0)
+      throw("fistaTree : smallest class should be 0");
+    if (maxval*X->n() > nAlpha || mD != m) {
+      cerr << "Number of classes: " << maxval << endl;
+      //cerr << "Alpha: " << pAlpha << " x " << nAlpha << endl;
+         //cerr << "X: " << X.m() << " x " << X.n() << endl;
+      throw("fistaTree : Argument sizes are not consistent");
+    }
+  } else if (param.loss == CUR && (pAlpha != D->n() || nAlpha != D->m())) {
+      throw("fistaTree : Argument sizes are not consistent");
+   }
+   if (param.num_threads == -1) {
+      param.num_threads=1;
+#ifdef _OPENMP
+      param.num_threads =  MIN(MAX_THREADS,omp_get_num_procs());
+#endif
+   }
+
+   if (param.regul==GRAPH || param.regul==GRAPHMULT) 
+    throw("Error: fistaGraph should be used instead");
+  if (param.regul==TREEMULT && abs<T>(param.lambda2 - 0) < 1e-20) 
+      throw("fistaTree error: with multi-task-tree, lambda2 should be > 0");
+  TreeStruct<T> tree;
+  tree.Nv=0;
+  int num_groups = own_variables->n();
+  if (num_groups != N_own_variables->n()) {
+    throw("fistaTree error: in tree,  own_variables and N_own_variables must have same dimension");
+  }
+  int *pr_N_own_variables = N_own_variables->rawX();
+  int num_var = 0;
+  for (int i = 0; i<num_groups; ++i)
+    num_var+=pr_N_own_variables[i];
+  if (pAlpha < num_var) 
+    throw("fistaTree error: Input alpha is too small");
+  if(num_groups != eta_g->n())
+    throw("fistaTree error: in tree, nb of groups incompatible with eta_g size");
+  if((num_groups != groups->n()) || (num_groups != groups->m()))
+    throw("fistaTree error: in tree, nb of groups incompatible with groups size");
+  for (int i = 0; i<num_groups; ++i) tree.Nv+=pr_N_own_variables[i]; 
+   tree.Ng=num_groups;
+   tree.weights= eta_g->rawX();
+   tree.own_variables= own_variables->rawX();
+   tree.N_own_variables=pr_N_own_variables;
+   tree.groups_ir= groups->r();
+   tree.groups_jc= groups->pB();
+
+  Matrix<T> *duality_gap = new Matrix<T>();
+  FISTA::solver<T>((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*duality_gap),NULL,&tree);
   if (param.log) delete[](param.logName);
   return duality_gap;
 }
@@ -344,7 +638,7 @@ using namespace FISTA;
     throw("proximalFlat : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
   strncpy(param.name_regul,name_regul,param.length_names);
   if (param.regul==GRAPH || param.regul==GRAPHMULT) 
-    throw("proximalFlat : FistaGraph should be used instead");
+    throw("proximalFlat : proximalGraph should be used instead");
   param.num_threads = (num_threads < 0) ? 1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
@@ -366,6 +660,82 @@ using namespace FISTA;
 
   Vector<T> *val_loss = new Vector<T>();
   FISTA::PROX((Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Vector<T> &)(*val_loss));
+  return val_loss;
+}
+
+template<typename T> 
+Vector<T> *_proximalTree(Matrix<T> *alpha0,Matrix<T> *alpha, // tree
+		Vector<double> *eta_g,SpMatrix<bool> *groups,Vector<int> *own_variables,
+		Vector<int> *N_own_variables, // params :	 
+		int num_threads,
+		T lambda1,
+		T lambda2,
+		T lambda3,
+		bool intercept,
+		bool resetflow,
+		char* name_regul,
+		bool verbose,
+		bool pos,
+		bool clever,
+		bool eval,
+		int size_group,
+		bool transpose
+		) 
+throw(const char *) 
+{
+using namespace FISTA;
+  FISTA::ParamFISTA<T> param;
+  param.regul = regul_from_string(name_regul);
+  if (param.regul==INCORRECT_REG)
+    throw("proximalTree : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+  strncpy(param.name_regul,name_regul,param.length_names);
+  if (param.regul==GRAPH || param.regul==GRAPHMULT) 
+    throw("proximalTree : proximalGraph should be used instead");
+  param.num_threads = (num_threads < 0) ? 1 : num_threads;
+  param.lambda = lambda1;
+  param.lambda2 = lambda2;
+  param.lambda3 = lambda3;
+  param.intercept = intercept;
+  param.resetflow = resetflow;
+  param.verbose = verbose;
+  param.pos = pos;
+  param.clever = clever;
+  param.eval = eval;
+  param.size_group = size_group;
+  param.transpose = transpose;
+  if (param.num_threads == -1) {
+    param.num_threads=1;
+#ifdef _OPENMP
+      param.num_threads =  MIN(MAX_THREADS,omp_get_num_procs());
+#endif
+   }
+  int pAlpha = alpha0->m();
+  TreeStruct<T> tree;
+  tree.Nv=0;
+  int num_groups = own_variables->n();
+  if (num_groups != N_own_variables->n()) {
+    throw("proximalTree error: in tree,  own_variables and N_own_variables must have same dimension");
+  }
+  int *pr_N_own_variables = N_own_variables->rawX();
+  int num_var = 0;
+  for (int i = 0; i<num_groups; ++i)
+    num_var+=pr_N_own_variables[i];
+  if (pAlpha < num_var) 
+    throw("proximalTree error: Input alpha is too small");
+  if(num_groups != eta_g->n())
+    throw("proximalTree error: in tree, nb of groups incompatible with eta_g size");
+  if((num_groups != groups->n()) || (num_groups != groups->m()))
+    throw("proximalTree error: in tree, nb of groups incompatible with groups size");
+  for (int i = 0; i<num_groups; ++i) tree.Nv+=pr_N_own_variables[i]; 
+   tree.Ng=num_groups;
+   tree.weights= eta_g->rawX();
+   tree.own_variables= own_variables->rawX();
+   tree.N_own_variables=pr_N_own_variables;
+   tree.groups_ir= groups->r();
+   tree.groups_jc= groups->pB();
+
+  Vector<T> *val_loss = new Vector<T>();
+  FISTA::PROX<T>((Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Vector<T> &)(*val_loss),NULL,&tree);
   return val_loss;
 }
 

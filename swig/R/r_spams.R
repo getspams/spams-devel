@@ -7,10 +7,10 @@
 }
 ###########  linalg ##############
 
-spams.sort <- function(v,mode=T) {
-     x = c(v)
-     sort(x,mode)
-     return(x)
+spams.sort <- function(X,mode=T) {
+     Y = c(X)
+     sort(Y,mode)
+     return(Y)
 }
 
 spams.calcAAt <- function(A) {
@@ -85,8 +85,8 @@ spams.invSym <- function(A) {
       return(B)
 }
 
-spams.normalize <- function(A) {
-      B = matrix(A,nrow = nrow(A),ncol = ncol(A))
+spams.normalize <- function(X) {
+      B = matrix(X,nrow = nrow(X),ncol = ncol(X))
       normalize(B)
       return(B)
 }
@@ -108,15 +108,11 @@ spams.sparseProject <- function(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.
   return(V)
 }
 
-# A = Lasso(X,D,param,return_reg_path = False):
-# (A,path) = Lasso(X,D,param,return_reg_path = True):
-# A = Lasso(X,Q,q,param,return_reg_path = False):
-# (A,path) = Lasso(X,Q,q,param,return_reg_path = True):
 spams.lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -1,lambda1= NULL,lambda2= 0.,
                         mode= 'PENALTY',pos= FALSE,ols= FALSE,numThreads= -1,
-                 length_path= -1,verbose=TRUE,cholesky= FALSE) {
+                 max_length_path= -1,verbose=FALSE,cholesky= FALSE) {
 #  require('Matrix')
-    # Note : 'L' and 'length_path' default to -1 so that their effective default values
+    # Note : 'L' and 'max_length_path' default to -1 so that their effective default values
     # will be set in spams.h
 
   if (! is.null(Q)) {
@@ -136,11 +132,11 @@ spams.lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -
   x = NULL
   if(! is.null(q)) {
 ##    x = do.call(spams_wrap.lassoQq,c(list(X,D,q,0,return_reg_path),params))
-    x = lassoQq(X,Q,q,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,length_path,verbose,cholesky)
+    x = lassoQq(X,Q,q,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
 ##    x = .mycall('lassoQq',c('X','D','q',0,'return_reg_path',params))
   } else {
 ##    x = do.call(spams_wrap.lassoD,c(list(X,D,0,return_reg_path),params))
-    x = lassoD(X,D,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,length_path,verbose,cholesky)
+    x = lassoD(X,D,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
 ##    x = .mycall('lassoD',c('X','D',0,'return_reg_path',params))
   }
   if(return_reg_path) {
@@ -151,12 +147,94 @@ spams.lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -
   data = x[[1]][[3]]
   shape = x[[1]][[4]]
   alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
-  tac2 = proc.time()
   if (return_reg_path)
     return (list(alpha,path))
   else
     return(alpha)
 
+}
+
+spams.lassoMask <- function(X,D,B,L= -1,lambda1= NULL,lambda2= 0.,
+                        mode= 'PENALTY',pos= FALSE,numThreads= -1,
+                 verbose=FALSE) {
+#  require('Matrix')
+    # Note : 'L' and 'max_length_path' default to -1 so that their effective default values
+    # will be set in spams.h
+
+  if(is.null(lambda1)) {
+    stop("ERROR lassoMask : lambda1 must be defined\n")
+  }
+  .verif_enum(mode,'constraint_type','mode in Lasso')
+  x = lassoMask(X,D,B,L,lambda1,lambda2,mode,pos,numThreads,verbose)
+  indptr = x[[1]]
+  indices = x[[2]]
+  data = x[[3]]
+  shape = x[[4]]
+  alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  return(alpha)
+}
+
+spams.lassoWeighted <- function(X,D,W,L= -1,lambda1= NULL,
+                        mode= 'PENALTY',pos= FALSE,numThreads= -1,
+                 verbose=FALSE) {
+#  require('Matrix')
+    # Note : 'L' and 'max_length_path' default to -1 so that their effective default values
+    # will be set in spams.h
+
+  if(is.null(lambda1)) {
+    stop("ERROR lassoWeighted : lambda1 must be defined\n")
+  }
+  .verif_enum(mode,'constraint_type','mode in Lasso')
+  x = lassoWeighted(X,D,W,L,lambda1,mode,pos,numThreads,verbose)
+  indptr = x[[1]]
+  indices = x[[2]]
+  data = x[[3]]
+  shape = x[[4]]
+  alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  return(alpha)
+}
+
+spams.omp <- function(X,D,L,eps,return_reg_path = FALSE, numThreads = -1) {
+  path = NULL
+  if(length(L) == 1 && ! is.integer(L)) {
+    L = as.vector(c(L),mode='integer')
+  }
+#  if(! is.vector(eps)) {
+#    eps = as.vector(c(eps),mode='double')
+#  }
+  x = omp(X,D,0,return_reg_path,L,eps, numThreads)
+  if(return_reg_path) {
+    path = x[[2]]
+  }
+  indptr = x[[1]][[1]]
+  indices = x[[1]][[2]]
+  data = x[[1]][[3]]
+  shape = x[[1]][[4]]
+  alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  if (return_reg_path)
+    return (list(alpha,path))
+  else
+    return(alpha)
+}
+
+spams.ompMask <- function(X,D,B,L,eps,return_reg_path = FALSE, numThreads = -1) {
+  path = NULL
+  if(length(L) == 1 && ! is.integer(L)) {
+    L = as.vector(c(L),mode='integer')
+  }
+  x = ompMask(X,D,B,0,return_reg_path,L,eps, numThreads)
+  if(return_reg_path) {
+    path = x[[2]]
+  }
+  indptr = x[[1]][[1]]
+  indices = x[[1]][[2]]
+  data = x[[1]][[3]]
+  shape = x[[1]][[4]]
+  alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  if (return_reg_path)
+    return (list(alpha,path))
+  else
+    return(alpha)
 }
 
 ###########  END decomp ##############
@@ -186,17 +264,70 @@ spams.fistaFlat <- function(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_
     return (W)
 }
 
+spams.fistaTree <- function(Y,X,W0,tree,return_optim_info = FALSE,numThreads =-1,max_it =1000,L0=1.0,
+              fixed_step=FALSE,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
+              a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
+              compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
+              resetflow=FALSE,regul="",loss="",verbose=FALSE,pos=FALSE,clever=FALSE,
+              log=FALSE,ista=FALSE,subgrad=FALSE,logName="",is_inner_weights=FALSE,
+              inner_weights=c(0.),eval=FALSE,size_group=1,sqrt_step=TRUE,transpose=FALSE) {
+  if (length(tree) != 4) {
+    stop("fistaTree : tree should be a list of 4 elements")
+  }
+  eta_g = tree[['eta_g']]
+  groups = tree[['groups']]
+  own_variables = tree[['own_variables']]
+  N_own_variables = tree[['N_own_variables']]
+  m = nrow(W0)
+  n = ncol(W0)
+#  W = matrix(rep(0,m * n),nrow = m,ncol = n)
+  W = matrix(c(0),nrow = m,ncol = n)
+  optim_info = fistaTree(Y,X,W0,W,eta_g,groups,own_variables,N_own_variables,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,eval,size_group,sqrt_step,transpose)
+  if(return_optim_info == TRUE)
+    return(list(W,optim_info))
+  else
+    return (W)
+}
 
-spams.proximalFlat <- function(alpha0,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
+
+spams.proximalFlat <- function(U,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
                  pos=FALSE,clever=TRUE,eval= NULL,size_group=1,transpose=FALSE) {
-
-  m = nrow(alpha0)
-  n = ncol(alpha0)
+  if(is.null(eval)) {
+    eval = return_val_loss
+  }
+  m = nrow(U)
+  n = ncol(U)
 #  alpha = matrix(rep(0,m * n),nrow = m,ncol = n)
   alpha = matrix(c(0),nrow = m,ncol = n)
-##  val_loss = .mycall('proximalFlat',c('alpha0','alpha',params))
-  val_loss = proximalFlat(alpha0,alpha,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
+##  val_loss = .mycall('proximalFlat',c('U','alpha',params))
+  val_loss = proximalFlat(U,alpha,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
+  if(return_val_loss == TRUE)
+    return(list(alpha,val_loss))
+  else
+    return (alpha)
+  
+}
+
+spams.proximalTree <- function(U,tree,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
+                 lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
+                 pos=FALSE,clever=TRUE,eval= NULL,size_group=1,transpose=FALSE) {
+  if(is.null(eval)) {
+    eval = return_val_loss
+  }
+  if (length(tree) != 4) {
+    stop("proximalTree : tree should be a list of 4 elements")
+  }
+  eta_g = tree[['eta_g']]
+  groups = tree[['groups']]
+  own_variables = tree[['own_variables']]
+  N_own_variables = tree[['N_own_variables']]
+  m = nrow(U)
+  n = ncol(U)
+#  alpha = matrix(rep(0,m * n),nrow = m,ncol = n)
+  alpha = matrix(c(0),nrow = m,ncol = n)
+##  val_loss = .mycall('proximalFlat',c('U','alpha',params))
+  val_loss = proximalTree(U,alpha,eta_g,groups,own_variables,N_own_variables,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
   if(return_val_loss == TRUE)
     return(list(alpha,val_loss))
   else

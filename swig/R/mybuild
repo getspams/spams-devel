@@ -5,11 +5,13 @@ debug=0
 
 nswg=0
 build=1
+mkvar=Makevars
 while [ $# -gt 0 ]; do
     case $1 in 
 	-ns) nswg=1;; 
 	-nb) build=0;; 
 	-D)debug=1;;
+	-g) mkvar=Makevars-g;;
 	-*) echo "BAD OPTION $1";exit 2;;
     esac
     shift
@@ -42,13 +44,14 @@ cp -p ../../COPYING $pkdir/LICENSE
 /bin/rm -rf $pkdir/man;cp -a man $pkdir
 
 rfiles="zzz.R r_$nom.R ${nom}.R"
-cfiles="$nom.h ${nom}.cpp Makevars"
+cfiles="$nom.h ${nom}.cpp"
 if [ $debug -ne 0 ]; then
     rfiles="$rfiles r_debug.R"
     cfiles="$cfiles spams-tst.h"
 fi
 cp $rfiles $pkdir/R
 cp $cfiles $pkdir/src
+cp $mkvar $pkdir/src/Makevars
 mkdir -p $pkdir/inst/test $pkdir/inst/doc $pkdir/inst/extdata
 cp -p test_*.R $pkdir/inst/test
 cp -p ../../doc/doc_spams.pdf $pkdir/inst/doc
@@ -63,13 +66,14 @@ if [ ! -d $pkdir/src/spams ]; then
    cd $cdir
 fi
 [ $build -eq 0 ] && exit 0
-htmldir=$pkdir/inst/html
+htmldir=$pkdir/inst/www
 mkdir -p $htmldir
 for f in man/*.Rd; do
     file=`basename $f .Rd`
     R CMD Rdconv -t html $f -o $htmldir/$file.html
 done
-R CMD build --binary --no-docs pkg/spams
+#R CMD build --binary --no-docs pkg/spams
+R CMD build --binary pkg/spams
 [ $? -ne 0 ] && exit 1
 rm -rf lib;mkdir lib
 cd lib

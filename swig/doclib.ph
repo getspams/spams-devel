@@ -115,28 +115,29 @@ sub get_doc {
 	exit 1;
 	return 0;
     }
-    my $stat = 0;
+    my $stat = 0; # 1 when usage is found
     my $tmp = [()];
     my $key = "";
     my $prefix = $r_mode ? "spams." : "";
     my $lang = $r_mode ? "R" : "python";
     while(<IN>) {
 	chomp;
-	if(/mex([A-Z][_A-z]+)/) {
+	if(/mex([A-Z][_A-z]+)/) { # replace mex*
 	    my $s = $1;
 	    (defined($main::conv_names{$s}) ) || die "Inconnu : $s\n";
 	    my $s1 = $main::conv_names{$s};
 	    s/mex$s/$prefix$s1/g;
 	}
-	if(! $stat) {
+	if(! $stat) { # skip to Usage
 	    (s/^%\s*Usage\s*:\s*//) || next;
 	    $stat = 1;
-	    if($r_mode) {s/\s*=\s*/ <- /;}
+##	    if($r_mode) {s/\s*=\s*/ <- /;}
+	    s/^.*=\s*//;
 	    push(@$tmp,$_);
 	    $key = 'Usage';
 	    next;
 	}
-	if(s/^%\s([^\s:]+)\s*:\s*//) {
+	if(s/^%\s([^\s:]+)\s*:\s*//) { # keys start at the beginning of line
 	    my $x = $1;
 	    my $i = $#$tmp;
 #	    # remove last empty lines
@@ -163,6 +164,7 @@ sub get_doc {
 		$key = "Param";
 		next;
 	    }
+	    s/^(\s*)tree:\s*struct\s*/$1tree: named list /;
 	    s/param\.lambda([^\w])/param.lambda1$1/;
 	    s/(param\.[^\s:]+)\s*:/$1/;
 	    if($key eq "Param") {
@@ -170,12 +172,19 @@ sub get_doc {
 		s/^\s*param\.([^\s]+)\s/    $1: /;
 	    }
 	    s/param\.//g;
+	    if($r_mode) {
+		s/tree\.([A-z_]+)/tree[['$1']]/g;
+	    } else {
+		s/tree\.([A-z_]+)/tree['$1']/g;
+	    }
+	    # somme corrections
+	    s/group_size/size_group/g;
 	    s/Matlab\s+function\s+pcg/$lang function solve/;
 	    s/Matlab\s+expression\s+XAt[^\s\;]+/$lang expression/;
 	    s/Matlab/$lang/;
-	    if($key eq "Usage") {
-		s/\s*=\s*/ <- /;
-	    }
+#	    if($key eq "Usage") {
+##!		s/\s*=\s*/ <- /;
+#	    }
 	    push(@$tmp,$_);
 	}
     }
@@ -198,7 +207,7 @@ sub get_def {
 	push(@def,$x);
     }
     $def[0] =~ s/^[^\(]+\(//;
-    $def[$#def] =~ s/\)[^\(]*$/\)/;
+    $def[$#def] =~ s/\)[\s:\{]*$//;
     $x = join('',@def);
     my @tmp = split(/\s*,\s*/,$x);
     my $lgr = $idt;
@@ -233,12 +242,30 @@ sub get_def {
 # out : $modifs (hash) = modifications by doc section
 sub get_modifs {
     my($r_mode,$f,$myprog,$modifs,$spams,$progdefs) = @_;
-    my $inblock = 0;
-    my ($tmp,$key,$op);
-    my $expr = "";
+    my @lines = ();
     open(IN,"<$f") || return;
     while(<IN>) {
 	chomp;
+	if(s/^include\s+//) {
+	    my $f2 = $_;
+	    my $d = $f;
+	    $d =~ s:[^/]+$::;
+	    if(open(INC,"<$d$f2")) {
+		while(<INC>) {
+		    chomp;
+		    push(@lines,$_);
+		}
+		close(INC);
+	    }
+	    next;
+	}
+	push(@lines,$_);
+    }
+    close(IN);
+    my $inblock = 0;
+    my ($tmp,$key,$op);
+    my $expr = "";
+    foreach $_ (@lines) {
 	(/^\s*$/) && next;
 	(/^\s*\#/) && next;
 	if(s/^\[([PR])\]//) {  # this line is only for R or python
@@ -282,7 +309,6 @@ sub get_modifs {
 	    $inblock = 1;
 	}
     }
-    close(IN);
 }
 
 # try to split Description into short description and detail
@@ -312,6 +338,10 @@ sub apply_modifs {
     my($doc,$format,$modifs) = @_;
     my($op,$tmp);
     while(my ($key,$x) = each(%$modifs)) {
+	if(! defined($$format{$key})) {
+	    print "Warning: Unknown modif key <$key>\n";
+	    next;
+	}
 	$op = $$x{'op'};
 	$tmp = $$x{'data'};
 	if($op eq "repl") {
@@ -369,6 +399,8 @@ $main::tex_docformat = {
     'Description' => {},
     'Usage' => {},
     'Inputs' => {},
+    'Param' => {},
+    'detail' => {},
     'Output' => {'indent' => 1},
     'Author' => {'tag' => 'Authors'},
     'Note' => {'tag' => 'Note', 'optional' => 1},

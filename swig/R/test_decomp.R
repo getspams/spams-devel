@@ -48,7 +48,7 @@ test_sparseProject <- function () {
 
 test_lasso <- function() {
   set.seed(0)
-  .printf("test Lasso\n")
+  .printf("test lasso\n")
 ##############################################
 # Decomposition of a large number of signals
 ##############################################
@@ -73,9 +73,102 @@ test_lasso <- function() {
   path = res[[2]]
   return(NULL)
 }
+test_lassoMask <- function() {
+  set.seed(0)
+  .printf("test lassoMask\n")
+##############################################
+# Decomposition of a large number of signals
+##############################################
+# data generation
+  X = matrix(rnorm(100 * 100),nrow = 100,ncol = 100,byrow = FALSE)
+  X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+  D = matrix(rnorm(100 * 20),nrow = 100,ncol = 20,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  mask = (X > 0) # generating a binary mask
+  tic = proc.time()
+  alpha = spams.lassoMask(X,D,mask,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY')
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
+  return(NULL)
+}
+test_lassoWeighted <- function() {
+  set.seed(0)
+  .printf("test lasso weighted\n")
+##############################################
+# Decomposition of a large number of signals
+##############################################
+# data generation
+  X = matrix(rnorm(64 * 10000),nrow = 64,ncol = 10000,byrow = FALSE)
+  X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+  D = matrix(rnorm(64 * 256),nrow = 64,ncol = 256,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  W = matrix(runif(ncol(D) * ncol(X),0,1),nrow = ncol(D),ncol = ncol(X),byrow = FALSE)
+  tic = proc.time()
+  alpha = spams.lassoWeighted(X,D,W,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY')
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
+  
+  return(NULL)
+}
 
+test_omp <- function() {
+  set.seed(0)
+  .printf("test omp\n")
+  X = matrix(rnorm(64 * 100000),nrow = 64,ncol = 100000,byrow = FALSE)
+  D = matrix(rnorm(64 * 200),nrow = 64,ncol = 200,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  L = 10
+  eps =0.1
+#  L = as.vector(c(10),mode='integer')
+#  eps = as.vector(c(0.1),mode='double')
+  numThreads = -1
+
+  tic = proc.time()
+  alpha = spams.omp(X,D,L,eps,FALSE,numThreads)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
+
+########################################
+# Regularization path of a single signal 
+########################################
+  X = matrix(rnorm(64 * 1),nrow = 64,ncol = 1,byrow = FALSE)
+  D = matrix(rnorm(64 * 10),nrow = 64,ncol = 10,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  L = 5
+  res = spams.omp(X,D,L,eps,TRUE,numThreads)
+  alpha = res[[1]]
+  path = res[[2]]
+  return(NULL)
+}
+test_ompMask <- function() {
+  set.seed(0)
+  .printf("test ompMask\n")
+  X = matrix(rnorm(100 * 100),nrow = 100,ncol = 100,byrow = FALSE)
+  X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+  D = matrix(rnorm(100 * 20),nrow = 100,ncol = 20,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  mask = (X > 0) # generating a binary mask
+  L = 10
+  eps =0.1
+  numThreads = -1
+
+  tic = proc.time()
+  alpha = spams.ompMask(X,D,mask,L,eps,FALSE,numThreads)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
+
+}
 
 #
 test_decomp.tests =list( 
   'sparseProject' = test_sparseProject,
-  'lasso' = test_lasso)
+  'lasso' = test_lasso,
+  'lassoMask' = test_lassoMask,
+  'lassoWeighted' = test_lassoWeighted,
+  'omp' = test_omp,
+  'ompMask' = test_ompMask
+  )

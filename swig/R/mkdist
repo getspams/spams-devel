@@ -26,6 +26,7 @@ mkdir $dir
 pkdir=$dir/$nom
 
 ./docmatlab2R r_spams
+[ $mktar -ne 0 ] && /bin/rm -rf tmp-doc
 ../mkdoc
 doc=tmp-doc
 swig -c++ -r -o ${nom}.cpp $nom.i

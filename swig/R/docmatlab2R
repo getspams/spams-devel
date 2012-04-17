@@ -81,7 +81,7 @@ foreach my $i (@indx) {
     my %doc = ();
     prepare_doc(1,$mlab_prog,$myprog,\%doc,$rdformat,\@spams,\%progdefs);
     print "++ $myprog\n";
-    write_man("man/spams.$myprog.Rd",$myprog,\%doc,$rdformat);
+    write_man("man/spams.$myprog.Rd","spams.$myprog",\%doc,$rdformat);
     # make html version
 ##    system "R CMD Rdconv -t html man/spams.$prog.Rd -o html/spams.$prog.html";
 #    print_man("man/spams.$prog.Rd",$prog,\%doc);
@@ -170,9 +170,9 @@ sub write_man {
     my($rdf,$i,$key,$tmp);
     open(OUT,">$f") || die "$f create err $!\n";
     print OUT "\\name{$prog}\n\\alias{$prog}\n";
+    my $doci = $$doc{'Inputs'};
     if(defined($$doc{'Param'})) {
 	my $docp = $$doc{'Param'};
-	my $doci = $$doc{'Inputs'};
 	push(@$doci,@$docp);
 	undef($$doc{'Param'});
     }
@@ -186,6 +186,12 @@ sub write_man {
 	    next;
 	}
 	$tmp = $$doc{$key};
+	if($#$tmp < 0) {
+	    if(! defined($$rdf{'optional'})) {
+		print STDERR "!! $prog : $key EMPTY.\n";
+	    }
+	    next;
+	}
 	print OUT "\\$$rdf{'tag'}\{\n";
 	if(defined($$rdf{'prog'})) {
 	    my $func = $$rdf{'prog'};

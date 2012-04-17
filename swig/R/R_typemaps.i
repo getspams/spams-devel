@@ -44,16 +44,16 @@ SEXP appendOutput(SEXP value,SEXP result) {
 %typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER)
     (Vector<DATA_TYPE> *INPLACE_VECTOR)
 {
-    $1 = (TYPEOF($input) == R_TYPE && Rf_ncols($input)==1 ) ? 1 : 0;
+    $1 = (TYPEOF($input) == R_TYPE && Rf_isVector($input) ) ? 1 : 0;
 }
 
 %typemap(in) (Vector<DATA_TYPE> *INPLACE_VECTOR)
 {
     SEXP rvec=$input;
-    if (TYPEOF(rvec) != R_TYPE || Rf_ncols(rvec)!=1)
+    if (TYPEOF(rvec) != R_TYPE || ! Rf_isVector(rvec))
     {
         /*SG_ERROR("Expected Double Vector as argument %d\n", m_rhs_counter);*/
-        myerr("Expected Double Vector as argument %d",$argnum);
+        myerr("Expected DATA_TYPE Vector as argument %d",$argnum);
     }
 
     $1 = new Vector<DATA_TYPE>((DATA_TYPE*) R_CAST(rvec), LENGTH(rvec));
@@ -209,7 +209,7 @@ SEXP appendOutput(SEXP value,SEXP result) {
      if (TYPEOF(xvec) != R_TYPE || LENGTH(dims) != 2)	
     {	
         /*SG_ERROR("Expected Double Vector as argument %d\n", m_rhs_counter);*/
-        myerr("Expected Double sparse matrix as argument %d",$argnum);
+        myerr("Expected DATA_TYPE sparse matrix as argument %d",$argnum);
     }
      int *pB = INTEGER(pvec);
      int *pE = pB + 1;
@@ -336,9 +336,11 @@ SEXP appendOutput(SEXP value,SEXP result) {
 
 %matrix_typemaps(REALSXP,REAL,float)
 %matrix_typemaps(REALSXP,REAL,double)
+%matrix_typemaps(LGLSXP,LOGICAL,bool)
 
 %spmatrix_typemaps(REALSXP,REAL,float)
 %spmatrix_typemaps(REALSXP,REAL,double)
+%spmatrix_typemaps(LGLSXP,LOGICAL,bool)
 
 %dspmatrix_typemaps(REALSXP,REAL,float)
 %dspmatrix_typemaps(REALSXP,REAL,double)

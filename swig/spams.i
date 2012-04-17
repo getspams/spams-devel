@@ -52,7 +52,8 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
      Matrix<ctype> *XY,
      Matrix<ctype> *AAt,
      Matrix<ctype> *alpha0,
-     Matrix<ctype> *alpha
+     Matrix<ctype> *alpha,
+     Matrix<ctype> *W
 %enddef
 %define argout_matrices(ctype)
      Matrix<ctype> **path,
@@ -65,10 +66,16 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
     Vector<ctype> *v,
     Vector<ctype> *b,
     Vector<ctype> *x,
-    Vector<ctype> *inner_weights
+    Vector<ctype> *inner_weights,
+    Vector<ctype> *L,
+    Vector<ctype> *eps,
+    Vector<ctype> *eta_g,
+    Vector<ctype> *own_variables,
+    Vector<ctype> *N_own_variables
 %enddef
 %define inplace_spmatrices(ctype)
-    SpMatrix<ctype> *A
+    SpMatrix<ctype> *A,
+    SpMatrix<ctype> *groups
 %enddef
 %define inplace_dspmatrices(ctype)
     AbstractMatrixB<ctype> *D
@@ -118,6 +125,10 @@ enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, PENALTY2};
 INSTANTIATE_DATA(sparseProject)
 INSTANTIATE_DATA(lassoD)
 INSTANTIATE_DATA(lassoQq)
+INSTANTIATE_DATA(lassoMask)
+INSTANTIATE_DATA(lassoWeighted)
+INSTANTIATE_DATA(omp)
+INSTANTIATE_DATA(ompMask)
 
 /**** dictLearn ****/
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};
@@ -125,4 +136,6 @@ INSTANTIATE_DATA(alltrainDL)
 
 /**** prox ****/
 INSTANTIATE_DATA(fistaFlat)
+INSTANTIATE_DATA(fistaTree)
 INSTANTIATE_DATA(proximalFlat)
+INSTANTIATE_DATA(proximalTree)

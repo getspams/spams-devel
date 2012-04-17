@@ -98,7 +98,7 @@ test_fistaFlat <- function() {
     
   .printf("\nOne classification experiment\n")
 #    Y = 2 * double(randn(100,1) > 0)-1
-  Y = matrix(2. * as.double(rnorm(100) > 1.) - 1.,nrow = 100,ncol = 1,byrow = FALSE)
+  Y = matrix(2. * as.double(rnorm(100) > 0.) - 1.,nrow = 100,ncol = 1,byrow = FALSE)
   .printf("\nFISTA + Logistic l1\n")
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'logistic',regul = 'l1',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
   W = res[[1]]
@@ -200,6 +200,124 @@ test_fistaGraph <- function() {
 }
 
 test_fistaTree <- function() {
+  set.seed(0)
+  m = 100;n = 10
+  X = matrix(rnorm(m * n),nrow = m,ncol = n,byrow = FALSE)
+  X = X - matrix(rep(colMeans(X),nrow(X)),nrow(X),ncol(X),byrow = T)
+  X = spams.normalize(X)
+  Y = matrix(rnorm(m),nrow = m,ncol = 1,byrow = FALSE)
+  Y = Y - matrix(rep(colMeans(Y),nrow(Y)),nrow(Y),ncol(Y),byrow = T)
+  Y = spams.normalize(Y)
+  W0 = matrix(c(0),nrow = ncol(X), ncol = ncol(Y))
+  own_variables = as.vector(c(0,0,3,5,6,6,8,9),mode= 'integer')
+  N_own_variables = as.vector(c(0,3,2,1,0,2,1,1),mode= 'integer')
+  eta_g = as.vector(c(1,1,1,2,2,2,2.5,2.5),mode = 'double')
+  groups = matrix(as.vector(c(0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 0, 0, 0, 0, 0, 0,
+    0, 1, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 1, 0),mode='logical'),ncol = 8,byrow = T)
+  groups = as(groups,'CsparseMatrix')
+  tree = list('eta_g'= eta_g,'groups' = groups,'own_variables' = own_variables,
+            'N_own_variables' = N_own_variables)
+  .printf('\nVarious regression experiments\n')
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l2')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+ ###
+  .printf('\nFISTA + Regression tree-linf\n')
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-linf')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
+###
+# works also with non tree-structured regularization. tree is ignored
+  .printf('\nFISTA + Regression Fused-Lasso\n')
+   res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'fused-lasso')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+ ###
+  .printf('\nISTA + Regression tree-l0\n')
+   res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l0')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+ ###
+  .printf('\nFISTA + Regression tree-l2 with intercept\n')
+  x1 = cbind(X,matrix(1,nrow = nrow(X),ncol = 1))
+  W01 = rbind(W0,matrix(0,nrow = 1, ncol = ncol(W0)))
+  res = Xtest1('spams',quote(spams.fistaTree(Y,x1,W01,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = TRUE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l2')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+ 
+#    Classification
+
+  .printf('\nOne classification experiment')
+  Y = matrix(2. * as.double(rnorm(100 * ncol(Y)) > 0.) - 1.,nrow = 100,ncol = ncol(Y),byrow = FALSE)
+  .printf('\nFISTA + Logistic + tree-linf\n')
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'logistic',regul = 'tree-linf')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
+###
+# can be used of course with other regularization functions, intercept,...
+
+#  Multi-Class classification
+  Y = ceiling(5 * matrix(runif(100 * ncol(Y),0,1),nrow = 100,ncol = ncol(Y),byrow = FALSE)) - 1
+  .printf('\nFISTA + Multi-Class Logistic + tree-l2\n')
+  nclasses = max(Y) + 1
+  W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'multi-logistic',regul = 'tree-l2')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+# can be used of course with other regularization functions, intercept,...
+
+# Multi-Task regression
+  Y = matrix(rnorm(100 * 100),nrow = 100,ncol = 100,byrow = FALSE)
+  Y = Y - matrix(rep(colMeans(Y),nrow(Y)),nrow(Y),ncol(Y),byrow = T)
+  Y = spams.normalize(Y)
+  W0 = matrix(c(0),nrow = ncol(X), ncol = ncol(Y))
+  .printf('\nFISTA + Regression  multi-task-tree\n')
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'square',regul = 'multi-task-tree')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
+  
+# Multi-Task Classification
+  .printf('\nFISTA + Logistic + multi-task-tree\n')
+  Y = matrix(rnorm(100 * ncol(Y)),nrow = 100,ncol = ncol(Y),byrow = FALSE)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'logistic',regul = 'multi-task-tree')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
+
+#  Multi-Class + Multi-Task Regularization
+  .printf('\nFISTA + Multi-Class Logistic +multi-task-tree\n')
+  Y = ceiling(5 * matrix(runif(100 * ncol(Y),0,1),nrow = 100,ncol = ncol(Y),byrow = FALSE)) - 1
+  nclasses = max(Y) + 1
+  W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'multi-task-tree')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
+# can be used of course with other regularization functions, intercept,...
+
+  .printf('\nFISTA + Multi-Class Logistic +multi-task-tree + sparse matrix\n')
+  nclasses = max(Y) + 1
+  W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,as(X,'CsparseMatrix'),W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'multi-task-tree')),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
+  
+
   return(NULL)
 }
 
@@ -259,6 +377,71 @@ test_proximalGraph <- function() {
 }
 
 test_proximalTree <- function() {
+  m = 10;n = 1000
+  U = matrix(rnorm(m * n),nrow = m,ncol = n,byrow = FALSE)
+
+  .printf("First tree example\n")
+# Example 1 of tree structure
+# tree structured groups:
+# g1= {0 1 2 3 4 5 6 7 8 9}
+# g2= {2 3 4}
+# g3= {5 6 7 8 9}
+  own_variables = as.vector(c(0,2,5),mode= 'integer')
+  N_own_variables = as.vector(c(2,3,5),mode= 'integer')
+  eta_g = as.vector(c(1,1,1),mode = 'double')
+  groups = matrix(as.vector(c(0,0,0,
+    1,0,0,
+    1,0,0),mode='logical'),ncol = 3,byrow = T)
+  groups = as(groups,'CsparseMatrix')
+  tree = list('eta_g'= eta_g,'groups' = groups,'own_variables' = own_variables,
+    'N_own_variables' = N_own_variables)
+  .printf('\ntest prox tree-linf\n')
+  alpha = Xtest1('spams',quote(spams.proximalTree(U,tree,FALSE,numThreads = -1,verbose = TRUE,lambda1 = 0.1,regul = 'tree-l2', pos = FALSE,intercept = FALSE)),n = 1)
+
+  .printf('\ntest prox tree-linf\n')
+  alpha = Xtest1('spams',quote(spams.proximalTree(U,tree,FALSE,numThreads = -1,verbose = TRUE,lambda1 = 0.1,regul = 'tree-linf', pos = FALSE,intercept = FALSE)),n = 1)
+
+  .printf('Second tree example\n')
+# Example 2 of tree structure
+# tree structured groups:
+# g1= {0 1 2 3 4 5 6 7 8 9}    root(g1) = { };
+# g2= {0 1 2 3 4 5}            root(g2) = {0 1 2};
+# g3= {3 4}                    root(g3) = {3 4};
+# g4= {5}                      root(g4) = {5};
+# g5= {6 7 8 9}                root(g5) = { };
+# g6= {6 7}                    root(g6) = {6 7};
+# g7= {8 9}                    root(g7) = {8};
+# g8 = {9}                     root(g8) = {9};
+  own_variables = as.vector(c(0, 0, 3, 5, 6, 6, 8, 9),mode= 'integer')
+  N_own_variables = as.vector(c(0,3,2,1,0,2,1,1),mode= 'integer')
+  eta_g = as.vector(c(1,1,1,2,2,2,2.5,2.5),mode = 'double')
+  groups = matrix(as.vector(c(0,0,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,
+    0,1,0,0,0,0,0,0,
+    0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,
+    0,0,0,0,1,0,0,0,
+    0,0,0,0,1,0,0,0,
+    0,0,0,0,0,0,1,0),mode='logical'),ncol = 8,byrow = T)
+  groups = as(groups,'CsparseMatrix')
+  tree = list('eta_g'= eta_g,'groups' = groups,'own_variables' = own_variables,
+    'N_own_variables' = N_own_variables)
+  .printf('\ntest prox tree-l0\n')
+  alpha = Xtest1('spams',quote(spams.proximalTree(U,tree,FALSE,numThreads = -1,verbose = TRUE,lambda1 = 0.1,regul = 'tree-l0', pos = FALSE,intercept = FALSE)),n = 1)
+ 
+  .printf('\ntest prox tree-l2\n')
+  alpha = Xtest1('spams',quote(spams.proximalTree(U,tree,FALSE,numThreads = -1,verbose = TRUE,lambda1 = 0.1,regul = 'tree-l2', pos = FALSE,intercept = FALSE)),n = 1)
+ 
+  .printf('\ntest prox tree-linf\n')
+  alpha = Xtest1('spams',quote(spams.proximalTree(U,tree,FALSE,numThreads = -1,verbose = TRUE,lambda1 = 0.1,regul = 'tree-linf', pos = FALSE,intercept = FALSE)),n = 1)
+ 
+# mexProximalTree also works with non-tree-structured regularization functions
+  .printf('\nprox l1, intercept, positivity constraint\n')
+  alpha = Xtest1('spams',quote(spams.proximalTree(U,tree,FALSE,numThreads = -1,verbose = TRUE,lambda1 = 0.1,regul = 'l1', pos = TRUE,intercept = TRUE)),n = 1)
+
+  .printf('\nprox multi-task tree\n')
+  alpha = Xtest1('spams',quote(spams.proximalTree(U,tree,FALSE,numThreads = -1,verbose = TRUE,lambda1 = 0.1,lambda2 = 0.1,regul = 'multi-task-tree', pos = FALSE,intercept = FALSE)),n = 1)
+  
   return(NULL)
 }
 
