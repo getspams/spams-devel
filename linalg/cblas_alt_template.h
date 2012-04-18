@@ -30,7 +30,48 @@ static char reduced='S';
 static char allV='V';
 
 #ifdef REMOVE_
-#define _( (
+#define dnrm2_ dnrm2
+#define snrm2_ snrm2
+#define dcopy_ dcopy
+#define scopy_ scopy
+#define daxpy_ daxpy
+#define saxpy_ saxpy
+#define dscal_ dscal
+#define sscal_ sscal
+#define dasum_ dasum
+#define sasum_ sasum
+#define ddot_ ddot
+#define sdot_ sdot
+#define dgemv_ dgemv
+#define sgemv_ sgemv
+#define dger_ dger
+#define sger_ sger
+#define dtrmv_ dtrmv
+#define strmv_ strmv
+#define dsyr_ dsyr
+#define ssyr_ ssyr
+#define dsymv_ dsymv
+#define ssymv_ ssymv
+#define dgemm_ dgemm
+#define sgemm_ sgemm
+#define dsyrk_ dsyrk
+#define ssyrk_ ssyrk
+#define dtrmm_ dtrmm
+#define strmm_ strmm
+#define dtrtri_ dtrtri
+#define strtri_ strtri
+#define idamax_ idamax
+#define isamax_ isamax
+#define dsytrf_ dsytrf
+#define ssytrf_ ssytrf
+#define dsytri_ dsytri
+#define ssytri_ ssytri
+#define dlasrt_ dlasrt
+#define slasrt_ slasrt
+#define dgesvd_ dgesvd
+#define sgesvd_ sgesvd
+#define dsyev_ dsyev
+#define ssyev_ ssyev
 #endif
 
 /// external functions
