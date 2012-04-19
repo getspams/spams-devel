@@ -186,7 +186,9 @@ sub write_doc {
 	    next;
 	}
 	
-	my $tmp = $$doc{$key};
+	my $l = $$doc{$key};
+	my $tmp = $$l{'lines'};
+	my $deltas = $$l{'deltas'};
 	if(defined($$fmt{'tag'})) {
 	    print $fh "$indent00$$fmt{'tag'}:\n";
 	    if($key eq "Examples") {print $fh "        ::\n\n";}
@@ -199,11 +201,14 @@ sub write_doc {
 	}
 	if(defined($$fmt{'prog'})) {
 	    my $func = $$fmt{'prog'};
-	    my @res = &$func($tmp);
+	    my @res = indent_lines($tmp,$deltas,$key);
+	    @res = &$func(\@res);
 	    print $fh $indent, join("\n$indent",@res), "\n";
 	} else {
-	    print $fh $indent, join("\n$indent",@$tmp), "\n";
+	    my @res = indent_lines($tmp,$deltas,$key);
+	    print $fh $indent, join("\n$indent",@res), "\n";
 	}
+	print $fh "\n";
     }
     print $fh "$indent00\"\"\"\n\n";
      
@@ -290,5 +295,6 @@ sub align_text {
 	$s =~ s/    //;
 	push(@res,$s);
     }
+
     return @res;
 }

@@ -1,7 +1,5 @@
 begin repl Usage
-[R]%DEF%
-[P]W = %DEF%
-[P](W,optim_info) = spams.fistaTree(Y,X,W0,tree,return_optim_info = TRUE,...)
+%DEF%
 end
 include fista.inc
 begin addlast Output

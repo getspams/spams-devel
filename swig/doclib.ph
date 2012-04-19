@@ -39,6 +39,20 @@ while( my($k,$v) = each(%main::conv_names)) {
     $main::tomlab{$v} = $k;
 }
 
+my $fixed_indent = 4;
+%main::alignments = ('Name','NO',
+		  'Description' , $fixed_indent,
+		  'Usage', 'NO',
+		  'Inputs', 'ONKEY',
+		  'detail' , $fixed_indent,
+		  'Param' , 'ONKEY',
+		  'Output' , 'ONKEY',
+		  'Author' , 'NO',
+		  'WARNING', $fixed_indent,
+		  'Note', $fixed_indent,
+		  'Examples', $fixed_indent
+    );
+
 # in : function name
 # out : matlab name (mex...)
 sub mlab_name {
@@ -115,61 +129,105 @@ sub get_doc {
 	exit 1;
 	return 0;
     }
+    my @lines = ();
     my $stat = 0; # 1 when usage is found
-    my $tmp = [()];
-    my $key = "";
     my $prefix = $r_mode ? "spams." : "";
-    my $lang = $r_mode ? "R" : "python";
     while(<IN>) {
 	chomp;
+	s/^%+\s?//;
+	if(! $stat) { # skip to Usage
+	    (s/^Usage\s*:\s*//) || next;
+	    $stat = 1;
+	}
 	if(/mex([A-Z][_A-z]+)/) { # replace mex*
 	    my $s = $1;
 	    (defined($main::conv_names{$s}) ) || die "Inconnu : $s\n";
 	    my $s1 = $main::conv_names{$s};
 	    s/mex$s/$prefix$s1/g;
 	}
-	if(! $stat) { # skip to Usage
-	    (s/^%\s*Usage\s*:\s*//) || next;
-	    $stat = 1;
-##	    if($r_mode) {s/\s*=\s*/ <- /;}
-	    s/^.*=\s*//;
-	    push(@$tmp,$_);
-	    $key = 'Usage';
-	    next;
-	}
-	if(s/^%\s([^\s:]+)\s*:\s*//) { # keys start at the beginning of line
+	push(@lines,$_);
+	if(/^Author:/) {last;}
+    }
+    close(IN);
+    ($#lines < 1) && die "No doc in $f!\n";
+	
+    my $tmp = [()];
+    my $deltas = [()]; # indention delta with previous line
+    my $key = "";
+    my $lang = $r_mode ? "R" : "python";
+    $_ = shift(@lines);
+    s/^.*=\s*//;
+    push(@$tmp,$_);
+    $key = 'Usage';
+    my $prev_indent = 0;
+    foreach $_ (@lines) {
+	if(s/^([^\s:]+)\s*:\s*//) { # keys start at the beginning of line
 	    my $x = $1;
 	    my $i = $#$tmp;
-#	    # remove last empty lines
-#	    while($i >= 0) {
-#		($$tmp[$i] =~ /^\s*$/) || last;
-#		$i--;
-#	    }
-#	    $#$tmp = $i;
-	    $$doc{$key} = $tmp;
-	    $tmp = [($_)];
+	    # remove last empty lines
+	    while($i >= 0) {
+		($$tmp[$i] =~ /^\s*$/) || last;
+		$i--;
+	    }
+	    $#$tmp = $i;
+	    $#$deltas = $i;
+	    $$doc{$key} = {'lines' => $tmp, 'deltas' => $deltas};
+	    if(/^\s*$/) {
+		$tmp = [()];
+		$deltas = [()];
+		$prev_indent = 0;
+	    } else {
+		$tmp = [($_)];
+		$deltas = [(0)];
+		$prev_indent = set_indent($x);
+	    }
 	    $key = $x;
 	    if ($x eq "Author") {
 		$$tmp[0] =~ s/$/ (spams, matlab interface and documentation)/;
-		push(@$tmp,"      Jean-Paul CHIEZE 2011-2012 ($lang interface)");
-		push(@$tmp,"");
-		$$doc{$x} = $tmp;
+		push(@$tmp,"Jean-Paul CHIEZE 2011-2012 ($lang interface)");
+#		push(@$tmp,"");
+		$deltas = [(0,0)];
+		$$doc{$x} = {'lines' => $tmp, 'deltas' => $deltas};
 		last;
 	    }
 	} else {
-	    s/^%\s?//;
-	    if(/^\s*param:\s*struct/) {
-		$$doc{$key} = $tmp;
+	    s/^(\s*)//;
+	    my $n = length($1);
+	    if(/^$/) {$n = $prev_indent;}
+	    if(/^param:\s*struct/) {
+		$$doc{$key} = {'lines' => $tmp, 'deltas' => $deltas};
 		$tmp = [()];
+		$deltas = [()];
 		$key = "Param";
 		next;
+	    }
+	    if($main::alignments{$key} eq 'NO') {
+		$prev_indent = 0;
+		$n = 0;
+		push(@$deltas,0);
+	    } else {
+		my $d = $n - $prev_indent;
+#		if($d < 0 && $#$deltas == 0) { # realign 1st line of block
+#		    $n -= $d;
+#		    $d = 0;
+#		}
+		push(@$deltas,$d);
+		$prev_indent = $n;
 	    }
 	    s/^(\s*)tree:\s*struct\s*/$1tree: named list /;
 	    s/param\.lambda([^\w])/param.lambda1$1/;
 	    s/(param\.[^\s:]+)\s*:/$1/;
 	    if($key eq "Param") {
-		s/^\s*param\.([\w]+)\s*,\s*param\.([\w]+)\s*/    $1, $2: /;
-		s/^\s*param\.([^\s]+)\s/    $1: /;
+		if(/^param\.([\w]+)\s*,\s*param\.([\w]+)\s*/) {
+		    my $p1 = $1;
+		    my $p2 = $2;
+		    $n = $$deltas[$#$deltas];
+		    push(@$deltas,$n);
+		    push(@$tmp,"$p1:");
+		    s/^param\.[\w]+\s*,\s*param\.[\w]+\s*/$p2: /;
+		} else {
+		    s/^param\.([^\s]+)\s/$1: /;
+		}
 	    }
 	    s/param\.//g;
 	    if($r_mode) {
@@ -191,7 +249,13 @@ sub get_doc {
     close(IN);
     1;
 }
-
+sub set_indent {
+    my($key) = @_;
+    (defined($main::alignments{$key})) || die "No alignment defined for <$key>!\n";
+    if ($main::alignments{$key} eq 'NO') {return 0;}
+    if($main::alignments{$key} eq 'ONKEY') { return length($key);}
+    $main::alignments{$key}; # it must be a nb of spaces
+}
 sub get_def {
     my ($spams,$progdefs,$myprog,$idt) = @_;
     my $x;
@@ -263,7 +327,7 @@ sub get_modifs {
     }
     close(IN);
     my $inblock = 0;
-    my ($tmp,$key,$op);
+    my ($tmp,$key,,$deltas,$op,$prev_indent);
     my $expr = "";
     foreach $_ (@lines) {
 	(/^\s*$/) && next;
@@ -276,7 +340,7 @@ sub get_modifs {
 	if($inblock) {
 	    if(/^end/) {
 		$inblock = 0;
-		$$modifs{$key} = { 'op' => $op, 'data' => $tmp};
+		$$modifs{$key} = { 'op' => $op, 'lines' => $tmp, 'deltas' => $deltas};
 		if("$expr") {
 		    my $x = $$modifs{$key};
 		    $$x{'subst'} = $expr;
@@ -295,18 +359,33 @@ sub get_modifs {
 		my @def = get_def($spams,$progdefs,$myprog,$n);
 		$_ .= shift(@def);
 		push(@$tmp,$_);
+		push(@$deltas,0);
 		foreach $_ (@def) {
 		    push(@$tmp,"$idt$_");
+		    push(@$deltas,0);
 		}
 	    } else {
+		my $d = 0;
+		s/^(\s*)//;
+		my $n = length($1);
+		if(! (/^$/)) {
+		    $d = $n - $prev_indent;
+		    if($d < 0 && $#$tmp < 0) {
+			$d = 0;
+		    }
+		    $prev_indent = $n;
+		}
 		push(@$tmp,$_);
+		push(@$deltas,$d);
 	    }
 	} else {
 	    (/^begin\s+([^\s]+)\s+([^\s]+)$/) || next;
 	    $op = $1;
 	    $key = $2;
 	    $tmp = [()];
+	    $deltas = [()];
 	    $inblock = 1;
+	    $prev_indent = set_indent($key);
 	}
     }
 }
@@ -314,19 +393,24 @@ sub get_modifs {
 # try to split Description into short description and detail
 sub split_description {
     my($doc) = @_;
-    my $tmp = $$doc{'Description'};
+    my $l = $$doc{'Description'};
+    my $tmp = $$l{'lines'};
+    my $deltas = $$l{'deltas'};
     my $det = [()];
+    my $dltdet = [()];
     ($#$tmp < 3) && return;
     for(my $i = 0;$i <= $#$tmp;$i++) {
 	my $s = $$tmp[$i];
-	if(($s =~ /^\s*$/) || ($s =~ /\.$/)) {
+	if(($s =~ /^$/) || ($s =~ /\.$/)) {
 	    my $j = $i;
 	    $i++;
 	    while($i <= $#$tmp) {
+		push(@$dltdet,$$deltas[$i]);
 		push(@$det,$$tmp[$i++]);
 	    }
-	    $$doc{'detail'} = $det;
+	    $$doc{'detail'} = {'lines' => $det, 'deltas' => $dltdet};
 	    $#$tmp = $j;
+	    $#$deltas = $j;
 	    last;
 	}
 		
@@ -336,25 +420,32 @@ sub split_description {
 # 
 sub apply_modifs {
     my($doc,$format,$modifs) = @_;
-    my($op,$tmp);
+    my($op,$tmp,$deltas);
     while(my ($key,$x) = each(%$modifs)) {
 	if(! defined($$format{$key})) {
 	    print "Warning: Unknown modif key <$key>\n";
 	    next;
 	}
 	$op = $$x{'op'};
-	$tmp = $$x{'data'};
+	$tmp = $$x{'lines'};
+	$deltas = $$x{'deltas'};
 	if($op eq "repl") {
-	    $$doc{$key} = $tmp;
+	    $$doc{$key} = {'lines' => $tmp, 'deltas' => $deltas};
 	
 	} else {
 	    (defined($$format{$key})) || next;
-	    my $lst = (defined($$doc{$key})) ? $$doc{$key} : [()];
+	    my ($lst,$ddeltas) = ([()], [()]);
+	    if(defined($$doc{$key})) {
+		my $l = $$doc{$key};
+		$lst = $$l{'lines'};
+		$ddeltas = $$l{'deltas'}
+	    }
 	    if ( $op eq "addfirst") {
 		die "Addfirst not implemented\n";
 	    } elsif ( $op eq "addlast") {
 		push(@$lst,@$tmp);
-		$$doc{$key} = $lst;
+		push(@$ddeltas,@$deltas);
+		$$doc{$key} = {'lines' => $lst, 'deltas' => $ddeltas};
 	    } elsif ( $op eq "subst") {
 		my $e = $$tmp[0];
 		$e =~ s/^\s+//;
@@ -395,9 +486,9 @@ sub prepare_doc {
 @main::texkeys = ('Name','Usage','Description','Inputs', 'Output','Author','Note','Examples');
 
 $main::tex_docformat = {
-    'Name' => {},
+    'Name' => {'no_nl' => 1},
     'Description' => {},
-    'Usage' => {},
+    'Usage' => {'no_nl' => 1},
     'Inputs' => {},
     'Param' => {},
     'detail' => {},
@@ -412,6 +503,7 @@ sub make_tex_doc {
     my($r_mode,$dir,$indx,$progs,$spams,$progdefs) = @_;
     foreach my $i (@$indx) {
 	my $myprog = $$progs{$i};
+##	($myprog eq "trainDL") || next;
 	my $mlab_prog = mlab_name($myprog);
 	my %doc = ();
 	prepare_doc($r_mode,$mlab_prog,$myprog,\%doc,$main::tex_docformat,$spams,$progdefs);
@@ -420,19 +512,73 @@ sub make_tex_doc {
     }
     modif_tex_src($r_mode,$dir);
 }
+sub xindent_lines {
+    my($lines,$deltas,$i0,$indent0) = @_;
+    my @res = ();
+    my $nindent = $indent0;
+    # adjust
+    my $adj = 0;
+    my $pos = $nindent;
+    for (my $i = $i0; $i <= $#$lines;$i++) {
+	my $n = $$deltas[$i];
+	$pos += $n;
+	if($pos < $adj) {$adj = $pos;}
+    }
+    $nindent -= $adj;
+    for (my $i = $i0; $i <= $#$lines;$i++) {
+	my $s = $$lines[$i];
+	my $n = $$deltas[$i];
+	$nindent += $n;
+	if($nindent < 0) {print "Indent < 0, $i <$s>, $n\n";}
+	if($nindent > 0) {
+	    my $sp = " " x $nindent;
+	    $s = "$sp$s";
+	}
+	push(@res,$s);
+    }
+    @res;
+}
+sub indent_lines {
+    my($lines,$deltas,$key) = @_;
+    my @res = ();
+    my $indent0 = set_indent($key);
+    my $nindent = $indent0;
+    # adjust
+    for (my $i = 0; $i <= $#$lines;$i++) {
+	my $s = $$lines[$i];
+	my $n = $$deltas[$i];
+	$nindent += $n;
+	if(($main::alignments{$key} eq "ONKEY") && ($s =~ /^[^\s:]+\s*:/)) { #reset alignment
+	    $nindent = $indent0;
+	}
+	if($nindent < 0) {print "Indent < 0, $i <$s>, $n\n";}
+	if($nindent > 0) {
+	    my $sp = " " x $nindent;
+	    $s = "$sp$s";
+	}
+	push(@res,$s);
+    }
+    @res;
+}
+
 sub merge_doc {
     my($doc,$tagin,$tagout) = @_;
 
     if(defined($$doc{$tagin})) {
-	my $docp = $$doc{$tagin};
-	my $doci = $$doc{$tagout};
-	push(@$doci,@$docp);
+	my $lin = $$doc{$tagin};
+	my $lout = $$doc{$tagout};
+	my $doco = $$lout{'lines'};
+	my $dlto = $$lout{'deltas'};
+	my $doci = $$lin{'lines'};
+	my $dlti = $$lin{'deltas'};
+	push(@$doco,@$doci);
+	push(@$dlto,@$dlti);
 	undef($$doc{$tagin});
     }
 }  
 sub write_tex_man {
     my ($f,$prog,$doc,$rdformat) = @_;
-    my($rdf,$i,$key,$tmp);
+    my($rdf,$i,$key,$tmp,$deltas);
     merge_doc($doc,'Param','Inputs');
     merge_doc($doc,'detail','Description');
     open(OUT,">$f") || die "$f create err $!\n";
@@ -446,15 +592,22 @@ sub write_tex_man {
 	    }
 	    next;
 	}
-	$tmp = $$doc{$key};
+	my $l = $$doc{$key};
+	$tmp = $$l{'lines'};
+	$deltas = $$l{'deltas'};
 	my $tag = (defined($$rdf{'tag'})) ? $$rdf{'tag'} : $key;
-	print OUT "# $tag: ";
+	if(defined($$rdf{'no_nl'})) {
+	    print OUT "# $tag: ";
+	} else {
+	    print OUT "# $tag:\n# ";
+	}
 	if(defined($$rdf{'prog'})) {
 	    my $func = $$rdf{'prog'};
 	    my @res = &$func($tmp);
 	    print OUT join("\n",@res), "\n}\n";
 	} else {
-	    print OUT join("\n#    ",@$tmp), "\n#\n";
+	    my @res = indent_lines($tmp,$deltas,$key);
+	    print OUT join("\n# ",@res), "\n#\n";
 	}
     }
     

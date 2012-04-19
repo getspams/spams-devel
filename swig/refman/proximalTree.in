@@ -1,7 +1,5 @@
 begin repl Usage
-[P]alpha <- %DEF%
-[R]%DEF%
-[P](alpha,val_loss) = spams.proximalTree(U,tree,return_val_loss = TRUE,...)
+ %DEF%
 end
 include proximal.inc
 begin addlast Output

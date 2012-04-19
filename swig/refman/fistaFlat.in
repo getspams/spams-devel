@@ -1,7 +1,5 @@
 begin repl Usage
-[R]%DEF%
-[P]W = %DEF%
-[P](W,optim_info) = spams.fistaFlat(Y,X,W0,return_optim_info = TRUE,...)
+%DEF%
 end
 include fista.inc
 begin addlast Output

@@ -7,7 +7,7 @@ require "doclib.ph";
 # pour les fonctions definies dans un fichier R (r_spams.R par ex)
 my $dir = $main::mlab_dir;
 
-@main::keys = ('Name','Description','Usage','Inputs','Param','detail','Output','Author','Note','Examples');
+@main::keys = ('Name','Description','Usage','Inputs','Param','detail','Output','Author','Note', 'WARNING', 'Examples');
 
 my $rdformat = {
     'Name' => {'tag' => 'title'},
@@ -74,7 +74,6 @@ if($flg_out > 0) {
     exit 0;
 }
 
-
 foreach my $i (@indx) {
     my $myprog = $iprogs{$i};
     my $mlab_prog = mlab_name($myprog);
@@ -129,14 +128,12 @@ sub parse_value {
     return @res;
 }
 sub set_verb {
-    my($lines) = @_;
+    my($lines,$deltas,$key) = @_;
     my @res = ();
     ($#$lines >= 0) || return @res;
     my $s = $$lines[0];
-    push(@res,"\\preformatted{$s");
-    for(my $i = 1;$i <= $#$lines;$i++) {
-	push(@res,$$lines[$i]);
-    }
+    push(@res,"\\preformatted{%\n");
+    push(@res,indent_lines($lines,$deltas,$key));
     push(@res,"}");
     return @res;
 }
@@ -144,19 +141,22 @@ sub set_verb {
 
 # format input args
 sub parse_args {
-    my ($lines) = @_;
+    my ($lines,$deltas,$key) = @_;
     my $in_var = 0;
     my @res = ();
     for(my $i = 0;$i <= $#$lines;$i++) {
 	my $s = $$lines[$i];
 	if($s =~ s/^\s*([^\s:]+)\s*:\s*//) {
 	    my $v = $1;
-	    if($v eq "param" && $s eq "struct") {$s = "";}
 	    if($in_var) {
 		push(@res,"}}");
 	    }
 	    $in_var = 1;
-	    push(@res,"\\item{$v}{%",$s,"\\preformatted{%");
+	    if($s =~ /^\s*$/) {
+		push(@res,"\\item{$v}{%","\\preformatted{%");
+	    } else {
+		push(@res,"\\item{$v}{%",$s,"\\preformatted{%");
+	    }
 	    next;
 	}
 	push(@res,$s);
@@ -167,13 +167,16 @@ sub parse_args {
 
 sub write_man {
     my($f,$prog,$doc,$rdformat) = @_;
-    my($rdf,$i,$key,$tmp);
+    my($rdf,$i,$key,$tmp,$deltas);
     open(OUT,">$f") || die "$f create err $!\n";
     print OUT "\\name{$prog}\n\\alias{$prog}\n";
-    my $doci = $$doc{'Inputs'};
+    my $l = $$doc{'Inputs'};
+    my ($doci,$dlti) = ($$l{'lines'},$$l{'deltas'});
     if(defined($$doc{'Param'})) {
-	my $docp = $$doc{'Param'};
+	$l = $$doc{'Param'};
+	my ($docp,$dltp) =  ($$l{'lines'},$$l{'deltas'});
 	push(@$doci,@$docp);
+	push(@$dlti,@$dltp);
 	undef($$doc{'Param'});
     }
     foreach $key (@main::keys) {
@@ -185,7 +188,8 @@ sub write_man {
 	    }
 	    next;
 	}
-	$tmp = $$doc{$key};
+	$l = $$doc{$key};
+	($tmp,$deltas) =  ($$l{'lines'},$$l{'deltas'});
 	if($#$tmp < 0) {
 	    if(! defined($$rdf{'optional'})) {
 		print STDERR "!! $prog : $key EMPTY.\n";
@@ -195,13 +199,15 @@ sub write_man {
 	print OUT "\\$$rdf{'tag'}\{\n";
 	if(defined($$rdf{'prog'})) {
 	    my $func = $$rdf{'prog'};
-	    my @res = &$func($tmp);
+	    my @res = &$func($tmp,$deltas,$key);
 	    print OUT join("\n",@res), "\n}\n";
 	} else {
-	    print OUT join("\n",@$tmp), "\n}\n";
+	    my @res = indent_lines($tmp,$deltas,$key);
+	    print OUT join("\n",@res), "\n}\n";
 	}
     }
 	
     close(OUT);
 #    exit;
 }
+

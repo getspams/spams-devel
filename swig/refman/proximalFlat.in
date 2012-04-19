@@ -1,7 +1,5 @@
 begin repl Usage
-[P]alpha = %DEF%
-[R]%DEF%
-[P](alpha,val_loss) = spams.proximalFlat(U,return_val_loss = TRUE,...)
+%DEF%
 end
 # modif Inputs & Params
 include proximal.inc
