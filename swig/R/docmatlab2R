@@ -30,8 +30,6 @@ sub usage {
 }
 
 (-d $dir) || die "No dir $dir!\n";
-system "rm -rf man"; mkdir "man";
-(-d "man") || die "No dir man!\n";
 ##(-d "html") || die "No dir html!\n";
 
 
@@ -60,6 +58,9 @@ my @spams = ();
 $file =~ s/\.R$//;
 if($flg_out) {
     (-d $doc_dir) || die "No dir $doc_dir!\n";
+} else {
+    system "rm -rf man"; mkdir "man";
+    (-d "man") || die "No dir man!\n";
 }
 read_spams("$file.R",\&find_Rdef,\%progdefs,\%iprogs,\@spams);
 
