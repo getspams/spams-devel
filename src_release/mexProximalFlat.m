@@ -27,17 +27,17 @@
 %             argmin 0.5||u-v||_2^2 + lambda||v||_2
 %         if param.regul='group-lasso-l2'  
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_2 
-%             where the groups are consecutive entries of v of size param.group_size 
+%             where the groups are consecutive entries of v of size param.size_group 
 %         if param.regul='group-lasso-linf'
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_inf
 %         if param.regul='sparse-group-lasso-l2'  
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_2 + lambda_2 ||v||_1
-%             where the groups are consecutive entries of v of size param.group_size 
+%             where the groups are consecutive entries of v of size param.size_group 
 %         if param.regul='sparse-group-lasso-linf'
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_inf + lambda_2 ||v||_1
 %         if param.regul='trace-norm-vec' 
 %             argmin 0.5||u-v||_2^2 + lambda ||mat(v)||_* 
-%            where mat(v) has param.group_size rows
+%            where mat(v) has param.size_group rows
 %
 %         if one chooses a regularization function on matrices
 %         if param.regul='l1l2',  V= 
@@ -71,8 +71,8 @@
 %               param.verbose (optional, verbosity level, false by default)
 %               param.intercept (optional, last row of U is not regularized,
 %                 false by default)
-%               param.transpose (optional, transpose the matrix in the regularizaiton function)
-%               param.group_size (optional, for regularization functions assuming a group
+%               param.transpose (optional, transpose the matrix in the regularization function)
+%               param.size_group (optional, for regularization functions assuming a group
 %                 structure)
 %               param.pos (optional, adds positivity constraints on the
 %                 coefficients, false by default)

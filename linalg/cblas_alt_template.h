@@ -722,7 +722,7 @@ template <> void inline gesvd( char& jobu, char& jobvt, INTT m,
    delete[](work);
 }
 
-template <> void syev( char& jobz, char& uplo, INTT n,
+template <> void inline syev( char& jobz, char& uplo, INTT n,
          float* a, INTT lda, float* w) {
    float* query = new float[1];
    INTT lwork=-1;
@@ -734,7 +734,7 @@ template <> void syev( char& jobz, char& uplo, INTT n,
    delete[](work);
 };
 
-template <> void syev( char& jobz, char& uplo, INTT n,
+template <> void inline syev( char& jobz, char& uplo, INTT n,
          double* a, INTT lda, double* w) {
    double* query = new double[1];
    INTT lwork=-1;

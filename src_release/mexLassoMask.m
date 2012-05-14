@@ -14,7 +14,8 @@
 %                                                              <= lambda*||beta||_0/m
 %       3) when param.mode=2
 %         min_{alpha} 0.5||diag(beta)(x-Dalpha)||_2^2 +
-%                                                 lambda*(||beta||_0/m)*||alpha||_1 
+%                                                 lambda*(||beta||_0/m)*||alpha||_1 +
+%                                                 (lambda2/2)||alpha||_2^2
 %     Possibly, when param.pos=true, it solves the previous problems
 %     with positivity constraints on the vectors alpha
 %
@@ -32,6 +33,8 @@
 %               param.pos (optional, adds positivity constraints on the
 %                 coefficients, false by default)
 %               param.mode (see above, by default: 2)
+%               param.lambda2  (optional parameter for solving the Elastic-Net)
+%                              for mode=0 and mode=1, it adds a ridge on the Gram Matrix
 %               param.numThreads (optional, number of threads for exploiting
 %                 multi-core / multi-cpus. By default, it takes the value -1,
 %                 which automatically selects all the available CPUs/cores).

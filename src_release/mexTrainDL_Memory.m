@@ -48,6 +48,7 @@
 %              p is the number of elements in the dictionary
 %              When D is not provided, the dictionary is initialized 
 %              with random elements from the training set.
+%           param.K (size of the dictionary, optional is param.D is provided)
 %           param.lambda  (parameter)
 %           param.iter (number of iterations).  If a negative number is 
 %              provided it will perform the computation during the
@@ -62,6 +63,8 @@
 %            param.gamma2 (optional parameter for param.modeD = 2)
 %            param.batchsize (optional, size of the minibatch, by default 
 %              512)
+%            param.iter_updateD (optional, number of BCD iterations for the dictionary 
+%                update step, by default 1)
 %            param.modeParam (optimization mode).
 %              1) if param.modeParam=0, the optimization uses the 
 %                 parameter free strategy of the ICML paper
@@ -71,6 +74,7 @@
 %                 decay weights with updates of the form 
 %                 A_{t} <- rho A_{t-1} + alpha_t alpha_t^T
 %            param.rho (optional) tuning parameter (see paper arXiv:0908.0050)
+%            param.t0 (optional) tuning parameter (see paper arXiv:0908.0050)
 %            param.clean (optional, true by default. prunes 
 %              automatically the dictionary from unused elements).
 %            param.numThreads (optional, number of threads for exploiting

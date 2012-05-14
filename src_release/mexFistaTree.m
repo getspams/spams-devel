@@ -29,14 +29,16 @@
 %            param.lambda2 (optional, regularization parameter, 0 by default)
 %            param.lambda3 (optional, regularization parameter, 0 by default)
 %            param.verbose (optional, verbosity level, false by default)
-%            param.intercept (optional, last row of U is not regularized,
-%                false by default)
 %            param.pos (optional, adds positivity constraints on the
 %                coefficients, false by default)
+%            param.transpose (optional, transpose the matrix in the regularization function)
+%            param.size_group (optional, for regularization functions assuming a group
+%                 structure)
 %            param.numThreads (optional, number of threads for exploiting
 %                multi-core / multi-cpus. By default, it takes the value -1,
 %                which automatically selects all the available CPUs/cores).
 %            param.max_it (optional, maximum number of iterations, 100 by default)
+%            param.it0 (optional, frequency for computing duality gap, every 10 iterations by default)
 %            param.tol (optional, tolerance for stopping criteration, which is a relative duality gap
 %                if it is available, or a relative change of parameters).
 %            param.gamma (optional, multiplier for increasing the parameter L in fista, 1.5 by default)

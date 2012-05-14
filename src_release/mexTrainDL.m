@@ -61,25 +61,28 @@
 %              p is the number of elements in the dictionary
 %              When D is not provided, the dictionary is initialized 
 %              with random elements from the training set.
+%           param.K (size of the dictionary, optional is param.D is provided)
 %           param.lambda  (parameter)
 %           param.lambda2  (optional, by default 0)
 %           param.iter (number of iterations).  If a negative number is 
 %              provided it will perform the computation during the
 %              corresponding number of seconds. For instance param.iter=-5
 %              learns the dictionary during 5 seconds.
-%            param.mode (optional, see above, by default 2) 
-%            param.posAlpha (optional, adds positivity constraints on the
-%              coefficients, false by default, not compatible with 
-%              param.mode =3,4)
-%            param.modeD (optional, see above, by default 0)
-%            param.posD (optional, adds positivity constraints on the 
-%              dictionary, false by default, not compatible with 
-%              param.modeD=2)
-%            param.gamma1 (optional parameter for param.modeD >= 1)
-%            param.gamma2 (optional parameter for param.modeD = 2)
-%            param.batchsize (optional, size of the minibatch, by default 
+%           param.mode (optional, see above, by default 2) 
+%           param.posAlpha (optional, adds positivity constraints on the
+%             coefficients, false by default, not compatible with 
+%             param.mode =3,4)
+%           param.modeD (optional, see above, by default 0)
+%           param.posD (optional, adds positivity constraints on the 
+%             dictionary, false by default, not compatible with 
+%             param.modeD=2)
+%           param.gamma1 (optional parameter for param.modeD >= 1)
+%           param.gamma2 (optional parameter for param.modeD = 2)
+%           param.batchsize (optional, size of the minibatch, by default 
 %              512)
-%            param.modeParam (optimization mode).
+%           param.iter_updateD (optional, number of BCD iterations for the dictionary
+%              update step, by default 1)
+%           param.modeParam (optimization mode).
 %              1) if param.modeParam=0, the optimization uses the 
 %                 parameter free strategy of the ICML paper
 %              2) if param.modeParam=1, the optimization uses the 
@@ -87,10 +90,12 @@
 %              3) if param.modeParam=2, the optimization uses exponential 
 %                 decay weights with updates of the form 
 %                 A_{t} <- rho A_{t-1} + alpha_t alpha_t^T
-%            param.rho (optional) tuning parameter (see paper arXiv:0908.0050)
-%            param.clean (optional, true by default. prunes 
+%           param.rho (optional) tuning parameter (see paper arXiv:0908.0050)
+%           param.t0 (optional) tuning parameter (see paper arXiv:0908.0050)
+%           param.clean (optional, true by default. prunes 
 %              automatically the dictionary from unused elements).
-%            param.numThreads (optional, number of threads for exploiting
+%           param.verbose (optional, true by default, increase verbosity)
+%           param.numThreads (optional, number of threads for exploiting
 %              multi-core / multi-cpus. By default, it takes the value -1,
 %              which automatically selects all the available CPUs/cores).
 %
