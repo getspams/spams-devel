@@ -119,7 +119,7 @@ sub read_spams {
 # read a .m doc file
 # in : $f = file path
 #      $r_mode (bool) = true if R
-#      $mlag_prog = name of matlab function
+#      $mlab_prog = name of matlab function
 #      $myprog = name of non matlab function
 # out : $doc (hash) = arrays of lines by doc section 
 sub get_doc {
@@ -614,12 +614,33 @@ sub write_tex_man {
     close(OUT);
 }
 
+sub insert_install {
+    my($fh) = @_;
+    open(INST,"<install.tex") || die "install.tex open err $!\n";
+    while(<INST>) {
+	print $fh $_;
+    }
+    close(INST)
+}
+
 sub modif_tex_src {
     my ($r_mode,$dir) = @_;
     open(IN,"<../../doc/doc_spams.tex") || die "Cannot read ../../doc/doc_spams.tex: $!\n";
     open(OUT,">$dir/doc_spams.tex") || die "Cannot create $dir/doc_spams.tex\n";
+    my $in_install = 0;
     while(<IN>) {
 	chomp;
+	if(/^\\section\{Installation/) {
+	    $in_install = 1;
+	    print OUT "\\section{Installation}\n";
+	    insert_install(\*OUT);
+	    next;
+	}
+	if($in_install) {
+	    if(/^\\section\{/) {
+		$in_install = 0;
+	    } else {next;}
+	}
 	if(/mex([A-Z][_A-z]+)/) {
 	    my $s = $1;
 	    my $x = $s;
