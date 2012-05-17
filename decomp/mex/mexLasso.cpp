@@ -61,7 +61,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
       T lambda = getScalarStruct<T>(prhs[2],"lambda");
       T lambda2 = getScalarStructDef<T>(prhs[2],"lambda2",0);
       int L = getScalarStructDef<int>(prhs[2],"L",K);
-      int length_path = getScalarStructDef<int>(prhs[2],"length_path",4*L);
+      int length_path = MAX(2,getScalarStructDef<int>(prhs[2],"length_path",4*L));
       int numThreads = getScalarStructDef<int>(prhs[2],"numThreads",-1);
       bool pos = getScalarStructDef<bool>(prhs[2],"pos",false);
       bool verbose = getScalarStructDef<bool>(prhs[2],"verbose",false);

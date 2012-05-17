@@ -823,7 +823,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
    const int LL = Gsm.n();
    const int K = Gsm.m();
    const int L = MIN(LL,K);
-   if (length_path < 0) length_path=4*L;
+   if (length_path <= 1) length_path=4*L;
    // permit unsafe fast low level access
    T* const Rdn = Rdnv.rawX();
    T* const Xdn = Xdnv.rawX();
@@ -1043,7 +1043,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
             (mode == L1COEFFS && (thrs - constraint > -1e-15)) || 
             (newAtom && mode == L2ERROR && (normX - constraint < 1e-15)) ||
             (normX < 1e-15) ||
-            (iter >= length_path && newAtom)) {
+            (iter >= length_path)) {
      //       cerr << "exit" << endl;
      //       PRINT_F(thrs)
      //       PRINT_F(constraint)
@@ -1634,7 +1634,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
    const int LL = Gs.n();
    const int K = G.n();
    const int L = MIN(LL,K);
-   if (length_path < 0) length_path=4*L;
+   if (length_path <= 1) length_path=4*L;
 
    coeffs.setZeros();
    ind.set(-1);
@@ -1814,7 +1814,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       } else {
          newAtom=true;
       }
-      if (iter >= length_path || abs(step) < 1e-15 ||
+      if ((iter >= length_path-1) || abs(step) < 1e-15 ||
             step == step_max2 || (normX < 1e-15) ||
             (i == (L-1)) ||
             (mode == L2ERROR && normX - constraint < 1e-15) ||
