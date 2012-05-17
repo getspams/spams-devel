@@ -45,7 +45,7 @@
 %                 implementation or one based on the matrix inversion Lemma
 %               param.ols (optional, default false), perform an orthogonal projection
 %                 before returning the solution.
-%               param.max_length_path (optional) maximum length of the path.
+%               param.max_length_path (optional) maximum length of the path, by default 4*p
 %
 % Output: A: double sparse p x n matrix (output coefficients)
 %         path: optional,  returns the regularisation path for the first signal
