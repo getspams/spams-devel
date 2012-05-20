@@ -63,67 +63,75 @@ template <typename T>
       Matrix<T> D(prD,n,K);
       SpMatrix<T> alpha;
 
-      mxArray* pr_L=mxGetField(prhs[2],0,"L");
-      if (!pr_L) mexErrMsgTxt("Missing field L in param");
-      const mwSize* dimsL=mxGetDimensions(pr_L);
-      int sizeL=static_cast<int>(dimsL[0])*static_cast<int>(dimsL[1]);
-
-      mxArray* pr_eps=mxGetField(prhs[2],0,"eps");
-      if (!pr_eps) mexErrMsgTxt("Missing field eps in param");
-      const mwSize* dimsE=mxGetDimensions(pr_eps);
-      int sizeE=static_cast<int>(dimsE[0])*static_cast<int>(dimsE[1]);
       int numThreads = getScalarStructDef<int>(prhs[2],"numThreads",-1);
+      mxArray* pr_L=mxGetField(prhs[2],0,"L");
+      mxArray* pr_eps=mxGetField(prhs[2],0,"eps");
+      mxArray* pr_lambda=mxGetField(prhs[2],0,"lambda");
+      if (!pr_L && !pr_eps && !pr_lambda) mexErrMsgTxt("You should either provide L, eps or lambda");
+      
+      int sizeL = 1;
+      int L=MIN(n,K);
+      int *pL = &L;
+      if (pr_L) {
+         const mwSize* dimsL= mxGetDimensions(pr_L);
+         sizeL=static_cast<int>(dimsL[0])*static_cast<int>(dimsL[1]);
+         if (sizeL > 1) {
+            if (!mexCheckType<int>(pr_L)) 
+               mexErrMsgTxt("Type of param.L should be int32");
+            pL = reinterpret_cast<int*>(mxGetPr(pr_L));
+         }
+         L=MIN(L,static_cast<int>(mxGetScalar(pr_L)));
+      }
 
+      int sizeE=1;
+      T eps=0;
+      T* pE=&eps;
+      if (pr_eps) {
+         const mwSize* dimsE=mxGetDimensions(pr_eps);
+         sizeE=static_cast<int>(dimsE[0])*static_cast<int>(dimsE[1]);
+         eps=static_cast<T>(mxGetScalar(pr_eps));
+         if (sizeE > 1) 
+            pE = reinterpret_cast<T*>(mxGetPr(pr_eps));
+      }
+
+      T lambda=0;
+      int sizeLambda=1;
+      T* pLambda=&lambda;
+      if (pr_lambda) {
+         const mwSize* dimsLambda=mxGetDimensions(pr_lambda);
+         sizeLambda=static_cast<int>(dimsLambda[0])*static_cast<int>(dimsLambda[1]);
+         lambda=static_cast<T>(mxGetScalar(pr_lambda));
+         if (sizeLambda > 1) 
+            pLambda = reinterpret_cast<T*>(mxGetPr(pr_lambda));
+      }
+
+      Matrix<T>* prPath=NULL;
       if (nlhs == 2) {
-         int L=MIN(n,MIN(static_cast<int>(mxGetScalar(pr_L)),K));
          plhs[1]=createMatrix<T>(K,L);
          T* pr_path=reinterpret_cast<T*>(mxGetPr(plhs[1]));
          Matrix<T> path(pr_path,K,L);
          path.setZeros();
-         T eps=static_cast<T>(mxGetScalar(pr_eps));
-         omp<T>(X,D,alpha,L,eps,numThreads,path);
-      } else {
-
-         if (sizeL == 1) {
-            int L=static_cast<int>(mxGetScalar(pr_L));
-            if (sizeE == 1) {
-               T eps=static_cast<T>(mxGetScalar(pr_eps));
-               omp<T>(X,D,alpha,L,eps,numThreads);
-            } else {
-               T* pE = reinterpret_cast<T*>(mxGetPr(pr_eps));
-               omp<T>(X,D,alpha,L,pE,numThreads);
-            }
-         } else {
-            if (!mexCheckType<int>(pr_L)) 
-               mexErrMsgTxt("Type of param.L should be int32");
-            int* pL = reinterpret_cast<int*>(mxGetPr(pr_L));
-            if (sizeE == 1) {
-               T eps=static_cast<T>(mxGetScalar(pr_eps));
-               omp<T>(X,D,alpha,pL,eps,numThreads);
-            } else {
-               T* pE = reinterpret_cast<T*>(mxGetPr(pr_eps));
-               omp<T>(X,D,alpha,pL,pE,numThreads,true,true);
-            }
-         }
+         prPath=&path;
       }
-
+      omp<T>(X,D,alpha,pL,pE,pLambda,sizeL > 1,sizeE > 1,sizeLambda > 1,
+            numThreads,prPath);
       convertSpMatrix(plhs[0],K,M,alpha.n(),alpha.nzmax(),alpha.v(),alpha.r(),
             alpha.pB());
    }
 
-   void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {
-      if (nrhs != 3)
-         mexErrMsgTxt("Bad number of inputs arguments");
+void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {
+   if (nrhs != 3)
+      mexErrMsgTxt("Bad number of inputs arguments");
 
-      if (nlhs != 1 && nlhs != 2) 
-         mexErrMsgTxt("Bad number of output arguments");
+   if (nlhs != 1 && nlhs != 2) 
+      mexErrMsgTxt("Bad number of output arguments");
 
-      if (mxGetClassID(prhs[0]) == mxDOUBLE_CLASS) {
-         callFunction<double>(plhs,prhs, nlhs);
-      } else {
-         callFunction<float>(plhs,prhs, nlhs);
-      }
+   if (mxGetClassID(prhs[0]) == mxDOUBLE_CLASS) {
+      callFunction<double>(plhs,prhs, nlhs);
+   } else {
+      callFunction<float>(plhs,prhs, nlhs);
    }
+}
 
 
 

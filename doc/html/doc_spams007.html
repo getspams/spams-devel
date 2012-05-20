@@ -9,325 +9,547 @@
 <META name="Author" content="Julien Mairal">
 <link rel="stylesheet" href="doc_spams.css">
 <LINK rel="stylesheet" type="text/css" href="doc_spams.css">
-<TITLE>Duality Gaps with Fenchel Duality</TITLE>
+<TITLE>Miscellaneous Functions</TITLE>
 </HEAD>
 <BODY >
 <A HREF="doc_spams006.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
 <A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
 <A HREF="doc_spams008.html"><IMG SRC="next_motif.gif" ALT="Next"></A>
 <HR>
-<H2 CLASS="section"><A NAME="htoc45">A</A>  Duality Gaps with Fenchel Duality</H2><P><A NAME="appendix"></A>
-This section is taken from the appendix D of Julien Mairal’s PhD thesis [<A HREF="doc_spams008.html#mairal11">17</A>].
-We are going to use intensively Fenchel Duality (see [<A HREF="doc_spams008.html#borwein">2</A>]).
-Let us consider the problem
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
-</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">min</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I><B>w</B></I> ∈ ℝ<I><SUP>p</SUP></I></TD></TR>
-</TABLE></TD><TD CLASS="dcell"> [<I>g</I>(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> <I>f</I>(<I><B>w</B></I>) + λψ(<I><B>w</B></I>)],<A NAME="software:eq:prb"></A>
-    (45)</TD></TR>
+<H2 CLASS="section"><A NAME="htoc36">6</A>  Miscellaneous Functions</H2><UL>
+<LI><A HREF="doc_spams007.html#toc25">Function mexConjGrad</A>
+</LI><LI><A HREF="doc_spams007.html#toc26">Function mexBayer</A>
+</LI><LI><A HREF="doc_spams007.html#toc27">Function mexCalcAAt</A>
+</LI><LI><A HREF="doc_spams007.html#toc28">Function mexCalcXAt</A>
+</LI><LI><A HREF="doc_spams007.html#toc29">Function mexCalcXY</A>
+</LI><LI><A HREF="doc_spams007.html#toc30">Function mexCalcXYt</A>
+</LI><LI><A HREF="doc_spams007.html#toc31">Function mexCalcXtY</A>
+</LI><LI><A HREF="doc_spams007.html#toc32">Function mexInvSym</A>
+</LI><LI><A HREF="doc_spams007.html#toc33">Function mexNormalize</A>
+</LI><LI><A HREF="doc_spams007.html#toc34">Function mexSort</A>
+</LI><LI><A HREF="doc_spams007.html#toc35">Function mexDisplayPatches</A>
+</LI><LI><A HREF="doc_spams007.html#toc36">Function mexCountPathsDAG</A>
+</LI><LI><A HREF="doc_spams007.html#toc37">Function mexRemoveCyclesGraph</A>
+</LI><LI><A HREF="doc_spams007.html#toc38">Function mexCountConnexComponents</A>
+</LI></UL>
+<H3 CLASS="subsection"><A NAME="toc25"></A><A NAME="htoc37">6.1</A>  Function mexConjGrad</H3><P>Implementation of a conjugate gradient for solving a linear system <B><I>Ax</I></B>=<I><B>b</B></I>
+when <I><B>A</B></I> is positive definite. In some cases, it is faster than the Matlab
+function <CODE>pcg</CODE>, especially when the library uses the Intel Math Kernel Library.
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   x =mexConjGrad(A,b,x0,tol,itermax)<BR>
+%<BR>
+% Name: mexConjGrad<BR>
+%<BR>
+% Description: Conjugate gradient algorithm, sometimes faster than the <BR>
+%    equivalent Matlab function pcg. In order to solve Ax=b;<BR>
+%<BR>
+% Inputs: A:  double square n x n matrix. HAS TO BE POSITIVE DEFINITE<BR>
+%         b:  double vector of length n.<BR>
+%         x0: double vector of length n. (optional) initial guess.<BR>
+%         tol: (optional) tolerance.<BR>
+%         itermax: (optional) maximum number of iterations.<BR>
+%<BR>
+% Output: x: double vector of length n.<BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-We first notice that for all the formulations we have been
-interested in, <I>g</I>(<I><B>w</B></I>) can be rewritten
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
-<I>g</I>(<I><B>w</B></I>) = f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>) + λψ(<I><B>w</B></I>), <A NAME="software:eq:prb2"></A>
-    (46)</TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">A=<FONT COLOR="blue"><B>randn</B></FONT>(5000,500);<BR>
+A=A<FONT COLOR="red">'*A;<BR>
+b=ones(500,1);<BR>
+x0=b;<BR>
+tol=1e-4;<BR>
+itermax=0.5*length(b);<BR>
+<BR>
+tic<BR>
+for ii = 1:20<BR>
+x1 = mexConjGrad(A,b,x0,tol,itermax);<BR>
+end<BR>
+t=toc;<BR>
+fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic<BR>
+for</B></FONT> ii = 1:20<BR>
+x2 = pcg(A,b);<BR>
+<FONT COLOR="blue"><B>end</B></FONT><BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Matlab time: %fs\n'</FONT>,t);<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((x1(:)-x2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc26"></A><A NAME="htoc38">6.2</A>  Function mexBayer</H3><P>Apply a Bayer pattern to an input image
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   x =mexConjGrad(A,b,x0,tol,itermax)<BR>
+%<BR>
+% Name: mexConjGrad<BR>
+%<BR>
+% Description: Conjugate gradient algorithm, sometimes faster than the <BR>
+%    equivalent Matlab function pcg. In order to solve Ax=b;<BR>
+%<BR>
+% Inputs: A:  double square n x n matrix. HAS TO BE POSITIVE DEFINITE<BR>
+%         b:  double vector of length n.<BR>
+%         x0: double vector of length n. (optional) initial guess.<BR>
+%         tol: (optional) tolerance.<BR>
+%         itermax: (optional) maximum number of iterations.<BR>
+%<BR>
+% Output: x: double vector of length n.<BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-where <I><B>X</B></I>=[<I><B>x</B></I><SUP>1</SUP>,…,<I><B>x</B><SUP>n</SUP></I>] are training vectors, and f is an
-appropriated smooth real-valued function of ℝ<I><SUP>n</SUP></I>,
-and ψ one of the regularization functions we have introduced.</P><P>Given a primal variable <I><B>w</B></I> in ℝ<I><SUP>p</SUP></I> and a dual variable κ in
-ℝ<I><SUP>n</SUP></I>, we obtain using classical Fenchel duality rules [<A HREF="doc_spams008.html#borwein">2</A>], 
-that the following quantity is a duality gap for problem (<A HREF="#software:eq:prb">45</A>):
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">   δ(<I><B>w</B></I>,κ) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> <I>g</I>(<I><B>w</B></I>) + f<SUP>∗</SUP>(κ) + λψ<SUP>∗</SUP>(−<I><B>X</B></I>κ / λ),
-</TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">A=<FONT COLOR="blue"><B>randn</B></FONT>(5000,500);<BR>
+A=A<FONT COLOR="red">'*A;<BR>
+b=ones(500,1);<BR>
+x0=b;<BR>
+tol=1e-4;<BR>
+itermax=0.5*length(b);<BR>
+<BR>
+tic<BR>
+for ii = 1:20<BR>
+x1 = mexConjGrad(A,b,x0,tol,itermax);<BR>
+end<BR>
+t=toc;<BR>
+fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic<BR>
+for</B></FONT> ii = 1:20<BR>
+x2 = pcg(A,b);<BR>
+<FONT COLOR="blue"><B>end</B></FONT><BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Matlab time: %fs\n'</FONT>,t);<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((x1(:)-x2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc27"></A><A NAME="htoc39">6.3</A>  Function mexCalcAAt</H3><P>For an input sparse matrix <I><B>A</B></I>, this function returns <I><B>AA</B><SUP>T</SUP></I>. For some reasons, when <I><B>A</B></I> has a lot more columns than rows, this function can be much faster than the equivalent matlab command <CODE>X*A'</CODE>. 
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   AAt =mexCalcAAt(A);<BR>
+%<BR>
+% Name: mexCalcAAt<BR>
+%<BR>
+% Description: Compute efficiently AAt = A*A', when A is sparse <BR>
+%   and has a lot more columns than rows. In some cases, it is<BR>
+%   up to 20 times faster than the equivalent Matlab expression<BR>
+%   AAt=A*A';<BR>
+%<BR>
+% Inputs: A:  double sparse m x n matrix   <BR>
+%<BR>
+% Output: AAt: double m x m matrix <BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-where f<SUP>∗</SUP> and ψ<SUP>∗</SUP> are respectively the Fenchel conjugates
-of f and ψ. Denoting by <I><B>w</B></I><SUP>⋆</SUP> the solution of
-Eq. (<A HREF="#software:eq:prb">45</A>), the duality gap is interesting in the sense that
-it upperbounds the difference with the optimal value of the function:
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">    δ(<I><B>w</B></I>,κ) ≥  <I>g</I>(<I><B>w</B></I>)−<I>g</I>(<I><B>w</B></I><SUP>⋆</SUP>) ≥ 0.
-</TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+A=sprand(200,200000,0.05);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+AAt=mexCalcAAt(A);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mex-file time: %fs\n'</FONT>,t);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+AAt2=A*A<FONT COLOR="red">';<BR>
+t=toc;<BR>
+fprintf('</FONT>matlab time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((AAt(:)-AAt2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc28"></A><A NAME="htoc40">6.4</A>  Function mexCalcXAt</H3><P>
+For an input sparse matrix <I><B>A</B></I> and a matrix <I><B>X</B></I>, this function returns <I><B>XA</B><SUP>T</SUP></I>. For some reasons, when <I><B>A</B></I> has a lot more columns than rows, this function can be much faster than the equivalent matlab command <CODE>X*A'</CODE>. 
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   XAt =mexCalcXAt(X,A);<BR>
+%<BR>
+% Name: mexCalcXAt<BR>
+%<BR>
+% Description: Compute efficiently XAt = X*A', when A is sparse and has a <BR>
+%   lot more columns than rows. In some cases, it is up to 20 times <BR>
+%   faster than the equivalent Matlab expression XAt=X*A';<BR>
+%<BR>
+% Inputs: X:  double m x n matrix<BR>
+%         A:  double sparse p x n matrix   <BR>
+%<BR>
+% Output: XAt: double m x p matrix <BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-Similarly, we will consider pairs of primal-dual variables (<I><B>W</B></I>,<I><B>K</B></I>) when 
-dealing with matrices.</P><P>During the optimization, sequences of primal variables <I><B>w</B></I> are available, 
-and one wishes to exploit duality gaps for estimating the difference
-<I>g</I>(<I><B>w</B></I>)−<I>g</I>(<I><B>w</B></I><SUP>⋆</SUP>). This requires the following components:
-</P><UL CLASS="itemize"><LI CLASS="li-itemize">
-being able to efficiently compute f<SUP>∗</SUP> and ψ<SUP>∗</SUP>.
-</LI><LI CLASS="li-itemize">being able to obtain a “good” dual variable κ given a primal
-variable <I><B>w</B></I>, such that δ(<I><B>w</B></I>,κ) is close to
-<I>g</I>(<I><B>w</B></I>)−<I>g</I>(<I><B>w</B></I><SUP>⋆</SUP>).
-</LI></UL><P>We suppose that the first point is satisfied (we will detail these computations
-for every loss and regularization functions in the sequel), and explain how to
-choose κ in general (details will also be given in the sequel).</P><P>Let us first consider the choice that associates with a primal variable <I><B>w</B></I>, the
-dual variable 
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
-κ(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> ∇ f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>), <A NAME="software:eq:kappab"></A>
-    (47)</TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200000);<BR>
+A=sprand(200,200000,0.05);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+XAt=mexCalcXAt(X,A);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mex-file time: %fs\n'</FONT>,t);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+XAt2=X*A<FONT COLOR="red">';<BR>
+t=toc;<BR>
+fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((XAt(:)-XAt2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc29"></A><A NAME="htoc41">6.5</A>  Function mexCalcXY</H3><P>
+For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function returns <B><I>XY</I></B>. 
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   Z =mexCalcXY(X,Y);<BR>
+%<BR>
+% Name: mexCalcXY<BR>
+%<BR>
+% Description: Compute Z=XY using the BLAS library used by SPAMS.<BR>
+%<BR>
+% Inputs: X:  double m x n matrix<BR>
+%         Y:  double n x p matrix   <BR>
+%<BR>
+% Output: Z: double m x p matrix <BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-and let us compute δ(<I><B>w</B></I>,κ(<I><B>w</B></I>)).
-First, easy computations show that for all vectors <I><B>z</B></I> in ℝ<I><SUP>n</SUP></I>,
-f<SUP>∗</SUP>(∇f(<I><B>z</B></I>)) = <I><B>z</B></I><SUP>⊤</SUP>∇f(<I><B>z</B></I>)−f(<I><B>z</B></I>),
-which gives
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">
-
-
-     
-
-</TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=right NOWRAP>   δ(<I><B>w</B></I>,κ(<I><B>w</B></I>))</TD><TD ALIGN=center NOWRAP>=</TD><TD ALIGN=left NOWRAP> f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>) + λ ψ(<I><B>w</B></I>) + f<SUP>∗</SUP>(∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>)) + λψ<SUP>∗</SUP>(−<I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>)/ λ), </TD><TD ALIGN=right NOWRAP>    (48)</TD></TR>
-<TR><TD ALIGN=right NOWRAP>&nbsp;</TD><TD ALIGN=center NOWRAP>=</TD><TD ALIGN=left NOWRAP> λ ψ(<I><B>w</B></I>) + <I><B>w</B></I><SUP>⊤</SUP><I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>) + λψ<SUP>∗</SUP>(−<I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>)/ λ). 
-</TD><TD ALIGN=right NOWRAP>    (49)</TD></TR>
-</TABLE></TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200);<BR>
+Y=<FONT COLOR="blue"><B>randn</B></FONT>(200,20000);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+XY=mexCalcXY(X,Y);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mex-file time: %fs\n'</FONT>,t);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+XY2=X*Y;<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mex-file time: %fs\n'</FONT>,t);<BR>
+<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((XY(:)-XY2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc30"></A><A NAME="htoc42">6.6</A>  Function mexCalcXYt</H3><P>
+For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function returns <I><B>XY</B><SUP>T</SUP></I>.
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   Z =mexCalcXYt(X,Y);<BR>
+%<BR>
+% Name: mexCalcXYt<BR>
+%<BR>
+% Description: Compute Z=XY' using the BLAS library used by SPAMS.<BR>
+%<BR>
+% Inputs: X:  double m x n matrix<BR>
+%         Y:  double p x n matrix   <BR>
+%<BR>
+% Output: Z: double m x p matrix <BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-We now use the classical Fenchel-Young inequality (see, Proposition
-3.3.4 of [<A HREF="doc_spams008.html#borwein">2</A>]) on the function ψ, which gives
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">   </TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=right NOWRAP>   δ(<I><B>w</B></I>,κ(<I><B>w</B></I>))  ≥  <I><B>w</B></I><SUP>⊤</SUP><I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>) − <I><B>w</B></I><SUP>⊤</SUP><I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>) = 0,</TD></TR>
-</TABLE></TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200);<BR>
+Y=<FONT COLOR="blue"><B>randn</B></FONT>(200,20000)<FONT COLOR="red">';<BR>
+<BR>
+<BR>
+tic<BR>
+XYt=mexCalcXYt(X,Y);<BR>
+t=toc;<BR>
+fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+XYt2=X*Y<FONT COLOR="red">';<BR>
+t=toc;<BR>
+fprintf('</FONT>matlab-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((XYt(:)-XYt2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc31"></A><A NAME="htoc43">6.7</A>  Function mexCalcXtY</H3><P>
+For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function returns <I><B>X</B><SUP>T</SUP><B>Y</B></I>.
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   Z =mexCalcXtY(X,Y);<BR>
+%<BR>
+% Name: mexCalcXtY<BR>
+%<BR>
+% Description: Compute Z=X'Y using the BLAS library used by SPAMS.<BR>
+%<BR>
+% Inputs: X:  double n x m matrix<BR>
+%         Y:  double n x p matrix   <BR>
+%<BR>
+% Output: Z: double m x p matrix <BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-with equality if and only if −<I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>) belongs to
-∂ ψ(<I><B>w</B></I>). Interestingly, we now that first-order optimality
-conditions for Eq. (<A HREF="#software:eq:prb2">46</A>) gives that
-−<I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I><SUP>⋆</SUP>) ∈ ∂ ψ(<I><B>w</B></I><SUP>⋆</SUP>).
-We have now in hand a non-negative function <I><B>w</B></I> ↦ δ(<I><B>w</B></I>,κ(<I><B>w</B></I>)) of <I><B>w</B></I>, that
-upperbounds <I>g</I>(<I><B>w</B></I>)−<I>g</I>(<I><B>w</B></I><SUP>⋆</SUP>) and satisfying δ(<I><B>w</B></I><SUP>⋆</SUP>,κ(<I><B>w</B></I><SUP>⋆</SUP>))=0.</P><P>This is however not a sufficient property to make it a good measure
-of the quality of the optimization, and further work is required, 
-that will be dependent on f and ψ.
-We have indeed proven that δ(<I><B>w</B></I><SUP>⋆</SUP>,κ(<I><B>w</B></I><SUP>⋆</SUP>)) is always 0. However, 
-for <I><B>w</B></I> different than <I><B>w</B></I><SUP>⋆</SUP>, δ(<I><B>w</B></I><SUP>⋆</SUP>,κ(<I><B>w</B></I><SUP>⋆</SUP>)) can be infinite, 
-making it a non-informative duality-gap. The reasons for this can be one of the following:
-</P><UL CLASS="itemize"><LI CLASS="li-itemize">
-The term ψ<SUP>∗</SUP>(−<I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>)/ λ) might have an infinite value.
-</LI><LI CLASS="li-itemize">Intercepts make the problem more complicated. One can write the formulation with an intercept by
-adding a row to <I><B>X</B></I> filled with the value 1, add one dimension to the vector <I><B>w</B></I>, and consider
-a regularization function ψ that does regularize the last entry of
-<I><B>w</B></I>. This further complexifies the computation of ψ<SUP>∗</SUP> and its
-definition, as shown in the next section.
-</LI></UL><P>Let us now detail how we proceed to solve these problems, but first without considering the intercept.
-The analysis is similar when working with matrices <I><B>W</B></I> instead of vectors <I><B>w</B></I>.
-</P><H4 CLASS="subsubsection"><A NAME="htoc46">A.0.1</A>  Duality Gaps without Intercepts</H4><P>
-Let us show how to compute the Fenchel conjugate of the functions we have introduced.
-We now present the Fenchel conjugate of the loss functions f.
-</P><UL CLASS="itemize"><LI CLASS="li-itemize">
-<B>The square loss</B> 
-<TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">         f(<I><B>z</B></I>)=</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
-<TR><TD CLASS="hbar"></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">2<I>n</I></TD></TR>
-</TABLE></TD><TD CLASS="dcell">||<I><B>y</B></I>−<I><B>z</B></I>||<SUB>2</SUB><SUP>2</SUP>, </TD></TR>
-</TABLE></TD></TR>
-<TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">         f<SUP>∗</SUP>(κ)=</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-<TR><TD CLASS="hbar"></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
-</TABLE></TD><TD CLASS="dcell">||κ||<SUB>2</SUB><SUP>2</SUP> + κ<SUP>⊤</SUP><I><B>y</B></I>.</TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE>
-</LI><LI CLASS="li-itemize"><B>The logistic loss</B> 
-<TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">         f(<I><B>z</B></I>)=</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
-<TR><TD CLASS="hbar"></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-</TABLE></TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>i</I>=1</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> log(1+<I>e</I><SUP>−<I>y<SUB>i</SUB><B>z</B><SUB>i</SUB></I></SUP>) </TD></TR>
-</TABLE></TD></TR>
-<TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">         f<SUP>∗</SUP>(κ)=</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">⎧<BR>
-⎪<BR>
-⎪<BR>
-⎨<BR>
-⎪<BR>
-⎪<BR>
-⎩</TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP>            +∞  if  ∃ <I>i</I>∈ [ 1;<I>n</I> ]   s.t.   <I>y<SUB>i</SUB></I>κ<I><SUB>i</SUB></I> ∉ [−1,0],</TD></TR>
-<TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">            </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>i</I>=1</TD></TR>
-</TABLE></TD><TD CLASS="dcell">(1+<I>y<SUB>i</SUB></I>κ<I><SUB>i</SUB></I>)log(1+<I>y<SUB>i</SUB></I>κ<I><SUB>i</SUB></I>)−<I>y<SUB>i</SUB></I>κ<I><SUB>i</SUB></I>log(−<I>y<SUB>i</SUB></I>κ<I><SUB>i</SUB></I>)  otherwise.</TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE>
-</LI><LI CLASS="li-itemize"><B>The multiclass logistic loss (or softmax)</B>. The primal variable is now a matrix <I><B>Z</B></I>, in ℝ<SUP><I>n</I> × <I>r</I></SUP>, which represents the product <I><B>X</B></I><SUP>⊤</SUP><I><B>W</B></I>. We denote by <I><B>K</B></I> the dual variable in ℝ<SUP><I>n</I> × <I>r</I></SUP>.
-<TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">          f(<I><B>Z</B></I>)=</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
-<TR><TD CLASS="hbar"></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-</TABLE></TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>i</I>=1</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> log</TD><TD CLASS="dcell">⎛<BR>
-⎜<BR>
-⎝</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>r</I></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>j</I>=1</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> <I>e</I><SUP> <I><B>Z</B><SUB>ij</SUB></I> − <I><B>Z</B><SUB>i<B>y</B>i</SUB></I></SUP></TD><TD CLASS="dcell">⎞<BR>
-⎟<BR>
-⎠</TD></TR>
-</TABLE></TD></TR>
-<TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">          f<SUP>∗</SUP>(<I><B>K</B></I>)=</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">⎧<BR>
-⎪<BR>
-⎪<BR>
-⎨<BR>
-⎪<BR>
-⎪<BR>
-⎩</TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP>             +∞  if  ∃ <I>i</I> ∈[ 1;<I>n</I> ]   s.t.   { <I><B>K</B><SUB>ij</SUB></I> &lt; 0  and  <I>j</I> ≠ <I><B>y</B><SUB>i</SUB></I> }  or  <I><B>K</B><SUB>i<B>y</B>i</SUB></I> &lt; −1,</TD></TR>
-<TR><TD ALIGN=left NOWRAP><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">             </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>i</I>=1</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> </TD><TD CLASS="dcell">⎡<BR>
-⎢<BR>
-⎣</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>j</I> ≠ <I><B>y</B><SUB>i</SUB></I></TD></TR>
-</TABLE></TD><TD CLASS="dcell"><I><B>K</B><SUB>ij</SUB></I>log(<I><B>K</B><SUB>ij</SUB></I>) + (1+<I><B>K</B></I><SUB><I>i</I> <I><B>y</B>i</I></SUB>)log(1+<I><B>K</B></I><SUB><I>i</I> <I><B>y</B>i</I></SUB>)</TD><TD CLASS="dcell">⎤<BR>
-⎥<BR>
-⎦</TD><TD CLASS="dcell">.</TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
-</TABLE>
-</LI></UL><P>Our first remark is that the choice Eq. (<A HREF="#software:eq:kappab">47</A>) ensures
-that f(κ) is not infinite.</P><P>As for the regularization function, except for the Tikhonov regularization
-which is self-conjugate (it is equal to its Fenchel conjugate), we have
-considered functions that are norms. There exists therefore a norm ||.|| such
-that ψ(<I><B>w</B></I>)=||<I><B>w</B></I>||, and we denote by ||.||<SUB>∗</SUB> its dual-norm. In such a
-case, the Fenchel conjugate of ψ for a vector γ in ℝ<I><SUP>p</SUP></I> takes the
-form
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">   ψ<SUP>∗</SUP>(γ) = </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">⎧<BR>
-⎨<BR>
-⎩</TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP>      0</TD><TD ALIGN=left NOWRAP> if  ||γ||<SUB>∗</SUB>≤ 1, </TD></TR>
-<TR><TD ALIGN=left NOWRAP>      +∞</TD><TD ALIGN=left NOWRAP> otherwise.</TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200)<FONT COLOR="red">';<BR>
+Y=randn(200,20000);<BR>
+<BR>
+<BR>
+tic<BR>
+XtY=mexCalcXtY(X,Y);<BR>
+t=toc;<BR>
+fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+XtY2=X<FONT COLOR="red">'*Y;<BR>
+t=toc;<BR>
+fprintf('</FONT>matlab-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((XtY(:)-XtY2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc32"></A><A NAME="htoc44">6.8</A>  Function mexInvSym</H3><P>
+For an input symmetric matrices <I><B>A</B></I> in ℝ<SUP><I>n</I> × <I>n</I></SUP>, this function returns <I><B>A</B></I><SUP>−1</SUP>.
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   B =mexInvSym(A);<BR>
+%<BR>
+% Name: mexInvSym<BR>
+%<BR>
+% Description: returns the inverse of a symmetric matrix A<BR>
+%<BR>
+% Inputs: A:  double n x n matrix   <BR>
+%<BR>
+% Output: B: double n x n matrix <BR>
+%<BR>
+% Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
-It turns out that for almost all the norms we have presented, there exists (i)
-either a closed form for the dual-norm or (ii) there exists an 
-efficient algorithm evaluating it. The only one which does not conform to this
-statement is the tree-structured sum of ℓ<SUB>2</SUB>-norms, for which we do not know
-how to evaluate it efficiently.</P><P>One can now slightly modify the definition of κ
-to ensure that ψ<SUP>∗</SUP>(−<I><B>X</B></I>κ/λ) ≠
-+∞. A natural choice is
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">   κ(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell">
-min</TD><TD CLASS="dcell">⎛<BR>
-⎜<BR>
-⎝</TD><TD CLASS="dcell">1,</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">λ</TD></TR>
-<TR><TD CLASS="hbar"></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">||<I><B>X</B></I>∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>)||<SUB>∗</SUB></TD></TR>
-</TABLE></TD><TD CLASS="dcell">⎞<BR>
-⎟<BR>
-⎠</TD><TD CLASS="dcell">∇
-f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>), 
-</TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+A=<FONT COLOR="blue"><B>rand</B></FONT>(1000,1000);<BR>
+A=A<FONT COLOR="red">'*A;<BR>
+<BR>
+<BR>
+tic<BR>
+B=mexInvSym(A);<BR>
+t=toc;<BR>
+fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+B2=<FONT COLOR="blue"><B>inv</B></FONT>(A);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'matlab-file time: %fs\n'</FONT>,t);<BR>
+<BR>
+<FONT COLOR="blue"><B>sum</B></FONT>((B(:)-B2(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc33"></A><A NAME="htoc45">6.9</A>  Function mexNormalize</H3><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   Y =mexNormalize(X);<BR>
+%<BR>
+% Name: mexNormalize<BR>
+%<BR>
+% Description: rescale the columns of X so that they have<BR>
+%        unit l2-norm.<BR>
+%<BR>
+% Inputs: X:  double m x n matrix   <BR>
+%<BR>
+% Output: Y: double m x n matrix <BR>
+%<BR>
+% Author: Julien Mairal, 2010</FONT></TD></TR>
 </TABLE><P>
-which is the one we have implemented. With this new choice, it is easy to see
-that for all vectors <I><B>w</B></I> in ℝ<I><SUP>p</SUP></I>, we still have f<SUP>∗</SUP>(κ) ≠ + ∞, and
-finally, we also have δ(<I><B>w</B></I>,κ(<I><B>w</B></I>)) &lt; + ∞ and
-δ(<I><B>w</B></I><SUP>⋆</SUP>,κ(<I><B>w</B></I><SUP>⋆</SUP>))=0, making it potentially a good
-duality gap.</P><H4 CLASS="subsubsection"><A NAME="htoc47">A.0.2</A>  Duality Gaps with Intercepts</H4><P>
-Even though adding an intercept does seem a simple modification to the original
-problem, it induces difficulties for finding good dual variables.</P><P>We recall that having an intercept is equivalent to having a problem of the
-type (<A HREF="#software:eq:prb2">46</A>), by adding a row to <I><B>X</B></I> filled with the value
-1, adding one dimension to the vector <I><B>w</B></I> (or one row for matrices <I><B>W</B></I>),
-and by using a regularization function that does not depend on the last entry
-of <I><B>w</B></I> (or the last row of <I><B>W</B></I>).</P><P>Suppose that we are considering a problem of
-type (<A HREF="#software:eq:prb2">46</A>) of dimension <I>p</I>+1, but we are using a
-regularization function ψ: ℝ<SUP><I>p</I>+1</SUP> → ℝ, such that for a
-vector <I><B>w</B></I> in ℝ<SUP><I>p</I>+1</SUP>, ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ψ(<I><B>w</B></I><SUB>[ 1;<I>p</I> ]</SUB>),
-where ψ: ℝ<I><SUP>p</SUP></I> → ℝ is one of the regularization function we have
-introduced. Then, considering a primal variable <I><B>w</B></I>, a dual variable κ, 
-and writing γ=<FONT SIZE=2><SUP>▵</SUP></FONT>−<I><B>X</B></I>κ/λ, we are interested in computing
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">   ψ<SUP>∗</SUP>(γ) = </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR VALIGN="middle"><TD CLASS="dcell">⎧<BR>
-⎨<BR>
-⎩</TD><TD CLASS="dcell"><TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=left NOWRAP>      +∞  if  γ<SUB><I>p</I>+1</SUB> ≠ 0 </TD></TR>
-<TR><TD ALIGN=left NOWRAP>      ψ<SUP>∗</SUP>(γ<SUB>[ 1;<I>p</I> ]</SUB>)  otherwise,</TD></TR>
-</TABLE></TD></TR>
-</TABLE></TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+X=<FONT COLOR="blue"><B>rand</B></FONT>(100,1000);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+Y=mexNormalize(X);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc34"></A><A NAME="htoc46">6.10</A>  Function mexSort</H3><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   Y =mexSort(X);<BR>
+%<BR>
+% Name: mexSort<BR>
+%<BR>
+% Description: sort the elements of X using quicksort<BR>
+%<BR>
+% Inputs: X:  double vector of size n<BR>
+%<BR>
+% Output: Y: double  vector of size n<BR>
+%<BR>
+% Author: Julien Mairal, 2010</FONT></TD></TR>
 </TABLE><P>
-which means that in order the duality gap not to be infinite, one needs in addition to ensure
-that γ<SUB><I>p</I>+1</SUB> be zero. Since the last row of <I><B>X</B></I> is filled with ones, this writes
-down ∑<SUB><I>i</I>=1</SUB><SUP><I>p</I>+1</SUP> κ<I><SUB>i</SUB></I>=0.
-For the formulation with matrices <I><B>W</B></I> and <I><B>K</B></I>, the constraint is similar but for every
-column of <I><B>K</B></I>.</P><P>Let us now detail how we proceed for every loss function to find a “good”
-dual variable κ satisfying this additional constraint, given a primal
-variable <I><B>w</B></I> in ℝ<SUP><I>p</I>+1</SUP>, we first define the auxiliary function
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">κ′(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> ∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>w</B></I>),
-</TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
+<BR>
+X=<FONT COLOR="blue"><B>rand</B></FONT>(1,300000);<BR>
+<BR>
+<BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+Y=mexSort(X);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>toc<BR>
+<BR>
+tic</B></FONT><BR>
+Y2=<FONT COLOR="blue"><B>sort</B></FONT>(X,<FONT COLOR="red">'ascend'</FONT>);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>toc<BR>
+<BR>
+sum</B></FONT>((Y2(:)-Y(:)).^2)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc35"></A><A NAME="htoc47">6.11</A>  Function mexDisplayPatches</H3><P>
+Print to the screen a matrix containing as columns image patches.</P><H3 CLASS="subsection"><A NAME="toc36"></A><A NAME="htoc48">6.12</A>  Function mexCountPathsDAG</H3><P>
+This function counts the number of paths in a DAG using dynamic programming.
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   num=mexCountPathsDAG(G);<BR>
+%<BR>
+% Name: mexCountPathsDAG<BR>
+%<BR>
+% Description: mexCountPathsDAG counts the number of paths <BR>
+%       in a DAG.<BR>
+%<BR>
+%       for a graph G with |V| nodes and |E| arcs,<BR>
+%       G is a double sparse adjacency matrix of size |V|x|V|,<BR>
+%       with |E| non-zero entries.<BR>
+%       (see example in test_CountPathsDAG.m<BR>
+%<BR>
+%<BR>
+% Inputs: G:  double sparse |V| x |V| matrix (full graph)<BR>
+%<BR>
+% Output: num: number of paths<BR>
+%<BR>
+% Author: Julien Mairal, 2012</FONT></TD></TR>
 </TABLE><P>
-(which becomes <I><B>K</B></I>′(<I><B>W</B></I>)=<FONT SIZE=2><SUP>▵</SUP></FONT> ∇f(<I><B>X</B></I><SUP>⊤</SUP><I><B>W</B></I>) for matrices),
-and then define another auxiliary function κ″(<I><B>w</B></I>) as follows,
-to take into account the additional constraint ∑<SUB><I>i</I>=1</SUB><SUP><I>p</I>+1</SUP> κ<I><SUB>i</SUB></I>=0.
-</P><UL CLASS="itemize"><LI CLASS="li-itemize">
-<B>For the square loss</B>, we define another auxiliary function:
-<TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">        κ″(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> κ′(<I><B>w</B></I>) − </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
-<TR><TD CLASS="hbar"></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-</TABLE></TD><TD CLASS="dcell"><B>1</B><SUB><I>p</I>+1</SUB><SUP>⊤</SUP>κ′(<I><B>w</B></I>)<B>1</B><SUB><I>p</I>+1</SUB> 
-</TD></TR>
-</TABLE>
-where <B>1</B><SUB><I>p</I>+1</SUB> is a vector of size <I>p</I>+1 filled with ones. This step,
-ensures that ∑<SUB><I>i</I>=1</SUB><SUP><I>p</I>+1</SUP>κ″(<I><B>w</B></I>)<I><SUB>i</SUB></I>= 0.
-</LI><LI CLASS="li-itemize"><B>For the logistic loss</B>, the situation is slightly more complicated since additional constraints are involved in the definition of f<SUP>∗</SUP>.
-<TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">      κ″(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> <I>arg</I> <I>min</I><SUB>κ ∈ ℝ<SUP><I>n</I></SUP></SUB> ||κ−κ′(<I><B>w</B></I>)||<SUB>2</SUB><SUP>2</SUP>   s.t.   </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>i</I>=1</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> κ<I><SUB>i</SUB></I>=0  and  ∀ <I>i</I> ∈ [ 1;<I>n</I> ], κ<I><SUB>i</SUB></I> ∈ [−1,0].
-</TD></TR>
-</TABLE>
-This problem can be solved in linear-time [<A HREF="doc_spams008.html#brucker">3</A>, <A ></A>]
-using a similar algorithm as for the projection onto the ℓ<SUB>1</SUB>-ball,
-since it is an instance of a <EM>quadratic knapsack problem</EM>.
-</LI><LI CLASS="li-itemize"><B>For the multi-class logistic loss</B>, we proceed in a similar way, for every column <I><B>K</B><SUP>j</SUP></I> of <I><B>K</B></I>, <I>j</I> ∈ [ 1;<I>r</I> ]:
-<DIV CLASS="flushleft"><TABLE CLASS="display"><TR><TD CLASS="dcell">
-<I><B>K</B></I><SUP>′′ <I>j</I></SUP>(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> <I>arg</I> <I>min</I><SUB>κ ∈ ℝ<SUP><I>n</I></SUP></SUB> ||<I><B>K</B></I><SUP>′ <I>j</I></SUP>−κ′(<I><B>w</B></I>)||<SUB>2</SUB><SUP>2</SUP>   s.t.   </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><I>n</I></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=6>∑</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center"><I>i</I>=1</TD></TR>
-</TABLE></TD><TD CLASS="dcell"> κ<I><SUB>i</SUB></I>=0  and  </TD></TR>
-</TABLE></DIV><DIV CLASS="flushright"> ∀ <I>i</I> ∈ [ 1;<I>n</I> ], {κ<I><SUB>i</SUB></I> ≥ 0  if  <I>j</I> ≠ <I><B>y</B><SUB>i</SUB></I>}  and  {κ<I><SUB>i</SUB></I> ≥ −1  if  <I><B>y</B><SUB>i</SUB></I>=<I>j</I>}.
-</DIV>
-</LI></UL><P>
-When the function ψ is the Tykhonov regularization function, we end the process by setting κ(<I><B>w</B></I>)=κ″(<I><B>w</B></I>).
-When it is a norm, we choose, as before for taking into account the constraint ||<I><B>X</B></I>κ||<SUB>∗</SUB>≤ λ,
-</P><TABLE CLASS="display dcenter"><TR VALIGN="middle"><TD CLASS="dcell">κ(<I><B>w</B></I>) </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center"><FONT SIZE=2>▵</FONT></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">=</TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">&nbsp;</TD></TR>
-</TABLE></TD><TD CLASS="dcell">  min</TD><TD CLASS="dcell">⎛<BR>
-⎜<BR>
-⎝</TD><TD CLASS="dcell">1,</TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">λ</TD></TR>
-<TR><TD CLASS="hbar"></TD></TR>
-<TR><TD CLASS="dcell" ALIGN="center">||<I><B>X</B></I>κ″(<I><B>w</B></I>)||<SUB>∗</SUB></TD></TR>
-</TABLE></TD><TD CLASS="dcell">⎞<BR>
-⎟<BR>
-⎠</TD><TD CLASS="dcell">κ″(<I><B>w</B></I>),
-</TD></TR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% graph corresponding to figure 1 in arXiv:1204.4539v1</FONT><BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'test mexCountPathsDAG\n'</FONT>);<BR>
+<FONT COLOR="#007F00">% this graph is a DAG</FONT><BR>
+G=[0 0 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 0 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 1 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 1 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   0 0 0 1 0 0 0 0 0 0 0 0 0;<BR>
+   0 1 1 0 1 0 0 0 0 0 0 0 0;<BR>
+   0 1 0 0 1 0 0 0 0 0 0 0 0;<BR>
+   0 0 0 0 0 1 1 0 0 0 0 0 0;<BR>
+   1 0 0 1 0 0 0 0 0 0 0 0 0;<BR>
+   1 0 0 0 0 0 0 0 1 0 0 0 0;<BR>
+   0 0 0 0 0 0 0 0 1 1 0 0 0;<BR>
+   0 0 0 0 0 0 0 0 1 0 1 0 0;<BR>
+   0 0 0 0 1 0 0 0 1 0 0 1 0];<BR>
+G=<FONT COLOR="blue"><B>sparse</B></FONT>(G);<BR>
+num=mexCountPathsDAG(G);<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Num of paths: %d\n'</FONT>,num);</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc37"></A><A NAME="htoc49">6.13</A>  Function mexRemoveCyclesGraph</H3><P>
+One heuristic to remove cycles from a graph.
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   DAG=mexRemoveCycleGraph(G);<BR>
+%<BR>
+% Name: mexRemoveCycleGraph<BR>
+%<BR>
+% Description: mexRemoveCycleGraph heuristically removes<BR>
+%       arcs along cycles in the graph G to obtain a DAG.<BR>
+%       the arcs of G can have weights. The heuristic will<BR>
+%       remove in priority arcs with the smallest weights.<BR>
+%<BR>
+%       for a graph G with |V| nodes and |E| arcs,<BR>
+%       G is a double sparse adjacency matrix of size |V|x|V|,<BR>
+%       with |E| non-zero entries. The non-zero entries correspond<BR>
+%       to the weights of the arcs.<BR>
+%<BR>
+%       DAG is a also double sparse adjacency matrix of size |V|x|V|,<BR>
+%       but the graph is acyclic.<BR>
+%<BR>
+%       Note that another heuristic to obtain a DAG from a general <BR>
+%       graph consists of ordering the vertices.<BR>
+%<BR>
+% Inputs: G:  double sparse |V| x |V| matrix<BR>
+%<BR>
+% Output: DAG:  double sparse |V| x |V| matrix<BR>
+%<BR>
+% Author: Julien Mairal, 2012</FONT></TD></TR>
 </TABLE><P>
-with a similar formulation for matrices <I><B>W</B></I> and <I><B>K</B></I>.</P><P>Even though finding dual variables while taking into account the intercept
-requires quite a lot of engineering, notably implementing a quadratic knapsack
-solver, it can be done efficiently.</P><HR>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'test mexRemoveCyclesGraph\n'</FONT>);<BR>
+<FONT COLOR="#007F00">% this graph is not a DAG</FONT><BR>
+G=[0   0   0   0   0   0   0   0   0   0   0   0   0;<BR>
+   1   0   0   0.1 0   0   0   0.1 0   0   0   0   0;<BR>
+   1   1   0   0   0   0.1 0   0   0   0   0   0   0;<BR>
+   1   1   0   0   0   0   0   0   0   0   0   0.1 0;<BR>
+   0   0   0   1   0   0   0   0   0   0   0   0   0;<BR>
+   0   1   1   0   1   0   0   0   0   0   0   0   0;<BR>
+   0   1   0   0   1   0   0   0   0   0   0   0   0;<BR>
+   0   0   0   0   0   1   1   0   0   0   0   0   0;<BR>
+   1   0   0   1   0   0   0   0   0   0   0   0   0;<BR>
+   1   0   0   0   0   0   0   0   1   0   0   0   0;<BR>
+   0   0   0   0   0   0   0   0   1   1   0   0   0;<BR>
+   0   0   0   0   0   0   0   0   1   0   1   0   0;<BR>
+   0   0   0   0   1   0   0   0   1   0   0   1   0];<BR>
+G=<FONT COLOR="blue"><B>sparse</B></FONT>(G);<BR>
+DAG=mexRemoveCyclesGraph(G);<BR>
+<FONT COLOR="blue"><B>format</B></FONT> compact;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Original graph:\n'</FONT>);<BR>
+<FONT COLOR="blue"><B>full</B></FONT>(G)<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'New graph:\n'</FONT>);<BR>
+<FONT COLOR="blue"><B>full</B></FONT>(DAG)</TD></TR>
+</TABLE><H3 CLASS="subsection"><A NAME="toc38"></A><A NAME="htoc50">6.14</A>  Function mexCountConnexComponents</H3><P>
+Count the number of connected components of a subgraph from a graph.
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% <BR>
+% Usage:   num=mexCountConnexComponents(G,N);<BR>
+%<BR>
+% Name: mexCountConnexComponents<BR>
+%<BR>
+% Description: mexCountConnexComponents counts the number of connected<BR>
+%       components of the subgraph of G corresponding to set of nodes<BR>
+%       in N. In other words, the subgraph of G by removing from G all<BR>
+%       the nodes which are not in N.<BR>
+%<BR>
+%       for a graph G with |V| nodes and |E| arcs,<BR>
+%       G is a double sparse adjacency matrix of size |V|x|V|,<BR>
+%       with |E| non-zero entries.<BR>
+%       (see example in test_CountConnexComponents.m)<BR>
+%       N is a dense vector of size |V|. if  N[i] is non-zero,<BR>
+%       it means that the node i is selected.<BR>
+%<BR>
+%<BR>
+% Inputs: G:  double sparse |V| x |V| matrix (full graph)<BR>
+%         N:  double full |V| vector.<BR>
+%<BR>
+% Output: num: number of connected components.<BR>
+%<BR>
+% Author: Julien Mairal, 2012</FONT></TD></TR>
+</TABLE><P>
+The following piece of code contains usage examples:
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><FONT COLOR="#007F00">% graph corresponding to figure 1 in arXiv:1204.4539v1</FONT><BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'test mexCountConnexComponents\n'</FONT>);<BR>
+<FONT COLOR="#007F00">% this graph is a DAG</FONT><BR>
+G=[0 0 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 0 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 1 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 1 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   0 0 0 1 0 0 0 0 0 0 0 0 0;<BR>
+   0 1 1 0 1 0 0 0 0 0 0 0 0;<BR>
+   0 1 0 0 1 0 0 0 0 0 0 0 0;<BR>
+   0 0 0 0 0 1 1 0 0 0 0 0 0;<BR>
+   1 0 0 1 0 0 0 0 0 0 0 0 0;<BR>
+   1 0 0 0 0 0 0 0 1 0 0 0 0;<BR>
+   0 0 0 0 0 0 0 0 1 1 0 0 0;<BR>
+   0 0 0 0 0 0 0 0 1 0 1 0 0;<BR>
+   0 0 0 0 1 0 0 0 1 0 0 1 0];<BR>
+G=<FONT COLOR="blue"><B>sparse</B></FONT>(G);<BR>
+nodes=[0 1 1 0 0 1 0 0 1 0 1 1 0];<BR>
+num=mexCountConnexComponents(G,nodes);<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Num of connected components: %d\n'</FONT>,num);<BR>
+<BR>
+<FONT COLOR="#007F00">% this graph is a not a DAG anymore. This function works<BR>
+% with general graphs.</FONT><BR>
+G=[0 0 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 0 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   1 1 0 1 0 0 0 0 0 0 0 0 0;<BR>
+   1 1 0 0 0 0 0 0 0 0 0 0 0;<BR>
+   0 0 0 1 0 0 0 0 0 0 0 0 0;<BR>
+   0 1 1 0 1 0 0 0 0 0 0 0 0;<BR>
+   0 1 0 0 1 0 0 0 0 0 0 0 0;<BR>
+   0 0 0 0 0 1 1 0 0 0 0 0 0;<BR>
+   1 0 0 1 0 0 0 0 0 0 0 0 0;<BR>
+   1 0 0 0 0 0 0 0 1 0 0 0 0;<BR>
+   0 0 0 0 0 0 0 0 1 1 0 0 0;<BR>
+   0 0 0 0 0 0 0 0 1 0 1 0 0;<BR>
+   0 0 0 0 1 0 0 0 1 0 0 1 0];<BR>
+nodes=[0 1 1 0 0 1 0 0 1 0 1 1 0];<BR>
+G=<FONT COLOR="blue"><B>sparse</B></FONT>(G);<BR>
+num=mexCountConnexComponents(G,nodes);<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Num of connected components: %d\n'</FONT>,num);<BR>
+<BR>
+nodes=[0 1 1 1 0 1 0 0 1 0 1 1 0];<BR>
+num=mexCountConnexComponents(G,nodes);<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Num of connected components: %d\n'</FONT>,num);</TD></TR>
+</TABLE><HR>
 <A HREF="doc_spams006.html"><IMG SRC="previous_motif.gif" ALT="Previous"></A>
 <A HREF="index.html"><IMG SRC="contents_motif.gif" ALT="Up"></A>
 <A HREF="doc_spams008.html"><IMG SRC="next_motif.gif" ALT="Next"></A>

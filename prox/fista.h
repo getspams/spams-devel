@@ -26,7 +26,7 @@
 namespace FISTA {
 
    enum loss_t { SQUARE, SQUARE_MISSING, LOG, LOGWEIGHT, MULTILOG, CUR, HINGE, INCORRECT_LOSS};
-   enum regul_t { L0, L1, RIDGE, L2, LINF, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG};
+   enum regul_t { L0, L1, RIDGE, L2, LINF, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG, GRAPH_PATH_L0, GRAPH_PATH_CONV};
 
    regul_t regul_from_string(char* regul) {
       if (strcmp(regul,"l0")==0) return L0;
@@ -57,6 +57,8 @@ namespace FISTA {
       if (strcmp(regul,"trace-norm-vec")==0) return TRACE_NORM_VEC;
       if (strcmp(regul,"rank")==0) return RANK;
       if (strcmp(regul,"rank-vec")==0) return RANK_VEC;
+      if (strcmp(regul,"graph-path-l0")==0) return GRAPH_PATH_L0;
+      if (strcmp(regul,"graph-path-conv")==0) return GRAPH_PATH_CONV;
       if (strcmp(regul,"none")==0) return NONE;
       return INCORRECT_REG;
    }
@@ -74,13 +76,13 @@ namespace FISTA {
 
    void print_loss(const loss_t& loss) {
       switch (loss) {
-         case SQUARE: cerr << "Square loss" << endl; break;
-         case SQUARE_MISSING: cerr << "Square loss with missing data" << endl; break;
-         case LOG: cerr << "Logistic loss" << endl; break;
-         case LOGWEIGHT: cerr << "Weighted Logistic loss" << endl; break;
-         case HINGE: cerr << "Hinge loss" << endl; break;
-         case MULTILOG: cerr << "Multiclass logistic Loss" << endl; break;
-         case CUR: cerr << "CUR decomposition" << endl; break;
+         case SQUARE: cout << "Square loss" << endl; break;
+         case SQUARE_MISSING: cout << "Square loss with missing data" << endl; break;
+         case LOG: cout << "Logistic loss" << endl; break;
+         case LOGWEIGHT: cout << "Weighted Logistic loss" << endl; break;
+         case HINGE: cout << "Hinge loss" << endl; break;
+         case MULTILOG: cout << "Multiclass logistic Loss" << endl; break;
+         case CUR: cout << "CUR decomposition" << endl; break;
          default: cerr << "Not implemented" << endl;
       }
    };
@@ -91,35 +93,37 @@ namespace FISTA {
 
    void print_regul(const regul_t& regul) {
       switch (regul) {
-         case L0: cerr << "L0 regularization" << endl; break;
-         case L1: cerr << "L1 regularization" << endl; break;
-         case RIDGE: cerr << "L2-squared regularization" << endl; break;
-         case L2: cerr << "L2-not-squared regularization" << endl; break;
-         case LINF: cerr << "Linf regularization" << endl; break;
-         case ELASTICNET: cerr << "Elastic-net regularization" << endl; break;
-         case FUSEDLASSO: cerr << "Fused Lasso or total variation regularization" << endl; break;
-         case GROUPLASSO_L2: cerr << "Group Lasso L2" << endl; break;
-         case GROUPLASSO_LINF: cerr << "Group Lasso LINF" << endl; break;
-         case GROUPLASSO_L2_L1: cerr << "Group Lasso L2 + L1" << endl; break;
-         case GROUPLASSO_LINF_L1: cerr << "Group Lasso LINF + L1" << endl; break;
-         case L1L2: cerr << "L1L2 regularization" << endl; break;
-         case L1LINF: cerr << "L1LINF regularization" << endl; break;
-         case TRACE_NORM: cerr << "Trace Norm regularization" << endl; break;
-         case TRACE_NORM_VEC: cerr << "Trace Norm regularization for vectors" << endl; break;
-         case RANK: cerr << "Rank regularization" << endl; break;
-         case RANK_VEC: cerr << "Rank regularization for vectors" << endl; break;
-         case L1L2_L1: cerr << "L1L2 regularization + L1" << endl; break;
-         case L1LINF_L1: cerr << "L1LINF regularization + L1" << endl; break;
-         case TREE_L0: cerr << "Tree-L0 regularization" << endl; break;
-         case TREE_L2: cerr << "Tree-L2 regularization" << endl; break;
-         case TREE_LINF: cerr << "Tree-Linf regularization" << endl; break;
-         case GRAPH: cerr << "Graph regularization" << endl; break;
-         case GRAPH_RIDGE: cerr << "Graph+ridge regularization" << endl; break;
-         case GRAPH_L2: cerr << "Graph regularization with l2" << endl; break;
-         case TREEMULT: cerr << "multitask tree regularization" << endl; break;
-         case GRAPHMULT: cerr << "multitask graph regularization" << endl; break;
-         case L1LINFCR: cerr << "L1LINF regularization on rows and columns" << endl; break;
-         case NONE: cerr << "No regularization" << endl; break;
+         case L0: cout << "L0 regularization" << endl; break;
+         case L1: cout << "L1 regularization" << endl; break;
+         case RIDGE: cout << "L2-squared regularization" << endl; break;
+         case L2: cout << "L2-not-squared regularization" << endl; break;
+         case LINF: cout << "Linf regularization" << endl; break;
+         case ELASTICNET: cout << "Elastic-net regularization" << endl; break;
+         case FUSEDLASSO: cout << "Fused Lasso or total variation regularization" << endl; break;
+         case GROUPLASSO_L2: cout << "Group Lasso L2" << endl; break;
+         case GROUPLASSO_LINF: cout << "Group Lasso LINF" << endl; break;
+         case GROUPLASSO_L2_L1: cout << "Group Lasso L2 + L1" << endl; break;
+         case GROUPLASSO_LINF_L1: cout << "Group Lasso LINF + L1" << endl; break;
+         case L1L2: cout << "L1L2 regularization" << endl; break;
+         case L1LINF: cout << "L1LINF regularization" << endl; break;
+         case TRACE_NORM: cout << "Trace Norm regularization" << endl; break;
+         case TRACE_NORM_VEC: cout << "Trace Norm regularization for vectors" << endl; break;
+         case RANK: cout << "Rank regularization" << endl; break;
+         case RANK_VEC: cout << "Rank regularization for vectors" << endl; break;
+         case L1L2_L1: cout << "L1L2 regularization + L1" << endl; break;
+         case L1LINF_L1: cout << "L1LINF regularization + L1" << endl; break;
+         case TREE_L0: cout << "Tree-L0 regularization" << endl; break;
+         case TREE_L2: cout << "Tree-L2 regularization" << endl; break;
+         case TREE_LINF: cout << "Tree-Linf regularization" << endl; break;
+         case GRAPH: cout << "Graph regularization" << endl; break;
+         case GRAPH_RIDGE: cout << "Graph+ridge regularization" << endl; break;
+         case GRAPH_L2: cout << "Graph regularization with l2" << endl; break;
+         case TREEMULT: cout << "multitask tree regularization" << endl; break;
+         case GRAPHMULT: cout << "multitask graph regularization" << endl; break;
+         case L1LINFCR: cout << "L1LINF regularization on rows and columns" << endl; break;
+         case GRAPH_PATH_L0: cout << "Graph path non-convex regularization" << endl; break;
+         case GRAPH_PATH_CONV: cout << "Graph path convex regularization" << endl; break;
+         case NONE: cout << "No regularization" << endl; break;
          default: cerr << "Not implemented" << endl;
       }
    };
@@ -146,8 +150,14 @@ namespace FISTA {
          sqrt_step=true;
          transpose=false;
          fixed_step=false;
+         copied=false;
       }
-      ~ParamFISTA() { delete[](name_regul); delete[](name_loss); };
+      ~ParamFISTA() { 
+         if (!copied) {
+            delete[](name_regul); 
+            delete[](name_loss); 
+         }
+      };
       int num_threads;
       int max_it;
       T L0;
@@ -177,6 +187,7 @@ namespace FISTA {
       bool clever;
       bool log;
       bool ista;
+      bool copied;
       bool subgrad;
       char* logName;
       bool is_inner_weights;
@@ -190,13 +201,14 @@ namespace FISTA {
 
    template <typename T> struct ParamReg { 
       ParamReg() { size_group=1; lambda2d1 = 0; lambda3d1 = 0; pos=false; intercept=false; num_cols=1; graph_st=NULL; tree_st=NULL;
-         resetflow=false; clever=false; linf=true; transpose=false;};
+      graph_path_st=NULL; resetflow=false; clever=false; linf=true; transpose=false;};
       T lambda2d1;
       T lambda3d1;
       int size_group;
       bool pos;
       bool intercept;
       int num_cols;
+      GraphPathStruct<T>* graph_path_st;
       GraphStruct<T>* graph_st;
       TreeStruct<T>* tree_st;
       bool resetflow;
@@ -1888,6 +1900,97 @@ namespace FISTA {
             void inline fenchel(const Matrix<T>& input, T& val, T& scal) const { };
       };
 
+    template <typename T>
+       inline void convert_paths_to_mat(const List<Path<long long>*>& paths,SpMatrix<T>& paths_mat, const int n) {
+          int nzmax=0;
+          for (ListIterator<Path<long long>*> it=paths.begin(); it != paths.end(); ++it)
+             nzmax+=it->nodes.size();
+          paths_mat.resize(n,paths.size(),nzmax);
+          int* pB =paths_mat.pB();
+          int* r =paths_mat.r();
+          T* v =paths_mat.v();
+          int count_col=0;
+          int count=0;
+          pB[0]=0;
+          for (ListIterator<Path<long long>*> it_path=paths.begin(); 
+                it_path != paths.end(); ++it_path) {
+             for (const_iterator_int it = it_path->nodes.begin(); 
+                   it != it_path->nodes.end(); ++it) {
+                r[count]= *it;
+                v[count++]= it_path->flow;
+             }
+             pB[++count_col]=count;
+          }
+       };
+ 
+    template <typename T> 
+       class GraphPathL0 : public Regularizer<T> {
+          public:
+             GraphPathL0(const ParamReg<T>& param) : Regularizer<T>(param) {
+                const GraphPathStruct<T>& graph=*(param.graph_path_st);
+                _graph.init_graph(graph);
+             }
+             virtual ~GraphPathL0() { };
+ 
+             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
+                // DEBUG
+                y.copy(x);
+                if (this->_pos) y.thrsPos();
+                _graph.proximal_l0(y.rawX(),lambda);
+             };
+             T inline eval(const Vector<T>& x) const { 
+                return const_cast<GraphPath<T>* >(&_graph)->eval_l0(x.rawX());
+             };
+             T inline eval_paths(const Vector<T>& x, SpMatrix<T>& paths_mat) const { 
+                List<Path<long long>*> paths;
+                T val=const_cast<GraphPath<T>* >(&_graph)->eval_l0(x.rawX(),&paths);
+                convert_paths_to_mat<T>(paths,paths_mat,_graph.n());
+                for (ListIterator<Path<>*> it_path=paths.begin(); 
+                      it_path != paths.end(); ++it_path) delete(*it_path);
+                return val;
+             };
+ 
+             virtual bool is_fenchel() const { return false; };
+             void inline fenchel(const Vector<T>& input, T& val, T& scal) const {  };
+ 
+          private:
+             GraphPath<T> _graph;
+       };
+ 
+    template <typename T> 
+       class GraphPathConv : public Regularizer<T> {
+          public:
+             GraphPathConv(const ParamReg<T>& param) : Regularizer<T>(param) {
+                const GraphPathStruct<T>& graph=*(param.graph_path_st);
+                _graph.init_graph(graph);
+             }
+             virtual ~GraphPathConv() {  };
+ 
+             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
+                y.copy(x);
+                if (this->_pos) y.thrsPos();
+                _graph.proximal_conv(y.rawX(),lambda);
+             };
+             T inline eval(const Vector<T>& x) const { 
+                return const_cast<GraphPath<T>* >(&_graph)->eval_conv(x.rawX());
+             };
+             T inline eval_paths(const Vector<T>& x, SpMatrix<T>& paths_mat) const { 
+                List<Path<long long>*> paths;
+                T val=const_cast<GraphPath<T>* >(&_graph)->eval_conv(x.rawX(),&paths);
+                convert_paths_to_mat<T>(paths,paths_mat,_graph.n());
+                for (ListIterator<Path<long long>*> it_path=paths.begin(); 
+                      it_path != paths.end(); ++it_path) delete(*it_path);
+                return val;
+             };
+             void inline fenchel(const Vector<T>& input, T& val, T& scal) const {
+                T mm = const_cast<GraphPath<T>* >(&_graph)->eval_dual_norm(input.rawX());
+                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
+                val=0;
+             };
+          private:
+             GraphPath<T> _graph;
+       };
+
 
    template <typename T,typename Reg>
       class RegMat : public Regularizer<T,Matrix<T> > {
@@ -2279,8 +2382,10 @@ namespace FISTA {
          dual -= loss.fenchel(grad1);
          dual = MAX(dual,best_dual);
          T delta= primal == 0 ? 0 : (primal-dual)/primal;
-         if (verbose)
-            cerr << "Relative duality gap: " << delta << endl;
+         if (verbose) {
+            cout << "Relative duality gap: " << delta << endl;
+            flush(cout);
+         }
          best_dual=dual;
          return delta;
       }
@@ -2351,11 +2456,12 @@ namespace FISTA {
                T los=loss.eval(x) + lambda*regularizer.eval(x);    
                optim_info[0]=los;
                T sec=time.getElapsed();
-               cerr << "Iter: " << it << ", loss: " << los << ", time: " << sec << " ";
+               cout << "Iter: " << it << ", loss: " << los << ", time: " << sec << " ";
                if (param.log) 
                   writeLog(it,sec,los,best_dual,param.logName);
                if (param.verbose) 
-                  cerr << endl;
+                  cout << endl;
+               flush(cout);
                time.start();
             }
 
@@ -2411,7 +2517,8 @@ namespace FISTA {
                T los=loss.eval(x) + lambda*regularizer.eval(x);
                optim_info[0]=los;
                T sec=time.getElapsed();
-               cerr << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L;
+               cout << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L;
+               flush(cout);
                if (param.log) 
                   writeLog(it,sec,los,best_dual,param.logName);
                time.start();
@@ -2431,11 +2538,11 @@ namespace FISTA {
                }
                L *= param.gamma;
                if (param.verbose && ((it % it0) == 0)) 
-                  cerr << " " << L;
+                  cout << " " << L;
                ++iter;
             }
             if (param.verbose && ((it % it0) == 0)) 
-               cerr << endl;
+               cout << endl;
             old.copy(x);
             x.copy(tmp);
             if (duality) {
@@ -2455,8 +2562,10 @@ namespace FISTA {
          T los=loss.eval(x) + lambda*regularizer.eval(x);    
          optim_info[0]=los;
          T sec=time.getElapsed();
-         if (param.verbose)
-            cerr << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L;
+         if (param.verbose) {
+            cout << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L << endl;
+            flush(cout);
+         }
          if (duality) {
             rel_duality_gap=duality_gap(loss,regularizer,x,lambda,best_dual,param.verbose);
             optim_info[1]=best_dual;
@@ -2494,7 +2603,8 @@ namespace FISTA {
                T los=loss.eval(x) + lambda*regularizer.eval(x);    
                optim_info[0]=los;
                T sec=time.getElapsed();
-               cerr << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L;
+               cout << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L;
+               flush(cout);
                if (param.log) 
                   writeLog(it,sec,los,best_dual,param.logName);
                time.start();
@@ -2513,11 +2623,11 @@ namespace FISTA {
                if (param.fixed_step || loss.test_backtracking(y,grad,tmp,L)) break;
                L *= param.gamma;
                if (param.verbose && ((it % it0) == 0)) 
-                  cerr << " " << L;
+                  cout << " " << L;
                ++iter;
             }
             if (param.verbose && ((it % it0) == 0)) 
-               cerr << endl;
+               cout << endl;
 
             prox.copy(x);
             prox.sub(tmp);
@@ -2542,8 +2652,10 @@ namespace FISTA {
          T los=loss.eval(x) + lambda*regularizer.eval(x);
          optim_info[0]=los;
          T sec=time.getElapsed();
-         if (param.verbose)
-            cerr << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L;
+         if (param.verbose) {
+            cout << "Iter: " << it << ", loss: " << los << ", time: " << sec << ", L: " << L << endl;
+            flush(cout);
+         }
          if (duality) {
             rel_duality_gap=duality_gap(loss,regularizer,x,lambda,best_dual,param.verbose);
             optim_info[1]=best_dual;
@@ -2558,7 +2670,6 @@ namespace FISTA {
             const Matrix<T>& multi_loss, const SpMatrix<T>& multi_reg, T& los, const T* weights = NULL) {
          const int n_reg=reg.num_components();
          //T loss_val = loss.eval(w) + lambda*reg.eval(w);
-         //cerr << "Loss: " << loss_val << endl;
          T lagrangian = loss.eval_split(splitted_loss) + lambda*reg.eval_split(splitted_reg);
          Matrix<T> tmp;
          tmp.copy(splitted_loss);
@@ -2696,7 +2807,8 @@ namespace FISTA {
                T sec=time.getElapsed();
                optim_info[2]=sec;
                if (param.verbose) {
-                  cerr << "Iter: " << it << ", loss: " << los << ", time: " << sec << endl;
+                  cout << "Iter: " << it << ", loss: " << los << ", time: " << sec << endl;
+                  flush(cout);
                   if (param.log) 
                      writeLog(it,sec,los,T(0),param.logName);
                }
@@ -2838,7 +2950,8 @@ namespace FISTA {
                T sec=time.getElapsed();
                optim_info[2]=sec;
                if (param.verbose) {
-                  cerr << "Iter: " << it << ", loss: " << los << ", time: " << sec << endl;
+                  cout << "Iter: " << it << ", loss: " << los << ", time: " << sec << endl;
+                  flush(cout);
                   if (param.log) 
                      writeLog(it,sec,los,T(0),param.logName);
                }
@@ -2902,7 +3015,8 @@ namespace FISTA {
    template <typename T>
       Regularizer<T>* setRegularizerVectors(const ParamFISTA<T>& param,
             const GraphStruct<T>* graph_st = NULL,
-            const TreeStruct<T>* tree_st = NULL) {
+            const TreeStruct<T>* tree_st = NULL,
+            const GraphPathStruct<T>* graph_path_st=NULL) {
          ParamReg<T> param_reg;
          param_reg.pos=param.pos;
          param_reg.intercept=param.intercept;
@@ -2911,6 +3025,7 @@ namespace FISTA {
          param_reg.size_group=param.size_group;
          param_reg.tree_st=const_cast<TreeStruct<T>* >(tree_st);
          param_reg.graph_st=const_cast<GraphStruct<T>* >(graph_st);
+         param_reg.graph_path_st=const_cast<GraphPathStruct<T>* >(graph_path_st);
          param_reg.resetflow=param.resetflow;
          param_reg.clever=param.clever;
          Regularizer<T>* reg;
@@ -2934,6 +3049,8 @@ namespace FISTA {
             case GROUPLASSO_LINF: reg=new typename GroupLassoLINF<T>::type(param_reg); break;
             case GROUPLASSO_L2_L1: reg=new typename GroupLassoL2_L1<T>::type(param_reg); break;
             case GROUPLASSO_LINF_L1: reg=new typename GroupLassoLINF_L1<T>::type(param_reg); break;
+            case GRAPH_PATH_L0: reg = new GraphPathL0<T>(param_reg); break;
+            case GRAPH_PATH_CONV: reg = new GraphPathConv<T>(param_reg); break;
             case NONE: reg=new None<T>(); break;
             default: cerr << "Not implemented"; exit(1);
          }
@@ -2944,7 +3061,8 @@ namespace FISTA {
       Regularizer<T, Matrix<T> >* setRegularizerMatrices(const ParamFISTA<T>& param,
             const int m, const int n,
             const GraphStruct<T>* graph_st = NULL,
-            const TreeStruct<T>* tree_st = NULL) {
+            const TreeStruct<T>* tree_st = NULL,
+            const GraphPathStruct<T>* graph_path_st=NULL) {
          ParamReg<T> param_reg;
          param_reg.transpose=param.transpose;
          param_reg.pos=param.pos;
@@ -2979,6 +3097,8 @@ namespace FISTA {
             case TREEMULT: reg = new TreeMult<T>(param_reg); break;
             case GRAPHMULT: reg=new GraphMult<T>(param_reg); break;
             case L1LINFCR: reg = new MixedL1LINFCR<T>(m,param_reg); break;
+            case GRAPH_PATH_L0: reg = new RegMat<T, GraphPathL0<T> >(param_reg); break;
+            case GRAPH_PATH_CONV: reg = new RegMat<T, GraphPathConv<T> >(param_reg); break;
             case NONE: reg=new RegMat<T, None<T> >(param_reg); break;
             default: cerr << "not implemented"; exit(1);
          }
@@ -2993,30 +3113,31 @@ namespace FISTA {
             if (param_for_admm(param)) {
                if (param.admm || param.lin_admm) {
                   if (param.lin_admm) {
-                     cerr << "Linearized ADMM algorithm" << endl;
+                     cout << "Linearized ADMM algorithm" << endl;
                   } else {
-                     cerr << "ADMM algorithm" << endl;
+                     cout << "ADMM algorithm" << endl;
                   }
                } 
             } else {
                if (param.ista) {
-                  cerr << "ISTA algorithm" << endl;
+                  cout << "ISTA algorithm" << endl;
                } else if (param.subgrad) {
-                  cerr << "Subgradient descent" << endl;
+                  cout << "Subgradient descent" << endl;
                } else {
-                  cerr << "FISTA algorithm" << endl;
+                  cout << "FISTA algorithm" << endl;
                }
                if ((param.regul == GRAPH || param.regul == TREEMULT ||
                         param.regul == GRAPHMULT || param.regul==L1LINFCR) &&
                      param.clever) 
-                  cerr << "Projections with arc capacities" << endl;
-               if (param.intercept) cerr << "with intercept" << endl;
+                  cout << "Projections with arc capacities" << endl;
+               if (param.intercept) cout << "with intercept" << endl;
                if (param.log && param.logName) {
-                  cerr << "log activated " << endl;
-                  cerr << param.logName << endl;
-                  cerr << endl;
+                  cout << "log activated " << endl;
+                  cout << param.logName << endl;
+                  cout << endl;
                }
             }
+            flush(cout);
          }
       };
 
@@ -3027,7 +3148,7 @@ namespace FISTA {
             SplittingFunction<T, Matrix<T> >** losses, const ParamFISTA<T>& param) {
          const int M = X.n();
          optim_info.resize(4,M);
-
+         
          int i1;
 #pragma omp parallel for private(i1) 
          for (i1 = 0; i1< M; ++i1) {
@@ -3064,12 +3185,13 @@ namespace FISTA {
          const int M = X.n();
          if (param.verbose) {
             const bool duality = losses[0]->is_fenchel() && regularizers[0]->is_fenchel();
-            if (duality) cerr << "Duality gap via Fenchel duality" << endl;
+            if (duality) cout << "Duality gap via Fenchel duality" << endl;
             if (!param.ista && param.subgrad && !regularizers[0]->is_subgrad()) {
                cerr << "Subgradient algorithm is not implemented for this combination of loss/regularization" << endl;
                exit(1);
             }
-            cerr << "Timings reported do not include loss and fenchel evaluation" << endl;
+            cout << "Timings reported do not include loss and fenchel evaluation" << endl;
+            flush(cout);
          }
          optim_info.resize(4,M);
 
@@ -3108,7 +3230,8 @@ namespace FISTA {
          const int M = X.n();
          if (param.verbose) {
             const bool duality = losses[0]->is_fenchel() && regularizers[0]->is_fenchel();
-            if (duality) cerr << "Duality gap via Fenchel duality" << endl;
+            if (duality) cout << "Duality gap via Fenchel duality" << endl;
+            flush(cout);
          }
 
          optim_info.resize(4,M);
@@ -3145,14 +3268,18 @@ namespace FISTA {
    /// AbstractMatrixB is basically either SpMatrix or Matrix
    template <typename T>
       void solver(const Matrix<T>& X, const AbstractMatrixB<T>& D, const Matrix<T>& alpha0,
-            Matrix<T>& alpha, const ParamFISTA<T>& param, Matrix<T>& optim_info,
+            Matrix<T>& alpha, const ParamFISTA<T>& param1, Matrix<T>& optim_info,
             const GraphStruct<T>* graph_st = NULL, 
-            const TreeStruct<T>* tree_st = NULL) {
-         print_info_solver(param);
+            const TreeStruct<T>* tree_st = NULL,
+            const GraphPathStruct<T>* graph_path_st=NULL) {
+         print_info_solver(param1);
 
-         int num_threads=MIN(X.n(),param.num_threads);
+         int num_threads=MIN(X.n(),param1.num_threads);
          num_threads=init_omp(num_threads);
+         ParamFISTA<T> param=param1;
+         param.copied=true;
          if (param_for_admm(param)) {
+            if (num_threads > 1) param.verbose=false;
             SplittingFunction<T>** losses = new SplittingFunction<T>*[num_threads];
             SplittingFunction<T, SpMatrix<T> >** regularizers= new SplittingFunction<T, SpMatrix<T> >*[num_threads];
             for (int i = 0; i<num_threads; ++i) {
@@ -3179,10 +3306,11 @@ namespace FISTA {
             }
             if (param.compute_gram && (param.loss==SQUARE)) D.XtX(G);
             if (!loss_for_matrices(param.loss) && !(param.transpose || regul_for_matrices(param.regul))) {
+               if (num_threads > 1) param.verbose=false;
                Loss<T>** losses = new Loss<T>*[num_threads];
                Regularizer<T>** regularizers= new Regularizer<T>*[num_threads];
                for (int i = 0; i<num_threads; ++i) {
-                  regularizers[i]=setRegularizerVectors(param,graph_st,tree_st);
+                  regularizers[i]=setRegularizerVectors(param,graph_st,tree_st,graph_path_st);
                   switch (param.loss) {
                      case SQUARE: if (param.compute_gram) {
                                      losses[i]=new SqLoss<T>(D,G); 
@@ -3208,11 +3336,12 @@ namespace FISTA {
                delete[](regularizers);
 
             } else if (loss_for_matrices(param.loss) && param.loss != CUR) {
+               if (num_threads > 1) param.verbose=false;
                Loss<T, Matrix<T> >** losses = new Loss<T, Matrix<T> >*[num_threads];
                Regularizer<T, Matrix<T> >** regularizers= new Regularizer<T, Matrix<T> >*[num_threads];
                const int N = alpha0.n()/X.n();
                for (int i = 0; i<num_threads; ++i) {
-                  regularizers[i]=setRegularizerMatrices(param,alpha0.m(),N,graph_st,tree_st);
+                  regularizers[i]=setRegularizerMatrices(param,alpha0.m(),N,graph_st,tree_st,graph_path_st);
                   switch (param.loss) {
                      case MULTILOG:  losses[i] = new MultiLogLoss<T>(D); break;
                      default: cerr << "Not implemented"; exit(1);
@@ -3246,10 +3375,10 @@ namespace FISTA {
                   case CUR:  loss = new LossCur<T>(D); break; 
                   default: cerr << "Not implemented"; exit(1);
                }
-               regularizer=setRegularizerMatrices(param,alpha0.m(),alpha0.n(),graph_st,tree_st);
+               regularizer=setRegularizerMatrices(param,alpha0.m(),alpha0.n(),graph_st,tree_st,graph_path_st);
                if (param.verbose) {
                   const bool duality = loss->is_fenchel() && regularizer->is_fenchel();
-                  if (duality) cerr << "Duality gap via Fenchel duality" << endl;
+                  if (duality) cout << "Duality gap via Fenchel duality" << endl;
                }
                loss->init(X);
                optim_info.resize(4,1);
@@ -3273,14 +3402,16 @@ namespace FISTA {
             Matrix<T>& alpha, const ParamFISTA<T>& param, 
             Vector<T>& val_loss,
             const GraphStruct<T>* graph_st = NULL, 
-            const TreeStruct<T>* tree_st = NULL) {
+            const TreeStruct<T>* tree_st = NULL,
+            const GraphPathStruct<T>* graph_path_st = NULL) {
          if (param.verbose) {
             print_regul(param.regul);
             if ((param.regul == GRAPH || param.regul == TREEMULT ||
                      param.regul == GRAPHMULT || param.regul==L1LINFCR) &&
                   param.clever) 
-               cerr << "Projections with arc capacities" << endl;
-            if (param.intercept) cerr << "with intercept" << endl;
+               cout << "Projections with arc capacities" << endl;
+            if (param.intercept) cout << "with intercept" << endl;
+            flush(cout);
          }
          int num_threads=MIN(alpha.n(),param.num_threads);
          num_threads=init_omp(num_threads);
@@ -3293,7 +3424,7 @@ namespace FISTA {
          if (!regul_for_matrices(param.regul)) {
             Regularizer<T>** regularizers= new Regularizer<T>*[num_threads];
             for (int i = 0; i<num_threads; ++i) 
-               regularizers[i]=setRegularizerVectors(param,graph_st,tree_st);
+               regularizers[i]=setRegularizerVectors(param,graph_st,tree_st,graph_path_st);
 
             int i;
             if (param.eval)
@@ -3325,11 +3456,61 @@ namespace FISTA {
             if (param.eval)
                val_loss.resize(1);
             Regularizer<T, Matrix<T> >* regularizer;
-            regularizer=setRegularizerMatrices(param,alpha0.m(),alpha0.n(),graph_st,tree_st);
+            regularizer=setRegularizerMatrices(param,alpha0.m(),alpha0.n(),graph_st,tree_st,graph_path_st);
             regularizer->prox(alpha0,alpha,param.lambda);
             if (param.eval)
                val_loss[0]=regularizer->eval(alpha);
             delete(regularizer);
+         }
+      };
+
+   template <typename T>
+      void EvalGraphPath(const Matrix<T>& alpha0,
+            const ParamFISTA<T>& param, 
+            Vector<T>& val_loss,
+            const GraphPathStruct<T>* graph_path_st,
+            SpMatrix<T>* paths = NULL) {
+         if (param.verbose) {
+            print_regul(param.regul);
+            if (param.intercept) cout << "with intercept" << endl;
+            flush(cout);
+         }
+         int num_threads=MIN(alpha0.n(),param.num_threads);
+         num_threads=init_omp(num_threads);
+         const int M = alpha0.n();
+
+         if (!regul_for_matrices(param.regul)) {
+            Regularizer<T>** regularizers= new Regularizer<T>*[num_threads];
+            for (int i = 0; i<num_threads; ++i) 
+               regularizers[i]=setRegularizerVectors<T>(param,NULL,NULL,graph_path_st);
+
+            int i;
+            val_loss.resize(M);
+#pragma omp parallel for private(i) 
+            for (i = 0; i< M; ++i) {
+#ifdef _OPENMP
+               int numT=omp_get_thread_num();
+#else
+               int numT=0;
+#endif
+               Vector<T> alphai;
+               alpha0.refCol(i,alphai);
+               regularizers[numT]->reset();
+               if (i==0 && paths) {
+                  val_loss[i]=regularizers[numT]->eval_paths(alphai,*paths);
+               } else {
+                  val_loss[i]=regularizers[numT]->eval(alphai);
+               }
+            }
+            for (i = 0; i<num_threads; ++i) {
+               delete(regularizers[i]);
+               regularizers[i]=NULL;
+            }
+            delete[](regularizers);
+
+         } else {
+            cerr << "Not implemented" << endl;
+            return;
          }
       };
 }

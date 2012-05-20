@@ -1,7 +1,7 @@
 format compact;
 randn('seed',0);
-param.numThreads=1; % all cores (-1 by default)
-param.verbose=false;   % verbosity, false by default
+param.numThreads=-1; % all cores (-1 by default)
+param.verbose=true;   % verbosity, false by default
 param.lambda=0.05; % regularization parameter
 param.it0=10;      % frequency for duality gap computations
 param.max_it=200; % maximum number of iterations
@@ -21,7 +21,6 @@ W0=zeros(size(X,2),size(Y,2));
 % 100 regression problems with the same design matrix X.
 fprintf('\nVarious regression experiments\n');
 param.compute_gram=true;
-param.verbose=true;
 fprintf('\nFISTA + Regression l1\n');
 param.loss='square';
 param.regul='l1';
@@ -155,12 +154,13 @@ fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of itera
 param.regul='l1';
 param.loss='weighted-logistic';
 param.lambda=0.01;
+fprintf('\nFISTA + weighted Logistic l1 + sparse matrix\n');
 tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param);
 t=toc;
-fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 % can be used of course with other regularization functions, intercept,...
 
+param.loss='logistic';
 fprintf('\nFISTA + Logistic l1 + sparse matrix\n');
 tic
 [W optim_info]=mexFistaFlat(Y,sparse(X),W0,param);
@@ -186,7 +186,6 @@ Y=randn(100,100);
 Y=Y-repmat(mean(Y),[size(Y,1) 1]);
 Y=mexNormalize(Y);
 param.compute_gram=false;
-param.verbose=true;   % verbosity, false by default
 W0=zeros(size(X,2),size(Y,2));
 param.loss='square';
 fprintf('\nFISTA + Regression l1l2 \n');
@@ -243,7 +242,6 @@ fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of itera
 % Multi-Class + Multi-Task Regularization
 
 
-param.verbose=false;
 fprintf('\nFISTA + Multi-Class Logistic l1l2 \n');
 Y=double(ceil(5*rand(100,1000))-1); 
 param.loss='multi-logistic';

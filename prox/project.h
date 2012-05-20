@@ -42,8 +42,6 @@ bool price_refine_heuristic = false;
 //typedef std::list<int> list_int;
 //typedef std::list<int>::const_iterator const_iterator_int;
 #include <list.h>
-typedef List<int> list_int;
-typedef ListIterator<int> const_iterator_int;
 
 Timer tglobal1, tglobal2, tglobal3;
 
@@ -2249,6 +2247,1164 @@ template <typename T> struct TreeStruct {
    int Ng;
 };
 
+template <typename T> struct GraphPathStruct { 
+   GraphPathStruct() { ir=NULL; jc=NULL; n=0; m=0;
+      precision=std::numeric_limits<long long>::max(); weights=NULL;
+      start_weights=NULL; stop_weights=NULL; //num_fixed=0; 
+      //indices=NULL;
+      };
+      mwSize* ir;
+      mwSize* jc;
+      int n;
+      int m;
+      long long precision;
+      T* weights;
+      T* start_weights;
+      T* stop_weights;
+//      int num_fixed;
+//      int* indices;
+};
+
+template <typename Int=long long>
+struct Path {
+   list_int nodes;
+   Int flow_int;
+   double flow;
+};
+
+template <typename Int = long long> class MinCostFlow {
+
+   public:
+      MinCostFlow(const int n, const int* max_num_arcs);
+      ~MinCostFlow();
+
+      void inline add_edge(const int u, const int v, const Int cost, const double double_cost, const Int cap);
+      void inline set_demand(const int node, const Int dem) { _demand[node]=dem; };
+      void inline set_edge(const int node, const int num_arc, const Int cost, const Int cap); 
+      void inline set_capacity(const int node, const int num_arc, const Int cap); 
+      void inline add_flow(const int node, const int num_arc, const Int flow); 
+      void inline set_quad_cost(const int node, const int num_arc, const bool quad_cost) { 
+         _quad_cost[_pr_node[node]+num_arc]=quad_cost;
+         _quad_cost[_reverse[_pr_node[node]+num_arc]]=quad_cost;
+      };
+      void inline set_is_quad_cost(const bool is_quad_cost) { _is_quadratic_cost=is_quad_cost; };
+      void inline discharge(const int node, const Int eps);
+      void save_costs();
+      void restore_costs();
+      void scale_costs(const double scal);
+      Int compute_cost() const;
+      double compute_cost_double() const;
+      Int compute_uncap_cost() const;
+      Int inline get_flow(const int node, const int num_arc) const { return _flow[_pr_node[node]+num_arc]; };
+
+      void compute_min_cost(const bool scale_data = true, const bool verbose=false);
+      Int refine(Int eps, const bool price_refine = false);
+      void price_update(const Int eps);
+      bool price_refine(const Int eps);
+
+      bool test_optimality_conditions() const;
+
+      void inline print_excess() const;
+      void inline print_prices() const;
+      void inline print_graph() const;
+      bool inline topological_sort(const bool admissible = false, bool* admiss = NULL, Int* rcosts = NULL);
+      Int inline reduced_cost(const int node, const int child, const int arc) const;
+
+      Int cost_shortest_path_in_dag(list_int& path);
+      void st_flow_decomposition_dag(List<Path<Int>*>& list, const int s, const int t) const;
+      void print_dimacs(const char* name) const;
+
+   private:
+      int _n;
+      int _m;
+
+      Int _max_cost;
+      double _alpha;
+
+      Int* _prices;
+      Int* _excess;
+      Int* _demand;
+      bool* _active;
+
+      int* _num_arcs;
+      int* _max_num_arcs;
+      int* _pr_node;
+      int* _children;
+      int* _reverse;
+      Int* _flow;
+      Int* _capacity;
+      Int* _cost;
+      Int* _save_cost;
+      double* _init_double_cost;
+      int _maxm;
+
+      int* _topological_order;
+      bool _topologically_sorted;
+
+      list_int _list_active;
+      bool _is_quadratic_cost;
+      bool* _quad_cost;
+      Timer _time1;
+      Timer _time2;
+};
+
+template <typename Int>
+MinCostFlow<Int>::MinCostFlow(const int n, const int* max_num_arcs) {
+   _n=n;
+   _m=0;
+   _max_cost=0;
+   _alpha=16.0;
+   _is_quadratic_cost=false;
+
+   _prices=new Int[n];
+   memset(_prices,0,n*sizeof(Int));
+   _excess=new Int[n];
+   memset(_excess,0,n*sizeof(Int));
+   _demand=new Int[n];
+   memset(_demand,0,n*sizeof(Int));
+   _active=new bool[n];
+   memset(_active,false,n*sizeof(bool));
+   
+   _topological_order=new int[n];
+   memset(_topological_order,0,n*sizeof(int));
+   _topologically_sorted=false;
+   _num_arcs=new int[n];
+   memset(_num_arcs,0,n*sizeof(int));
+   _max_num_arcs=new int[n];
+   memcpy(_max_num_arcs,max_num_arcs,n*sizeof(int));
+   _pr_node=new int[n];
+   _maxm=0;
+   for (int i = 0; i<n; ++i) {
+      _pr_node[i]=_maxm;
+      _maxm+=_max_num_arcs[i];
+   }
+   _children=new int[_maxm];
+   memset(_children,-1,_maxm*sizeof(int));
+   _reverse=new int[_maxm];
+   memset(_reverse,-1,_maxm*sizeof(int));
+   _flow=new Int[_maxm];
+   memset(_flow,0,_maxm*sizeof(Int));
+   _capacity=new Int[_maxm];
+   memset(_capacity,0,_maxm*sizeof(Int));
+   _cost=new Int[_maxm];
+   memset(_cost,0,_maxm*sizeof(Int));
+   _save_cost=new Int[_maxm];
+   memset(_save_cost,0,_maxm*sizeof(Int));
+   _init_double_cost=new double[_maxm];
+   memset(_init_double_cost,0,_maxm*sizeof(double));
+   _quad_cost=new bool[_maxm];
+   memset(_quad_cost,false,_maxm*sizeof(bool));
+};
+
+template <typename Int>
+MinCostFlow<Int>::~MinCostFlow() {
+   delete[](_prices);
+   delete[](_excess);
+   delete[](_demand);
+   delete[](_topological_order);
+   delete[](_num_arcs);
+   delete[](_max_num_arcs);
+   delete[](_pr_node);
+   delete[](_children);
+   delete[](_reverse);
+   delete[](_flow);
+   delete[](_capacity);
+   delete[](_cost);
+   delete[](_save_cost);
+   delete[](_init_double_cost);
+   delete[](_active);
+   delete[](_quad_cost);
+}
+
+template <typename Int>
+void inline MinCostFlow<Int>::add_edge(const int u, const int v, const Int cost, const double double_cost, const Int cap) {
+   const int pu=_pr_node[u];
+   const int pv=_pr_node[v];
+   const int nu=_num_arcs[u]+pu;
+   const int nv=_num_arcs[v]+pv;
+   _children[nu]=v;
+   _children[nv]=u;
+   _capacity[nu]=cap;
+   _capacity[nv]=0;
+   _cost[nu]=cost;
+   _cost[nv]=-cost;
+   _init_double_cost[nu]=double_cost;
+   _init_double_cost[nv]=-double_cost;
+   _reverse[nu]=nv;
+   _reverse[nv]=nu;
+   _num_arcs[u]++;
+   _num_arcs[v]++;
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::set_edge(const int node, const int num_arc, 
+      const Int cost, const Int cap) {
+   const int pu=_pr_node[node];
+   const int nu=pu+num_arc; 
+   _cost[nu]=cost;
+   _capacity[nu]=cap;
+   _cost[_reverse[nu]]=-cost;
+   _capacity[_reverse[nu]]=0;
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::set_capacity(const int node, const int num_arc, 
+      const Int cap) {
+   const int pu=_pr_node[node];
+   const int nu=pu+num_arc; 
+   _capacity[nu]=cap;
+   _capacity[_reverse[nu]]=0;
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::add_flow(const int node, const int num_arc, const Int flow) {
+   const int nu=_pr_node[node]+num_arc; 
+   _flow[nu]+=flow;
+   _flow[_reverse[nu]]-=flow;
+};
+
+template <typename Int>
+void MinCostFlow<Int>::save_costs() {
+   memcpy(_save_cost,_cost,_maxm*sizeof(Int));
+};
+
+template <typename Int>
+void MinCostFlow<Int>::restore_costs() {
+   memcpy(_cost,_save_cost,_maxm*sizeof(Int));
+};
+
+template <typename Int>
+void MinCostFlow<Int>::scale_costs(const double scal) {
+   // TODO: should maybe change sf?
+   for (int i = 0;i<_maxm; ++i) {
+      _cost[i]=static_cast<Int>(ceil(scal*_init_double_cost[i]));
+   }
+};
+
+template <typename Int>
+void MinCostFlow<Int>::compute_min_cost(const bool scale_data, const bool verbose) {
+   _time1.reset();
+   _time1.start();
+   _time2.reset();
+   _time2.stop();
+   _max_cost=0;
+   Int eps=0;
+   tglobal1.reset();
+   tglobal1.start();
+   tglobal2.reset();
+   tglobal2.stop();
+   tglobal3.reset();
+   tglobal3.stop();
+
+   if (scale_data) {
+      for (int i = 0; i<_maxm; ++i) _cost[i] *= _n;
+      for (int i = 0; i<_maxm; ++i) _capacity[i] *= _n;
+      for (int i = 0; i<_n; ++i) _demand[i] *= _n;
+   }
+
+   for (int i=0; i< _maxm; ++i) if (_cost[i] > eps) eps=_cost[i];
+   memset(_prices,0,_n*sizeof(Int));
+   memset(_flow,0,_maxm*sizeof(Int));
+   memset(_active,false,_n*sizeof(bool));
+   for (int i=0; i<_n; ++i) _excess[i]=-_demand[i];
+   num_relabels=0;
+   num_pushes=0;
+
+   bool price_refine=false;
+   while (eps > 1) {
+//      cerr << "eps " << eps << endl;
+      eps=this->refine(eps,price_refine);
+      price_refine=true;
+   } 
+   if (scale_data) {
+      for (int i = 0; i<_maxm; ++i) _cost[i] /= _n;
+      for (int i = 0; i<_maxm; ++i) _capacity[i] /= _n;
+      for (int i = 0; i<_n; ++i) _demand[i] /= _n;
+      for (int i = 0; i<_maxm; ++i) _flow[i] /= _n;
+      for (int i = 0; i<_n; ++i) _prices[i] /= _n;
+   }
+   tglobal1.stop();
+   _time1.stop();
+   if (verbose) {
+      cerr << "Num pushes: " << num_pushes << ", num relabels: " << num_relabels << endl;
+      tglobal1.printElapsed();
+      cerr << "Time for price updates" << endl;
+      tglobal2.printElapsed();
+      cerr << "Time for price refines" << endl;
+      tglobal3.printElapsed();
+   }
+};
+
+template <typename Int>
+Int MinCostFlow<Int>::refine(Int eps, const bool price_refine) {
+//   cerr << eps << endl;
+//   cerr << "Num pushes: " << num_pushes << ", num relabels: " << num_relabels << endl;
+   eps=static_cast<Int>(ceil(static_cast<double>(eps)/_alpha));
+   if (price_refine_heuristic && price_refine && this->price_refine(eps)) return eps;
+
+   for (int i = 0; i<_n; ++i) {
+      const int pr_begin=_pr_node[i];
+      const int pr_end=_pr_node[i]+_num_arcs[i];
+      for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+         const int child=_children[pointer];
+         if (_is_quadratic_cost && _quad_cost[pointer]) {
+            const Int reduced_cost=_flow[pointer]+_cost[pointer]+_prices[i]-_prices[child];
+            if (reduced_cost < 0) {
+               const Int delta=MIN(_capacity[pointer]-_flow[pointer],-reduced_cost);
+               assert(delta >= 0);
+               if (delta != 0) {
+                  _excess[i]-=delta;
+                  _excess[child]+=delta;
+                  _flow[pointer] += delta;
+                  _flow[_reverse[pointer]] -=delta;
+               }
+            }
+         } else {
+            const Int reduced_cost=_cost[pointer]+_prices[i]-_prices[child];
+            if (reduced_cost < 0) {
+               const Int delta=_capacity[pointer]-_flow[pointer];
+               if (delta != 0) {
+                  _excess[i]-=delta;
+                  _excess[child]+=delta;
+                  _flow[pointer] = _capacity[pointer];
+                  _flow[_reverse[pointer]]=-_capacity[pointer];
+               }
+            }
+         }
+      }
+   }
+
+   for (int i = 0; i<_n; ++i) 
+      if (_excess[i] > 0 && !_active[i]) {
+         _list_active.push_back(i);
+         _active[i]=true;
+      }
+
+   while (!_list_active.empty()) {
+      if (price_heuristic && (_time2.getElapsed()/_time1.getElapsed() < 0.5)) this->price_update(eps);
+      const int node = _list_active.front();
+      _list_active.pop_front();
+      _active[node]=false;
+      this->discharge(node,eps);
+   }
+   return eps;
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::price_update(const Int eps) {
+   tglobal2.start();
+   _time2.start();
+   //this->print_prices();
+   Int* rank = new Int[_n];
+   Int* scanned = new Int[_n];
+   Int* temp_scanned = new Int[_n];
+   BinaryHeap<Int> heap(_n);
+   memset(scanned,false,_n*sizeof(Int));
+   memset(temp_scanned,false,_n*sizeof(Int));
+   Int total_excess=0;
+   for (int i = 0; i<_n; ++i) {
+      if (_excess[i] < 0) {
+         rank[i]=0;
+         temp_scanned[i]=true;
+         heap.insert(i,0);
+         total_excess-=_excess[i];
+      } else {
+         rank[i]=std::numeric_limits<Int>::max();
+      }
+   }
+
+   while (!heap.is_empty()) {
+      int node;
+      Int rank_node;
+      heap.find_min(node,rank_node);
+      heap.delete_min();
+      scanned[node]=true;
+      if (_excess[node] > 0) total_excess-=_excess[node];
+      if (total_excess==0) break;
+      const int pr_begin=_pr_node[node];
+      const int pr_end=_pr_node[node]+_num_arcs[node];
+      for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+         const int child = _children[pointer];
+         if (!scanned[child] && _flow[_reverse[pointer]] < _capacity[_reverse[pointer]]) {
+            const Int reduced_cost=this->reduced_cost(node,child,pointer);
+            if (reduced_cost >= 0) {
+               if (temp_scanned[child]) {
+                  if (rank[node]<rank[child]) 
+                     heap.decrease_key(child,rank[node]);
+               } else {
+                  heap.insert(child,rank[node]);
+                  temp_scanned[child]=true;
+               }
+               rank[child]=rank[node];
+            } else {
+               const Int new_rank=rank[node]-reduced_cost;
+               if (temp_scanned[child]) {
+                  if (new_rank < rank[child]) {
+                     rank[child]=new_rank;
+                     heap.decrease_key(child,rank[child]);
+                  }
+               } else {
+                  temp_scanned[child]=true;
+                  rank[child]=new_rank;
+                  heap.insert(child,rank[child]);
+               }
+            }
+         }
+      }
+   }
+   
+   Int max_rank=0;
+   for (int i = 0; i<_n; ++i) {
+      if (scanned[i] && rank[i] > max_rank) max_rank=rank[i];
+   }
+
+   //this->print_graph();
+   const Int max_increase=max_rank;
+   for (int i = 0; i<_n; ++i) {
+      assert(rank[i] >= 0);
+      _prices[i] -= rank[i] > max_rank ? max_increase : rank[i];
+   }
+
+   delete[](rank);
+   delete[](scanned);
+   delete[](temp_scanned);
+
+   tglobal2.stop();
+   _time2.stop();
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::discharge(const int node, const Int eps) {
+   if (_excess[node] <= 0) return;
+   // sequence of pushes
+   Int max_cmp_cost=-std::numeric_limits<Int>::max();
+ //  bool non_saturated_quadratic_arc=false;
+   const int pr_begin=_pr_node[node];
+   const int pr_end=_pr_node[node]+_num_arcs[node];
+   for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+      const Int cap_residual=_capacity[pointer]-_flow[pointer];
+      const int child=_children[pointer];
+      if (cap_residual > 0) {
+         if (_is_quadratic_cost && _quad_cost[pointer]) {
+            const Int reduced_cost=_flow[pointer]+_cost[pointer]+_prices[node]-_prices[child];
+            if (reduced_cost < 0) {
+               num_pushes++;
+               const Int delta=MIN(MIN(cap_residual,-reduced_cost),_excess[node]);
+               _excess[node]-=delta;              
+               _excess[child]+=delta;              
+               _flow[pointer] += delta;
+               _flow[_reverse[pointer]] -= delta;
+               if (!_active[child]) {
+                  _active[child]=true;
+                  _list_active.push_back(child);
+               }
+               if (delta==-reduced_cost) {
+                //  non_saturated_quadratic_arc=true;
+                  max_cmp_cost=MAX(max_cmp_cost,_prices[node]);
+               }
+            } else {
+               max_cmp_cost=MAX(max_cmp_cost,_prices[node]-reduced_cost);
+            }
+            if (!_excess[node]) break;
+         } else {
+            const Int compare_cost=_prices[child]-_cost[pointer]; 
+            if (compare_cost > _prices[node]) {
+               num_pushes++;
+               Int delta;
+               if (_excess[node] > cap_residual) {
+                  delta=cap_residual;
+                  _excess[node]-=delta;
+               } else {
+                  delta=_excess[node];
+                  _excess[node]=0;
+               }
+               _excess[child]+=delta;
+               _flow[pointer] += delta;
+               _flow[_reverse[pointer]] -= delta;
+               if (!_active[child]) {
+                  _active[child]=true;
+                  _list_active.push_back(child);
+               }
+               if (!_excess[node]) break;
+            } else {
+               max_cmp_cost=MAX(max_cmp_cost,compare_cost);
+            }
+         }
+      }
+   }
+   // relabel
+   if (_excess[node] > 0) {
+      num_relabels++;
+      _prices[node]=max_cmp_cost-eps;
+      _list_active.push_front(node);
+      _active[node]=true;
+   }
+};
+
+template <typename Int>
+bool MinCostFlow<Int>::test_optimality_conditions() const {
+   Int min_prb=0;
+   for (int i = 0; i<_n; ++i) {
+      const int pr_begin=_pr_node[i];
+      const int pr_end=_pr_node[i]+_num_arcs[i];
+      for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+         const Int cap_residual=_capacity[pointer]-_flow[pointer];
+         if (cap_residual > 0) {
+            const int child=_children[pointer];
+            const Int reduced_cost=this->reduced_cost(i,child,pointer);
+            min_prb=MIN(min_prb,reduced_cost);
+         }
+      }
+   }
+   cerr << "Flow is " << -min_prb << "-optimal" << endl;
+   return !min_prb;
+};
+
+template <typename Int>
+Int MinCostFlow<Int>::compute_cost() const {
+   Int cost=0;
+   for (int i = 0; i<_n; ++i) {
+      const int pr_begin=_pr_node[i];
+      const int pr_end=_pr_node[i]+_num_arcs[i];
+      for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+         cost+=_flow[pointer]*_cost[pointer];
+      }
+   }
+   return cost;
+};
+
+template <typename Int>
+double MinCostFlow<Int>::compute_cost_double() const {
+   double cost=0;
+   for (int i = 0; i<_n; ++i) {
+      const int pr_begin=_pr_node[i];
+      const int pr_end=_pr_node[i]+_num_arcs[i];
+      for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+         cost+=static_cast<double>(_flow[pointer])*static_cast<double>(_cost[pointer]);
+      }
+   }
+   return cost;
+};
+
+
+template <typename Int>
+Int MinCostFlow<Int>::compute_uncap_cost() const {
+   Int cost=0;
+   for (int i = 0; i<_n; ++i) {
+      cost += _prices[i]*_demand[i];
+   }
+   return cost;
+};
+
+template <typename Int>
+bool MinCostFlow<Int>::price_refine(const Int eps) {
+   tglobal3.start();
+  // cerr << "Start price refine" << endl;
+   bool* admiss = new bool[_maxm];
+   Int* reduced_costs = new Int[_maxm];
+   Int* distances = new Int[_n];
+   bool* scanned = new bool[_n];
+   bool acyclic=true;
+   bool optimal=false;
+   BinaryHeap<Int> heap(_n);
+   const Int infinity=std::numeric_limits<Int>::max();
+
+   int iter=0;
+   while (iter < 2) {
+      ++iter;
+      acyclic=this->topological_sort(true,admiss,reduced_costs);
+      if (!acyclic) break;
+      optimal=true;
+      for (int i = 0; i<_maxm; ++i) {
+         if (admiss[i] && reduced_costs[i] < -eps) { optimal=false; break; }
+      }
+      if (iter==2) break;
+      if (optimal) break;
+      memset(distances,0,_n*sizeof(Int));
+      distances[_topological_order[0]]=0;
+      for (int i = 0; i<_n; ++i) {
+         const int node = _topological_order[i];
+         const int pr_begin=_pr_node[node];
+         const int pr_end=_pr_node[node]+_num_arcs[node];
+         for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+            if (admiss[pointer]) {
+               const int child = _children[pointer];
+               const Int new_cost=distances[node] + reduced_costs[pointer]; // : distances[node] + MIN(reduced_costs[pointer]+eps,0);
+               if (distances[child] > new_cost) {
+                  distances[child]=new_cost;
+               }
+            }
+         }
+         heap.insert(node,distances[node]);
+      }
+      
+      memset(scanned,false,_n*sizeof(bool));
+      while (!heap.is_empty()) {
+         int node;
+         Int rank_node;
+         heap.find_min(node,rank_node);
+         heap.delete_min();
+         scanned[node]=true;
+         const int pr_begin=_pr_node[node];
+         const int pr_end=_pr_node[node]+_num_arcs[node];
+         for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+            const int child = _children[pointer];
+            const Int reduced_cost=reduced_costs[pointer];
+            if (!scanned[child] && _capacity[pointer] > _flow[pointer]) {
+               if (reduced_cost < 0) {
+                  if (distances[child] > distances[node]) {
+                     distances[child]=distances[node];
+                     heap.decrease_key(child,distances[node]);
+                  }
+               } else {
+                  const Int new_dist = distances[node]+eps*(reduced_cost/eps); // : distances[node]+reduced_cost+eps;
+                  if (distances[child] > new_dist) {
+                     distances[child]=new_dist;
+                     heap.decrease_key(child,new_dist);
+                  }
+               }
+            }
+         }
+      }
+      Int max_distances=-infinity;
+      Int min_distances=infinity;
+      for (int i = 0; i<_n; ++i) {
+         if (distances[i] < min_distances) min_distances=distances[i];
+         if (distances[i] > max_distances) max_distances=distances[i];
+      }
+    //  this->print_graph();
+     
+      if (min_distances==max_distances) break;
+      for (int i = 0; i<_n; ++i) {
+         _prices[i] += distances[i]-max_distances;
+      }
+      break;
+   }
+
+   delete[](admiss);
+   delete[](reduced_costs);
+   delete[](distances);
+   delete[](scanned);
+   tglobal3.stop();
+   return optimal;
+}
+
+template <typename Int>
+Int MinCostFlow<Int>::cost_shortest_path_in_dag(list_int& list_path) {
+   if (!_topologically_sorted) this->topological_sort();
+   Int* distances = new Int[_n];
+   int* prec = new int[_n];
+   for (int i = 0; i < _n; ++i) prec[i]=-1;
+   const Int infinity=std::numeric_limits<Int>::max();
+   for (int i = 0; i < _n; ++i) distances[i]=infinity;
+   distances[_topological_order[0]]=0;
+   for (int i = 0; i < _n; ++i) {
+      const int node = _topological_order[i];
+      const int pr_begin=_pr_node[node];
+      const int pr_end=_pr_node[node]+_num_arcs[node];
+      for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+         if (_capacity[pointer] > 0) {
+            const int child = _children[pointer];
+            const Int new_cost= distances[node] + _cost[pointer];
+            if (distances[child] > new_cost) {
+               distances[child]=new_cost;
+               prec[child]=node;
+            }
+         }
+      }
+   }
+   const Int shortest_path=distances[_topological_order[_n-1]];
+   int current=_topological_order[_n-1];
+   list_path.clear();
+   while (current != -1) {
+      list_path.push_front(current);
+      current=prec[current];
+   }
+   delete[](distances);
+   delete[](prec);
+   return shortest_path;
+};
+
+template <typename Int>
+void MinCostFlow<Int>::st_flow_decomposition_dag(List<Path<Int>*>& decomposition, const int s, const int t) const {
+   const int pr_begin=_pr_node[s];
+   const int pr_end=_pr_node[s]+_num_arcs[s];
+   BinaryHeap<Int> heap(_n);
+   int * sj_arcs = new int[_n];
+   for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+      if (_capacity[pointer] >0 && _flow[pointer] > 0) {
+         heap.insert(_children[pointer],-_flow[pointer]);
+         sj_arcs[_children[pointer]]=pointer;
+      }
+   }
+   while (!heap.is_empty()) {
+      Path<Int>* path = new Path<Int>();
+      decomposition.push_back(path);
+      Int& flow = path->flow_int;
+      list_int& list = path->nodes;
+      int node;
+      heap.find_min(node,flow);
+      heap.delete_min();
+      flow=-flow; // max flow in fact
+      Int init_flow=flow;
+      int init_node=node;
+      list_int pointers;
+      pointers.push_back(sj_arcs[node]);
+      while (node != t) {
+         list.push_back(node);
+         const int pr_begin=_pr_node[node];
+         const int pr_end=_pr_node[node]+_num_arcs[node];
+         int max_pointer=pr_begin;
+         Int max_flow = 0;
+         for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+            if (_capacity[pointer] >0 && _flow[pointer] > max_flow) {
+               max_pointer=pointer;
+               max_flow=_flow[pointer];
+            }
+         }
+         flow=MIN(flow,max_flow);
+         pointers.push_back(max_pointer);
+         node=_children[max_pointer];
+      }
+      //stop();
+      for (const_iterator_int it = pointers.begin(); it != pointers.end(); ++it) {
+         _flow[*it]-=flow;
+         _flow[_reverse[*it]]+=flow;
+      }
+      if (init_flow!=flow) {
+         heap.insert(init_node,-init_flow+flow);
+      }
+   }
+   delete[](sj_arcs);
+};
+
+template <typename Int>
+void MinCostFlow<Int>::print_dimacs(const char* name) const {
+   ofstream stream;
+   stream.open(name);
+   stream << "p min " << _n << " " << _m << endl;
+   for (int i = 0; i<_n; ++i) {
+      if (_demand[i] != 0)
+         stream << "n " << i+1 << " " << _demand[i] << endl;
+   }
+   for (int i = 0; i<_n; ++i) {
+      const int pr_begin=_pr_node[i];
+      const int pr_end=_pr_node[i]+_num_arcs[i];
+      for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+         if (_capacity[pointer] > 0) {
+            stream << "a " << i+1 << " " << _children[pointer]+1 << " " << 0 << " " << _capacity[pointer] << " " << _cost[pointer] << endl;
+         }
+      }
+   }
+   stream.close();
+}
+
+template <typename Int>
+Int inline MinCostFlow<Int>::reduced_cost(const int node, const int child, const int pointer) const {
+   return (_is_quadratic_cost && _quad_cost[pointer]) ? _cost[pointer]+_flow[pointer] + _prices[node]-_prices[child] :
+      _cost[pointer] + _prices[node]-_prices[child];
+};
+
+/// the function assumes the graph is a DAG
+template <typename Int>
+bool inline MinCostFlow<Int>::topological_sort(const bool admissible, bool* admiss_node, Int* reduced_costs) {
+   const bool extern_admiss_node=admiss_node != NULL;
+   const bool extern_reduced_costs=reduced_costs != NULL;
+   int* indegree = new int[_n];
+   for (int i = 0; i<_n; ++i) indegree[i]=0;
+   if (admissible) {
+      if (!extern_admiss_node)
+         admiss_node=new bool[_maxm];
+      for (int i = 0; i<_n; ++i) {
+         const int pr_begin=_pr_node[i];
+         const int pr_end=_pr_node[i]+_num_arcs[i];
+         for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+            const int child=_children[pointer];
+            const int rcost=this->reduced_cost(i,child,pointer);
+            if (extern_reduced_costs) reduced_costs[pointer]=rcost;
+            admiss_node[pointer]=(_capacity[pointer] > _flow[pointer] && rcost < 0);
+            if (admiss_node[pointer]) indegree[child]++;
+         }
+      }
+   } else {
+      for (int i = 0; i<_n; ++i) {
+         const int pr_begin=_pr_node[i];
+         const int pr_end=_pr_node[i]+_num_arcs[i];
+         for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+            if (_capacity[pointer] > 0)
+               indegree[_children[pointer]]++;
+         }
+      }
+   }
+   list_int list;
+   int next=0;
+   for (int i = 0; i<_n; ++i) {
+      if (indegree[i]==0) list.push_back(i);
+   }
+   while (!list.empty()) {
+      int node=list.front();
+      list.pop_front();
+      _topological_order[next++]=node;
+      if (admissible) {
+         const int pr_begin=_pr_node[node];
+         const int pr_end=_pr_node[node]+_num_arcs[node];
+         for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+            const int child=_children[pointer];
+            if (admiss_node[pointer]) {
+               indegree[child]--;
+               if (!indegree[child]) list.push_back(child);
+            }
+         }
+      } else {
+         const int pr_begin=_pr_node[node];
+         const int pr_end=_pr_node[node]+_num_arcs[node];
+         for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
+            if (_capacity[pointer] > 0) {
+               const int child=_children[pointer];
+               indegree[child]--;
+               if (!indegree[child]) list.push_back(child);
+            }
+         }
+      }
+   }
+   //for (int i = next; i<_n; ++i) _topological_order[i]=-1;
+
+   _topologically_sorted=!admissible;   // if admissible, only the admissible graph is sorted
+   delete[](indegree);
+   if (!extern_admiss_node)
+      delete[](admiss_node);
+   return next==_n;
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::print_excess() const {
+   cerr << "Excess: " << endl;
+   for (int i= 0; i<_n; ++i) {
+      cerr << _excess[i] << " ";
+   }
+   cerr << endl;
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::print_prices() const {
+   cerr << "Prices: " << endl;
+   for (int i= 0; i<_n; ++i) {
+      cerr << _prices[i] << " ";
+   }
+   cerr << endl;
+};
+
+template <typename Int>
+void inline MinCostFlow<Int>::print_graph() const {
+   cerr << "Graph: " << _n << " x " << _m << endl;
+   for (int i= 0; i<_n; ++i) {
+      cerr <<"***********************" << endl; 
+      cerr <<"Node: " << i << ", e(i): " << _excess[i] << ", pi(i): " << _prices[i] << ", d(i): " << _demand[i] << endl;
+      const int pr=_pr_node[i];
+      for (int j = 0; j<_num_arcs[i]; ++j) {
+         cerr << "    child: " << _children[pr+j] << ", cap: " << _capacity[pr+j] << ", cost: " << _cost[pr+j] << ", flow: " << _flow[pr+j] << endl;
+      }
+   }
+   cerr << endl;
+};
+
+template <typename T = double, typename Int = long long> class GraphPath {
+   public:
+      GraphPath() { _n=0; _m=0; _min_cost_flow=NULL; };
+      ~GraphPath() { delete(_min_cost_flow); };
+
+      void init_graph(const GraphPathStruct<T>& graph);
+      T eval_l0(const T* variables, List<Path<Int>*>* decomposition = NULL);
+      T eval_conv(const T* variables, List<Path<Int>*>* decomposition = NULL);
+      T eval_dual_norm(const T* variables, list_int* path_out = NULL);
+      void proximal_l0(T* variables, const T lambda);
+      void proximal_conv(T* variables,const T lambda);
+      int n() const { return _n; };
+
+   protected:
+      void flow_decomposition(List<Path<Int>*>& decomposition) const;
+      void scale_costs(const T lambda);
+
+   private:
+      int _n;
+      int _m;
+      MinCostFlow<Int>* _min_cost_flow;
+
+      Int _big_integer;        // should be 64-bits max_precision
+      // max demand for s should be big_integer
+      // max capacity s-t idem
+      Int _infinite_capacity;  // should be _big_integer/n
+      // unbounded max_capacity network infinite_capacity
+      T _sf;     // to convert input float data to integer
+      T _maxsf;     // to convert input float data to integer
+      // sf*sf*(sum cost)*(sum demand)  should be _big_integer ?
+      T* _init_weights;
+      T* _init_start_weights;
+      T* _init_stop_weights;
+    //  int* _indices;
+//      int _num_fixed;
+      T _graphprecision;
+};
+
+template <typename T, typename Int>
+void GraphPath<T,Int>::init_graph(const GraphPathStruct<T>& graph) {
+   //_indices=graph.indices;
+//   _num_fixed=graph.num_fixed;
+   _big_integer=std::numeric_limits<Int>::max();
+   _n=graph.n;
+   _m=graph.m;
+   const int n2=_n*2+2;
+   _infinite_capacity=_big_integer/n2;
+   int* num_arcs=new int[n2];
+   for (int i = 0; i<_n; ++i) {
+      // s,t, j-j' j-j' dummy connexions
+      num_arcs[i]= isinf(graph.start_weights[i]) ? 2 :  3;
+   }
+   for (int i = 0; i<_n; ++i) {
+      num_arcs[i+_n]= isinf(graph.stop_weights[i]) ? 2 :  3;
+   }
+   num_arcs[n2-2]=_n+1; // s connexions
+   num_arcs[n2-1]=_n+1; // t connexions
+   for (int i = 0; i<_n; ++i) {
+      for (int j = graph.jc[i]; j<graph.jc[i+1]; ++j) {
+         num_arcs[i+_n]++;
+         num_arcs[graph.ir[j]]++;  // i'-j connexions
+      }
+   }
+   _min_cost_flow=new MinCostFlow<Int>(n2,num_arcs);
+
+   Vector<T> start_weights(graph.start_weights,_n);
+   Vector<T> stop_weights(graph.stop_weights,_n);
+   Vector<T> weights(graph.weights,_m);
+   T max_weight=MAX(start_weights.fmaxval(),MAX(stop_weights.fmaxval(),weights.fmaxval()));
+   _graphprecision=graph.precision;
+   
+   _sf=MIN(graph.precision,static_cast<T>(_big_integer)/(max_weight*1000000.0*n2));
+   _init_weights=graph.weights;
+   _init_start_weights=graph.start_weights;
+   _init_stop_weights=graph.stop_weights;
+   _min_cost_flow->add_edge(2*_n,2*_n+1,0,0,_big_integer);  // s-t connexion
+
+   // j-j' connexions
+   for (int i = 0; i<_n; ++i) {
+      _min_cost_flow->add_edge(i,i+_n,0,0,_infinite_capacity);
+      _min_cost_flow->add_edge(i,i+_n,0,0,0);  // dummy arc for piecewise linear costs
+   }
+   // s-j connexions
+   for (int i = 0; i<_n; ++i) {
+      if (!isinf(graph.start_weights[i])) {
+         const Int cost=static_cast<Int>(ceil(graph.start_weights[i]*_sf));
+         const double double_cost=static_cast<double>((graph.start_weights[i]));
+         _min_cost_flow->add_edge(2*_n,i,cost,double_cost,_infinite_capacity);
+      }
+   }
+   // j'-t connexions
+   for (int i = 0; i<_n; ++i) {
+      if (!isinf(graph.stop_weights[i])) {
+         const Int cost=static_cast<Int>(ceil(graph.stop_weights[i]*_sf));
+         const double double_cost=static_cast<double>((graph.stop_weights[i]));
+         _min_cost_flow->add_edge(i+_n,2*_n+1,cost,double_cost,_infinite_capacity);
+      }
+   }
+   // other connexions
+   for (int i = 0; i<_n; ++i) {
+      for (int j= graph.jc[i]; j<graph.jc[i+1]; ++j) {
+         const Int cost=static_cast<Int>(ceil(graph.weights[j]*_sf));
+         const double double_cost=static_cast<double>((graph.weights[j]));
+         _min_cost_flow->add_edge(i+_n,graph.ir[j],cost,double_cost,_infinite_capacity);
+      }
+   }
+   // s-t connexion 
+   _min_cost_flow->set_demand(2*_n,-_big_integer);
+   _min_cost_flow->set_demand(2*_n+1,_big_integer);
+   delete[](num_arcs);
+};
+
+template <typename T, typename Int>
+T GraphPath<T,Int>::eval_l0(const T* variables, List<Path<Int>*>* decomposition) {
+   for (int i = 0; i<_n; ++i) {
+      const Int dem= variables[i] ? static_cast<Int>(_sf) :  0;
+      _min_cost_flow->set_demand(i,dem);
+      _min_cost_flow->set_demand(i+_n,-dem);
+   }
+   _min_cost_flow->compute_min_cost(false,false);
+   const T val = static_cast<T>(_min_cost_flow->compute_cost_double())/(2*_sf*_sf);
+   if (decomposition) {
+      for (int i = 0; i<_n; ++i) {
+         const Int dem= variables[i] ? static_cast<Int>(_sf) :  0;
+         _min_cost_flow->set_demand(i,0);
+         _min_cost_flow->set_demand(i+_n,0);
+         _min_cost_flow->add_flow(i,0,dem);
+      }
+      this->flow_decomposition(*decomposition);
+   }
+   //  _min_cost_flow->print_graph();
+  // _min_cost_flow->test_optimality_conditions();
+   return val;
+};
+
+template <typename T, typename Int>
+T GraphPath<T,Int>::eval_conv(const T* variables, List<Path<Int>*>* decomposition) {
+   for (int i = 0; i<_n; ++i) {
+      const Int dem= static_cast<Int>(_sf*abs<T>(variables[i]));
+      _min_cost_flow->set_demand(i,dem);
+      _min_cost_flow->set_demand(i+_n,-dem);
+   }
+   _min_cost_flow->compute_min_cost(false,false);
+   const T val = static_cast<T>(_min_cost_flow->compute_cost_double())/(2*_sf*_sf);
+   if (decomposition) {
+      for (int i = 0; i<_n; ++i) {
+         const Int dem= static_cast<Int>(_sf*abs<T>(variables[i]));
+         _min_cost_flow->set_demand(i,0);
+         _min_cost_flow->set_demand(i+_n,0);
+         _min_cost_flow->add_flow(i,0,dem);
+      }
+      this->flow_decomposition(*decomposition);
+   }
+   //  _min_cost_flow->test_optimality_conditions();
+   return val;
+};
+
+template <typename T, typename Int>
+T GraphPath<T,Int>::eval_dual_norm(const T* variables, list_int* path_out) {
+   T tau=T(1.0);
+   list_int path;
+   bool exit_loop=false;
+   bool first=true;
+   _min_cost_flow->set_edge(2*_n,0,0,0);
+
+   while (!exit_loop) {
+      for (int i = 0; i<_n; ++i) {
+         const Int fact= static_cast<Int>(_sf*abs<T>(variables[i]/tau));
+         _min_cost_flow->set_edge(i,0,-fact,_infinite_capacity);
+         _min_cost_flow->set_edge(i,1,0,0);
+      }
+      T delta=static_cast<T>(_min_cost_flow->cost_shortest_path_in_dag(path))/_sf;
+      T gamma=0;
+      for (const_iterator_int it = path.begin(); it != path.end(); ++it) {
+         if (*it  < _n) gamma+=abs<T>(variables[*it]);
+      }
+      T new_tau=gamma/(delta+gamma/tau);
+      if (abs<T>(delta) < 1e-12 || abs<T>(new_tau-tau) < 1e-12 || (!first && (new_tau <= tau))) exit_loop=true;
+      tau=new_tau;
+      first=false;
+   }
+
+   _min_cost_flow->set_edge(2*_n,0,0,_big_integer);
+   for (int i = 0; i<_n; ++i) {
+      _min_cost_flow->set_edge(i,0,0,_infinite_capacity);
+      _min_cost_flow->set_edge(i,1,0,0);
+   }
+   if (path_out) {
+      path_out->clear();
+      path_out->fusion(path);
+   }
+   return tau;
+};
+
+template <typename T, typename Int>
+void GraphPath<T,Int>::proximal_l0(T* variables, const T lambda) {
+   _min_cost_flow->save_costs();
+   T oldsf=_sf;
+   this->scale_costs(lambda);
+   const Int unit= static_cast<Int>(_sf);
+   for (int i = 0; i<2*_n; ++i) {
+      _min_cost_flow->set_demand(i,0);
+   }
+   for (int i = 0; i<_n; ++i) {
+      const Int fact= static_cast<Int>(_sf*(0.5*variables[i]*variables[i]));
+      _min_cost_flow->set_edge(i,0,-fact,unit);
+      _min_cost_flow->set_edge(i,1,0,_infinite_capacity);
+   }
+   _min_cost_flow->compute_min_cost(false,false);
+//   _min_cost_flow->test_optimality_conditions();
+
+ //     _min_cost_flow->print_graph();
+
+   for (int i = 0; i<_n; ++i) {
+      /// should check significant flow or not
+      variables[i]= _min_cost_flow->get_flow(i,0) > 0 ? variables[i] : 0;
+   }
+
+   for (int i = 0; i<_n; ++i) {
+      _min_cost_flow->set_edge(i,0,0,_infinite_capacity);
+      _min_cost_flow->set_edge(i,1,0,0);
+   }
+
+   _sf=oldsf;
+   _min_cost_flow->restore_costs();
+//   T new_loss=lambda*this->eval_l0(variables);
+//   PRINT_F(init_loss)
+//   PRINT_F(new_loss)
+//   PRINT_F(diff+new_loss)
+//   PRINT_F(diff2);
+//   if (diff2 < diff+new_loss) {
+//      PRINT_F(_sf)
+//      stop();
+//   }
+
+
+   
+};
+
+template <typename T, typename Int>
+void GraphPath<T,Int>::proximal_conv(T* variables, const T lambda) {
+   _min_cost_flow->set_is_quad_cost(true);
+   _min_cost_flow->save_costs();
+   T oldsf=_sf;
+   this->scale_costs(lambda);
+//   _min_cost_flow->scale_costs(static_cast<double>(lambda));
+   for (int i = 0; i<2*_n; ++i) {
+      _min_cost_flow->set_demand(i,0);
+   }
+   for (int i = 0; i<_n; ++i) {
+      const Int fact= static_cast<Int>(_sf*(abs<T>(variables[i])));
+      _min_cost_flow->set_edge(i,0,-fact,fact);
+      _min_cost_flow->set_quad_cost(i,0,true);
+      _min_cost_flow->set_edge(i,1,0,_infinite_capacity);
+   }
+   _min_cost_flow->compute_min_cost(false,false);
+//   _min_cost_flow->test_optimality_conditions();
+   for (int i = 0; i<_n; ++i) {
+      variables[i]= variables[i] > 0 ? static_cast<T>(_min_cost_flow->get_flow(i,0))/_sf : -static_cast<T>(_min_cost_flow->get_flow(i,0))/_sf;
+   }
+   for (int i = 0; i<_n; ++i) {
+      _min_cost_flow->set_edge(i,0,0,_infinite_capacity);
+      _min_cost_flow->set_quad_cost(i,0,false);
+      _min_cost_flow->set_edge(i,1,0,0);
+   }
+   _min_cost_flow->set_is_quad_cost(false);
+   _min_cost_flow->restore_costs();
+   _sf=oldsf;
+};
+
+template <typename T, typename Int>
+void GraphPath<T,Int>::flow_decomposition(List<Path<Int>*>& decomposition) const {
+   _min_cost_flow->set_edge(2*_n,0,0,0);
+   _min_cost_flow->st_flow_decomposition_dag(decomposition,2*_n,2*_n+1);
+   _min_cost_flow->set_edge(2*_n,0,0,_big_integer);  // to prevent dummy s-t path
+   for (ListIterator<Path<Int>*> it_path = decomposition.begin(); it_path != decomposition.end(); ++it_path) {
+      list_int new_nodes;
+      for (const_iterator_int it = it_path->nodes.begin(); it != it_path->nodes.end(); ++it) {
+         if (*it <_n) new_nodes.push_back(*it);
+      }
+      it_path->nodes.clear();
+      it_path->nodes.fusion(new_nodes);
+      it_path->flow = static_cast<T>(it_path->flow_int)/_sf;
+   }
+};
+
+template <typename T, typename Int>
+void GraphPath<T,Int>::scale_costs(const T lambda) {
+   Vector<T> start_weights(_init_start_weights,_n);
+   Vector<T> stop_weights(_init_stop_weights,_n);
+   Vector<T> weights(_init_weights,_m);
+   const int n2=_n*2+2;
+   T max_weight=lambda*MAX(start_weights.fmaxval(),MAX(stop_weights.fmaxval(),weights.fmaxval()));
+   _sf=MIN(_graphprecision,static_cast<T>(_big_integer)/(max_weight*1000000.0*n2));
+//   cerr << "sf " << _sf << endl;
+   _min_cost_flow->scale_costs(_sf*lambda);
+}
 
 
 #endif

@@ -14,7 +14,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='mex';
+compiler='icc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -24,7 +24,7 @@ compiler='mex';
 %   - acml: (AMD Core math library), optimized for opteron cpus
 %   - blas: (netlib at atlas version of blas/lapack), free
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='builtin';
+blas='mkl';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -102,11 +102,30 @@ elseif strcmp(blas,'builtin')
     path_to_blas='/';
 end
    
+debug=false;
+if debug 
+   use_multithread=false;
+end
 %%%%%%%%%%%% END OF THE CONFIGURATION %%%%%%%%%%%%%%
 % Do not touch what is below this line, unless you know what you are doing
 out_dir='./build/';
 
-COMPILE = { % compile linalg toolbox
+COMPILE = { 
+            % compile dag toolbox
+            '-I./dags/ -I./linalg/ dags/mex/mexRemoveCyclesGraph.cpp',
+            '-I./dags/ -I./linalg/ dags/mex/mexCountPathsDAG.cpp',
+            '-I./dags/ -I./linalg/ dags/mex/mexCountConnexComponents.cpp',
+            % compile proximal toolbox
+            '-I./linalg/ -I./prox/ prox/mex/mexEvalPathCoding.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
+            '-I./linalg/ -I./prox/ prox/mex/mexFistaTree.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexFistaGraph.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexFistaPathCoding.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexProximalFlat.cpp', 
+            '-I./linalg/ -I./prox/ prox/mex/mexProximalTree.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexProximalGraph.cpp',
+            '-I./linalg/ -I./prox/ prox/mex/mexProximalPathCoding.cpp',  
+            % compile linalg toolbox
             '-I./linalg/ linalg/mex/mexCalcAAt.cpp',
             '-I./linalg/ linalg/mex/mexCalcXAt.cpp',  
             '-I./linalg/ linalg/mex/mexCalcXY.cpp',  
@@ -114,8 +133,8 @@ COMPILE = { % compile linalg toolbox
             '-I./linalg/ linalg/mex/mexCalcXtY.cpp',  
             '-I./linalg/ linalg/mex/mexConjGrad.cpp',  
             '-I./linalg/ linalg/mex/mexInvSym.cpp',  
-            '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             '-I./linalg/ linalg/mex/mexSort.cpp', 
+            '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             % compile decomp toolbox
             '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
@@ -128,14 +147,7 @@ COMPILE = { % compile linalg toolbox
             '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp',
             % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
-            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
-            % compile proximal toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
-            '-I./linalg/ -I./prox/ prox/mex/mexFistaTree.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexFistaGraph.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexProximalFlat.cpp', 
-            '-I./linalg/ -I./prox/ prox/mex/mexProximalTree.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexProximalGraph.cpp' };        
+            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp'};        
 
 if linux || mac
    fid=fopen('run_matlab.sh','w+');
@@ -143,9 +155,17 @@ if linux || mac
 end
 
 if sixtyfourbits
-   DEFCOMMON='-largeArrayDims -DNDEBUG';
+   if debug
+      DEFCOMMON='-largeArrayDims -DDEBUG';
+   else
+      DEFCOMMON='-largeArrayDims -DNDEBUG';
+   end
 else
-   DEFCOMMON='-DNDEBUG';
+   if debug
+      DEFCOMMON='-DDEBUG';
+   else
+      DEFCOMMON='-DNDEBUG';
+   end
 end
 if windows
    DEFCOMMON=[DEFCOMMON ' -DWINDOWS -DREMOVE_'];
@@ -243,7 +263,11 @@ elseif strcmp(compiler,'gcc')
    else
       DEFCOMP=sprintf('CXX=%s/g++',path_to_compiler);
    end
-   compile_flags='-O3 -mtune=core2 -fomit-frame-pointer -funsafe-loop-optimizations'; 
+   if debug
+      compile_flags='-O2 -g'; 
+   else
+      compile_flags='-O3 -mtune=core2 -fomit-frame-pointer -funsafe-loop-optimizations'; 
+   end
    links_lib=[links_lib ' -L"' path_to_compiler_libraries '" -L' path_to_blas];
    if mac
       fprintf(fid,'export LIB_GCC=%s\n',path_to_compiler_libraries);
@@ -283,7 +307,7 @@ else
 end
 
 if ~windows
-   fprintf(fid,'matlab $* -r \"addpath(''./src_release/''); addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n'); 
+   fprintf(fid,'matlab $* -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n'); 
    fclose(fid);
    !chmod +x run_matlab.sh
 end
@@ -302,3 +326,5 @@ for k = 1:length(COMPILE),
     args = args(find(~cellfun(@isempty, args)));
     mex(args{:});
 end
+
+copyfile src_release/*.m build/

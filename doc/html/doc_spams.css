@@ -112,7 +112,7 @@ BLOCKQUOTE{margin-left:4ex;margin-right:4ex;text-align:left;}
 TD P{margin:0px;}
 .hbar{border:none;height:2px;width:100%;background-color:black;}
 .display{border-collapse:separate;border-spacing:2px;width:auto; border:none;}
-.dcell{white-space:nowrap;padding:0px;width:auto; border:none;}
+.dcell{white-space:pre;padding:0px;width:auto; border:none;}
 .dcenter{margin:0ex auto;}
 BODY{background:white;}
 /*.title{padding:1ex;background:#00B200;}*/

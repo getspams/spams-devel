@@ -45,61 +45,32 @@
 ///   * based on Cholesky decompositions
 ///   * parallel
 ///   * optimized for a large number of signals (precompute the Gramm matrix
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int L, T eps, int numThreads);
 
 template <typename T>
 void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int* L, T eps, int numThreads);
-
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int L, T* eps, int numThreads);
-
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int* L, T* eps, int numThreads, const bool vecL = false, const bool vecEps = false, Matrix<T>* path= NULL);
-
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D,
-      SpMatrix<T>& spalpha, int L, T eps, int numThreads,
-      Matrix<T>& norm);
+      const int *L, const T* eps, const T* lambda, const bool vecL = false,
+      const bool vecEps = false, const bool Lambda=false, const int numThreads=-1,
+      Matrix<T>* path = NULL);
 
 template <typename T>
 void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int L, T eps, int numThreads = -1);
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int L, T* eps, int numThreads = -1);
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int* L, T eps, int numThreads = -1);
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D,
-      SpMatrix<T>& spalpha, const Matrix<bool>& mask, int L, T eps, int numThreads,
-      Matrix<T>& path);
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int* pL, T* eps, int numThreads = -1 , const bool vecL = false, const bool vecEps = false, Matrix<T>* path = NULL);
+      const int *L, const T* eps, const T* lambda, const bool vecL = false,
+      const bool vecEps = false, const bool Lambda=false, const int numThreads=-1,
+      Matrix<T>* path = NULL);
 
 /// Auxiliary function of omp
 template <typename T>
 void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, 
       Matrix<T>& Un, Matrix<T>& Undn, Matrix<T>& Unds, Matrix<T>& Gs, 
       Vector<T>& Rdn, const AbstractMatrix<T>& G, Vector<int>& ind, 
-      Vector<T>& RUn, const T* eps, T& normX, int LL = 32000, 
+      Vector<T>& RUn, T& normX, const T* eps, const int* L, const T* lambda,
       T* path = NULL);
 
 
 /// Auxiliary function of omp
 template <typename T>
 void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<int>& ind, 
-      Vector<T>& coeffs, T& normX, const int L, const T eps);
+      Vector<T>& coeffs, T& normX, const int L, const T eps, const T lambda = 0);
 
 /* **************
  * LARS - Lasso 
@@ -109,7 +80,7 @@ void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<int>& ind,
 ///       - constraint on the l1 norm of the coefficients
 ///       - constraint on the reconstruction error
 ///       - l1-sparsity penalty 
-enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, PENALTY2};
+enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, L2ERROR2, PENALTY2};
 
 /// Implementation of LARS-Lasso for solving
 /// \forall i, \min_{\alpha_i} ||X_i-D\alpha_i||_2^2 
@@ -317,39 +288,17 @@ void coreSOMP(const Matrix<T>& X, const Matrix<T>& D, const Matrix<T>& G,
 ///   * efficient (Cholesky-based)
 ///   * parallel
 ///   * optimized for a big number of signals (precompute the Gramm matrix
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int L, T eps, int numThreads) {
-   omp(X,D,spalpha,&L,&eps,numThreads);
-} 
 
 template <typename T>
 void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int L, T* eps, int numThreads) {
-   omp(X,D,spalpha,&L,eps,numThreads,false,true);
-}
-
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int* L, T eps, int numThreads) {
-   omp(X,D,spalpha,L,&eps,numThreads,true,false);
-}
-
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D,
-      SpMatrix<T>& spalpha, int L, T eps, int numThreads,
-      Matrix<T>& path) {
-   omp(X,D,spalpha,&L,&eps,numThreads,false,false,&path);
-}
-
-template <typename T>
-void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-      int* pL, T* eps, int numThreads, const bool vecL, const bool vecEps, Matrix<T>* path) {
+      const int* pL, const T* peps, const T* pLambda, 
+      const bool vecL, const bool vecEps,
+      const bool vecLambda, const int numThreads, Matrix<T>* path) {
    int L;
    if (!vecL) {
       L=*pL;
    } else {
-      Vector<int> vL(pL,X.n());
+      Vector<int> vL(const_cast<int*>(pL),X.n());
       L=vL.maxval();
    }
    spalpha.clear();
@@ -406,8 +355,9 @@ void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha,
       Vector<T>& Rdn=RdnT[numT];
       D.multTrans(Xi,Rdn);
       coreORMP(scoresT[numT],normT[numT],tmpT[numT],UnT[numT],UndnT[numT],UndsT[numT],
-            GsT[numT],Rdn,G,ind,RUn,(vecEps && *eps >= 0) ? eps+i : eps, normX,
-            vecL ? pL[i] : L, path && i==0 ? path->rawX() : NULL);
+            GsT[numT],Rdn,G,ind,RUn, normX, vecEps ? peps+i : peps,
+            vecL ? pL+i : pL, vecLambda ? pLambda+i : pLambda, 
+            path && i==0 ? path->rawX() : NULL);
    }
 
    delete[](scoresT);
@@ -425,39 +375,14 @@ void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha,
 
 template <typename T>
 void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int L, T eps, int numThreads) {
-   omp_mask(X,D,spalpha,mask,&L,&eps,numThreads);
-} 
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int L, T* eps, int numThreads) {
-   omp_mask(X,D,spalpha,mask,&L,eps,numThreads,false,true);
-}
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int* L, T eps, int numThreads) {
-   omp_mask(X,D,spalpha,mask,L,&eps,numThreads,true,false);
-}
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D,
-      SpMatrix<T>& spalpha, const Matrix<bool>& mask, int L, T eps, int numThreads,
-      Matrix<T>& path) {
-   omp_mask(X,D,spalpha,mask,&L,&eps,numThreads,false,false,&path);
-}
-
-
-
-template <typename T>
-void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, const Matrix<bool>& mask,
-      int* pL, T* eps, int numThreads, const bool vecL, const bool vecEps, Matrix<T>* path) {
+      const int *pL, const T* peps, const T* pLambda, const bool vecL,
+      const bool vecEps, const bool vecLambda, const int numThreads,
+      Matrix<T>* path) {
    int L;
    if (!vecL) {
       L=*pL;
    } else {
-      Vector<int> vL(pL,X.n());
+      Vector<int> vL(const_cast<int*>(pL),X.n());
       L=vL.maxval();
    }
    spalpha.clear();
@@ -523,8 +448,9 @@ void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, cons
          D.multTrans(Xi,Rdn);
          T normX = Xi.nrm2sq();
          coreORMP(scoresT[numT],normT[numT],tmpT[numT],UnT[numT],UndnT[numT],UndsT[numT],
-               GsT[numT],Rdn,G,ind,RUn,(vecEps && *eps >= 0) ? eps+i : eps, normX,
-               vecL ? pL[i] : L, path && i==0 ? path->rawX() : NULL);
+               GsT[numT],Rdn,G,ind,RUn, normX, vecEps ? peps+i : peps,
+               vecL ? pL+i : pL, vecLambda ? pLambda+i : pLambda, 
+               path && i==0 ? path->rawX() : NULL);
       } else {
          D.copyMask(DmaskT[numT],maski);
          Xi.copyMask(XmaskT[numT],maski);
@@ -532,12 +458,12 @@ void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, cons
          DmaskT[numT].multTrans(XmaskT[numT],Rdn);
          GT[numT].setMatrices(DmaskT[numT],false);
          GT[numT].addDiag(T(1e-10));
-         T eps_mask= ((vecEps && *eps >= 0) ? *(eps+i) : *eps)*XmaskT[numT].n()/Xi.n();
+         T eps_mask= (vecEps ? *(peps+i) : *peps)*XmaskT[numT].n()/Xi.n();
          coreORMP(scoresT[numT],normT[numT],tmpT[numT],
                UnT[numT],UndnT[numT],UndsT[numT],
                GsT[numT],Rdn,GT[numT],ind,RUn,
-               &eps_mask, normX,
-               vecL ? pL[i] : L, 
+               normX, &eps_mask, vecL ? pL+i : pL, 
+               vecLambda ? pLambda+i : pLambda, 
                path && i==0 ? path->rawX() : NULL);
 
          DmaskT[numT].setm(D.m());
@@ -565,7 +491,7 @@ void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, cons
 /// Auxiliary function of omp
 template <typename T>
 void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<int>& ind, 
-      Vector<T>& coeffs, T& normX, const int L, const T eps) {
+      Vector<T>& coeffs, T& normX, const int L, const T eps, const T lambda) {
    const int K = G.n();
    Vector<T> scores(K);
    Vector<T> norm(K);
@@ -575,17 +501,21 @@ void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<int>& ind,
    Matrix<T> Unds(L,L);
    Matrix<T> Gs(K,L);
    ind.set(-1);
-   coreORMP(scores,norm,tmp,Un,Undn,Unds,Gs,RtD,G,ind,coeffs,&eps,normX,L);
+   coreORMP(scores,norm,tmp,Un,Undn,Unds,Gs,RtD,G,ind,coeffs,normX,&eps,&L,&lambda);
 };
 
 /// Auxiliary function of omp
 template <typename T>
 void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
-      Matrix<T>& Undn, Matrix<T>& Unds, Matrix<T>& Gs, Vector<T>& Rdn, const AbstractMatrix<T>& G,
-      Vector<int>& ind, Vector<T>& RUn, const T* eps2, T& normX, int LL, T* path) {
-   T eps = abs<T>(*eps2);
-   const int L = MIN(LL,Gs.n());
-   if ( (*eps2 >= 0 && normX <= eps) || L == 0) return;
+      Matrix<T>& Undn, Matrix<T>& Unds, Matrix<T>& Gs, Vector<T>& Rdn,
+      const AbstractMatrix<T>& G,
+      Vector<int>& ind, Vector<T>& RUn, 
+       T& normX, const T* peps, const int* pL, const T* plambda,
+      T* path) {
+   const T eps = abs<T>(*peps);
+   const int L = MIN(*pL,Gs.n());
+   const T lambda=*plambda;
+   if ((normX <= eps) || L == 0) return;
    const int K = scores.n();
    scores.copy(Rdn);
    norm.set(T(1.0));
@@ -603,14 +533,14 @@ void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
    int j;
    for (j = 0; j<L; ++j) {
       const int currentInd=scores.fmax();
-      if (norm[currentInd] < 1e-6) {
+      if (norm[currentInd] < 1e-8) {
          ind[j]=-1;
          break;
       }
       const T invNorm=T(1.0)/sqrt(norm[currentInd]);
       const T RU=Rdn[currentInd]*invNorm;
       const T delta = RU*RU;
-      if (*eps2 < 0 && delta < eps) {
+      if (delta < 2*lambda) {
          break;
       }
 
@@ -1616,7 +1546,7 @@ void lasso2(const Data<T>& X, const AbstractMatrix<T>& G, const AbstractMatrix<T
 
 
 
-/// Auxiliary function for lasso % TODO : recode avec matrix inversion lemma
+/// Auxiliary function for lasso 
 template <typename T>
 void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       Matrix<T>& Gs,
@@ -1824,7 +1754,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
    }
 }
 
-/// Auxiliary function for lasso % TODO : recode avec matrix inversion lemma
+/// Auxiliary function for lasso 
 template <typename T>
 void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
       Matrix<T>& Gs,
@@ -2646,7 +2576,8 @@ void coreSOMP(const Matrix<T>& X, const Matrix<T>& D, const Matrix<T>& G,
       D.multTrans(Xt,Rdn);
       Vector<T> RUn(L);
       T normX = Xt.nrm2sq();
-      coreORMP(scores,norm,tmp,Un,Undn,Unds,Gs,Rdn,G,r,RUn,&eps,normX,L);
+      T lambda=0;
+      coreORMP(scores,norm,tmp,Un,Undn,Unds,Gs,Rdn,G,r,RUn,normX,&eps,&L,&lambda);
       int count=0;
       for (int i = 0; i<L; ++i) {
          if (r[i] == -1) break;

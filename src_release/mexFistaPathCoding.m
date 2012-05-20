@@ -1,9 +1,10 @@
 % 
-% Usage: [W [optim]]=mexFistaGraph(Y,X,W0,graph,param);
+% Usage: [W [optim]]=mexFistaPathCoding(Y,X,W0,DAG,param);
 %
-% Name: mexFistaGraph
+% Name: mexFistaPathCoding
 %
-% Description: mexFistaGraph solves sparse regularized problems.
+% Description: mexFistaPathCoding solves sparse regularized problems for the 
+%         path coding penalties of http://arxiv.org/abs/1204.4539
 %         X is a design matrix of size m x p
 %         X=[x^1,...,x^n]', where the x_i's are the rows of X
 %         Y=[y^1,...,y^n] is a matrix of size m x n
@@ -13,7 +14,7 @@
 %
 %           min_W  loss(W) + lambda psi(W)
 %          
-%         The function psi are those used by mexProximalGraph (see documentation)
+%         The function psi are those used by mexProximalPathCoding (see documentation)
 %         for the loss functions, see the documentation of mexFistaFlat
 %         
 %         This function can also handle intercepts (last row of W is not regularized),
@@ -23,10 +24,10 @@
 %         X:  double dense or sparse m x p matrix   
 %         W0:  double dense p x n matrix or p x Nn matrix (for multi-logistic loss)
 %              initial guess
-%         graph: struct (see documentation of mexProximalGraph)
+%         DAG: struct (see documentation of mexProximalPathCoding)
 %         param: struct
 %            param.loss (choice of loss, see above)
-%            param.regul (choice of regularization, see function mexProximalFlat)
+%            param.regul (choice of regularization, see function mexProximalPathCoding)
 %            param.lambda (regularization parameter)
 %            param.lambda2 (optional, regularization parameter, 0 by default)
 %            param.lambda3 (optional, regularization parameter, 0 by default)
@@ -48,10 +49,7 @@
 %            param.ista (optional, use ista instead of fista, false by default).
 %            param.subgrad (optional, if not param.ista, use subradient descent instead of fista, false by default).
 %            param.a, param.b (optional, if param.subgrad, the gradient step is a/(t+b)
-%            also similar options as mexProximalTree
-%
-%            the function also implements the ADMM algorithm via an option param.admm=true. It is not documented
-%            and you need to look at the source code to use it.
+%            also similar options as mexProximalPathCoding
 %
 %
 % Output:  W:  double dense p x n matrix or p x Nn matrix (for multi-logistic loss)
@@ -60,6 +58,6 @@
 %              third row: values of the relative duality gap (if available)
 %              fourth row: number of iterations
 %
-% Author: Julien Mairal, 2010
+% Author: Julien Mairal, 2012
 
 

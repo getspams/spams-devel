@@ -7,7 +7,7 @@ param.lambda=0.1; % regularization parameter
 param.it0=1;      % frequency for duality gap computations
 param.max_it=100; % maximum number of iterations
 param.L0=0.1;
-param.tol=-1e7;
+param.tol=1e-5;
 param.intercept=false;
 param.pos=false;
 

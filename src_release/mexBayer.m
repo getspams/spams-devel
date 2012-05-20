@@ -1,6 +1,8 @@
 % 
 % Usage:   Y =mexBayer(X,offset);
 %
+% Name: mexBayer
+%
 % Description: mexBayer applies a Bayer pattern to an image X.
 %       There are four possible offsets.
 %

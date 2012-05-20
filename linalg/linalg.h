@@ -5233,5 +5233,339 @@ template <typename T> inline T SubMatrix<T>::operator()(const int index1,
    return (*_matrix)(_indicesI[index1],_indicesJ[index2]);
 }
 
+/// Matrix with shifts
+template <typename T> class ShiftMatrix : public AbstractMatrixB<T> {
+   public:
+      ShiftMatrix(const AbstractMatrixB<T>& inputmatrix, const int shifts, const bool center = false) : _shifts(shifts), _inputmatrix(&inputmatrix), _centered(false) {
+         _m=_inputmatrix->m()-shifts+1;
+         _n=_inputmatrix->n()*shifts;
+         if (center) this->center();
+      };
+      int n() const { return _n; };
+      int m() const { return _m; };
+
+      /// b <- alpha A'x + beta b
+      void multTrans(const Vector<T>& x, Vector<T>& b,
+            const T alpha = 1.0, const T beta = 0.0) const;
+
+      /// perform b = alpha*A*x + beta*b, when x is sparse
+      virtual void mult(const SpVector<T>& x, Vector<T>& b, 
+            const T alpha = 1.0, const T beta = 0.0) const;
+
+      virtual void mult(const Vector<T>& x, Vector<T>& b, 
+            const T alpha = 1.0, const T beta = 0.0) const;
+
+      /// perform C = a*A*B + b*C, possibly transposing A or B.
+      virtual void mult(const Matrix<T>& B, Matrix<T>& C, 
+            const bool transA = false, const bool transB = false,
+            const T a = 1.0, const T b = 0.0) const;
+
+      virtual void mult(const SpMatrix<T>& B, Matrix<T>& C, 
+            const bool transA = false, const bool transB = false,
+            const T a = 1.0, const T b = 0.0) const;
+
+      /// perform C = a*B*A + b*C, possibly transposing A or B.
+      virtual void multSwitch(const Matrix<T>& B, Matrix<T>& C, 
+            const bool transA = false, const bool transB = false,
+            const T a = 1.0, const T b = 0.0) const;
+
+      /// XtX = A'*A
+      virtual void XtX(Matrix<T>& XtX) const;
+
+      virtual void copyRow(const int i, Vector<T>& x) const;
+
+      virtual void copyTo(Matrix<T>& copy) const;
+      virtual T dot(const Matrix<T>& x) const;
+
+      virtual void print(const string& name) const;
+
+      virtual ~ShiftMatrix() {  };
+
+   private:
+      void center() { 
+         Vector<T> ones(_m);
+         ones.set(T(1.0)/_m);
+         this->multTrans(ones,_means);
+         _centered=true;  };
+
+      int _m;
+      int _n;
+      int _shifts;
+      bool _centered;
+      Vector<T> _means;
+      const AbstractMatrixB<T>* _inputmatrix;
+};
+
+template <typename T> void ShiftMatrix<T>::multTrans(const
+      Vector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
+   b.resize(_n);
+   if (beta==0) b.setZeros();
+   Vector<T> tmp(_inputmatrix->m());
+   Vector<T> subvec;
+   Vector<T> subvec2;
+   const int nn=_inputmatrix->n();
+   for (int i = 0; i<_shifts; ++i) {
+      tmp.setZeros();
+      subvec2.setData(tmp.rawX()+i,_m);
+      subvec2.copy(x);
+      subvec.setData(b.rawX()+i*nn,nn);
+      _inputmatrix->multTrans(tmp,subvec,alpha,beta);
+   }
+   if (_centered) {
+      b.add(_means,-alpha*x.sum());
+   }
+};
+
+
+/// perform b = alpha*A*x + beta*b, when x is sparse
+template <typename T> void ShiftMatrix<T>::mult(const
+      SpVector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
+   b.resize(_m);
+   if (beta==0) {
+      b.setZeros();
+   } else {
+      b.scal(beta);
+   }
+   const int nn=_inputmatrix->n();
+   const int mm=_inputmatrix->m();
+   Vector<T> fullx(_n);
+   x.toFull(fullx);
+   SpVector<T> sptmp(nn);
+   Vector<T> tmp;
+   Vector<T> tmp2(mm);
+   for (int i = 0; i<_shifts; ++i) {
+      tmp.setData(fullx.rawX()+i*nn,nn);
+      tmp.toSparse(sptmp);
+      _inputmatrix->mult(sptmp,tmp2,alpha,0);
+      tmp.setData(tmp2.rawX()+i,_m);
+      b.add(tmp);
+   }
+   if (_centered) {
+      b.add(-alpha*_means.dot(x));
+   }
+};
+
+/// perform b = alpha*A*x + beta*b, when x is sparse
+template <typename T> void ShiftMatrix<T>::mult(const
+      Vector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
+   b.resize(_m);
+   const int nn=_inputmatrix->n();
+   const int mm=_inputmatrix->m();
+   Vector<T> tmp;
+   Vector<T> tmp2(mm);
+   if (beta==0) {
+      b.setZeros();
+   } else {
+      b.scal(beta);
+   }
+   for (int i = 0; i<_shifts; ++i) {
+      tmp.setData(x.rawX()+i*nn,nn);
+      _inputmatrix->mult(tmp,tmp2,alpha,0);
+      tmp.setData(tmp2.rawX()+i,_m);
+      b.add(tmp);
+   }
+   if (_centered) {
+      b.add(-alpha*_means.dot(x));
+   }
+};
+
+/// perform C = a*A*B + b*C, possibly transposing A or B.
+template <typename T> void ShiftMatrix<T>::mult(const Matrix<T>&
+      B, Matrix<T>& C, const bool transA, const bool transB, const T a, const T
+      b) const {
+   cerr << "Shift Matrix is used in inadequate setting" << endl;
+}
+
+template <typename T> void ShiftMatrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C, 
+      const bool transA, const bool transB, const T a, const T b) const {
+   cerr << "Shift Matrix is used in inadequate setting" << endl;
+}
+
+/// perform C = a*B*A + b*C, possibly transposing A or B.
+template <typename T> void ShiftMatrix<T>::multSwitch(const
+      Matrix<T>& B, Matrix<T>& C, const bool transA, const bool transB,
+      const T a, const T b) const {
+   cerr << "Shift Matrix is used in inadequate setting" << endl;
+}
+
+template <typename T> void ShiftMatrix<T>::XtX(Matrix<T>& XtX) const {
+   cerr << "Shift Matrix is used in inadequate setting" << endl;
+};
+
+template <typename T> void ShiftMatrix<T>::copyRow(const int ind, Vector<T>& x) const {
+   Vector<T> sub_vec;
+   const int mm=_inputmatrix->m();
+   for (int i = 0; i<_shifts; ++i) {
+      sub_vec.setData(x.rawX()+i*mm,mm);
+      _inputmatrix->copyRow(ind+i,sub_vec);
+   }
+   if (_centered) x.sub(_means);
+};
+
+template <typename T> void ShiftMatrix<T>::copyTo(Matrix<T>& x) const {
+   cerr << "Shift Matrix is used in inadequate setting" << endl;
+};
+
+
+template <typename T> T ShiftMatrix<T>::dot(const Matrix<T>& x) const {
+   cerr << "Shift Matrix is used in inadequate setting" << endl;
+   return 0;
+};
+
+template <typename T> void ShiftMatrix<T>::print(const string& name) const {
+   cerr << name << endl;
+   cerr << "Shift Matrix: " << _shifts << " shifts" << endl;
+   _inputmatrix->print(name);
+};
+
+/// Matrix with shifts
+template <typename T> class DoubleRowMatrix : public AbstractMatrixB<T> {
+   public:
+      DoubleRowMatrix(const AbstractMatrixB<T>& inputmatrix) : _inputmatrix(&inputmatrix) { 
+         _n=inputmatrix.n();
+         _m=2*inputmatrix.m();
+      };
+      int n() const { return _n; };
+      int m() const { return _m; };
+
+      /// b <- alpha A'x + beta b
+      void multTrans(const Vector<T>& x, Vector<T>& b,
+            const T alpha = 1.0, const T beta = 0.0) const;
+
+      /// perform b = alpha*A*x + beta*b, when x is sparse
+      virtual void mult(const SpVector<T>& x, Vector<T>& b, 
+            const T alpha = 1.0, const T beta = 0.0) const;
+
+      virtual void mult(const Vector<T>& x, Vector<T>& b, 
+            const T alpha = 1.0, const T beta = 0.0) const;
+
+      /// perform C = a*A*B + b*C, possibly transposing A or B.
+      virtual void mult(const Matrix<T>& B, Matrix<T>& C, 
+            const bool transA = false, const bool transB = false,
+            const T a = 1.0, const T b = 0.0) const;
+
+      virtual void mult(const SpMatrix<T>& B, Matrix<T>& C, 
+            const bool transA = false, const bool transB = false,
+            const T a = 1.0, const T b = 0.0) const;
+
+      /// perform C = a*B*A + b*C, possibly transposing A or B.
+      virtual void multSwitch(const Matrix<T>& B, Matrix<T>& C, 
+            const bool transA = false, const bool transB = false,
+            const T a = 1.0, const T b = 0.0) const;
+
+      /// XtX = A'*A
+      virtual void XtX(Matrix<T>& XtX) const;
+
+      virtual void copyRow(const int i, Vector<T>& x) const;
+
+      virtual void copyTo(Matrix<T>& copy) const;
+      virtual T dot(const Matrix<T>& x) const;
+
+      virtual void print(const string& name) const;
+
+      virtual ~DoubleRowMatrix() {  };
+
+   private:
+      int _m;
+      int _n;
+      const AbstractMatrixB<T>* _inputmatrix;
+};
+
+
+template <typename T> void DoubleRowMatrix<T>::multTrans(const
+      Vector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
+   const int mm = _inputmatrix->m();
+   Vector<T> tmp(mm);
+   for (int i = 0; i<mm; ++i) 
+      tmp[i]=x[2*i]+x[2*i+1];
+   _inputmatrix->multTrans(tmp,b,alpha,beta);
+};
+
+
+/// perform b = alpha*A*x + beta*b, when x is sparse
+template <typename T> void DoubleRowMatrix<T>::mult(const
+      SpVector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
+   b.resize(_m);
+   if (beta==0) {
+      b.setZeros();
+   } else {
+      b.scal(beta);
+   }
+   const int mm = _inputmatrix->m();
+   Vector<T> tmp(mm);
+   _inputmatrix->mult(x,tmp,alpha);
+   for (int i = 0; i<mm; ++i) {
+      b[2*i]+=tmp[i];
+      b[2*i+1]+=tmp[i];
+   }
+};
+
+/// perform b = alpha*A*x + beta*b, when x is sparse
+template <typename T> void DoubleRowMatrix<T>::mult(const
+      Vector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
+   b.resize(_m);
+   if (beta==0) {
+      b.setZeros();
+   } else {
+      b.scal(beta);
+   }
+   const int mm = _inputmatrix->m();
+   Vector<T> tmp(mm);
+   _inputmatrix->mult(x,tmp,alpha);
+   for (int i = 0; i<mm; ++i) {
+      b[2*i]+=tmp[i];
+      b[2*i+1]+=tmp[i];
+   }
+};
+
+/// perform C = a*A*B + b*C, possibly transposing A or B.
+template <typename T> void DoubleRowMatrix<T>::mult(const Matrix<T>&
+      B, Matrix<T>& C, const bool transA, const bool transB, const T a, const T
+      b) const {
+   FLAG(5)
+   cerr << "Double Matrix is used in inadequate setting" << endl;
+}
+
+template <typename T> void DoubleRowMatrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C, 
+      const bool transA, const bool transB, const T a, const T b) const {
+   FLAG(4)
+   cerr << "Double Matrix is used in inadequate setting" << endl;
+}
+
+/// perform C = a*B*A + b*C, possibly transposing A or B.
+template <typename T> void DoubleRowMatrix<T>::multSwitch(const
+      Matrix<T>& B, Matrix<T>& C, const bool transA, const bool transB,
+      const T a, const T b) const {
+   FLAG(3)
+   cerr << "Double Matrix is used in inadequate setting" << endl;
+}
+
+template <typename T> void DoubleRowMatrix<T>::XtX(Matrix<T>& XtX) const {
+   FLAG(2)
+   cerr << "Double Matrix is used in inadequate setting" << endl;
+};
+
+template <typename T> void DoubleRowMatrix<T>::copyRow(const int ind, Vector<T>& x) const {
+   const int indd2= floor(ind/2);
+   _inputmatrix->copyRow(indd2,x);
+};
+
+template <typename T> void DoubleRowMatrix<T>::copyTo(Matrix<T>& x) const {
+   FLAG(1)
+   cerr << "Double Matrix is used in inadequate setting" << endl;
+};
+
+
+template <typename T> T DoubleRowMatrix<T>::dot(const Matrix<T>& x) const {
+   FLAG(0)
+   cerr << "Double Matrix is used in inadequate setting" << endl;
+   return 0;
+};
+
+template <typename T> void DoubleRowMatrix<T>::print(const string& name) const {
+   cerr << name << endl;
+   cerr << "Double Row Matrix" << endl;
+   _inputmatrix->print(name);
+};
 
 #endif

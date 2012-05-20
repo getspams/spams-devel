@@ -295,8 +295,8 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
    T t0 = param.t0;
    int sparseD = param.modeD == L1L2 ? 2 : param.modeD == L1L2MU ? 7 : 6;
    int NUM_THREADS=init_omp(_NUM_THREADS);
-   fprintf(stderr,"num param iterD: %d\n",param.iter_updateD);
    if (param.verbose) {
+      fprintf(stderr,"num param iterD: %d\n",param.iter_updateD);
       if (param.batch) {
          cout << "Batch Mode" << endl;
       } else if (param.stochastic) {
@@ -324,7 +324,8 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
       if (param.mode == PENALTY && param.lambda==0 && param.lambda2 > 0 && !param.posAlpha)
          cout << "L2 solver is used" << endl;
       if (_itercount > 0)
-         cout << "Retraining from iteratio " << _itercount << endl;
+         cout << "Retraining from iteration " << _itercount << endl;
+      flush(cout);
    }
 
    const int M = X.n();
@@ -339,6 +340,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
       cout << "L: " << L << endl;
       cout << "lambda: " << param.lambda << endl;
       cout << "mode: " << param.mode << endl;
+      flush(cout);
    }
 
    if (_D.m() != n || _D.n() != K) 
@@ -358,8 +360,10 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
       _initialDict=true;
    }
 
-   if (param.verbose)
+   if (param.verbose) {
       cout << "*****Online Dictionary Learning*****" << endl;
+      flush(cout);
+   }
 
    Vector<T> tmp(n);
    if (param.modeD != L2) {
@@ -521,9 +525,11 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
             }
          } else {
             if (param.mode == SPARSITY) {
-               coreORMPB(DtRj,G,ind,coeffs_sparse,normX,L,T(1e-5));
+               coreORMPB(DtRj,G,ind,coeffs_sparse,normX,L,T(0.0),T(0.0));
+            } else if (param.mode==L2ERROR2) {
+               coreORMPB(DtRj,G,ind,coeffs_sparse,normX,L,param.lambda,T(0.0));
             } else {
-               coreORMPB(DtRj,G,ind,coeffs_sparse,normX,L,param.lambda);
+               coreORMPB(DtRj,G,ind,coeffs_sparse,normX,L,T(0.0),param.lambda);
             }
          }
          int count2=0;
@@ -683,10 +689,6 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
          }
       }
    }
-   if (param.verbose) {
-      cerr << "\r                                                                              \r";
-      cerr << i;
-   }
 
    _itercount += i;
    if (param.verbose)
@@ -742,6 +744,7 @@ void Trainer<T>::trainOffline(const Data<T>& X,
    cout << "lambda: " << param.lambda << endl;
    cout << "X: " << n << " x " << M << endl;
    cout << "D: " << n << " x " << K << endl;
+   flush(cout);
 
    srandom(0);
    Vector<T> col(n);

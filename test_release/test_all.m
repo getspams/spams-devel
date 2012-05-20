@@ -16,9 +16,12 @@ test_nmf
 test_ProximalFlat
 test_ProximalTree
 test_ProximalGraph
+test_ProximalPathCoding
+test_EvalPathCoding
 test_FistaFlat
 test_FistaTree
 test_FistaGraph
+test_FistaPathCoding
 test_CalcAAt
 test_CalcXAt
 test_CalcXY
@@ -28,3 +31,7 @@ test_ConjGrad
 test_InvSym
 test_Normalize
 test_Sort
+test_CountConnexComponents
+test_CountPathsDAG
+test_RemoveCyclesGraph
+

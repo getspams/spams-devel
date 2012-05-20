@@ -21,7 +21,6 @@
 #include <utils.h>
 #include <misc.h>
 
-#define printf mexPrintf
 
 //#ifndef EM64T
 //#define mwSize int
@@ -201,7 +200,6 @@ inline bool checkField(const mxArray* pr_struct,
    return true;
 };
 
-
 /// get a scalar from a struct  and provide a default value
 template <typename T> inline T getScalarStructDef(const mxArray* pr_struct,
       const char* name, const T def) {
@@ -210,5 +208,11 @@ template <typename T> inline T getScalarStructDef(const mxArray* pr_struct,
       def;
 }
 
+void super_flush(std::ostream& stream) {
+    std::flush(stream);   
+    mexEvalString("pause(0.0000000001);"); // to dump string.
+}
+
+#define flush super_flush
 
 #endif

@@ -13,6 +13,8 @@
 %                                                               <= eps*||beta||_0/m
 %         or
 %         min_{alpha} ||diag(beta)*(x-Dalpha)||_2^2  s.t. ||alpha||_0 <= L
+%         or
+%         min_{alpha} 0.5||diag(beta)*(x-Dalpha)||_2^2  + lambda||alpha||_0
 %         
 %
 % Inputs: X:  double m x n matrix   (input signals)
@@ -24,8 +26,11 @@
 %         B:  boolean m x n matrix   (mask)
 %               p is the number of elements in the dictionary
 %         param: struct
-%            param.L (maximum number of elements in each decomposition)
-%            param.eps (threshold on the squared l2-norm of the residual
+%            param.L (optional, maximum number of elements in each decomposition, 
+%               min(m,p) by default)
+%            param.eps (optional, threshold on the squared l2-norm of the residual,
+%               0 by default
+%            param.lambda (optional, penalty parameter, 0 by default
 %            param.numThreads (optional, number of threads for exploiting
 %            multi-core / multi-cpus. By default, it takes the value -1,
 %            which automatically selects all the available CPUs/cores).
@@ -38,10 +43,10 @@
 %     been extensively tested:
 %      - single precision setting (even though the output alpha is double 
 %        precision)
-%      - Passing an int32 vector of length n to param.L allows to provide
+%      - Passing an int32 vector of length n to param.L provides
 %        a different parameter L for each input signal x_i
-%      - Passing a double vector of length n to param.eps allows to provide
-%        a different parameter eps for each input signal x_i
+%      - Passing a double vector of length n to param.eps and or param.lambda 
+%        provides a different parameter eps (or lambda) for each input signal x_i
 %
 % Author: Julien Mairal, 2010
 

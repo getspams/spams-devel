@@ -1,6 +1,6 @@
 clear all; 
 
-I=double(imread('../../data/house.png'))/255;
+I=double(imread('data/lena.png'))/255;
 % extract 8 x 8 patches
 X=im2col(I,[8 8],'sliding');
 X=X-repmat(mean(X),[size(X,1) 1]);

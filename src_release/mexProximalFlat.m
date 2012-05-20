@@ -1,5 +1,5 @@
 % 
-% Usage:   alpha=mexProximalFlat(U,param);
+% Usage:  [V [val_regularizer]]=mexProximalFlat(U,param);
 %
 % Name: mexProximalFlat
 %
@@ -80,7 +80,9 @@
 %                 multi-core / multi-cpus. By default, it takes the value -1,
 %                 which automatically selects all the available CPUs/cores).
 %
-% Output: alpha: double m x n matrix (output coefficients)
+% Output: V: double m x n matrix (output coefficients)
+%         val_regularizer: double 1 x n vector (value of the regularization
+%         term at the optimum).
 %
 % Author: Julien Mairal, 2010
 

@@ -1,5 +1,5 @@
 % 
-% Usage: W=mexFistaTree(Y,X,W0,tree,param);
+% Usage: [W [optim]]=mexFistaTree(Y,X,W0,tree,param);
 %
 % Name: mexFistaTree
 %
@@ -55,6 +55,10 @@
 %            and you need to look at the source code to use it.
 %
 % Output:  W:  double dense p x n matrix or p x Nn matrix (for multi-logistic loss)
+%          optim: optional, double dense 4 x n matrix.
+%              first row: values of the objective functions.
+%              third row: values of the relative duality gap (if available)
+%              fourth row: number of iterations
 %
 % Author: Julien Mairal, 2010
 

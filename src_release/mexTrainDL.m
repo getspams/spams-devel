@@ -36,6 +36,9 @@
 %        5) if param.mode=4, the sparse coding is done with OMP
 %     min_{D in C} (1/n) sum_{i=1}^n  ||alpha_i||_0  s.t.  ...
 %                                           ||x_i-Dalpha_i||_2^2 <= lambda
+%        6) if param.mode=5, the sparse coding is done with OMP
+%     min_{D in C} (1/n) sum_{i=1}^n 0.5||x_i-Dalpha_i||_2^2 +lambda||alpha_i||_0  
+%                                           
 %
 %%     C is a convex set verifying
 %        1) if param.modeD=0

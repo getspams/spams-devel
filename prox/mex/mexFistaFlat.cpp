@@ -54,11 +54,16 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    int mD=static_cast<int>(dimsD[0]);
    int p=static_cast<int>(dimsD[1]);
    AbstractMatrixB<T>* D;
+   AbstractMatrixB<T>* D2 = NULL;
+   AbstractMatrixB<T>* D3 = NULL;
 
    double* D_v;
    mwSize* D_r, *D_pB, *D_pE;
    int* D_r2, *D_pB2, *D_pE2;
    T* D_v2;
+   
+   const int shifts = getScalarStructDef<int>(prhs[3],"shifts",1); // undocumented function
+
    if (mxIsSparse(prhs[1])) {
       D_v=static_cast<double*>(mxGetPr(prhs[1]));
       D_r=mxGetIr(prhs[1]);
@@ -70,6 +75,17 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    } else {
       T* prD = reinterpret_cast<T*>(mxGetPr(prhs[1]));
       D = new Matrix<T>(prD,mD,p);
+   }
+   const bool double_rows = getScalarStructDef<bool>(prhs[3],"double_rows",false); // undocumented function
+   if (double_rows) {
+      D2=D;
+      D=new DoubleRowMatrix<T>(*D);
+   }
+
+   if (shifts > 1) {
+      const bool center_shifts = getScalarStructDef<bool>(prhs[3],"center_shifts",false);
+      D3=D;
+      D=new ShiftMatrix<T>(*D,shifts,center_shifts);
    }
 
    T* pr_alpha0 = reinterpret_cast<T*>(mxGetPr(prhs[2]));
@@ -140,7 +156,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
       mxGetString(stringData,param.logName,stringLength);
    }
 
-   if ((param.loss != CUR && param.loss != MULTILOG) && (pAlpha != p || nAlpha != n || mD != m)) { 
+   if ((!double_rows && shifts==1 && param.loss != CUR && param.loss != MULTILOG) && (pAlpha != p || nAlpha != n || mD != m)) { 
       mexErrMsgTxt("Argument sizes are not consistent");
    } else if (param.loss == MULTILOG) {
       Vector<T> Xv;
@@ -166,6 +182,8 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
 #endif
    } 
 
+   if (param.regul==GRAPH_PATH_L0 || param.regul==GRAPH_PATH_CONV) 
+      mexErrMsgTxt("Error: mexFistaPathCoding should be used instead");
    if (param.regul==GRAPH || param.regul==GRAPHMULT) 
       mexErrMsgTxt("Error: mexFistaGraph should be used instead");
    if (param.regul==TREE_L0 || param.regul==TREEMULT || param.regul==TREE_L2 || param.regul==TREE_LINF) 
@@ -185,6 +203,13 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
             D_v,D_r);
    }
    delete(D);
+   if (shifts > 1) {
+      delete(D2);
+   }
+   if (double_rows) {
+      delete(D3);
+   }
+
 }
 
    void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {

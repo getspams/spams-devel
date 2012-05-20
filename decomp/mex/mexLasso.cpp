@@ -69,13 +69,13 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
       bool cholesky = ols || getScalarStructDef<bool>(prhs[2],"cholesky",false);
       constraint_type mode = (constraint_type)getScalarStructDef<int>(prhs[2],"mode",PENALTY);
       if (L > n && !(mode == PENALTY && isZero(lambda) && !pos && lambda2 > 0)) {
-         if (verbose)
-            printf("L is changed to %d\n",n);
+//         if (verbose)
+//            printf("L is changed to %d\n",n);
          L=n;
       }
       if (L > K) {
-         if (verbose)
-            printf("L is changed to %d\n",K);
+//         if (verbose)
+//            printf("L is changed to %d\n",K);
          L=K;
       }
       Matrix<T> X(prX,n,M);
@@ -158,13 +158,13 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
       bool cholesky = ols || getScalarStructDef<bool>(prhs[3],"cholesky",false);
       constraint_type mode = (constraint_type)getScalarStructDef<int>(prhs[3],"mode",PENALTY);
       if (L > n && !(mode == PENALTY && isZero(lambda) && !pos && lambda2 > 0)) {
-         if (verbose)
-            printf("L is changed to %d\n",n);
+//         if (verbose)
+//            printf("L is changed to %d\n",n);
          L=n;
       }
       if (L > K) {
-         if (verbose)
-            printf("L is changed to %d\n",K);
+//         if (verbose)
+//            printf("L is changed to %d\n",K);
          L=K;
       }
       Matrix<T> X(prX,n,M);

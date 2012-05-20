@@ -1,5 +1,5 @@
 % 
-% Usage:   alpha=mexProximalGraph(U,graph,param);
+% Usage:   [V [val_regularizer]]=mexProximalGraph(U,graph,param);
 %
 % Name: mexProximalGraph
 %
@@ -63,7 +63,9 @@
 %                 multi-core / multi-cpus. By default, it takes the value -1,
 %                 which automatically selects all the available CPUs/cores).
 %
-% Output: alpha: double p x n matrix (output coefficients)
+% Output: V: double p x n matrix (output coefficients)
+%         val_regularizer: double 1 x n vector (value of the regularization
+%         term at the optimum).
 %
 % Author: Julien Mairal, 2010
 
