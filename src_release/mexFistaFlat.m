@@ -65,8 +65,6 @@
 %            param.lambda2 (optional, regularization parameter, 0 by default)
 %            param.lambda3 (optional, regularization parameter, 0 by default)
 %            param.verbose (optional, verbosity level, false by default)
-%            param.intercept (optional, last row of U is not regularized,
-%                false by default)
 %            param.pos (optional, adds positivity constraints on the
 %                coefficients, false by default)
 %            param.transpose (optional, transpose the matrix in the regularization function)

@@ -1,5 +1,5 @@
 rm -rf spams-matlab
-svn export trunk spams-matlab
+svn export ./ spams-matlab
 rm -rf spams-matlab/swig/
 rm spams-matlab/make_matlab_package.sh
 rm spams-matlab/TODO
