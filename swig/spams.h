@@ -233,7 +233,7 @@ throw(const char *)
 }
 
 template <typename T>
-SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_path,Vector<int>*L,Vector<T>*eps,const int numThreads) {
+SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_path,bool given_L,Vector<int>*L,bool given_eps,Vector<T>*eps,bool given_Lambda,Vector<T>*Lambda,const int numThreads) {
   SpMatrix<T> *alpha = new SpMatrix<T>();
     int n = X->m();
     int M = X->n();
@@ -243,29 +243,43 @@ SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_pat
       throw("omp : incompatible matrix dimensions");
     int sizeL = L->n();
     int sizeE = eps->n();
+    int sizeLambda = Lambda->n();
     T *pE = eps->rawX();
+    T *pLambda = Lambda->rawX();
     int *pL = L->rawX();
     bool vecL = false;
     bool vecEps = false;
+    bool vecLambda = false;
+    if (! given_L && ! given_eps && ! given_Lambda)
+      throw("omp : You should either provide L, eps or lambda");
+    int scalar_L = MIN(n,K);
+    if(! given_L) 
+      pL = &scalar_L;
+    else if (sizeL > 1)
+      vecL = true;
+    if(! given_eps) {
+      T scalar_eps = 0.;
+      pE = &scalar_eps;
+    } else if (sizeE > 1)
+      vecEps = true;
+    if(! given_Lambda) {
+      T scalar_Lambda = 0.;
+      pLambda = &scalar_Lambda;
+    } else if(sizeLambda > 1)
+      vecLambda = true;
     if(return_reg_path) {
-      int scalar_L = MIN(n,MIN(*pL,K));
       *path = new Matrix<T>(K,scalar_L);
       (*path)->setZeros();
-      pL = &scalar_L;
-      omp((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),pL,pE,numThreads,vecL,vecEps,*path);
+      omp((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),pL,pE,pLambda,vecL,vecEps,vecLambda,numThreads,*path);
     } else {
       *path = NULL;
-      if (sizeL != 1) 
-	vecL = true;
-      if (sizeE != 1) 
-	vecEps = true;
-      omp((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),pL,pE,numThreads,vecL,vecEps);
+      omp((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),pL,pE,pLambda,vecL,vecEps,vecLambda,numThreads);
     }
     return alpha;
 }
 
 template <typename T>
-SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path,bool return_reg_path,Vector<int>*L,Vector<T>*eps,const int numThreads) {
+SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path,bool return_reg_path,bool given_L,Vector<int>*L,bool given_eps,Vector<T>*eps,bool given_Lambda,Vector<T>*Lambda,const int numThreads) {
   SpMatrix<T> *alpha = new SpMatrix<T>();
     int n = X->m();
     int M = X->n();
@@ -279,23 +293,37 @@ SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path
       throw("ompMask : Mash has non acceptable dimensions");
     int sizeL = L->n();
     int sizeE = eps->n();
+    int sizeLambda = Lambda->n();
     T *pE = eps->rawX();
+    T *pLambda = Lambda->rawX();
     int *pL = L->rawX();
     bool vecL = false;
     bool vecEps = false;
+    bool vecLambda = false;
+    if (! given_L && ! given_eps && ! given_Lambda)
+      throw("omp : You should either provide L, eps or lambda");
+    int scalar_L = MIN(n,K);
+    if(! given_L) 
+      pL = &scalar_L;
+    else if (sizeL > 1)
+      vecL = true;
+    if(! given_eps) {
+      T scalar_eps = 0.;
+      pE = &scalar_eps;
+    } else if (sizeE > 1)
+      vecEps = true;
+    if(! given_Lambda) {
+      T scalar_Lambda = 0.;
+      pLambda = &scalar_Lambda;
+    } else if(sizeLambda > 1)
+      vecLambda = true;
     if(return_reg_path) {
-      int scalar_L = MIN(n,MIN(*pL,K));
       *path = new Matrix<T>(K,scalar_L);
       (*path)->setZeros();
-      pL = &scalar_L;
-      omp_mask((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),(Matrix<bool> &)(*B),pL,pE,numThreads,vecL,vecEps,*path);
+      omp_mask((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),(Matrix<bool> &)(*B),pL,pE,pLambda,vecL,vecEps,vecLambda,numThreads,*path);
     } else {
       *path = NULL;
-      if (sizeL != 1) 
-	vecL = true;
-      if (sizeE != 1) 
-	vecEps = true;
-      omp_mask((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),(Matrix<bool> &)(*B),pL,pE,numThreads,vecL,vecEps);
+      omp_mask((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha),(Matrix<bool> &)(*B),pL,pE,pLambda,vecL,vecEps,vecLambda,numThreads);
     }
     return alpha;
 }
@@ -341,7 +369,6 @@ Matrix<T> *_fistaFlat(Matrix<T> *X,AbstractMatrixB<T> *D,Matrix<T> *alpha0,
 	     char* logName,
 	     bool is_inner_weights,
 	     Vector<T> *inner_weights,
-	     bool eval,
 	     int size_group,
 	     bool sqrt_step,
 	     bool transpose
@@ -406,7 +433,7 @@ using namespace FISTA;
     param.inner_weights = inner_weights->rawX();
   }
 
-  param.eval = eval;
+  param.eval = false;
   param.size_group = size_group;
   param.sqrt_step = sqrt_step;
   param.transpose = transpose;
@@ -484,7 +511,6 @@ Matrix<T> *_fistaTree(
 	     char* logName,
 	     bool is_inner_weights,
 	     Vector<T> *inner_weights,
-	     bool eval,
 	     int size_group,
 	     bool sqrt_step,
 	     bool transpose
@@ -549,7 +575,7 @@ using namespace FISTA;
     param.inner_weights = inner_weights->rawX();
   }
 
-  param.eval = eval;
+  param.eval = false;
   param.size_group = size_group;
   param.sqrt_step = sqrt_step;
   param.transpose = transpose;
@@ -733,7 +759,6 @@ using namespace FISTA;
    tree.N_own_variables=pr_N_own_variables;
    tree.groups_ir= groups->r();
    tree.groups_jc= groups->pB();
-
   Vector<T> *val_loss = new Vector<T>();
   FISTA::PROX<T>((Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Vector<T> &)(*val_loss),NULL,&tree);
   return val_loss;

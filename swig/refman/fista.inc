@@ -1,9 +1,6 @@
 begin addlast Param
 delta:
-a:
-b:
 c:
-it0:
 max_iter_backtracking:
 lin_admm:
 admm:
@@ -13,10 +10,7 @@ log:
 logName:
 is_inner_weights:
 inner_weights:
-eval:
-size_group:
 sqrt_step:
-transpose:
 end
 begin addlast Inputs
 return_optim_info:     

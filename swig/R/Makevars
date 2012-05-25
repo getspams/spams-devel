@@ -10,4 +10,5 @@ endif
 
 
 PKG_CXXFLAGS = -I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn $(SHLIB_OPENMP_CXXFLAGS) $(OPT_DBG) -DUSE_BLAS_LIB
-PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -lstdc++ $(BLAS_LIBS) $(LAPACK_LIBS) $(EXTRA_LIBS) $(FLIBS)
+# -s to strip the .so 
+PKG_LIBS = -s $(SHLIB_OPENMP_CXXFLAGS) -lstdc++ $(BLAS_LIBS) $(LAPACK_LIBS) $(EXTRA_LIBS) $(FLIBS)

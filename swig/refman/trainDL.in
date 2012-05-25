@@ -6,6 +6,8 @@ begin addlast Inputs
 return_model:     
 		      if true the function will return the model
 		      as a named list ('A' = A, 'B' = B, 'iter' = n)
+[R]model:	      NULL or model (as A,B,iter) to use as initialisation
+[P]model:	      None or model (as A,B,iter) to use as initialisation
 end
 begin repl Output
 D:     double m x p matrix   (dictionary)

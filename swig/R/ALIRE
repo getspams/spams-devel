@@ -1,7 +1,14 @@
 Test sur place :
+./docmatlab2R r_spams
 ./mybuild
 export R_LIBS=`/bin/pwd`/lib
 Rscript test_spams.R
+
+Debug avec valgrind + compil avec -g
+./docmatlab2R r_spams
+./mybuild -g
+export R_LIBS=`/bin/pwd`/lib
+R -d "valgrind --tool=memcheck --log-file=log" --vanilla < test.R
 
 package:
 # fabrication de man/
@@ -17,6 +24,7 @@ R CMD INSTALL --html -l $R_LIBS pkg/spams
 
 tests : (option -D de mybuild pour avoir spams.{tst,xtst,ztst}
 ./mybuild -D
+(pour tester les nouveaux typemaps par exemple)
 
 distrib:
 ./mkdist -f /tmp

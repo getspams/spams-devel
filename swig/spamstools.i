@@ -49,11 +49,17 @@ APPLY_INPLACE_VECTOR(double)
 APPLY_INPLACE_VECTOR(int)
 APPLY_ARGOUT_VECTOR(int)
 
+%apply Matrix<bool> *INPLACE_MATRIX {
+       inplace_bool_matrices
+};
 APPLY_INPLACE_MATRIX(float)
 APPLY_INPLACE_MATRIX(double)
 APPLY_INPLACE_MATRIX(bool)
 APPLY_ARGOUT_MATRIX(double)
 
+%apply SpMatrix<bool> *INPLACE_SPMATRIX {
+       inplace_bool_spmatrices
+};
 APPLY_INPLACE_SPMATRIX(float)
 APPLY_INPLACE_SPMATRIX(double)
 APPLY_INPLACE_SPMATRIX(bool)

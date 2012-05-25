@@ -21,7 +21,8 @@ spams_wrap = Extension(
     include_dirs = incs,
     extra_compile_args = ['-fPIC', '-fopenmp', '-DUSE_BLAS_LIB'] + cc_flags,
     libraries = ['stdc++', 'blas', 'lapack', ],
-    extra_link_args = [ '-fopenmp' ] + link_flags,
+    # strip the .so
+    extra_link_args = [ '-fopenmp', '-s' ] + link_flags,
     language = 'c++',
     depends = ['spams.h'],
 )

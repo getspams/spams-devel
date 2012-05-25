@@ -98,6 +98,40 @@ sub find_pydef {
     }
     return($prog,$found);
 }
+# in : $s = string
+# out : ($prog,$found) 
+#     $prog : progname if test function def, "" else
+# $found = 0 (not a test def) / 1 (test def)
+sub find_test {
+    my ($s) = @_;
+    my $prog = "";
+    my $found = 0;
+    if($s =~ /^def\s+test_([^\s\(]+)\s*\(\)\s*:/) {
+	$prog = $1;
+	$found = 1;
+    }
+    ($prog,$found);
+}
+# detect end of function
+# in: $s = string
+# out: $found = 0 (not found) / 1 (found)
+sub find_Pyend {
+    my($s) = @_;
+    my $ret = 0;
+    
+    if($s =~ /^\w/) {
+	$ret = 1;}
+    $ret;
+}
+
+# replace Xtest in examples
+sub replace_Xtest {
+    my ($s) = @_;
+    $s =~ s/return\s*/result = /;
+    $s =~ s/Xtest1*\(.*[\'\"]spams\./spams./;
+    $s =~ s/[\'\"]\s*,loc.*$//;
+    $s;
+}
 
 my @idx = ();
 while(my ($k,$ix) = each(%progdefs)) {
@@ -105,6 +139,15 @@ while(my ($k,$ix) = each(%progdefs)) {
 }
 my @indx2 = sort {$a <=> $b} @idx;
 if($flg_out > 1) {
+    my $txt = "import spams\nimport numpy as np\n";
+    foreach my $f (@main::tests) {
+	my @lines = ();
+	my %testtbl = ();
+	$f = "test_$f.py";
+	read_test($f,0,\&find_test,\&find_Pyend,\@lines,\%testtbl);
+	write_tex_examples(0,$doc_dir,\&replace_Xtest,$txt,\%testtbl,\@lines);
+    }
+
     make_tex_doc(0,$doc_dir,\@indx2,\%iprogs,\@spams,\%progdefs);
     exit 0;
 }

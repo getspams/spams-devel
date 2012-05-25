@@ -15,7 +15,7 @@ else:
 def test_sparseProject():
     np.random.seed(0)
     X = np.asfortranarray(np.random.normal(size = (20000,100)))
-    # matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    #* matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
     param = {'numThreads' : -1, # number of processors/cores to use (-1 => all cores)
              'pos' : False,
@@ -51,7 +51,7 @@ def test_sparseProject():
     param['lambda2'] = 0.7
     param['lambda3'] = 1.0
     X = np.asfortranarray(np.random.random(size = (2000,100)))
-    # matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    #* matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
     tic = time.time()
     X1 = spams.sparseProject(X,**param)
@@ -79,7 +79,7 @@ def test_lasso():
 ##############################################
 # data generation
     X = np.asfortranarray(np.random.normal(size=(100,100000)))
-    # X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    #* X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
     D = np.asfortranarray(np.random.normal(size=(100,200)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
@@ -163,7 +163,7 @@ def test_omp():
     eps = 0.1
     numThreads = -1
     tic = time.time()
-    alpha = spams.omp(X,D,L,eps,False,numThreads)
+    alpha = spams.omp(X,D,L=L,eps= eps,return_reg_path = False,numThreads = numThreads)
     tac = time.time()
     t = tac - tic
     print "%f signals processed per second\n" %(float(X.shape[1]) / t)
@@ -174,7 +174,7 @@ def test_omp():
     D = np.asfortranarray(np.random.normal(size=(64,10)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
     L = 5
-    (alpha,path) = spams.omp(X,D,L,eps,True,numThreads)
+    (alpha,path) = spams.omp(X,D,L=L,eps= eps,return_reg_path = True,numThreads = numThreads)
     return None
 
 def test_ompMask():
@@ -193,7 +193,7 @@ def test_ompMask():
     eps = 0.1
     numThreads=-1
     tic = time.time()
-    alpha = spams.ompMask(X,D,mask,L,eps,False,numThreads)
+    alpha = spams.ompMask(X,D,mask,L = L,eps = eps,return_reg_path = False,numThreads = numThreads)
     tac = time.time()
     t = tac - tic
     print "%f signals processed per second\n" %(float(X.shape[1]) / t)

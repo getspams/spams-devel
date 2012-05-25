@@ -153,16 +153,33 @@ def lassoWeighted(X,D,W,L= -1,lambda1= None,
     return alpha
 
 
-def omp(X,D,L,eps,return_reg_path = False, numThreads = -1):
+def omp(X,D,L=None,eps= None,Lambda = None,return_reg_path = False, numThreads = -1):
     path = None
-    if str(type(L)) != "<type 'numpy.ndarray'>":
-        L = np.array([L],dtype=np.int32)
-    if str(type(eps)) != "<type 'numpy.ndarray'>":
-        eps = np.array([eps],dtype=np.float64)
-    if return_reg_path:
-        ((indptr,indices,data,shape),path) = spams_wrap.omp(X,D,0,return_reg_path,L,eps, numThreads)
+    given_L = False
+    given_eps = False
+    given_Lambda = False
+    if L == None:
+        L = np.array([0],dtype=np.int32)
     else:
-        (indptr,indices,data,shape) = spams_wrap.omp(X,D,0,return_reg_path,L,eps, numThreads)
+        given_L = True
+        if str(type(L)) != "<type 'numpy.ndarray'>":
+            L = np.array([L],dtype=np.int32)
+    if eps == None:
+        eps = np.array([0.],dtype=np.float64)
+    else:
+        given_eps = True
+        if str(type(eps)) != "<type 'numpy.ndarray'>":
+            eps = np.array([eps],dtype=np.float64)
+    if Lambda == None:
+        Lambda = np.array([0.],dtype=np.float64)
+    else:
+        given_Lambda = True
+        if str(type(Lambda)) != "<type 'numpy.ndarray'>":
+            Lambda = np.array([Lambda],dtype=np.float64)
+    if return_reg_path:
+        ((indptr,indices,data,shape),path) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
+    else:
+        (indptr,indices,data,shape) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
@@ -170,16 +187,33 @@ def omp(X,D,L,eps,return_reg_path = False, numThreads = -1):
         return alpha
 
 
-def ompMask(X,D,B,L,eps,return_reg_path = False, numThreads = -1):
+def ompMask(X,D,B,L=None,eps= None,Lambda = None,return_reg_path = False, numThreads = -1):
     path = None
-    if str(type(L)) != "<type 'numpy.ndarray'>":
-        L = np.array([L],dtype=np.int32)
-    if str(type(eps)) != "<type 'numpy.ndarray'>":
-        eps = np.array([eps],dtype=np.float64)
-    if return_reg_path:
-        ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,0,return_reg_path,L,eps, numThreads)
+    given_L = False
+    given_eps = False
+    given_Lambda = False
+    if L == None:
+        L = np.array([0],dtype=np.int32)
     else:
-        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,0,return_reg_path,L,eps, numThreads)
+        given_L = True
+        if str(type(L)) != "<type 'numpy.ndarray'>":
+            L = np.array([L],dtype=np.int32)
+    if eps == None:
+        eps = np.array([0.],dtype=np.float64)
+    else:
+        given_eps = True
+        if str(type(eps)) != "<type 'numpy.ndarray'>":
+            eps = np.array([eps],dtype=np.float64)
+    if Lambda == None:
+        Lambda = np.array([0.],dtype=np.float64)
+    else:
+        given_Lambda = True
+        if str(type(Lambda)) != "<type 'numpy.ndarray'>":
+            Lambda = np.array([Lambda],dtype=np.float64)
+    if return_reg_path:
+        ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
+    else:
+        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
@@ -200,7 +234,7 @@ def fistaFlat(
     compute_gram=False,lin_admm=False,admm=False,intercept=False,
     resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
     log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-    inner_weights=np.array([0.]),eval=False,size_group=1,sqrt_step=True,transpose=False):
+    inner_weights=np.array([0.]),size_group=1,sqrt_step=True,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ("max_it" , 1000),('L0',1.0),
 #                 ('fixed_step',False),
@@ -218,7 +252,7 @@ def fistaFlat(
 ##    params = __param_struct(paramlist,param)
 #    W = np.empty((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
     W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
-    optim_info = spams_wrap.fistaFlat(Y,X,W0,W,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,eval,size_group,sqrt_step,transpose)
+    optim_info = spams_wrap.fistaFlat(Y,X,W0,W,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
     if(return_optim_info != None):
         return(W,optim_info)
     else:
@@ -231,7 +265,7 @@ def fistaTree(
     compute_gram=False,lin_admm=False,admm=False,intercept=False,
     resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
     log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-    inner_weights=np.array([0.]),eval=False,size_group=1,sqrt_step=True,transpose=False):
+    inner_weights=np.array([0.]),size_group=1,sqrt_step=True,transpose=False):
     if(len(tree) != 4):
         raise ValueError("fistaTree : tree should be a list of 4 elements")
     eta_g = tree['eta_g']
@@ -239,7 +273,7 @@ def fistaTree(
     own_variables = tree['own_variables']
     N_own_variables = tree['N_own_variables']
     W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
-    optim_info = spams_wrap.fistaTree(Y,X,W0,W,eta_g,groups,own_variables,N_own_variables,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,eval,size_group,sqrt_step,transpose)
+    optim_info = spams_wrap.fistaTree(Y,X,W0,W,eta_g,groups,own_variables,N_own_variables,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
     if return_optim_info:
         return(W,optim_info)
     else:
@@ -350,8 +384,11 @@ def trainDL(
 
 
 def trainDL_Memory(X,D = np.array([[],[]],dtype=np.float64,order="FORTRAN"),numThreads = -1,batchsize = -1,
-                   K= -1,lambda1= None,lambda2= 10e-10,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,
-                   posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
+                   K= -1,lambda1= None,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,
+                   posD=False,expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
+    lambda2= 10e-10
+    verbose = False
+    posAlpha = False
     return __allTrainDL(X,False,None,True,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
 ###########  END dictLearn ##############

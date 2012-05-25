@@ -31,7 +31,7 @@ def test_calcXAt():
     A = ssprand(m,n,density=d,format='csc',dtype=np.float64)
     X = np.asfortranarray(np.random.normal(size = (64,n)))
 
-    # dot is very very slow betewwen a full and a sparse matrix
+    #* dot is very very slow betewwen a full and a sparse matrix
     return Xtest('np.dot(X,A.T.todense())','spams.calcXAt(X,A)',locals())
 
 def test_calcXY():
@@ -58,8 +58,8 @@ def test_bayer():
 
 def test_conjGrad():
     A = np.asfortranarray(np.random.normal(size = (5000,500)))
-#    np.random.seed(0)
-#    A = np.asfortranarray(np.random.normal(size = (10,5)))
+#*    np.random.seed(0)
+#*    A = np.asfortranarray(np.random.normal(size = (10,5)))
     A = np.asfortranarray(np.dot(A.T,A))
     b = np.ones((A.shape[1],),dtype=np.float64,order="FORTRAN")
     x0 = b
@@ -77,7 +77,7 @@ def test_conjGrad():
     tic = time.time()
     for i in xrange(0,20):
         y2 = spams.conjGrad(A,b,x0,tol,itermax)
-#        y2 = spams.conjGrad(A,b)
+#*        y2 = spams.conjGrad(A,b)
     tac = time.time()
     print "  Time (spams): ", tac - tic
     x1 = np.dot(A,y2)

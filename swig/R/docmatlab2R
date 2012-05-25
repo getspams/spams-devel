@@ -71,6 +71,14 @@ while(my ($k,$ix) = each(%progdefs)) {
 }
 my @indx = sort {$a <=> $b} @idx;
 if($flg_out > 0) {
+    my $txt = "library(spams)\n";
+    foreach my $f (@main::tests) {
+	my @lines = ();
+	my %testtbl = ();
+	$f = "test_$f.R";
+	read_test($f,1,\&find_test,\&find_Rend,\@lines,\%testtbl);
+	write_tex_examples(1,$doc_dir,\&replace_Xtest,$txt,\%testtbl,\@lines);
+    }
     make_tex_doc(1,$doc_dir,\@indx,\%iprogs,\@spams,\%progdefs);
     exit 0;
 }
@@ -112,6 +120,42 @@ sub find_Rdef {
     return($prog,$found);
 }
 
+# in : $s = string
+# out : ($prog,$found) 
+#     $prog : progname if test function def, "" else
+# $found = 0 (not a test def) / 1 (test def)
+sub find_test {
+    my ($s) = @_;
+    my $prog = "";
+    my $found = 0;
+    if($s =~ /^test_([^\s<]+)\s*<-.*\{\s*$/) {
+	$prog = $1;
+	$found = 1;
+    }
+    ($prog,$found);
+}
+# detect end of function
+# in: $s = string
+# out: $found = 0 (not found) / 1 (found)
+sub find_Rend {
+    my($s) = @_;
+    my $ret = 0;
+    if(/^\}/) { $ret = 1;}
+    $ret;
+}
+
+# replace Xtest in examples
+sub replace_Xtest {
+    my ($s) = @_;
+    $s =~ s/return\s*\(\s*(.*)\s*\)\s*$/$1/;
+    if($s =~ s/Xtest1\(\"spams\",quote\(//) {
+	$s =~ s/\)\s*,\s*[^\)]+\)\s*$//;
+    } else {
+	$s =~ s/Xtest\s*\(.*quote\s*\(\s*spams\./spams./;
+	$s =~ s/\)\)\s*$//;
+    }
+    $s;
+}
 
 # format value
 sub parse_value {

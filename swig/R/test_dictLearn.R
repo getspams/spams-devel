@@ -21,7 +21,7 @@ test_trainDL <- function() {
 
 ########## FIRST EXPERIMENT ###########
   tic = proc.time()
-  D = spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000)
+  D <- spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
@@ -118,7 +118,7 @@ test_trainDL_Memory <- function() {
 
   X = X - matrix(rep(colMeans(X),nrow(X)),nrow(X),ncol(X),byrow = T)
   X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
- ##!!   X = X[:,np.arange(0,X.shape[1],10)]
+ #*#!!   X = X[:,np.arange(0,X.shape[1],10)]
   X = X[,seq(from = 1,to = ncol(X),by = 10)]
   lambda1 = 0.15
   

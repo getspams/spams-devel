@@ -35,6 +35,13 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
 %enddef
 
 // list of arguments of type INPLACE_MATRIX
+%define inplace_bool_matrices
+	Matrix<bool> *B
+%enddef
+%define inplace_bool_spmatrices
+    SpMatrix<bool> *groups
+%enddef
+
 %define inplace_matrices(ctype)
      Matrix<ctype> *A,
      Matrix<ctype> *B,
@@ -69,6 +76,7 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
     Vector<ctype> *inner_weights,
     Vector<ctype> *L,
     Vector<ctype> *eps,
+    Vector<ctype> *Lambda,
     Vector<ctype> *eta_g,
     Vector<ctype> *own_variables,
     Vector<ctype> *N_own_variables
@@ -120,7 +128,7 @@ INSTANTIATE_DATA(invSym)
 INSTANTIATE_DATA(normalize)
 
 /**** decomp ****/
-enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, PENALTY2};
+enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, L2ERROR2, PENALTY2};
 
 INSTANTIATE_DATA(sparseProject)
 INSTANTIATE_DATA(lassoD)

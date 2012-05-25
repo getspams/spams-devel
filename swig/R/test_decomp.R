@@ -32,7 +32,7 @@ test_sparseProject <- function () {
   lambda3 = 0.7
   X = matrix(runif(2000 * 100,0,1),nrow = 2000,ncol = 100,byrow = FALSE)
   X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
- # matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+ #* matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
   tic = proc.time()
   X1 = spams.sparseProject(X,numThreads = -1, pos = FALSE,mode= 6,thrs = 2,lambda1= lambda1,lambda2= lambda2,lambda3= lambda3)
   tac = proc.time()
@@ -121,12 +121,12 @@ test_omp <- function() {
   D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
   L = 10
   eps =0.1
-#  L = as.vector(c(10),mode='integer')
-#  eps = as.vector(c(0.1),mode='double')
+#*  L = as.vector(c(10),mode='integer')
+#*  eps = as.vector(c(0.1),mode='double')
   numThreads = -1
 
   tic = proc.time()
-  alpha = spams.omp(X,D,L,eps,FALSE,numThreads)
+  alpha = spams.omp(X,D,L=L,eps=eps,return_reg_path = FALSE,numThreads = numThreads)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
@@ -138,7 +138,7 @@ test_omp <- function() {
   D = matrix(rnorm(64 * 10),nrow = 64,ncol = 10,byrow = FALSE)
   D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
   L = 5
-  res = spams.omp(X,D,L,eps,TRUE,numThreads)
+  res = spams.omp(X,D,L = L,eps = eps,return_reg_path = TRUE,numThreads = numThreads)
   alpha = res[[1]]
   path = res[[2]]
   return(NULL)
@@ -151,12 +151,12 @@ test_ompMask <- function() {
   D = matrix(rnorm(100 * 20),nrow = 100,ncol = 20,byrow = FALSE)
   D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
   mask = (X > 0) # generating a binary mask
-  L = 10
-  eps =0.1
+  L = 20
+  eps =0.01
   numThreads = -1
 
   tic = proc.time()
-  alpha = spams.ompMask(X,D,mask,L,eps,FALSE,numThreads)
+  alpha = spams.ompMask(X,D,mask,L = L,eps = eps,return_reg_path = FALSE,numThreads = numThreads)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("%f signals processed per second\n",as.double(ncol(X)) / t)

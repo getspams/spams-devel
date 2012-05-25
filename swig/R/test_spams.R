@@ -17,7 +17,7 @@ usage <- function() {
   .printf("\nUsage : %s [test-or-group-name]+\n",name)
   .printf("  Run specified test or group of tests (all by default)\n")
   .printf("  Available groups and tests are:\n")
-  for (m in names(modules)) {
+  for (m in modules) {
     .printf("%s :\n    ",m)
     s = sprintf("lst <- test_%s.tests",m)
     eval(parse(text= s))

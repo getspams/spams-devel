@@ -3,7 +3,7 @@ import numpy as np
 import sys
 
 param = {'numThreads' : -1,'verbose' : True,
-         'lambda' : 0.1 }
+         'lambda1' : 0.1 }
 m = 5;n = 10
 U = np.asfortranarray(np.random.normal(size = (m,n)))
 
@@ -12,7 +12,7 @@ print "\nprox lo"
 param['regul'] = 'l0'
 param['pos'] = False       # false by default
 param['intercept'] = False # false by default
-(alpha,X) = spams.ProximalFlat(U,param,True);
+(alpha,X) = spams.proximalFlat(U,True,**param);
 print "ALPHA %s" %str(alpha.shape)
 print "XX %s" %str(X.shape)
 ##

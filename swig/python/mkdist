@@ -45,7 +45,7 @@ cd dist
 name=spams-python
 mv $dir $name
 [ $mktar -eq 0 ] && exit 0
-tgz=$name-v2.2-svn`date +%Y-%m-%d`.tar.gz
+tgz=$name-v2.3-svn`date +%Y-%m-%d`.tar.gz
 tar zcf $tgz $name
 cp -p $tgz ../${name}_svn.tar.gz
 exit 0

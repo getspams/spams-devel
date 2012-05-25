@@ -34,6 +34,7 @@ my %undocumented = ("mult",1,"im2col_sliding",1);
     "ProximalTree", "proximalTree",
 );
 
+@main::tests = ("linalg","decomp","prox","dictLearn");
 %main::tomlab = ();
 while( my($k,$v) = each(%main::conv_names)) {
     $main::tomlab{$v} = $k;
@@ -116,6 +117,47 @@ sub read_spams {
     close(IN);
 }
 
+# read a test file
+# ignore lines starting with '#*' or '#!'
+# in : $f = file path 
+#      $r_mode = true if R
+#      $start_func = sub to find the function definition
+#      $end_func = sub to find the function end
+# out : $lines = list of file lines
+#       $table = hash by tested function name (i.e lasso)
+#               value = (i1,i2) {i1 = 1st line of function (after definition); i2 = last non empty line}
+sub read_test {
+    my($f,$r_mode,$start_func,$end_func,$lines,$table) = @_;
+    open(IN,"<$f") || die "$f open err $!\n";
+    my $i = 0;
+    my $found = 0;
+    my $prog = "";
+    my ($i1,$i2);
+    while(<IN>) {
+	chomp;
+	(/^\s*\#[\*\!]/) && next; # ignore some comment lines
+	$i++;
+	push(@$lines,$_);
+	if($found) { # we are in a function
+	    if(&$end_func($_)) {
+		$found = 0;
+		for($i2 = $i - 2;$i2 >= $i1;$i2 --) {
+		    if(! ($$lines[$i2] =~ /^\s*$/)) {last;}
+		}
+		("$prog") || die "Empty prog name!\n";
+		$$table{$prog} = [($i1,$i2)];
+	    }
+	} 
+	if(! $found) {
+	    ($prog,$found) = &$start_func("$_",$found);
+	    if($found) {
+		$i1 = $i;
+		next;
+	    }
+	}
+    }
+    close(IN);
+}
 # read a .m doc file
 # in : $f = file path
 #      $r_mode (bool) = true if R
@@ -226,7 +268,9 @@ sub get_doc {
 		    push(@$tmp,"$p1:");
 		    s/^param\.[\w]+\s*,\s*param\.[\w]+\s*/$p2: /;
 		} else {
-		    s/^param\.([^\s]+)\s/$1: /;
+		    if (! /^param\.([^\s]+)\s*=/) {
+			s/^param\.([^\s]+)\s/$1: /;
+		    }
 		}
 	    }
 	    s/param\.//g;
@@ -374,6 +418,9 @@ sub get_modifs {
 			$d = 0;
 		    }
 		    $prev_indent = $n;
+		    if($key eq "Param" && ($_ =~ /:\s*$/)) {
+			s/$/    undocumented; modify at your own risks!/;
+		    }
 		}
 		push(@$tmp,$_);
 		push(@$deltas,$d);
@@ -497,6 +544,41 @@ $main::tex_docformat = {
     'Note' => {'tag' => 'Note', 'optional' => 1},
     'Examples' => {'tag' => 'Examples', 'optional' => 1},
 };
+
+# write example files
+# in: $r_mode = 0/1 (python/R)
+#     $dir = doc dir (files written in $dir/examples
+#     $txt = text to write at begining of each file
+#     $repl_Xtest = prog to handle Xtest and Xtest1 calls
+#     $table = prog table (hash by name, value = (i1,i2) indices of 1st and last line
+#     $lines = input file lines
+sub write_tex_examples {
+    my($r_mode,$dir,$repl_Xtest,$txt,$table,$lines) = @_;
+    my $ext = $r_mode ? ".R" : ".py";
+    $dir .= "/examples";
+    (-d $dir) || mkdir $dir;
+    while (my($prog,$v) = each(%$table)) {
+	my ($i1,$i2) = @$v;
+	(($i2 - $i1) < 1) && next;  # too short : not really a test prog
+	my $s = $$lines[$i1];
+	$s =~ /^(\s*)/;
+	my $indent = $1;
+	my $f = "$dir/test_$prog$ext";
+	open(OUT,">$f") || die "Cannot ceate $f : $!\n";
+	print OUT $txt;
+	for(my $i = $i1;$i <= $i2;$i++) {
+	    $s = $$lines[$i];
+	    $s =~ s/^$indent//;
+	    if($s =~ /Xtest/) {
+		$s = &$repl_Xtest($s);
+	    } else {
+		($s =~ /^\s*return/) && next;
+	    }
+	    print OUT "$s\n";
+	}
+	close(OUT);
+    }
+}
 
 # in : $indx : array of last line of function def
 sub make_tex_doc {
@@ -628,8 +710,21 @@ sub modif_tex_src {
     open(IN,"<../../doc/doc_spams.tex") || die "Cannot read ../../doc/doc_spams.tex: $!\n";
     open(OUT,">$dir/doc_spams.tex") || die "Cannot create $dir/doc_spams.tex\n";
     my $in_install = 0;
+    my $in_hdr = 1;
+    my $lang = $r_mode ? "R" : "Python";
+    my $ext = $r_mode ? ".R" : ".py";
     while(<IN>) {
 	chomp;
+	if($in_hdr) {
+	    if(/\\lstset\{/) {
+		s/Matlab/$lang/;
+	    }
+	    if(/^\\begin\{/) {
+		$in_hdr = 0;
+	    }
+	    print OUT "$_\n";
+	    next;
+	}
 	if(/^\\section\{Installation/) {
 	    $in_install = 1;
 	    print OUT "\\section{Installation}\n";
@@ -641,25 +736,45 @@ sub modif_tex_src {
 		$in_install = 0;
 	    } else {next;}
 	}
-	if(/mex([A-Z][_A-z]+)/) {
-	    my $s = $1;
-	    my $x = $s;
-	    $x =~ s/\\_/_/;
-	    $s =~ s/\\/\\\\/;
-	    if (! defined($main::conv_names{$x}) ) {
-		print STDERR "Unkown $s\n";
-	    } else {
-		my $s1 = $main::conv_names{$x};
-		$x = $s1;
-		$s1 =~ s/_/\\_/;
-		s/mex$s/spams.$s1/g;
+	##  exemples inclusion
+	(/^The following piece of code contains usage examples/) && next;
+	if(s:^\\lstinputlisting\{\.\./test_release/test_::) {
+	    s/\.m\}.*$//;
+	    my $x = $_;
+	    (defined($main::conv_names{$x})) || next;
+	    my $s1 = $main::conv_names{$x};
+	    my $f = "test_$s1$ext";
+	    (-r "$dir/examples/$f") || next;
+	    print OUT "The following piece of code contains usage examples:\n";
+	    $_ = "\\lstinputlisting{examples/$f}";
+	} else {
+	    my $s1 = "";
+	    my $x = "";
+	    if(/mex([A-Z][_A-z]+)/) {
+		my $s = $1;
+		$x = $s;
+		$x =~ s/\\_/_/;
+		$s =~ s/\\/\\\\/;
+		if (! defined($main::conv_names{$x}) ) {
+		    print STDERR "Unkown $s\n";
+		} else {
+		    $s1 = $main::conv_names{$x};
+		    $x = $s1;
+		    $s1 =~ s/_/\\_/;
+		    s/mex$s/spams.$s1/g;
+		}
 	    }
-	    if(/verbatiminput/) {
-	      s|../src_release/spams\.(.*)\.m|functions/$1.in|;
-	      s/\\_/_/;
-	      if (! -r "$dir/functions/$x.in") {
-		  $_ = "\\verbatiminput{functions/missing.in}";
-	      }
+	    if(s:^\\lstinputlisting\{\.\./src_release/::) {
+		if(! "$s1") {
+		    s/\.m\}\s*$//;
+		    $s1 = $_;
+		    $x = $s1;
+		}
+		if (! -r "$dir/functions/$x.in") {
+		    $_ = "\\lstinputlisting{functions/missing.in}";
+		} else {
+		    $_ = "\\lstinputlisting{functions/$x.in}";
+		}
 	    }
 	}
 	print OUT "$_\n";

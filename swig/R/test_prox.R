@@ -14,7 +14,7 @@ test_fistaFlat <- function() {
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.05, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'l1')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
-  ## optim_info = vecteur colonne de 4 lignes
+  #*# optim_info = vecteur colonne de 4 lignes
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
  ###
 
@@ -97,7 +97,7 @@ test_fistaFlat <- function() {
 # Classification
     
   .printf("\nOne classification experiment\n")
-#    Y = 2 * double(randn(100,1) > 0)-1
+#*    Y = 2 * double(randn(100,1) > 0)-1
   Y = matrix(2. * as.double(rnorm(100) > 0.) - 1.,nrow = 100,ncol = 1,byrow = FALSE)
   .printf("\nFISTA + Logistic l1\n")
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'logistic',regul = 'l1',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
@@ -113,14 +113,14 @@ test_fistaFlat <- function() {
 #!    pause
     
   .printf("\nFISTA + Logistic l1 + sparse matrix\n")
-  res = Xtest1('spams',quote(spams.fistaFlat(Y,as(X,'CsparseMatrix'),W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'weighted-logistic',regul = 'l1',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
+  res = Xtest1('spams',quote(spams.fistaFlat(Y,as(X,'CsparseMatrix'),W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'logistic',regul = 'l1',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
 # can be used of course with other regularization functions, intercept,...
 
 # Multi-Class classification
-#    Y = double(ceil(5*rand(100,1000))-1)
+#*    Y = double(ceil(5*rand(100,1000))-1)
   Y = ceiling(5 * matrix(runif(100 * 1000,0,1),nrow = 100,ncol = 1000,byrow = FALSE)) - 1
   .printf("\nFISTA + Multi-Class Logistic l1\n")
   nclasses = max(Y) + 1
@@ -140,7 +140,7 @@ test_fistaFlat <- function() {
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'square',regul = 'l1l2',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
-  ## optim_info = vecteur colonne de 4 lignes
+  #*# optim_info = vecteur colonne de 4 lignes
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
   
   .printf("\nFISTA + Regression l1linf\n")
@@ -171,7 +171,7 @@ test_fistaFlat <- function() {
  # Multi-Task Classification
     
   .printf("\nFISTA + Logistic + l1l2\n")
-#    Y = 2*double(randn(100,100) > 0)-1
+#*    Y = 2*double(randn(100,100) > 0)-1
   Y = matrix(2. * as.double(rnorm(100 * 100) > 1.) - 1.,nrow = 100,ncol = 100,byrow = FALSE)
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'logistic',regul = 'l1l2',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
   W = res[[1]]
@@ -180,12 +180,12 @@ test_fistaFlat <- function() {
 # Multi-Class + Multi-Task Regularization
   
   .printf("\nFISTA + Multi-Class Logistic l1l2\n")
-#    Y = double(ceil(5*rand(100,1000))-1)
+#*    Y = double(ceil(5*rand(100,1000))-1)
   Y = ceiling(5 * matrix(runif(100 * 1000,0,1),nrow = 100,ncol = 1000,byrow = FALSE)) - 1
   Y = spams.normalize(Y)
   nclasses = max(Y) + 1
   W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
-  res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'l1l2',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
+  res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.01, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'l1l2',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
@@ -224,26 +224,26 @@ test_fistaTree <- function() {
   tree = list('eta_g'= eta_g,'groups' = groups,'own_variables' = own_variables,
             'N_own_variables' = N_own_variables)
   .printf('\nVarious regression experiments\n')
-  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l2')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l2')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
  ###
   .printf('\nFISTA + Regression tree-linf\n')
-  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-linf')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-linf')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
 ###
 # works also with non tree-structured regularization. tree is ignored
   .printf('\nFISTA + Regression Fused-Lasso\n')
-   res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'fused-lasso')),n = 1)
+   res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'fused-lasso')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
  ###
   .printf('\nISTA + Regression tree-l0\n')
-   res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l0')),n = 1)
+   res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l0')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
@@ -251,7 +251,7 @@ test_fistaTree <- function() {
   .printf('\nFISTA + Regression tree-l2 with intercept\n')
   x1 = cbind(X,matrix(1,nrow = nrow(X),ncol = 1))
   W01 = rbind(W0,matrix(0,nrow = 1, ncol = ncol(W0)))
-  res = Xtest1('spams',quote(spams.fistaTree(Y,x1,W01,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = TRUE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l2')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,x1,W01,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = TRUE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'tree-l2')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
@@ -261,7 +261,7 @@ test_fistaTree <- function() {
   .printf('\nOne classification experiment')
   Y = matrix(2. * as.double(rnorm(100 * ncol(Y)) > 0.) - 1.,nrow = 100,ncol = ncol(Y),byrow = FALSE)
   .printf('\nFISTA + Logistic + tree-linf\n')
-  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'logistic',regul = 'tree-linf')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'logistic',regul = 'tree-linf')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
@@ -273,7 +273,7 @@ test_fistaTree <- function() {
   .printf('\nFISTA + Multi-Class Logistic + tree-l2\n')
   nclasses = max(Y) + 1
   W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
-  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'multi-logistic',regul = 'tree-l2')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'multi-logistic',regul = 'tree-l2')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
@@ -285,7 +285,7 @@ test_fistaTree <- function() {
   Y = spams.normalize(Y)
   W0 = matrix(c(0),nrow = ncol(X), ncol = ncol(Y))
   .printf('\nFISTA + Regression  multi-task-tree\n')
-  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'square',regul = 'multi-task-tree')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'square',regul = 'multi-task-tree')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
@@ -293,7 +293,7 @@ test_fistaTree <- function() {
 # Multi-Task Classification
   .printf('\nFISTA + Logistic + multi-task-tree\n')
   Y = matrix(rnorm(100 * ncol(Y)),nrow = 100,ncol = ncol(Y),byrow = FALSE)
-  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'logistic',regul = 'multi-task-tree')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'logistic',regul = 'multi-task-tree')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
@@ -303,7 +303,7 @@ test_fistaTree <- function() {
   Y = ceiling(5 * matrix(runif(100 * ncol(Y),0,1),nrow = 100,ncol = ncol(Y),byrow = FALSE)) - 1
   nclasses = max(Y) + 1
   W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
-  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'multi-task-tree')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,X,W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'multi-task-tree')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
@@ -312,7 +312,7 @@ test_fistaTree <- function() {
   .printf('\nFISTA + Multi-Class Logistic +multi-task-tree + sparse matrix\n')
   nclasses = max(Y) + 1
   W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
-  res = Xtest1('spams',quote(spams.fistaTree(Y,as(X,'CsparseMatrix'),W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'multi-task-tree')),n = 1)
+  res = Xtest1('spams',quote(spams.fistaTree(Y,as(X,'CsparseMatrix'),W0,tree,TRUE,numThreads = 1,verbose = FALSE,lambda1 = 0.001,lambda2 = 0.001,lambda3 = 0.001, it0 = 10, max_it = 200,L0 = 0.1, tol = 1e-5, intercept = FALSE,pos = FALSE,compute_gram = FALSE, loss = 'multi-logistic',regul = 'multi-task-tree')),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])

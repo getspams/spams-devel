@@ -1,10 +1,10 @@
 This directory contains files to build the python interfaces
-to the functions of SPAMS library already interfaced with matlab.
+to the functions of V2.3 SPAMS library already interfaced with matlab.
 
 The interface consists of 4 files : spams.py myscipy_rand.py spams_wrap.py _spams_wrap.so
 Note: myscipy_rand.py supplies a random generator for sparse matrix
       for some old scipy distributions
-
+WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
 ----------------------------------
 Interface building :
 tar zxf spams-python.tar.gz
@@ -26,8 +26,8 @@ python test_spams.py name1 name2 ... : run named tests
 Warning : for now the python interface is only available for a subset of the functions
 	described in the documentation of SPAMS.
 toolbox linalg : all functions
-toolbox decomp : spams.SparseProject spams.Lasso 
-toolbox prox : spams.FistaFlat spams.ProximalFlat
+toolbox decomp : spams.sparseProject spams.lasso spams.lassoMask spams.lassoWeighted spams.omp spams.ompMask
+toolbox prox : spams.fistaFlat spams.fistaTree spams.proximalFlat spams.proximalTree
 toolbox dictLearn : spams.TrainDL spams.TrainDL_Memory
 
 ----------------------------------------

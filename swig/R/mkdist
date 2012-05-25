@@ -62,7 +62,7 @@ if [ $mktar -eq 0 ]; then
     exit 0
 fi
 cd $wdir
-tgz=$pkg-v2.2-svn`date +%Y-%m-%d`.tar.gz
+tgz=$pkg-v2.3-svn`date +%Y-%m-%d`.tar.gz
 tar zcf $tgz $pkg
 cp -p $tgz ../${pkg}_svn.tar.gz
 exit 0

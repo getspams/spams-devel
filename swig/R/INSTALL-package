@@ -1,3 +1,9 @@
+This directory contains files to build the R interfaces
+to the functions of V2.3 SPAMS library already interfaced with matlab.
+
+WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
+
+-------------------------------------------------
 tar zxf spams-R.tar.gz
 cd spams-R
 # rlib=install-directory
@@ -21,8 +27,8 @@ Rscript test_spams.R
 Warning : for now the R interface is only available for a subset of the functions
 	described in the documentation of SPAMS.
 toolbox linalg : all functions
-toolbox decomp : spams.SparseProject spams.Lasso 
-toolbox prox : spams.FistaFlat spams.ProximalFlat
+toolbox decomp : spams.sparseProject spams.lasso spams.lassoMask spams.lassoWeighted spams.omp spams.ompMask
+toolbox prox : spams.fistaFlat spams.fistaTree spams.proximalFlat spams.proximalTree
 toolbox dictLearn : spams.TrainDL spams.TrainDL_Memory
 
 # Notes:

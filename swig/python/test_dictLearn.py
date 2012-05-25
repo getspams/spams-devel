@@ -62,7 +62,7 @@ def test_trainDL():
     alpha = spams.lasso(X,D = D,**lparam)
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
-    # display ????
+    #* display ????
 
     print "objective function: %f" %R
 
@@ -117,7 +117,7 @@ def test_trainDL():
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
 
-    # DISPLAY
+    #* DISPLAY
     print '*********** FOURTH EXPERIMENT ***********'
     param['modeParam'] = 0
     param['iter'] = 1000
@@ -177,7 +177,7 @@ def test_trainDL_Memory():
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
-    ## ? DISPLAY
+    #* ? DISPLAY
 
     ############# SECOND EXPERIMENT  ##################
     tic = time.time()
@@ -191,7 +191,7 @@ def test_trainDL_Memory():
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
 
-    ## ? DISPLAY
+    #* ? DISPLAY
 
     return None
 

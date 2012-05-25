@@ -60,7 +60,6 @@ test_conjGrad <- function () {
   }
   y2 = CGtest("R",quote(solve(A,b)))
   y1 = CGtest("spams",quote(spams.conjGrad(A,b,x0,tol,itermax)))
-  ## y1 = CGtest("spams",quote(spams.conjGrad(A,b)))
   return(max(abs(y1 - y2)))
 }
 

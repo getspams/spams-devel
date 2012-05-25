@@ -8,7 +8,7 @@ import time
 from test_utils import *
 
 def test_fistaFlat():
-    param = {'numThreads' : 1,'verbose' : False,
+    param = {'numThreads' : 1,'verbose' : True,
              'lambda1' : 0.05, 'it0' : 10, 'max_it' : 200,
              'L0' : 0.1, 'tol' : 1e-3, 'intercept' : False,
              'pos' : False}
@@ -25,7 +25,6 @@ def test_fistaFlat():
     # 100 regression problems with the same design matrix X.
     print '\nVarious regression experiments'
     param['compute_gram'] = True
-    param['verbose'] = True
     print '\nFISTA + Regression l1'
     param['loss'] = 'square'
     param['regul'] = 'l1'
@@ -125,7 +124,7 @@ def test_fistaFlat():
 # Classification
     
     print '\nOne classification experiment'
-#    Y = 2 * double(randn(100,1) > 0)-1
+#*    Y = 2 * double(randn(100,1) > 0)-1
     Y = np.asfortranarray(2 * np.asarray(np.random.normal(size = (100,1)) > 0,dtype='float64') - 1)
     print '\nFISTA + Logistic l1'
     param['regul'] = 'l1'
@@ -145,13 +144,13 @@ def test_fistaFlat():
     
 
     print '\nFISTA + Logistic l1 + sparse matrix'
+    param['loss'] = 'logistic'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,ssp.csc_matrix(X),W0,True,**param)',locals())
     print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:]))
 # can be used of course with other regularization functions, intercept,...
     
 
 # Multi-Class classification
-#    Y = double(ceil(5*rand(100,1000))-1)
     Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,1000))) - 1)
     param['loss'] = 'multi-logistic'
     print '\nFISTA + Multi-Class Logistic l1'
@@ -168,7 +167,6 @@ def test_fistaFlat():
     Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)))
     Y = spams.normalize(Y)
     param['compute_gram'] = False
-    param['verbose'] = True;   # verbosity, False by default
     W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="FORTRAN")
     param['loss'] = 'square'
     print '\nFISTA + Regression l1l2 '
@@ -207,16 +205,15 @@ def test_fistaFlat():
     print '\nFISTA + Logistic + l1l2 '
     param['regul'] = 'l1l2'
     param['loss'] = 'logistic'
-#    Y = 2*double(randn(100,100) > 0)-1
+#*    Y = 2*double(randn(100,100) > 0)-1
     Y = np.asfortranarray(2 * np.asarray(np.random.normal(size = (100,100)) > 1,dtype='float64') - 1)
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:]))
 # Multi-Class + Multi-Task Regularization
     
     
-    param['verbose'] = False
     print '\nFISTA + Multi-Class Logistic l1l2 '
-#    Y = double(ceil(5*rand(100,1000))-1)
+#*    Y = double(ceil(5*rand(100,1000))-1)
     Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,1000))) - 1)
     Y = spams.normalize(Y)
     param['loss'] = 'multi-logistic'

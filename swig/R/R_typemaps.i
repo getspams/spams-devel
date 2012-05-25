@@ -113,13 +113,35 @@ SEXP appendOutput(SEXP value,SEXP result) {
     if (TYPEOF(rmat) != R_TYPE || LENGTH(dims) != 2)	
     {	
         /*SG_ERROR("Expected Double Vector as argument %d\n", m_rhs_counter);*/
-        myerr("Expected Double dense matrix as argument %d",$argnum);
+        myerr("Expected DATA_TYPE dense matrix as argument %d",$argnum);
     }
     $1 = new Matrix<DATA_TYPE> ((DATA_TYPE *)R_CAST(rmat),Rf_nrows(rmat),Rf_ncols(rmat));
 
 %enddef /* map_matrix */
 
 /* full matrix input/output */
+%typemap(in) (Matrix<bool> *INPLACE_MATRIX)
+{
+     SEXP rmat=$input;
+     SEXP dims = Rf_getAttrib(rmat,Rf_install("dim"));
+    if (TYPEOF(rmat) != LGLSXP || LENGTH(dims) != 2)	
+    {	
+        /*SG_ERROR("Expected Double Vector as argument %d\n", m_rhs_counter);*/
+        myerr("Expected bool dense matrix as argument %d",$argnum);
+    }
+      	 $1 = new Matrix<bool> (Rf_nrows(rmat),Rf_ncols(rmat));
+	 int *pi = (int *)LOGICAL(rmat);
+	 bool *po = $1->rawX();
+	 for(int i =0;i < Rf_nrows(rmat) * Rf_ncols(rmat);i++)
+	 	*po++ = (bool) *pi++;
+         
+}
+%typemap(freearg)
+  (Matrix<bool> *INPLACE_MATRIX)
+{
+	delete arg$argnum;
+}
+
 %define %matrix_typemaps(R_TYPE,R_CAST,DATA_TYPE)
 %typecheck(SWIG_TYPECHECK_DOUBLE_ARRAY)
            (Matrix<DATA_TYPE> *INPLACE_MATRIX)
@@ -217,6 +239,37 @@ SEXP appendOutput(SEXP value,SEXP result) {
      $1 = new SpMatrix<DATA_TYPE> ((DATA_TYPE *)R_CAST(xvec),INTEGER(ivec),pB,pE,idims[0],idims[1],LENGTH(xvec));
 	
 %enddef /* map_sparse */
+
+/* special case for type bool (32bits in R , 8 bits in C++) */
+%typemap(in) (SpMatrix<bool> *INPLACE_SPMATRIX)
+{
+     SEXP spmat=$input;
+     SEXP ivec = Rf_getAttrib(spmat,Rf_install("i"));
+     SEXP pvec = Rf_getAttrib(spmat,Rf_install("p"));
+     SEXP xvec = Rf_getAttrib(spmat,Rf_install("x"));
+     SEXP dims = Rf_getAttrib(spmat,Rf_install("Dim"));
+
+     if (TYPEOF(xvec) != LGLSXP || LENGTH(dims) != 2)	
+    {	
+        myerr("Expected bool sparse matrix as argument %d",$argnum);
+    }
+    int nzmax = LENGTH(xvec);
+     $1 = new SpMatrix<bool> (idims[0],idims[1],nzmax);
+     int *pB = INTEGER(pvec);
+     int *pE = pB + 1;
+     int *idims = INTEGER(dims);
+     int *pi = (int *)LOGICAL(xvec);
+     memcpy($1->pB(),INTEGER(ivec),(idims[1] + 1) * sizeof(int));
+     memcpy($1->r(),INTEGER(pvec),nzmax * sizeof(int));
+     bool *po = $1->v();
+     for(int i =0;i < nzmax;i++)
+	*po++ = (bool) *pi++;
+}
+%typemap(freearg)
+  (SpMatrix<bool> *INPLACE_SPMATRIX)
+{
+	delete arg$argnum;
+}
 
 %define %spmatrix_typemaps(R_TYPE,R_CAST,DATA_TYPE)
 %typecheck(SWIG_TYPECHECK_DOUBLE_ARRAY,
@@ -336,7 +389,7 @@ SEXP appendOutput(SEXP value,SEXP result) {
 
 %matrix_typemaps(REALSXP,REAL,float)
 %matrix_typemaps(REALSXP,REAL,double)
-%matrix_typemaps(LGLSXP,LOGICAL,bool)
+#%matrix_typemaps(LGLSXP,LOGICAL,bool)
 
 %spmatrix_typemaps(REALSXP,REAL,float)
 %spmatrix_typemaps(REALSXP,REAL,double)
