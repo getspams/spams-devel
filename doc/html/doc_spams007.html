@@ -68,7 +68,6 @@ end<BR>
 t=toc;<BR>
 fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
 <BR>
-<BR>
 <FONT COLOR="blue"><B>tic<BR>
 for</B></FONT> ii = 1:20<BR>
 x2 = pcg(A,b);<BR>
@@ -110,7 +109,6 @@ end<BR>
 t=toc;<BR>
 fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
 <BR>
-<BR>
 <FONT COLOR="blue"><B>tic<BR>
 for</B></FONT> ii = 1:20<BR>
 x2 = pcg(A,b);<BR>
@@ -136,16 +134,12 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 % Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-A=sprand(200,200000,0.05);<BR>
-<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">A=sprand(200,200000,0.05);<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 AAt=mexCalcAAt(A);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mex-file time: %fs\n'</FONT>,t);<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 AAt2=A*A<FONT COLOR="red">';<BR>
@@ -172,17 +166,13 @@ For an input sparse matrix <I><B>A</B></I> and a matrix <I><B>X</B></I>, this fu
 % Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200000);<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200000);<BR>
 A=sprand(200,200000,0.05);<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 XAt=mexCalcXAt(X,A);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mex-file time: %fs\n'</FONT>,t);<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 XAt2=X*A<FONT COLOR="red">';<BR>
@@ -207,17 +197,13 @@ For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function return
 % Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200);<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200);<BR>
 Y=<FONT COLOR="blue"><B>randn</B></FONT>(200,20000);<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 XY=mexCalcXY(X,Y);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mex-file time: %fs\n'</FONT>,t);<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 XY2=X*Y;<BR>
@@ -242,11 +228,8 @@ For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function return
 % Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200);<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200);<BR>
 Y=<FONT COLOR="blue"><B>randn</B></FONT>(200,20000)<FONT COLOR="red">';<BR>
-<BR>
 <BR>
 tic<BR>
 XYt=mexCalcXYt(X,Y);<BR>
@@ -277,17 +260,13 @@ For two input matrices <I><B>X</B></I> and <I><B>Y</B></I>, this function return
 % Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200)<FONT COLOR="red">';<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">X=<FONT COLOR="blue"><B>randn</B></FONT>(64,200)<FONT COLOR="red">';<BR>
 Y=randn(200,20000);<BR>
-<BR>
 <BR>
 tic<BR>
 XtY=mexCalcXtY(X,Y);<BR>
 t=toc;<BR>
 fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 XtY2=X<FONT COLOR="red">'*Y;<BR>
@@ -311,17 +290,13 @@ For an input symmetric matrices <I><B>A</B></I> in ℝ<SUP><I>n</I> × <I>n</I><
 % Author: Julien Mairal, 2009</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-A=<FONT COLOR="blue"><B>rand</B></FONT>(1000,1000);<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">A=<FONT COLOR="blue"><B>rand</B></FONT>(1000,1000);<BR>
 A=A<FONT COLOR="red">'*A;<BR>
-<BR>
 <BR>
 tic<BR>
 B=mexInvSym(A);<BR>
 t=toc;<BR>
 fprintf('</FONT>mex-file time: <FONT COLOR="#007F00">%fs\n',t);</FONT><BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 B2=<FONT COLOR="blue"><B>inv</B></FONT>(A);<BR>
@@ -344,10 +319,7 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 % Author: Julien Mairal, 2010</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-X=<FONT COLOR="blue"><B>rand</B></FONT>(100,1000);<BR>
-<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">X=<FONT COLOR="blue"><B>rand</B></FONT>(100,1000);<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 Y=mexNormalize(X);<BR>
@@ -366,10 +338,7 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;</TD></TR>
 % Author: Julien Mairal, 2010</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-<BR>
-X=<FONT COLOR="blue"><B>rand</B></FONT>(1,300000);<BR>
-<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">X=<FONT COLOR="blue"><B>rand</B></FONT>(1,300000);<BR>
 <BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 Y=mexSort(X);<BR>

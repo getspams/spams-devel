@@ -249,7 +249,6 @@ param.L=20; <FONT COLOR="#007F00">% not more than 20 non-zeros coefficien
 param.<FONT COLOR="blue"><B>eps</B></FONT>=0.01; <FONT COLOR="#007F00">%</FONT><BR>
 param.numThreads=-1; <FONT COLOR="#007F00">% number of processors/cores to use; the default choice is -1</FONT><BR>
                      <FONT COLOR="#007F00">% and uses all the cores of the machine</FONT><BR>
-<BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 alpha=mexOMPMask(X,D,mask,param);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
@@ -361,7 +360,6 @@ The following piece of code contains usage examples:
 <BR>
 <FONT COLOR="blue"><B>randn</B></FONT>(<FONT COLOR="red">'seed'</FONT>,0);<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'test mexLasso\n'</FONT>);<BR>
-<BR>
 <FONT COLOR="#007F00">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<BR>
 % Decomposition of a large number of signals<BR>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<BR>
@@ -381,7 +379,6 @@ param.mode=2;        <FONT COLOR="#007F00">% penalized formulation</FO
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 alpha=mexLasso(X,D,param);<BR>
 t=<FONT COLOR="blue"><B>toc<BR>
-<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'%f signals processed per second\n'</FONT>,<FONT COLOR="blue"><B>size</B></FONT>(X,2)/t);<BR>
 <BR>
 <FONT COLOR="#007F00">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<BR>
@@ -697,7 +694,6 @@ E=<FONT COLOR="blue"><B>mean</B></FONT>(0.5*<FONT COLOR="blue"><B>sum</B></FONT>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'%f signals processed per second for LARS\n'</FONT>,<FONT COLOR="blue"><B>size</B></FONT>(X,2)/t);<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Objective function for LARS: %g\n'</FONT>,E);<BR>
 <BR>
-<BR>
 param.tol=0.001;<BR>
 param.itermax=1000;<BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
@@ -871,7 +867,6 @@ The following piece of code contains usage examples:
 <FONT COLOR="blue"><B>randn</B></FONT>(<FONT COLOR="red">'seed'</FONT>,0);<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'test mexL1L2BCD\n'</FONT>);<BR>
-<BR>
 <FONT COLOR="#007F00">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%<BR>
 % Decomposition of a large number of groups <BR>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</FONT><BR>
@@ -1038,7 +1033,6 @@ fprintf</B></FONT>(<FONT COLOR="red">'%f signals of size %d projected per�
 constraints=0.5*param.lambda3*<FONT COLOR="blue"><B>sum</B></FONT>(X1.^2)+param.lambda1*<FONT COLOR="blue"><B>sum</B></FONT>(<FONT COLOR="blue"><B>abs</B></FONT>(X1))+param.lambda2*<FONT COLOR="blue"><B>sum</B></FONT>(<FONT COLOR="blue"><B>abs</B></FONT>(X1(2:<FONT COLOR="blue"><B>end</B></FONT>,:)-X1(1:<FONT COLOR="blue"><B>end</B></FONT>-1,:)));<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Checking constraint: %f, %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(constraints),<FONT COLOR="blue"><B>max</B></FONT>(constraints));<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Projection is approximate (stops at a kink)\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(constraints),<FONT COLOR="blue"><B>max</B></FONT>(constraints));<BR>
-<BR>
 <BR>
 param.mode=6;       <FONT COLOR="#007F00">% projection on the FLSA</FONT><BR>
 param.lambda1=0.7;<BR>

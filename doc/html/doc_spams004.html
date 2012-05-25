@@ -177,14 +177,12 @@ X=im2col(I,[8 8],<FONT COLOR="red">'sliding'</FONT>);<BR>
 X=X-repmat(<FONT COLOR="blue"><B>mean</B></FONT>(X),[<FONT COLOR="blue"><B>size</B></FONT>(X,1) 1]);<BR>
 X=X ./ repmat(<FONT COLOR="blue"><B>sqrt</B></FONT>(<FONT COLOR="blue"><B>sum</B></FONT>(X.^2)),[<FONT COLOR="blue"><B>size</B></FONT>(X,1) 1]);<BR>
 <BR>
-<BR>
 param.K=100;  <FONT COLOR="#007F00">% learns a dictionary with 100 elements</FONT><BR>
 param.lambda=0.15;<BR>
 param.numThreads=4; <FONT COLOR="#007F00">% number of threads</FONT><BR>
 param.batchsize=400;<BR>
 <BR>
 param.iter=1000;  <FONT COLOR="#007F00">% let us see what happens after 1000 iterations.<BR>
-<BR>
 <BR>
 %%%%%%%%%% FIRST EXPERIMENT %%%%%%%%%%%</FONT><BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
@@ -203,7 +201,6 @@ ImD=displayPatches(D);<BR>
 <FONT COLOR="blue"><B>drawnow</B></FONT>;<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'*********** SECOND EXPERIMENT ***********\n'</FONT>);<BR>
-<BR>
 <FONT COLOR="#007F00">%%%%%%%%%% SECOND EXPERIMENT %%%%%%%%%%%<BR>
 % Train on half of the training set, then retrain on the second part</FONT><BR>
 X1=X(:,1:<FONT COLOR="blue"><B>floor</B></FONT>(<FONT COLOR="blue"><B>size</B></FONT>(X,2)/2));<BR>
@@ -230,9 +227,7 @@ alpha=mexLasso(X,D,param);<BR>
 R=<FONT COLOR="blue"><B>mean</B></FONT>(0.5*<FONT COLOR="blue"><B>sum</B></FONT>((X-D*alpha).^2)+param.lambda*<FONT COLOR="blue"><B>sum</B></FONT>(<FONT COLOR="blue"><B>abs</B></FONT>(alpha)));<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'objective function: %f\n'</FONT>,R);<BR>
 <BR>
-<FONT COLOR="#007F00">%%%%%%%% FOURTH EXPERIMENT %%%%%%%%%%%%%%%%%%%%%%<BR>
-% let us add sparsity to the dictionary itself</FONT><BR>
-<BR>
+<FONT COLOR="#007F00">% let us add sparsity to the dictionary itself</FONT><BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'*********** THIRD EXPERIMENT ***********\n'</FONT>);<BR>
 param.modeParam=0;<BR>
 param.iter=1000;<BR>
@@ -251,7 +246,6 @@ subplot</B></FONT>(1,3,2);<BR>
 ImD=displayPatches(D);<BR>
 <FONT COLOR="blue"><B>imagesc</B></FONT>(ImD); <FONT COLOR="blue"><B>colormap</B></FONT>(<FONT COLOR="red">'gray'</FONT>);<BR>
 <FONT COLOR="blue"><B>drawnow</B></FONT>;<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'*********** FOURTH EXPERIMENT ***********\n'</FONT>);<BR>
 param.modeParam=0;<BR>
@@ -380,13 +374,11 @@ X=X-repmat(<FONT COLOR="blue"><B>mean</B></FONT>(X),[<FONT COLOR="blue"><B>size<
 X=X ./ repmat(<FONT COLOR="blue"><B>sqrt</B></FONT>(<FONT COLOR="blue"><B>sum</B></FONT>(X.^2)),[<FONT COLOR="blue"><B>size</B></FONT>(X,1) 1]);<BR>
 X=X(:,1:10:<FONT COLOR="blue"><B>end</B></FONT>);<BR>
 <BR>
-<BR>
 param.K=200;  <FONT COLOR="#007F00">% learns a dictionary with 100 elements</FONT><BR>
 param.lambda=0.15;<BR>
 param.numThreads=4; <FONT COLOR="#007F00">% number of threads</FONT><BR>
 <BR>
 param.iter=100;  <FONT COLOR="#007F00">% let us see what happens after 100 iterations.<BR>
-<BR>
 <BR>
 %%%%%%%%%% FIRST EXPERIMENT %%%%%%%%%%%</FONT><BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
@@ -507,13 +499,11 @@ X=im2col(I,[16 16],<FONT COLOR="red">'sliding'</FONT>);<BR>
 X=X(:,1:10:<FONT COLOR="blue"><B>end</B></FONT>);<BR>
 X=X ./ repmat(<FONT COLOR="blue"><B>sqrt</B></FONT>(<FONT COLOR="blue"><B>sum</B></FONT>(X.^2)),[<FONT COLOR="blue"><B>size</B></FONT>(X,1) 1]);<BR>
 <BR>
-<BR>
 param.K=49;  <FONT COLOR="#007F00">% learns a dictionary with 100 elements</FONT><BR>
 param.lambda=0.15;<BR>
 param.numThreads=4; <FONT COLOR="#007F00">% number of threads</FONT><BR>
 <BR>
 param.iter=-5;  <FONT COLOR="#007F00">% let us see what happens after 100 iterations.<BR>
-<BR>
 <BR>
 %%%%%%%%%% FIRST EXPERIMENT %%%%%%%%%%%</FONT><BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>

@@ -413,13 +413,11 @@ where <I><B>V</B><SUP>j</SUP></I> is the <I>j</I>-th column of <I><B>V</B></I>.<
 % Author: Julien Mairal, 2010</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-U=<FONT COLOR="blue"><B>randn</B></FONT>(100,1000);<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">U=<FONT COLOR="blue"><B>randn</B></FONT>(100,1000);<BR>
 <BR>
 param.lambda=0.1; <FONT COLOR="#007F00">% regularization parameter</FONT><BR>
 param.num_threads=-1; <FONT COLOR="#007F00">% all cores (-1 by default)</FONT><BR>
 param.verbose=true;   <FONT COLOR="#007F00">% verbosity, false by default<BR>
-<BR>
 <BR>
 % test l0</FONT><BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nprox l0\n'</FONT>);<BR>
@@ -661,8 +659,7 @@ which is a formulation presented in [<A HREF="doc_spams009.html#mairal10">21</A>
 % Author: Julien Mairal, 2010</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-U=<FONT COLOR="blue"><B>randn</B></FONT>(10,1000);<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">U=<FONT COLOR="blue"><B>randn</B></FONT>(10,1000);<BR>
 <BR>
 param.lambda=0.1; <FONT COLOR="#007F00">% regularization parameter</FONT><BR>
 param.num_threads=-1; <FONT COLOR="#007F00">% all cores (-1 by default)</FONT><BR>
@@ -699,7 +696,6 @@ alpha=mexProximalTree(U,tree,param);<BR>
 param.regul=<FONT COLOR="red">'tree-linf'</FONT>;<BR>
 alpha=mexProximalTree(U,tree,param);<BR>
 <BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Second tree example\n'</FONT>);<BR>
 <FONT COLOR="#007F00">% Example 2 of tree structure<BR>
 % tree structured groups:<BR>
@@ -734,8 +730,6 @@ alpha=mexProximalTree(U,tree,param);<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\ntest prox tree-linf\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'tree-linf'</FONT>;<BR>
 alpha=mexProximalTree(U,tree,param);<BR>
-<BR>
-<BR>
 <BR>
 <FONT COLOR="#007F00">% mexProximalTree also works with non-tree-structured regularization functions</FONT><BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nprox l1, intercept, positivity constraint\n'</FONT>);<BR>
@@ -863,8 +857,7 @@ This function can also be used for computing the proximal operators addressed by
 % Author: Julien Mairal, 2010</FONT></TD></TR>
 </TABLE><P>
 The following piece of code contains usage examples:
-</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting"><BR>
-U=<FONT COLOR="blue"><B>randn</B></FONT>(10,1000);<BR>
+</P><TABLE CLASS="lstframe" STYLE="padding:1ex;background-color:#E5EDFF;"><TR><TD CLASS="mouselstlisting">U=<FONT COLOR="blue"><B>randn</B></FONT>(10,1000);<BR>
 <BR>
 param.lambda=0.1; <FONT COLOR="#007F00">% regularization parameter</FONT><BR>
 param.num_threads=-1; <FONT COLOR="#007F00">% all cores (-1 by default)</FONT><BR>
@@ -924,12 +917,10 @@ graph.groups_var=<FONT COLOR="blue"><B>sparse</B></FONT>([1 0 0 0 0;<BR>
 param.regul=<FONT COLOR="red">'graph'</FONT>;<BR>
 alpha=mexProximalGraph(U,graph,param);<BR>
 <BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\ntest prox multi-task-graph\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'multi-task-graph'</FONT>;<BR>
 param.lambda2=0.1;<BR>
 alpha=mexProximalGraph(U,graph,param);<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\ntest no regularization\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'none'</FONT>;<BR>
@@ -1336,8 +1327,6 @@ see usage details below:
 %            param.lambda2 (optional, regularization parameter, 0 by default)<BR>
 %            param.lambda3 (optional, regularization parameter, 0 by default)<BR>
 %            param.verbose (optional, verbosity level, false by default)<BR>
-%            param.intercept (optional, last row of U is not regularized,<BR>
-%                false by default)<BR>
 %            param.pos (optional, adds positivity constraints on the<BR>
 %                coefficients, false by default)<BR>
 %            param.transpose (optional, transpose the matrix in the regularization function)<BR>
@@ -1468,8 +1457,6 @@ param.size_group=5;<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
-<BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Regression Fused-Lasso\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'fused-lasso'</FONT>;<BR>
 param.lambda2=0.1;<BR>
@@ -1485,7 +1472,6 @@ param.regul=<FONT COLOR="red">'none'</FONT>;<BR>
 [W optim_info]=mexFistaFlat(Y,X,W0,param);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Regression l1 with intercept \n'</FONT>);<BR>
 param.intercept=true;<BR>
@@ -1511,8 +1497,6 @@ param.regul=<FONT COLOR="red">'l0'</FONT>;<BR>
 [W optim_info]=mexFistaFlat(Y,X,W0,param);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
-<BR>
-<FONT COLOR="#007F00">% Classification</FONT><BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nOne classification experiment\n'</FONT>);<BR>
 Y=2*double(<FONT COLOR="blue"><B>randn</B></FONT>(100,1) &gt; 0)-1;<BR>
@@ -1554,7 +1538,6 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <FONT COLOR="#007F00">% can be used of course with other regularization functions, intercept,...<BR>
 <BR>
-<BR>
 % Multi-Task regression</FONT><BR>
 Y=<FONT COLOR="blue"><B>randn</B></FONT>(100,100);<BR>
 Y=Y-repmat(<FONT COLOR="blue"><B>mean</B></FONT>(Y),[<FONT COLOR="blue"><B>size</B></FONT>(Y,1) 1]);<BR>
@@ -1576,7 +1559,6 @@ param.regul=<FONT COLOR="red">'l1linf'</FONT>;<BR>
 <FONT COLOR="blue"><B>toc<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Regression l1l2 + l1 \n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'l1l2+l1'</FONT>;<BR>
 param.lambda2=0.1;<BR>
@@ -1585,7 +1567,6 @@ param.lambda2=0.1;<BR>
 <FONT COLOR="blue"><B>toc<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Regression l1linf + l1 \n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'l1linf+l1'</FONT>;<BR>
 param.lambda2=0.1;<BR>
@@ -1593,7 +1574,6 @@ param.lambda2=0.1;<BR>
 [W optim_info]=mexFistaFlat(Y,X,W0,param);<BR>
 <FONT COLOR="blue"><B>toc<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Regression l1linf + row + columns \n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'l1linf-row-column'</FONT>;<BR>
@@ -1604,7 +1584,6 @@ param.lambda2=0.1;<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
 <FONT COLOR="#007F00">% Multi-Task Classification</FONT><BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Logistic + l1l2 \n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'l1l2'</FONT>;<BR>
 param.loss=<FONT COLOR="red">'logistic'</FONT>;<BR>
@@ -1614,7 +1593,6 @@ Y=2*double(<FONT COLOR="blue"><B>randn</B></FONT>(100,100) &gt; 0)-1;<BR>
 <FONT COLOR="blue"><B>toc<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <FONT COLOR="#007F00">% Multi-Class + Multi-Task Regularization</FONT><BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Multi-Class Logistic l1l2 \n'</FONT>);<BR>
 Y=double(<FONT COLOR="blue"><B>ceil</B></FONT>(5*<FONT COLOR="blue"><B>rand</B></FONT>(100,1000))-1);<BR>
@@ -1727,7 +1705,6 @@ tree.groups=<FONT COLOR="blue"><B>sparse</B></FONT>([0 0 0 0 0 0 0 0; ..
                     0 0 0 0 1 0 0 0; ...<BR>
                     0 0 0 0 0 0 1 0]);  <FONT COLOR="#007F00">% first group should always be the root of the tree</FONT><BR>
 <BR>
-<BR>
 X=<FONT COLOR="blue"><B>randn</B></FONT>(100,10);<BR>
 X=X-repmat(<FONT COLOR="blue"><B>mean</B></FONT>(X),[<FONT COLOR="blue"><B>size</B></FONT>(X,1) 1]);<BR>
 X=mexNormalize(X);<BR>
@@ -1780,9 +1757,7 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 param.intercept=false;<BR>
 <BR>
-<BR>
 <FONT COLOR="#007F00">% Classification</FONT><BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nOne classification experiment\n'</FONT>);<BR>
 Y=2*double(<FONT COLOR="blue"><B>randn</B></FONT>(100,<FONT COLOR="blue"><B>size</B></FONT>(Y,2)) &gt; 0)-1;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Logistic + tree-linf\n'</FONT>);<BR>
@@ -1808,7 +1783,6 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <FONT COLOR="#007F00">% can be used of course with other regularization functions, intercept,...<BR>
 <BR>
-<BR>
 % Multi-Task regression</FONT><BR>
 Y=<FONT COLOR="blue"><B>randn</B></FONT>(100,<FONT COLOR="blue"><B>size</B></FONT>(Y,2));<BR>
 Y=Y-repmat(<FONT COLOR="blue"><B>mean</B></FONT>(Y),[<FONT COLOR="blue"><B>size</B></FONT>(Y,1) 1]);<BR>
@@ -1826,7 +1800,6 @@ param.lambda2=0.001;<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
 <FONT COLOR="#007F00">% Multi-Task Classification</FONT><BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Logistic + multi-task-tree \n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'multi-task-tree'</FONT>;<BR>
 param.lambda2=0.001;<BR>
@@ -1836,8 +1809,8 @@ Y=2*double(<FONT COLOR="blue"><B>randn</B></FONT>(100,<FONT COLOR="blue"><B>size
 [W optim_info]=mexFistaTree(Y,X,W0,tree,param);<BR>
 <FONT COLOR="blue"><B>toc<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
-<FONT COLOR="#007F00">% Multi-Class + Multi-Task Regularization</FONT><BR>
 <BR>
+<FONT COLOR="#007F00">% Multi-Class + Multi-Task Regularization</FONT><BR>
 param.verbose=false;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Multi-Class Logistic +multi-task-tree \n'</FONT>);<BR>
 Y=double(<FONT COLOR="blue"><B>ceil</B></FONT>(5*<FONT COLOR="blue"><B>rand</B></FONT>(100,<FONT COLOR="blue"><B>size</B></FONT>(Y,2)))-1);<BR>
@@ -1938,7 +1911,6 @@ param.tol=1e-5;<BR>
 param.intercept=false;<BR>
 param.pos=false;<BR>
 <BR>
-<BR>
 graph.eta_g=[1 1 1 1 1];<BR>
 graph.groups=<FONT COLOR="blue"><B>sparse</B></FONT>([0 0 0 1 0;<BR>
                      0 0 0 0 0;<BR>
@@ -1977,7 +1949,6 @@ param.regul=<FONT COLOR="red">'graph'</FONT>;<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nADMM + Regression graph\n'</FONT>);<BR>
 param.admm=true;<BR>
 param.lin_admm=true;<BR>
@@ -1987,7 +1958,6 @@ param.delta=1;<BR>
 [W optim_info]=mexFistaGraph(Y,X,W0,graph,param);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, stopping criterion: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
-<BR>
 <BR>
 param.admm=false;<BR>
 param.max_it=5;<BR>
@@ -2016,9 +1986,7 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 param.intercept=false;<BR>
 <BR>
-<BR>
 <FONT COLOR="#007F00">% Classification</FONT><BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nOne classification experiment\n'</FONT>);<BR>
 Y=2*double(<FONT COLOR="blue"><B>randn</B></FONT>(100,<FONT COLOR="blue"><B>size</B></FONT>(Y,2)) &gt; 0)-1;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Logistic + graph-linf\n'</FONT>);<BR>
@@ -2044,7 +2012,6 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <FONT COLOR="#007F00">% can be used of course with other regularization functions, intercept,...<BR>
 <BR>
-<BR>
 % Multi-Task regression</FONT><BR>
 Y=<FONT COLOR="blue"><B>randn</B></FONT>(100,<FONT COLOR="blue"><B>size</B></FONT>(Y,2));<BR>
 Y=Y-repmat(<FONT COLOR="blue"><B>mean</B></FONT>(Y),[<FONT COLOR="blue"><B>size</B></FONT>(Y,1) 1]);<BR>
@@ -2062,7 +2029,6 @@ param.lambda2=0.01;<BR>
 fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
 <FONT COLOR="#007F00">% Multi-Task Classification</FONT><BR>
-<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Logistic + multi-task-graph \n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'multi-task-graph'</FONT>;<BR>
 param.lambda2=0.01;<BR>
@@ -2196,7 +2162,6 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 num=mexCountConnexComponents(graph.weights,W1(:,1));<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Num of connected components: %d\n'</FONT>,num);<BR>
-<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\n'</FONT>);<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'Square Loss + non-convex path penalty\n'</FONT>);<BR>
