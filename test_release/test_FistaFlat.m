@@ -94,8 +94,6 @@ tic
 t=toc;
 fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
 
-
-
 fprintf('\nFISTA + Regression Fused-Lasso\n');
 param.regul='fused-lasso';
 param.lambda2=0.1;
@@ -111,7 +109,6 @@ tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param);
 t=toc;
 fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
-
 
 fprintf('\nFISTA + Regression l1 with intercept \n');
 param.intercept=true;
@@ -137,8 +134,6 @@ tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param);
 t=toc;
 fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
-
-% Classification
 
 fprintf('\nOne classification experiment\n');
 Y=2*double(randn(100,1) > 0)-1;
@@ -180,7 +175,6 @@ t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 % can be used of course with other regularization functions, intercept,...
 
-
 % Multi-Task regression
 Y=randn(100,100);
 Y=Y-repmat(mean(Y),[size(Y,1) 1]);
@@ -202,7 +196,6 @@ tic
 toc
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 
-
 fprintf('\nFISTA + Regression l1l2 + l1 \n');
 param.regul='l1l2+l1';
 param.lambda2=0.1;
@@ -211,7 +204,6 @@ tic
 toc
 fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
 
-
 fprintf('\nFISTA + Regression l1linf + l1 \n');
 param.regul='l1linf+l1';
 param.lambda2=0.1;
@@ -219,7 +211,6 @@ tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param);
 toc
 fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
-
 
 fprintf('\nFISTA + Regression l1linf + row + columns \n');
 param.regul='l1linf-row-column';
@@ -230,7 +221,6 @@ toc
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 
 % Multi-Task Classification
-
 fprintf('\nFISTA + Logistic + l1l2 \n');
 param.regul='l1l2';
 param.loss='logistic';
@@ -240,7 +230,6 @@ tic
 toc
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 % Multi-Class + Multi-Task Regularization
-
 
 fprintf('\nFISTA + Multi-Class Logistic l1l2 \n');
 Y=double(ceil(5*rand(100,1000))-1); 
@@ -253,7 +242,3 @@ W0=zeros(size(X,2),nclasses*size(Y,2));
 t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 % can be used of course with other regularization functions, intercept,...
-
-
-
-

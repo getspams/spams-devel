@@ -26,4 +26,3 @@ t=toc;
 toc
 
 fprintf('%f signals processed per second\n',size(X,2)/t);
-

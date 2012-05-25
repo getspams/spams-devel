@@ -296,7 +296,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
    int sparseD = param.modeD == L1L2 ? 2 : param.modeD == L1L2MU ? 7 : 6;
    int NUM_THREADS=init_omp(_NUM_THREADS);
    if (param.verbose) {
-      fprintf(stderr,"num param iterD: %d\n",param.iter_updateD);
+      cout << "num param iterD: " param.iter_updateD << endl;
       if (param.batch) {
          cout << "Batch Mode" << endl;
       } else if (param.stochastic) {
@@ -554,7 +554,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
          }
          Vector<T> di, ai,bi;
          Vector<T> newd(n);
-         for (j = 0; j<5; ++j) {
+         for (j = 0; j<param.iter_updateD; ++j) {
             for (int k = 0; k<K; ++k) {
                if (_A[k*K+k] > 1e-6) {
                   _D.refCol(k,di);

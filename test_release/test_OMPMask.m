@@ -18,11 +18,9 @@ param.L=20; % not more than 20 non-zeros coefficients (default: min(size(D,1),si
 param.eps=0.01; %
 param.numThreads=-1; % number of processors/cores to use; the default choice is -1
                      % and uses all the cores of the machine
-
 tic
 alpha=mexOMPMask(X,D,mask,param);
 t=toc;
 toc
 
 fprintf('%f signals processed per second\n',size(X,2)/t);
-

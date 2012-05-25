@@ -130,12 +130,12 @@ template <typename T>
       param.gamma1 = getScalarStructDef<T>(prhs[1],"gamma1",0);
       param.gamma2 = getScalarStructDef<T>(prhs[1],"gamma2",0);
       param.rho = getScalarStructDef<T>(prhs[1],"rho",T(1.0));
-      param.iter_updateD = getScalarStructDef<T>(prhs[1],"iter_updateD",1);
       param.stochastic = 
          getScalarStructDef<bool>(prhs[1],"stochastic_deprecated",
                false);
       param.modeParam = static_cast<mode_compute>(getScalarStructDef<int>(prhs[1],"modeParam",0));
       param.batch = getScalarStructDef<bool>(prhs[1],"batch",false);
+      param.iter_updateD = getScalarStructDef<T>(prhs[1],"iter_updateD",param.batch ? 5 : 1);
       param.log = getScalarStructDef<bool>(prhs[1],"log_deprecated",
             false);
       if (param.log) {

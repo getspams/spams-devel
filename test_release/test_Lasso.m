@@ -2,7 +2,6 @@ clear all;
 
 randn('seed',0);
 fprintf('test mexLasso\n');
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Decomposition of a large number of signals
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,7 +21,6 @@ param.mode=2;        % penalized formulation
 tic
 alpha=mexLasso(X,D,param);
 t=toc
-
 fprintf('%f signals processed per second\n',size(X,2)/t);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,4 +31,3 @@ D=randn(64,10);
 D=D./repmat(sqrt(sum(D.^2)),[size(D,1) 1]);
 param.lambda=0;
 [alpha path]=mexLasso(X,D,param);
-

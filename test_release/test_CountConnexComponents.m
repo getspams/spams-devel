@@ -42,4 +42,3 @@ fprintf('Num of connected components: %d\n',num);
 nodes=[0 1 1 1 0 1 0 0 1 0 1 1 0];
 num=mexCountConnexComponents(G,nodes);
 fprintf('Num of connected components: %d\n',num);
-

@@ -19,5 +19,3 @@ U=mexNormalize(U);
 param.lambda=0.005;
 [V2 optim]=mexProximalPathCoding(U,graph,param);
 [vals paths]=mexEvalPathCoding(U,graph,param);
-
-

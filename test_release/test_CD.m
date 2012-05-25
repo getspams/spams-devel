@@ -21,7 +21,6 @@ E=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
 fprintf('%f signals processed per second for LARS\n',size(X,2)/t);
 fprintf('Objective function for LARS: %g\n',E);
 
-
 param.tol=0.001;
 param.itermax=1000;
 tic

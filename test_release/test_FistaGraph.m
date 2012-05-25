@@ -11,7 +11,6 @@ param.tol=1e-5;
 param.intercept=false;
 param.pos=false;
 
-
 graph.eta_g=[1 1 1 1 1];
 graph.groups=sparse([0 0 0 1 0;
                      0 0 0 0 0;
@@ -50,7 +49,6 @@ tic
 t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 
-
 fprintf('\nADMM + Regression graph\n');
 param.admm=true;
 param.lin_admm=true;
@@ -60,7 +58,6 @@ tic
 [W optim_info]=mexFistaGraph(Y,X,W0,graph,param);
 t=toc;
 fprintf('mean loss: %f, stopping criterion: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
-
 
 param.admm=false;
 param.max_it=5;
@@ -89,9 +86,7 @@ t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 param.intercept=false;
 
-
 % Classification
-
 fprintf('\nOne classification experiment\n');
 Y=2*double(randn(100,size(Y,2)) > 0)-1;
 fprintf('\nFISTA + Logistic + graph-linf\n');
@@ -117,7 +112,6 @@ t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 % can be used of course with other regularization functions, intercept,...
 
-
 % Multi-Task regression
 Y=randn(100,size(Y,2));
 Y=Y-repmat(mean(Y),[size(Y,1) 1]);
@@ -135,7 +129,6 @@ toc
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 
 % Multi-Task Classification
-
 fprintf('\nFISTA + Logistic + multi-task-graph \n');
 param.regul='multi-task-graph';
 param.lambda2=0.01;

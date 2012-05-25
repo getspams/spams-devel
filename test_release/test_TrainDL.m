@@ -6,14 +6,12 @@ X=im2col(I,[8 8],'sliding');
 X=X-repmat(mean(X),[size(X,1) 1]);
 X=X ./ repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
 
-
 param.K=100;  % learns a dictionary with 100 elements
 param.lambda=0.15;
 param.numThreads=4; % number of threads
 param.batchsize=400;
 
 param.iter=1000;  % let us see what happens after 1000 iterations.
-
 
 %%%%%%%%%% FIRST EXPERIMENT %%%%%%%%%%%
 tic
@@ -32,7 +30,6 @@ fprintf('objective function: %f\n',R);
 drawnow;
 
 fprintf('*********** SECOND EXPERIMENT ***********\n');
-
 %%%%%%%%%% SECOND EXPERIMENT %%%%%%%%%%%
 % Train on half of the training set, then retrain on the second part
 X1=X(:,1:floor(size(X,2)/2));
@@ -59,9 +56,7 @@ alpha=mexLasso(X,D,param);
 R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
 fprintf('objective function: %f\n',R);
 
-%%%%%%%% FOURTH EXPERIMENT %%%%%%%%%%%%%%%%%%%%%%
 % let us add sparsity to the dictionary itself
-
 fprintf('*********** THIRD EXPERIMENT ***********\n');
 param.modeParam=0;
 param.iter=1000;
@@ -80,7 +75,6 @@ subplot(1,3,2);
 ImD=displayPatches(D);
 imagesc(ImD); colormap('gray');
 drawnow;
-
 
 fprintf('*********** FOURTH EXPERIMENT ***********\n');
 param.modeParam=0;

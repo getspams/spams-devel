@@ -17,5 +17,3 @@ G=[0 0 0 0 0 0 0 0 0 0 0 0 0;
 G=sparse(G);
 num=mexCountPathsDAG(G);
 fprintf('Num of paths: %d\n',num);
-
-

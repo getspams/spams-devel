@@ -12,7 +12,6 @@ end
 t=toc;
 fprintf('mex-file time: %fs\n',t);
 
-
 tic
 for ii = 1:20
 x2 = pcg(A,b);
@@ -20,4 +19,3 @@ end
 t=toc;
 fprintf('Matlab time: %fs\n',t);
 sum((x1(:)-x2(:)).^2)
-

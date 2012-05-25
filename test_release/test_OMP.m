@@ -27,4 +27,3 @@ D=randn(64,10);
 param.L=5;
 D=D./repmat(sqrt(sum(D.^2)),[size(D,1) 1]);
 [alpha path]=mexOMP(X,D,param);
-

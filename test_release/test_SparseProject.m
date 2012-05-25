@@ -47,7 +47,6 @@ constraints=0.5*param.lambda3*sum(X1.^2)+param.lambda1*sum(abs(X1))+param.lambda
 fprintf('Checking constraint: %f, %f\n',mean(constraints),max(constraints));
 fprintf('Projection is approximate (stops at a kink)\n',mean(constraints),max(constraints));
 
-
 param.mode=6;       % projection on the FLSA
 param.lambda1=0.7;
 param.lambda2=0.7;
@@ -64,5 +63,3 @@ fprintf('%f signals of size %d projected per second\n',size(X,2)/t,size(X,1));
 constraints=0.5*param.lambda3*sum(X1.^2)+param.lambda1*sum(abs(X1))+param.lambda2*sum(abs(X1(2:end,:)-X1(1:end-1,:)));
 fprintf('Checking constraint: %f, %f\n',mean(constraints),max(constraints));
 fprintf('Projection is approximate (stops at a kink)\n',mean(constraints),max(constraints));
-
-

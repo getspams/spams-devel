@@ -44,7 +44,6 @@ fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of itera
 num=mexCountConnexComponents(graph.weights,W1(:,1));
 fprintf('Num of connected components: %d\n',num);
 
-
 fprintf('\n');
 fprintf('Square Loss + non-convex path penalty\n');
 param.loss='square';

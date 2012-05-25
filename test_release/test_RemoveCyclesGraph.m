@@ -20,5 +20,3 @@ fprintf('Original graph:\n');
 full(G)
 fprintf('New graph:\n');
 full(DAG)
-
-

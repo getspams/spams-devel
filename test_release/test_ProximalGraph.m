@@ -1,4 +1,3 @@
-
 U=randn(10,1000);
 
 param.lambda=0.1; % regularization parameter
@@ -59,21 +58,11 @@ fprintf('\ntest prox graph\n');
 param.regul='graph';
 alpha=mexProximalGraph(U,graph,param);
 
-
 fprintf('\ntest prox multi-task-graph\n');                                
 param.regul='multi-task-graph';
 param.lambda2=0.1;
 alpha=mexProximalGraph(U,graph,param);
 
-
 fprintf('\ntest no regularization\n');                                
 param.regul='none';
 alpha=mexProximalGraph(U,graph,param);
-
-
-
-
-
-
-
-

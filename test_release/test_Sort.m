@@ -1,7 +1,4 @@
-
-
 X=rand(1,300000);
-
 
 tic
 Y=mexSort(X);

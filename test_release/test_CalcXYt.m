@@ -1,8 +1,5 @@
-
-
 X=randn(64,200);
 Y=randn(200,20000)';
-
 
 tic
 XYt=mexCalcXYt(X,Y);

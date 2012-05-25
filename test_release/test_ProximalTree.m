@@ -1,4 +1,3 @@
-
 U=randn(10,1000);
 
 param.lambda=0.1; % regularization parameter
@@ -36,7 +35,6 @@ fprintf('\ntest prox tree-linf\n');
 param.regul='tree-linf'; 
 alpha=mexProximalTree(U,tree,param);
 
-
 fprintf('Second tree example\n');
 % Example 2 of tree structure
 % tree structured groups:
@@ -71,8 +69,6 @@ alpha=mexProximalTree(U,tree,param);
 fprintf('\ntest prox tree-linf\n');                                
 param.regul='tree-linf'; 
 alpha=mexProximalTree(U,tree,param);
-
-
 
 % mexProximalTree also works with non-tree-structured regularization functions
 fprintf('\nprox l1, intercept, positivity constraint\n');

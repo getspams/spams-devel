@@ -20,5 +20,3 @@ tic
 alpha=mexSOMP(X,D,ind_groups,param);
 t=toc
 fprintf('%f signals processed per second\n',size(X,2)/t);
-
-

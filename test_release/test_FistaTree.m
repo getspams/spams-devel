@@ -31,7 +31,6 @@ tree.groups=sparse([0 0 0 0 0 0 0 0; ...
                     0 0 0 0 1 0 0 0; ...
                     0 0 0 0 0 0 1 0]);  % first group should always be the root of the tree
 
-
 X=randn(100,10);
 X=X-repmat(mean(X),[size(X,1) 1]);
 X=mexNormalize(X);
@@ -84,9 +83,7 @@ t=toc;
 fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
 param.intercept=false;
 
-
 % Classification
-
 fprintf('\nOne classification experiment\n');
 Y=2*double(randn(100,size(Y,2)) > 0)-1;
 fprintf('\nFISTA + Logistic + tree-linf\n');
@@ -112,7 +109,6 @@ t=toc;
 fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
 % can be used of course with other regularization functions, intercept,...
 
-
 % Multi-Task regression
 Y=randn(100,size(Y,2));
 Y=Y-repmat(mean(Y),[size(Y,1) 1]);
@@ -130,7 +126,6 @@ toc
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 
 % Multi-Task Classification
-
 fprintf('\nFISTA + Logistic + multi-task-tree \n');
 param.regul='multi-task-tree';
 param.lambda2=0.001;
@@ -140,8 +135,8 @@ tic
 [W optim_info]=mexFistaTree(Y,X,W0,tree,param);
 toc
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
-% Multi-Class + Multi-Task Regularization
 
+% Multi-Class + Multi-Task Regularization
 param.verbose=false;
 fprintf('\nFISTA + Multi-Class Logistic +multi-task-tree \n');
 Y=double(ceil(5*rand(100,size(Y,2)))-1); 
@@ -162,6 +157,3 @@ W0=zeros(size(X,2),nclasses*size(Y,2));
 [W optim_info]=mexFistaTree(Y,sparse(X),W0,tree,param);
 t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
-
-
-

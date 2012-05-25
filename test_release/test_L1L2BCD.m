@@ -2,7 +2,6 @@ clear all;
 randn('seed',0);
 
 fprintf('test mexL1L2BCD\n');
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Decomposition of a large number of groups 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,5 +22,3 @@ alpha0=zeros(size(D,2),size(X,2));
 alpha=mexL1L2BCD(X,D,alpha0,ind_groups,param);
 t=toc
 fprintf('%f signals processed per second\n',size(X,2)/t);
-
-

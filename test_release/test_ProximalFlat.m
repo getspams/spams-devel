@@ -1,10 +1,8 @@
-
 U=randn(100,1000);
 
 param.lambda=0.1; % regularization parameter
 param.num_threads=-1; % all cores (-1 by default)
 param.verbose=true;   % verbosity, false by default
-
 
 % test l0
 fprintf('\nprox l0\n');
@@ -72,4 +70,3 @@ alpha=mexProximalFlat(U,param);
 fprintf('\nprox no regularization\n');
 param.regul='none';
 alpha=mexProximalFlat(U,param);
-
