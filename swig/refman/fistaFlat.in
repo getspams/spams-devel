@@ -1,6 +1,20 @@
 begin repl Usage
 %DEF%
 end
+begin addlast Param
+delta:
+c:
+max_iter_backtracking:
+lin_admm:
+admm:
+resetflow:
+clever:
+log:
+logName:
+is_inner_weights:
+inner_weights:
+sqrt_step:
+end
 include fista.inc
 begin addlast Output
 optim_info:        vector of size 4, containing information of the optimization.

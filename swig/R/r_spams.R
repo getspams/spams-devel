@@ -194,11 +194,11 @@ spams.lassoWeighted <- function(X,D,W,L= -1,lambda1= NULL,
   return(alpha)
 }
 
-spams.omp <- function(X,D,L = NULL,eps = NULL,Lambda = NULL,return_reg_path = FALSE, numThreads = -1) {
+spams.omp <- function(X,D,L = NULL,eps = NULL,lambda1 = NULL,return_reg_path = FALSE, numThreads = -1) {
   path = NULL
   given_L = FALSE
   given_eps = FALSE
-  given_Lambda = FALSE
+  given_lambda1 = FALSE
   if (is.null(L)) {
     L = as.vector(c(0),mode='integer')
   } else {
@@ -212,16 +212,16 @@ spams.omp <- function(X,D,L = NULL,eps = NULL,Lambda = NULL,return_reg_path = FA
   } else {
     given_eps = TRUE
   }
-  if (is.null(Lambda)) {
-    Lambda = as.vector(c(0.),mode='double')
+  if (is.null(lambda1)) {
+    lambda1 = as.vector(c(0.),mode='double')
   } else {
-    given_Lambda = TRUE
+    given_lambda1 = TRUE
   }
   
 #  if(! is.vector(eps)) {
 #    eps = as.vector(c(eps),mode='double')
 #  }
-  x = omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda, numThreads)
+  x = omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1, numThreads)
   if(return_reg_path) {
     path = x[[2]]
   }
@@ -236,11 +236,11 @@ spams.omp <- function(X,D,L = NULL,eps = NULL,Lambda = NULL,return_reg_path = FA
     return(alpha)
 }
 
-spams.ompMask <- function(X,D,B,L = NULL,eps = NULL,Lambda = NULL,return_reg_path = FALSE, numThreads = -1) {
+spams.ompMask <- function(X,D,B,L = NULL,eps = NULL,lambda1 = NULL,return_reg_path = FALSE, numThreads = -1) {
   path = NULL
   given_L = FALSE
   given_eps = FALSE
-  given_Lambda = FALSE
+  given_lambda1 = FALSE
   if (is.null(L)) {
     L = as.vector(c(0),mode='integer')
   } else {
@@ -254,13 +254,13 @@ spams.ompMask <- function(X,D,B,L = NULL,eps = NULL,Lambda = NULL,return_reg_pat
   } else {
     given_eps = TRUE
   }
-  if (is.null(Lambda)) {
-    Lambda = as.vector(c(0.),mode='double')
+  if (is.null(lambda1)) {
+    lambda1 = as.vector(c(0.),mode='double')
   } else {
-    given_Lambda = TRUE
+    given_lambda1 = TRUE
   }
 
-  x = ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda, numThreads)
+  x = ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1, numThreads)
   if(return_reg_path) {
     path = x[[2]]
   }

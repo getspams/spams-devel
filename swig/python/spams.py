@@ -153,11 +153,11 @@ def lassoWeighted(X,D,W,L= -1,lambda1= None,
     return alpha
 
 
-def omp(X,D,L=None,eps= None,Lambda = None,return_reg_path = False, numThreads = -1):
+def omp(X,D,L=None,eps= None,lambda1 = None,return_reg_path = False, numThreads = -1):
     path = None
     given_L = False
     given_eps = False
-    given_Lambda = False
+    given_lambda1 = False
     if L == None:
         L = np.array([0],dtype=np.int32)
     else:
@@ -170,16 +170,16 @@ def omp(X,D,L=None,eps= None,Lambda = None,return_reg_path = False, numThreads =
         given_eps = True
         if str(type(eps)) != "<type 'numpy.ndarray'>":
             eps = np.array([eps],dtype=np.float64)
-    if Lambda == None:
-        Lambda = np.array([0.],dtype=np.float64)
+    if lambda1 == None:
+        lambda1 = np.array([0.],dtype=np.float64)
     else:
-        given_Lambda = True
-        if str(type(Lambda)) != "<type 'numpy.ndarray'>":
-            Lambda = np.array([Lambda],dtype=np.float64)
+        given_lambda1 = True
+        if str(type(lambda1)) != "<type 'numpy.ndarray'>":
+            lambda1 = np.array([lambda1],dtype=np.float64)
     if return_reg_path:
-        ((indptr,indices,data,shape),path) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
+        ((indptr,indices,data,shape),path) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     else:
-        (indptr,indices,data,shape) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
+        (indptr,indices,data,shape) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
@@ -187,11 +187,11 @@ def omp(X,D,L=None,eps= None,Lambda = None,return_reg_path = False, numThreads =
         return alpha
 
 
-def ompMask(X,D,B,L=None,eps= None,Lambda = None,return_reg_path = False, numThreads = -1):
+def ompMask(X,D,B,L=None,eps= None,lambda1 = None,return_reg_path = False, numThreads = -1):
     path = None
     given_L = False
     given_eps = False
-    given_Lambda = False
+    given_lambda1 = False
     if L == None:
         L = np.array([0],dtype=np.int32)
     else:
@@ -204,16 +204,16 @@ def ompMask(X,D,B,L=None,eps= None,Lambda = None,return_reg_path = False, numThr
         given_eps = True
         if str(type(eps)) != "<type 'numpy.ndarray'>":
             eps = np.array([eps],dtype=np.float64)
-    if Lambda == None:
-        Lambda = np.array([0.],dtype=np.float64)
+    if lambda1 == None:
+        lambda1 = np.array([0.],dtype=np.float64)
     else:
-        given_Lambda = True
-        if str(type(Lambda)) != "<type 'numpy.ndarray'>":
-            Lambda = np.array([Lambda],dtype=np.float64)
+        given_lambda1 = True
+        if str(type(lambda1)) != "<type 'numpy.ndarray'>":
+            lambda1 = np.array([lambda1],dtype=np.float64)
     if return_reg_path:
-        ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
+        ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     else:
-        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_Lambda,Lambda,numThreads)
+        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,Lambda,numThreads)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
