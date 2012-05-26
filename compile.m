@@ -111,6 +111,9 @@ end
 out_dir='./build/';
 
 COMPILE = { 
+            % compile dictLearn toolbox
+            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
+            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
             % compile dag toolbox
             '-I./dags/ -I./linalg/ dags/mex/mexRemoveCyclesGraph.cpp',
             '-I./dags/ -I./linalg/ dags/mex/mexCountPathsDAG.cpp',
@@ -144,10 +147,7 @@ COMPILE = {
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoWeighted.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMPMask.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexSOMP.cpp',
-            '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp',
-            % compile dictLearn toolbox
-            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
-            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp'};        
+            '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp'};
 
 if linux || mac
    fid=fopen('run_matlab.sh','w+');
