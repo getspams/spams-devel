@@ -1924,7 +1924,10 @@ or
 </TABLE></TD><TD CLASS="dcell"> </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">1</TD></TR>
 <TR><TD CLASS="hbar"></TD></TR>
 <TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
-</TABLE></TD><TD CLASS="dcell">||<I><B>u</B></I>−<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP> + λ ||<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>,
+</TABLE></TD><TD CLASS="dcell">||<I><B>u</B></I>−<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP> + </TD><TD CLASS="dcell"><TABLE CLASS="display"><TR><TD CLASS="dcell" ALIGN="center">λ</TD></TR>
+<TR><TD CLASS="hbar"></TD></TR>
+<TR><TD CLASS="dcell" ALIGN="center">2</TD></TR>
+</TABLE></TD><TD CLASS="dcell"> ||<I><B>v</B></I>||<SUB>2</SUB><SUP>2</SUP>,
     (28)</TD></TR>
 </TABLE><P>
 or
@@ -2112,7 +2115,7 @@ where <I><B>V</B><SUP>j</SUP></I> is the <I>j</I>-th column of <I><B>V</B></I>.<
 %         if param.regul='l1'<BR>
 %             argmin 0.5||u-v||_2^2 + lambda||v||_1<BR>
 %         if param.regul='l2'<BR>
-%             argmin 0.5||u-v||_2^2 + lambda||v||_2^2<BR>
+%             argmin 0.5||u-v||_2^2 + 0.5lambda||v||_2^2<BR>
 %         if param.regul='elastic-net'<BR>
 %             argmin 0.5||u-v||_2^2 + lambda||v||_1 + lambda_2||v||_2^2<BR>
 %         if param.regul='fused-lasso'<BR>

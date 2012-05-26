@@ -15,7 +15,7 @@
 %         if param.regul='l1'
 %             argmin 0.5||u-v||_2^2 + lambda||v||_1
 %         if param.regul='l2'
-%             argmin 0.5||u-v||_2^2 + lambda||v||_2^2
+%             argmin 0.5||u-v||_2^2 + 0.5lambda||v||_2^2
 %         if param.regul='elastic-net'
 %             argmin 0.5||u-v||_2^2 + lambda||v||_1 + lambda_2||v||_2^2
 %         if param.regul='fused-lasso'
