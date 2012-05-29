@@ -2678,7 +2678,6 @@ void inline MinCostFlow<Int>::discharge(const int node, const Int eps) {
    if (_excess[node] <= 0) return;
    // sequence of pushes
    Int max_cmp_cost=-std::numeric_limits<Int>::max();
- //  bool non_saturated_quadratic_arc=false;
    const int pr_begin=_pr_node[node];
    const int pr_end=_pr_node[node]+_num_arcs[node];
    for (int pointer = pr_begin; pointer<pr_end; ++pointer) {
@@ -2699,7 +2698,6 @@ void inline MinCostFlow<Int>::discharge(const int node, const Int eps) {
                   _list_active.push_back(child);
                }
                if (delta==-reduced_cost) {
-                //  non_saturated_quadratic_arc=true;
                   max_cmp_cost=MAX(max_cmp_cost,_prices[node]);
                }
             } else {

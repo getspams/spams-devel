@@ -791,6 +791,8 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    inline T asum() const;
    /// compute the sum of the matrix elements
    inline T normFsq() const;
+   /// Direct access to _pE
+   inline int* pE() const { return _pE; };
    /// Direct access to _pB
    inline int* pB() const { return _pB; };
    /// Direct access to _r
@@ -4786,9 +4788,7 @@ template <typename T> inline void SpMatrix<T>::convert(const Matrix<T>&vM,
       }
       _pE[i]=count;
    }
-   int i;
-#pragma omp parallel for private(i)
-   for (i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
+   for (int i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
 };
 
 /// use the data from v, r for _v, _r
@@ -4810,9 +4810,7 @@ template <typename T> inline void SpMatrix<T>::convert2(
       }
       _pE[i]=count;
    }
-   int i;
-#pragma omp parallel for private(i)
-   for (i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
+   for (int i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
 
 };
 

@@ -1907,6 +1907,7 @@ namespace FISTA {
              nzmax+=it->nodes.size();
           paths_mat.resize(n,paths.size(),nzmax);
           int* pB =paths_mat.pB();
+          int* pE =paths_mat.pE();
           int* r =paths_mat.r();
           T* v =paths_mat.v();
           int count_col=0;
@@ -1921,6 +1922,7 @@ namespace FISTA {
              }
              pB[++count_col]=count;
           }
+          for (int i = 0; i<paths_mat.n(); ++i) sort(r,v,pB[i],pE[i]-1);
        };
  
     template <typename T> 
