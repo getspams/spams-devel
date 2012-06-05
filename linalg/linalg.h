@@ -2825,7 +2825,7 @@ inline void Vector<int>::logspace(const int n, const int a, const int b) {
    _X[0]=a;
    _X[n-1]=b;
    for (int i = 1; i<_n-1; ++i) {
-      int candidate=static_cast<int>(floor(tmp[i]));
+      int candidate=static_cast<int>(floor(static_cast<double>(tmp[i])));
       _X[i]= candidate > _X[i-1] ? candidate : _X[i-1]+1;
    }
 }
@@ -5544,7 +5544,7 @@ template <typename T> void DoubleRowMatrix<T>::XtX(Matrix<T>& XtX) const {
 };
 
 template <typename T> void DoubleRowMatrix<T>::copyRow(const int ind, Vector<T>& x) const {
-   const int indd2= floor(ind/2);
+   const int indd2= static_cast<int>(floor(static_cast<double>(ind)/2.0));
    _inputmatrix->copyRow(indd2,x);
 };
 
