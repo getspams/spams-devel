@@ -31,7 +31,7 @@ usage () {
 flg_clear=0
 flg_swig=1
 lst=""
-optc="-O"
+optc="-O -DNDEBUG"
 #CXX=g++-4.2
 CXX=g++
 while [ $# -gt 0 ]; do

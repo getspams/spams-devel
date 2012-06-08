@@ -19,7 +19,7 @@ spams_wrap = Extension(
     '_spams_wrap',
     sources = ['spams_wrap.cpp'],
     include_dirs = incs,
-    extra_compile_args = ['-fPIC', '-fopenmp', '-DUSE_BLAS_LIB'] + cc_flags,
+    extra_compile_args = ['-fPIC', '-fopenmp', '-DNDEBUG', '-DUSE_BLAS_LIB'] + cc_flags,
     libraries = ['stdc++', 'blas', 'lapack', ],
     # strip the .so
     extra_link_args = [ '-fopenmp', '-s' ] + link_flags,
