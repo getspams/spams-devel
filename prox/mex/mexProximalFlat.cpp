@@ -52,7 +52,20 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    param.lambda= getScalarStructDef<T>(prhs[1],"lambda",1.0);
    param.lambda2= getScalarStructDef<T>(prhs[1],"lambda2",0.0);
    param.lambda3= getScalarStructDef<T>(prhs[1],"lambda3",0.0);
-   param.size_group= getScalarStructDef<int>(prhs[1],"size_group",1);
+   mxArray* ppr_groups = mxGetField(prhs[1],0,"groups");
+   if (ppr_groups) {
+      if (!mexCheckType<int>(ppr_groups))
+         mexErrMsgTxt("param.groups should be int32 (starting group is 1)");
+      int* pr_groups = reinterpret_cast<int*>(mxGetPr(ppr_groups));
+      const mwSize* dims_groups =mxGetDimensions(ppr_groups);
+      int num_groups=static_cast<int>(dims_groups[0])*static_cast<int>(dims_groups[1]);
+      if (num_groups != pAlpha) mexErrMsgTxt("Wrong size of param.groups");
+      param.ngroups=num_groups;
+      param.groups=pr_groups;
+   } else {
+      param.size_group= getScalarStructDef<int>(prhs[1],"size_group",1);
+   }
+
    getStringStruct(prhs[1],"regul",param.name_regul,param.length_names);
    param.regul = regul_from_string(param.name_regul);
    if (param.regul==INCORRECT_REG)

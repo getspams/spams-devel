@@ -27,12 +27,12 @@
 %             argmin 0.5||u-v||_2^2 + lambda||v||_2
 %         if param.regul='group-lasso-l2'  
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_2 
-%             where the groups are consecutive entries of v of size param.size_group 
+%             where the groups are either defined by param.groups or by param.size_group,
 %         if param.regul='group-lasso-linf'
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_inf
 %         if param.regul='sparse-group-lasso-l2'  
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_2 + lambda_2 ||v||_1
-%             where the groups are consecutive entries of v of size param.size_group 
+%             where the groups are either defined by param.groups or by param.size_group,
 %         if param.regul='sparse-group-lasso-linf'
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_inf + lambda_2 ||v||_1
 %         if param.regul='trace-norm-vec' 
@@ -73,7 +73,11 @@
 %                 false by default)
 %               param.transpose (optional, transpose the matrix in the regularization function)
 %               param.size_group (optional, for regularization functions assuming a group
-%                 structure)
+%                 structure). It is a scalar. When param.groups is not specified, it assumes
+%                 that the groups are the sets of consecutive elements of size param.size_group
+%               param.groups (int32, optional, for regularization functions assuming a group
+%                 structure. It is an int32 vector of size m containing the group indices of the
+%                 variables (first group is 1).
 %               param.pos (optional, adds positivity constraints on the
 %                 coefficients, false by default)
 %               param.numThreads (optional, number of threads for exploiting

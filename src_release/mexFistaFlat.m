@@ -70,6 +70,8 @@
 %            param.transpose (optional, transpose the matrix in the regularization function)
 %            param.size_group (optional, for regularization functions assuming a group
 %                 structure)
+%            param.groups (int32, optional, for regularization functions assuming a group
+%                 structure, see mexProximalFlat)
 %            param.numThreads (optional, number of threads for exploiting
 %                multi-core / multi-cpus. By default, it takes the value -1,
 %                which automatically selects all the available CPUs/cores).

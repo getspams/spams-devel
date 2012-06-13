@@ -151,6 +151,8 @@ namespace FISTA {
          transpose=false;
          fixed_step=false;
          copied=false;
+         groups=NULL;
+         ngroups=0;
       }
       ~ParamFISTA() { 
          if (!copied) {
@@ -197,11 +199,14 @@ namespace FISTA {
       bool sqrt_step;
       bool transpose;
       bool fixed_step;
+      int* groups;
+      int ngroups;
    };
 
    template <typename T> struct ParamReg { 
       ParamReg() { size_group=1; lambda2d1 = 0; lambda3d1 = 0; pos=false; intercept=false; num_cols=1; graph_st=NULL; tree_st=NULL;
-      graph_path_st=NULL; resetflow=false; clever=false; linf=true; transpose=false;};
+      graph_path_st=NULL; resetflow=false; clever=false; linf=true; transpose=false; ngroups=0;
+      groups=NULL;};
       T lambda2d1;
       T lambda3d1;
       int size_group;
@@ -215,6 +220,8 @@ namespace FISTA {
       bool clever;
       bool linf;
       bool transpose;
+      int ngroups;
+      int* groups;
    };
 
    template <typename T>
@@ -1594,51 +1601,105 @@ namespace FISTA {
                ParamReg<T> param2=param;
                param2.intercept=false;
                _size_group=param.size_group;
+               if (param.groups) {
+                  int num_groups=0;
+                  for (int i = 0; i<param.ngroups; ++i) num_groups=MAX(num_groups,param.groups[i]);
+                  _groups.resize(num_groups);
+                  for (int i = 0; i<num_groups; ++i) _groups[i]=new list_int();
+                  for (int i = 0; i<param.ngroups; ++i) _groups[param.groups[i]-1]->push_back(i); 
+               } 
                _prox = new Reg(param2);
             }
-            virtual ~GroupProx() { delete(_prox); };
+            virtual ~GroupProx() { 
+               delete(_prox); 
+               for (int i = 0; i<_groups.size(); ++i) delete(_groups[i]);
+            };
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
                y.copy(x);
                const int maxn= this->_intercept ? x.n()-1 : x.n();
-               Vector<T> tmp;
-               Vector<T> tmp2;
-               const int p = _size_group;
-               for (int i = 0; i+p-1<maxn; i+=p) {
-                  tmp.setPointer(x.rawX()+i,p);
-                  tmp2.setPointer(y.rawX()+i,p);
-                  _prox->prox(tmp,tmp2,lambda);
+               if (!_groups.empty()) {
+                  for (int i = 0; i<_groups.size(); ++i) {
+                     list_int* group=_groups[i];
+                     Vector<T> tmp(group->size());
+                     Vector<T> tmp2(group->size());
+                     int count=0;
+                     for (const_iterator_int it = group->begin(); it != group->end(); ++it) {
+                        tmp[count++]=x[*it];
+                     }
+                     _prox->prox(tmp,tmp2,lambda);
+                     count=0;
+                     for (const_iterator_int it = group->begin(); it != group->end(); ++it) {
+                        y[*it]=tmp2[count++];
+                     }
+                  }
+               } else {
+                  Vector<T> tmp;
+                  Vector<T> tmp2;
+                  const int p = _size_group;
+                  for (int i = 0; i+p-1<maxn; i+=p) {
+                     tmp.setPointer(x.rawX()+i,p);
+                     tmp2.setPointer(y.rawX()+i,p);
+                     _prox->prox(tmp,tmp2,lambda);
+                  }
                }
             }
             T inline eval(const Vector<T>& x) const {
                const int maxn= this->_intercept ? x.n()-1 : x.n();
                T sum=0;
-               Vector<T> tmp;
-               const int p = _size_group;
-               for (int i = 0; i+p-1<maxn; i+=p) {
-                  tmp.setPointer(x.rawX()+i,p);
-                  sum+=_prox->eval(tmp);
+               if (!_groups.empty()) {
+                  for (int i = 0; i<_groups.size(); ++i) {
+                     list_int* group=_groups[i];
+                     Vector<T> tmp(group->size());
+                     int count=0;
+                     for (const_iterator_int it = group->begin(); it != group->end(); ++it) {
+                        tmp[count++]=x[*it];
+                     }
+                     sum+=_prox->eval(tmp);
+                  }
+               } else {
+                  Vector<T> tmp;
+                  const int p = _size_group;
+                  for (int i = 0; i+p-1<maxn; i+=p) {
+                     tmp.setPointer(x.rawX()+i,p);
+                     sum+=_prox->eval(tmp);
+                  }
                }
                return sum;
             }
             virtual bool is_fenchel() const { return _prox->is_fenchel(); };
             void inline fenchel(const Vector<T>& x, T& val, T& scal) const { 
-               Vector<T> tmp;
                const int maxn= this->_intercept ? x.n()-1 : x.n();
-               const int p = _size_group;
                T val2;
                T scal2;
                scal=T(1.0);
                val=0;
-               for (int i = 0; i+p-1<maxn; i+=p) {
-                  tmp.setPointer(x.rawX()+i,p);
-                  _prox->fenchel(tmp,val2,scal2);
-                  val+=val2;
-                  scal=MIN(scal,scal2);
+               if (!_groups.empty()) {
+                  for (int i = 0; i<_groups.size(); ++i) {
+                     list_int* group=_groups[i];
+                     Vector<T> tmp(group->size());
+                     int count=0;
+                     for (const_iterator_int it = group->begin(); it != group->end(); ++it) {
+                        tmp[count++]=x[*it];
+                     }
+                     _prox->fenchel(tmp,val2,scal2);
+                     val+=val2;
+                     scal=MIN(scal,scal2);
+                  }
+               } else {
+                  const int p = _size_group;
+                  Vector<T> tmp;
+                  for (int i = 0; i+p-1<maxn; i+=p) {
+                     tmp.setPointer(x.rawX()+i,p);
+                     _prox->fenchel(tmp,val2,scal2);
+                     val+=val2;
+                     scal=MIN(scal,scal2);
+                  }
                }
             };
          protected:
             int _size_group;
+            std::vector<list_int*> _groups;
             Reg* _prox;
       };
 
@@ -3030,6 +3091,8 @@ namespace FISTA {
          param_reg.graph_path_st=const_cast<GraphPathStruct<T>* >(graph_path_st);
          param_reg.resetflow=param.resetflow;
          param_reg.clever=param.clever;
+         param_reg.ngroups=param.ngroups;
+         param_reg.groups=param.groups;
          Regularizer<T>* reg;
          switch (param.regul) {
             case L0: reg=new Lzero<T>(param_reg); break;

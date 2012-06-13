@@ -92,7 +92,8 @@
 %                 coefficients, false by default)
 %               param.transpose (optional, transpose the matrix in the regularization function)
 %               param.size_group (optional, for regularization functions assuming a group
-%                 structure)
+%                 structure). It is a scalar. When param.groups is not specified, it assumes
+%                 that the groups are the sets of consecutive elements of size param.size_group
 %               param.numThreads (optional, number of threads for exploiting
 %                 multi-core / multi-cpus. By default, it takes the value -1,
 %                 which automatically selects all the available CPUs/cores).

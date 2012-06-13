@@ -9,11 +9,11 @@ if floor(sizeEdge) ~= sizeEdge
    sizeEdge=sqrt(n/V);
 end
 
-for (ii = 1:size(D,2))
-   if (D(1,ii) > 0)
-      D(:,ii) = -D(:,ii);
-   end
-end
+% for (ii = 1:size(D,2))
+%    if (D(1,ii) > 0)
+%       D(:,ii) = -D(:,ii);
+%    end
+% end
 
 p=4.5;
         M=max((D(:)));

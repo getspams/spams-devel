@@ -509,8 +509,8 @@ Our software can handle the following regularization functions~$\psi$ for vector
 \item \textbf{The $\ell_1$-norm}: $\psi(\w) \defin \|\w\|_1$.
 \item \textbf{The Elastic-Net}: $\psi(\w) \defin \|\w\|_1+\gamma\|\w\|_2^2$.
 \item \textbf{The Fused-Lasso}: $\psi(\w) \defin \|\w\|_1+\gamma\|\w\|_2^2+\gamma_2\sum_{i=1}^{p-1}|\w_{i+1}-\w_i|$.
-\item \textbf{The group Lasso}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_2$, where $\GG$ are groups of variables of the same size.
-\item \textbf{The group Lasso with~$\ell_\infty$-norm}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_\infty$, where $\GG$ are groups of variables of the same size.
+\item \textbf{The group Lasso}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_2$, where $\GG$ are groups of variables.
+\item \textbf{The group Lasso with~$\ell_\infty$-norm}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_\infty$, where $\GG$ are groups of variables.
 \item \textbf{The sparse group Lasso}: same as above but with an additional $\ell_1$ term.
 \item \textbf{The tree-structured sum of $\ell_2$-norms}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_2$, where $\GG$ is a tree-structured set of groups~\cite{jenatton3}, and the $\eta_g$ are positive weights.
 \item \textbf{The tree-structured sum of $\ell_\infty$-norms}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_\infty$. See \cite{jenatton3}

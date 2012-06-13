@@ -1844,8 +1844,8 @@ Our software can handle the following regularization functions ψ for vectors 
 </LI><LI CLASS="li-itemize"><B>The ℓ<SUB>1</SUB>-norm</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ||<I><B>w</B></I>||<SUB>1</SUB>.
 </LI><LI CLASS="li-itemize"><B>The Elastic-Net</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ||<I><B>w</B></I>||<SUB>1</SUB>+γ||<I><B>w</B></I>||<SUB>2</SUB><SUP>2</SUP>.
 </LI><LI CLASS="li-itemize"><B>The Fused-Lasso</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ||<I><B>w</B></I>||<SUB>1</SUB>+γ||<I><B>w</B></I>||<SUB>2</SUB><SUP>2</SUP>+γ<SUB>2</SUB>∑<SUB><I>i</I>=1</SUB><SUP><I>p</I>−1</SUP>|<I><B>w</B></I><SUB><I>i</I>+1</SUB>−<I><B>w</B><SUB>i</SUB></I>|.
-</LI><LI CLASS="li-itemize"><B>The group Lasso</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ∑<SUB><I>g</I> ∈ <FONT COLOR=red><I>G</I></FONT></SUB> η<I><SUB>g</SUB></I> ||<I><B>w</B><SUB>g</SUB></I>||<SUB>2</SUB>, where <FONT COLOR=red><I>G</I></FONT> are groups of variables of the same size.
-</LI><LI CLASS="li-itemize"><B>The group Lasso with ℓ<SUB>∞</SUB>-norm</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ∑<SUB><I>g</I> ∈ <FONT COLOR=red><I>G</I></FONT></SUB> η<I><SUB>g</SUB></I> ||<I><B>w</B><SUB>g</SUB></I>||<SUB>∞</SUB>, where <FONT COLOR=red><I>G</I></FONT> are groups of variables of the same size.
+</LI><LI CLASS="li-itemize"><B>The group Lasso</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ∑<SUB><I>g</I> ∈ <FONT COLOR=red><I>G</I></FONT></SUB> η<I><SUB>g</SUB></I> ||<I><B>w</B><SUB>g</SUB></I>||<SUB>2</SUB>, where <FONT COLOR=red><I>G</I></FONT> are groups of variables.
+</LI><LI CLASS="li-itemize"><B>The group Lasso with ℓ<SUB>∞</SUB>-norm</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ∑<SUB><I>g</I> ∈ <FONT COLOR=red><I>G</I></FONT></SUB> η<I><SUB>g</SUB></I> ||<I><B>w</B><SUB>g</SUB></I>||<SUB>∞</SUB>, where <FONT COLOR=red><I>G</I></FONT> are groups of variables.
 </LI><LI CLASS="li-itemize"><B>The sparse group Lasso</B>: same as above but with an additional ℓ<SUB>1</SUB> term.
 </LI><LI CLASS="li-itemize"><B>The tree-structured sum of ℓ<SUB>2</SUB>-norms</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ∑<SUB><I>g</I> ∈ <FONT COLOR=red><I>G</I></FONT></SUB> η<I><SUB>g</SUB></I> ||<I><B>w</B><SUB>g</SUB></I>||<SUB>2</SUB>, where <FONT COLOR=red><I>G</I></FONT> is a tree-structured set of groups [<A HREF="#jenatton3">14</A>], and the η<I><SUB>g</SUB></I> are positive weights.
 </LI><LI CLASS="li-itemize"><B>The tree-structured sum of ℓ<SUB>∞</SUB>-norms</B>: ψ(<I><B>w</B></I>) =<FONT SIZE=2><SUP>▵</SUP></FONT> ∑<SUB><I>g</I> ∈ <FONT COLOR=red><I>G</I></FONT></SUB> η<I><SUB>g</SUB></I> ||<I><B>w</B><SUB>g</SUB></I>||<SUB>∞</SUB>. See [<A HREF="#jenatton3">14</A>]
@@ -2127,12 +2127,12 @@ where <I><B>V</B><SUP>j</SUP></I> is the <I>j</I>-th column of <I><B>V</B></I>.<
 %             argmin 0.5||u-v||_2^2 + lambda||v||_2<BR>
 %         if param.regul='group-lasso-l2'  <BR>
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_2 <BR>
-%             where the groups are consecutive entries of v of size param.size_group <BR>
+%             where the groups are either defined by param.groups or by param.size_group,<BR>
 %         if param.regul='group-lasso-linf'<BR>
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_inf<BR>
 %         if param.regul='sparse-group-lasso-l2'  <BR>
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_2 + lambda_2 ||v||_1<BR>
-%             where the groups are consecutive entries of v of size param.size_group <BR>
+%             where the groups are either defined by param.groups or by param.size_group,<BR>
 %         if param.regul='sparse-group-lasso-linf'<BR>
 %             argmin 0.5||u-v||_2^2 + lambda sum_g ||v_g||_inf + lambda_2 ||v||_1<BR>
 %         if param.regul='trace-norm-vec' <BR>
@@ -2173,7 +2173,11 @@ where <I><B>V</B><SUP>j</SUP></I> is the <I>j</I>-th column of <I><B>V</B></I>.<
 %                 false by default)<BR>
 %               param.transpose (optional, transpose the matrix in the regularization function)<BR>
 %               param.size_group (optional, for regularization functions assuming a group<BR>
-%                 structure)<BR>
+%                 structure). It is a scalar. When param.groups is not specified, it assumes<BR>
+%                 that the groups are the sets of consecutive elements of size param.size_group<BR>
+%               param.groups (int32, optional, for regularization functions assuming a group<BR>
+%                 structure. It is an int32 vector of size m containing the group indices of the<BR>
+%                 variables (first group is 1).<BR>
 %               param.pos (optional, adds positivity constraints on the<BR>
 %                 coefficients, false by default)<BR>
 %               param.numThreads (optional, number of threads for exploiting<BR>
@@ -2421,7 +2425,8 @@ which is a formulation presented in [<A HREF="#mairal10">21</A>].</P><P>This fun
 %                 coefficients, false by default)<BR>
 %               param.transpose (optional, transpose the matrix in the regularization function)<BR>
 %               param.size_group (optional, for regularization functions assuming a group<BR>
-%                 structure)<BR>
+%                 structure). It is a scalar. When param.groups is not specified, it assumes<BR>
+%                 that the groups are the sets of consecutive elements of size param.size_group<BR>
 %               param.numThreads (optional, number of threads for exploiting<BR>
 %                 multi-core / multi-cpus. By default, it takes the value -1,<BR>
 %                 which automatically selects all the available CPUs/cores).<BR>
@@ -3118,6 +3123,8 @@ see usage details below:
 %            param.transpose (optional, transpose the matrix in the regularization function)<BR>
 %            param.size_group (optional, for regularization functions assuming a group<BR>
 %                 structure)<BR>
+%            param.groups (int32, optional, for regularization functions assuming a group<BR>
+%                 structure, see mexProximalFlat)<BR>
 %            param.numThreads (optional, number of threads for exploiting<BR>
 %                multi-core / multi-cpus. By default, it takes the value -1,<BR>
 %                which automatically selects all the available CPUs/cores).<BR>
@@ -3229,11 +3236,20 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Group Lasso L2\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'group-lasso-l2'</FONT>;<BR>
-param.size_group=2;<BR>
+param.size_group=2;  <FONT COLOR="#007F00">% all the groups are of size 2</FONT><BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 [W optim_info]=mexFistaFlat(Y,X,W0,param);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
-<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
+<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Group Lasso L2 with variable size of groups \n'</FONT>);<BR>
+param.regul=<FONT COLOR="red">'group-lasso-l2'</FONT>;<BR>
+param2=param;<BR>
+param2.groups=int32(randi(5,1,<FONT COLOR="blue"><B>size</B></FONT>(X,2)));  <FONT COLOR="#007F00">% all the groups are of size 2</FONT><BR>
+<FONT COLOR="blue"><B>tic</B></FONT><BR>
+[W optim_info]=mexFistaFlat(Y,X,W0,param2);<BR>
+t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Trace Norm\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'trace-norm-vec'</FONT>;<BR>
@@ -3241,7 +3257,7 @@ param.size_group=5;<BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 [W optim_info]=mexFistaFlat(Y,X,W0,param);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
-<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
+<FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Regression Fused-Lasso\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'fused-lasso'</FONT>;<BR>

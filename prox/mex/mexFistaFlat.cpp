@@ -114,7 +114,20 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    param.delta = getScalarStructDef<T>(prhs[3],"delta",1.0);
    param.lambda2= getScalarStructDef<T>(prhs[3],"lambda2",0.0);
    param.lambda3= getScalarStructDef<T>(prhs[3],"lambda3",0.0);
-   param.size_group= getScalarStructDef<int>(prhs[3],"size_group",1);
+   mxArray* ppr_groups = mxGetField(prhs[3],0,"groups");
+   if (ppr_groups) {
+      if (!mexCheckType<int>(ppr_groups))
+         mexErrMsgTxt("param.groups should be int32 (starting group is 1)");
+      int* pr_groups = reinterpret_cast<int*>(mxGetPr(ppr_groups));
+      const mwSize* dims_groups =mxGetDimensions(ppr_groups);
+      int num_groups=static_cast<int>(dims_groups[0])*static_cast<int>(dims_groups[1]);
+      if (num_groups != pAlpha) mexErrMsgTxt("Wrong size of param.groups");
+      param.ngroups=num_groups;
+      param.groups=pr_groups;
+   } else {
+      param.size_group= getScalarStructDef<int>(prhs[3],"size_group",1);
+   }
+
    param.admm = getScalarStructDef<bool>(prhs[3],"admm",false);
    param.lin_admm = getScalarStructDef<bool>(prhs[3],"lin_admm",false);
    param.sqrt_step = getScalarStructDef<bool>(prhs[3],"sqrt_step",true);

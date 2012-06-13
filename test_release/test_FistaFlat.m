@@ -80,11 +80,22 @@ fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,
 
 fprintf('\nFISTA + Group Lasso L2\n');
 param.regul='group-lasso-l2';
-param.size_group=2;
+param.size_group=2;  % all the groups are of size 2
 tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param);
 t=toc;
-fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
+fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
+
+fprintf('\nFISTA + Group Lasso L2 with variable size of groups \n');
+param.regul='group-lasso-l2';
+param2=param;
+param2.groups=int32(randi(5,1,size(X,2)));  % all the groups are of size 2
+param2.lambda=10*param2.lambda;
+tic
+[W optim_info]=mexFistaFlat(Y,X,W0,param2);
+t=toc;
+fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
+return;
 
 fprintf('\nFISTA + Trace Norm\n');
 param.regul='trace-norm-vec';
@@ -92,7 +103,7 @@ param.size_group=5;
 tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param);
 t=toc;
-fprintf('mean loss: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),t,mean(optim_info(4,:)));
+fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 
 fprintf('\nFISTA + Regression Fused-Lasso\n');
 param.regul='fused-lasso';
