@@ -1463,10 +1463,12 @@ t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 param.regul=<FONT COLOR="red">'group-lasso-l2'</FONT>;<BR>
 param2=param;<BR>
 param2.groups=int32(randi(5,1,<FONT COLOR="blue"><B>size</B></FONT>(X,2)));  <FONT COLOR="#007F00">% all the groups are of size 2</FONT><BR>
+param2.lambda=10*param2.lambda;<BR>
 <FONT COLOR="blue"><B>tic</B></FONT><BR>
 [W optim_info]=mexFistaFlat(Y,X,W0,param2);<BR>
 t=<FONT COLOR="blue"><B>toc</B></FONT>;<BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n'</FONT>,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(1,:)),<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(3,:)),t,<FONT COLOR="blue"><B>mean</B></FONT>(optim_info(4,:)));<BR>
+<FONT COLOR="blue"><B>return</B></FONT>;<BR>
 <BR>
 <FONT COLOR="blue"><B>fprintf</B></FONT>(<FONT COLOR="red">'\nFISTA + Trace Norm\n'</FONT>);<BR>
 param.regul=<FONT COLOR="red">'trace-norm-vec'</FONT>;<BR>

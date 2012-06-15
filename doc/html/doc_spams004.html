@@ -500,7 +500,6 @@ X=X(:,1:10:<FONT COLOR="blue"><B>end</B></FONT>);<BR>
 X=X ./ repmat(<FONT COLOR="blue"><B>sqrt</B></FONT>(<FONT COLOR="blue"><B>sum</B></FONT>(X.^2)),[<FONT COLOR="blue"><B>size</B></FONT>(X,1) 1]);<BR>
 <BR>
 param.K=49;  <FONT COLOR="#007F00">% learns a dictionary with 100 elements</FONT><BR>
-param.lambda=0.15;<BR>
 param.numThreads=4; <FONT COLOR="#007F00">% number of threads</FONT><BR>
 <BR>
 param.iter=-5;  <FONT COLOR="#007F00">% let us see what happens after 100 iterations.<BR>
