@@ -195,8 +195,40 @@ def test_trainDL_Memory():
 
     return None
 
+def test_nmf():
+    img_file = '../extdata/boat.png'
+    try:
+        img = Image.open(img_file)
+    except:
+        print "Cannot load image %s : skipping test" %img_file
+        return None
+    I = np.array(img) / 255.
+    if I.ndim == 3:
+        A = np.asfortranarray(I.reshape((I.shape[0],I.shape[1] * I.shape[2])))
+        rgb = True
+    else:
+        A = np.asfortranarray(I)
+        rgb = False
+
+    m = 16;n = 16;
+    X = spams.im2col_sliding(A,m,n,rgb)
+    X = X[:,::10]
+    X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)))
+    ########## FIRST EXPERIMENT ###########
+    tic = time.time()
+    (U,V) = spams.nmf(X,return_lasso= True,K = 49,numThreads=4,iter = -5)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    print 'Evaluating cost function...'
+    Y = X - U * V
+    R = np.mean(0.5 * (Y * Y).sum(axis=0))
+    print 'objective function: %f' %R
+    return None
 
 tests = {
     'trainDL' : test_trainDL,
     'trainDL_Memory' : test_trainDL_Memory,
+    'nmf' : test_nmf,
 }

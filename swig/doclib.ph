@@ -22,6 +22,7 @@ my %undocumented = ("mult",1,"im2col_sliding",1);
     "ProximalFlat", "proximalFlat",
     "TrainDL", "trainDL",
     "TrainDL_Memory", "trainDL_Memory",
+    "nmf", "nmf",
     "CD", "cd",
     "LassoMask", "lassoMask",
     "LassoWeighted", "lassoWeighted",
@@ -159,24 +160,29 @@ sub read_test {
     close(IN);
 }
 # read a .m doc file
-# in : $f = file path
+# in : $mlab_prog = matlab prog name (=> file mex$mlab_prog.m)
 #      $r_mode (bool) = true if R
 #      $mlab_prog = name of matlab function
 #      $myprog = name of non matlab function
 # out : $doc (hash) = arrays of lines by doc section 
 sub get_doc {
-    my($f,$r_mode,$mlab_prog,$myprog,$doc) = @_;
+    my($mlab_prog,$r_mode,$mlab_prog,$myprog,$doc) = @_;
+    my $f = "$main::mlab_dir/mex$mlab_prog.m";
     if(! open(IN,"<$f") ) {
-	print "ERR $f open err $!\n";
-	exit 1;
-	return 0;
+	my $f1 = "$main::mlab_dir/$mlab_prog.m";
+	print "Warning! $f open err ($!), trying $f1\n";
+	if(! open(IN,"<$f1") ) {
+	    print "ERR $f1 open err ($!)\n";
+#	    exit 1;
+	    return 0;
+	}
     }
     my @lines = ();
     my $stat = 0; # 1 when usage is found
     my $prefix = $r_mode ? "spams." : "";
     while(<IN>) {
 	chomp;
-	s/^%+\s?//;
+	(s/^%+\s?//) || next;  # extrcat comment only
 	if(! $stat) { # skip to Usage
 	    (s/^Usage\s*:\s*//) || next;
 	    $stat = 1;
@@ -518,10 +524,9 @@ sub apply_modifs {
 # Out : $doc of the function
 sub prepare_doc {
     my($r_mode,$mlab_prog,$myprog,$doc,$format,$spams,$progdefs) = @_;
-    my $f = "$main::mlab_dir/mex$mlab_prog.m";
     my $fref = "./refman/$myprog.in";
     my %modifs = ();
-    get_doc($f,$r_mode,$mlab_prog,$myprog,$doc) || return;
+    get_doc($mlab_prog,$r_mode,$mlab_prog,$myprog,$doc) || return;
     split_description($doc);
 
     get_modifs($r_mode,$fref,$myprog,\%modifs,$spams,$progdefs);

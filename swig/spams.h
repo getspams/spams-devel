@@ -337,7 +337,8 @@ SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path
 #endif
 template<typename T> 
 Matrix<T> *_fistaFlat(Matrix<T> *X,AbstractMatrixB<T> *D,Matrix<T> *alpha0,
-	     Matrix<T> *alpha,  // params
+	     Matrix<T> *alpha,  
+	     Vector<int> *groups, // params
 	     int num_threads,
 	     int max_it,
 	     T L0,
@@ -416,6 +417,14 @@ using namespace FISTA;
   param.pos = pos;
   param.clever = clever;
 
+  if(groups->n() == 0) { // groups is not given
+      param.size_group = size_group;
+  } else {
+    param.ngroups = groups->n();
+    if (param.ngroups != pAlpha)
+      throw("fistaFlat : Wrong size of param.groups");
+    param.groups = groups->rawX();
+  }
   if(param.log = log) {
     int n = strlen(logName);
     if(n == 0) 
@@ -434,7 +443,6 @@ using namespace FISTA;
   }
 
   param.eval = false;
-  param.size_group = size_group;
   param.sqrt_step = sqrt_step;
   param.transpose = transpose;
 
@@ -640,7 +648,8 @@ using namespace FISTA;
 }
 
 template<typename T> 
-Vector<T> *_proximalFlat(Matrix<T> *alpha0,Matrix<T> *alpha, // params
+Vector<T> *_proximalFlat(Matrix<T> *alpha0,Matrix<T> *alpha, 
+		 Vector<int> *groups,  // params
 		int num_threads,
 		T lambda1,
 		T lambda2,
@@ -675,7 +684,6 @@ using namespace FISTA;
   param.pos = pos;
   param.clever = clever;
   param.eval = eval;
-  param.size_group = size_group;
   param.transpose = transpose;
   if (param.num_threads == -1) {
     param.num_threads=1;
@@ -683,7 +691,16 @@ using namespace FISTA;
       param.num_threads =  MIN(MAX_THREADS,omp_get_num_procs());
 #endif
    }
-
+  if(groups->n() == 0) { // groups is not given
+    param.size_group = size_group;
+  } else {
+    int pAlpha = alpha0->m();
+    param.ngroups = groups->n();
+    if (param.ngroups != pAlpha)
+      throw("fistaFlat : Wrong size of param.groups");
+    param.groups = groups->rawX();
+  }
+  
   Vector<T> *val_loss = new Vector<T>();
   FISTA::PROX((Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Vector<T> &)(*val_loss));
   return val_loss;
@@ -802,8 +819,6 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
 #endif
   if (in_memory) return_model = false;
   if (batch_size < 0) batch_size = 256 * (num_threads + 1);
-  if (iter < 0)
-    throw("trainDL : bad iter param\n");
   int n = X->m();
   int M = X->n();
   Trainer<T>* trainer;

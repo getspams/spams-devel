@@ -61,7 +61,7 @@ fi
 err=0
 for nom in $lst; do
     [ $flg_swig -ne 0 ] && {
-	swig -c++ -python $INC $OPT_DBG -o ${nom}_wrap.cpp $nom.i
+	swig -c++ -python $OPT_DBG -o ${nom}_wrap.cpp $nom.i
 	[ $? -ne 0 ] && exit
     }
     if [ -e $nom.cpp ]; then

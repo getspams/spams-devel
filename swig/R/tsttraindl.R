@@ -6,7 +6,7 @@ library(png)
   argv <- list(...)
   cat(sprintf(...))
 }
-I = readPNG('boat.png')
+I = readPNG('../extdata/boat.png')
 rgb = FALSE
 
 if (length(dim(I)) == 3) {
@@ -21,22 +21,21 @@ X = spams.im2col_sliding(A,m,n)
 X = X - matrix(rep(colMeans(X),nrow(X)),nrow(X),ncol(X),byrow = T)
 X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
 
-param = list( 'K' = 100, # learns a dictionary with 100 elements
-  'lambda' = 0.15, 'numThreads' = 4, 'batchsize' = 400,
-  'iter' = 1000)
+lambda1 = 0.15
 
 ########## FIRST EXPERIMENT ###########
 tic = proc.time()
-D = spams.TrainDL(X,param)
-tac = proc.time()
-t = (tac - tic)[['elapsed']]
-.printf("time of computation for Dictionary Learning: %f\n",t)
+ D <- spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
 
-.printf("Evaluating cost function...\n")
-alpha = spams.Lasso(X,D,param)
+  .printf("Evaluating cost function...\n")
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
+  .printf("objective function: %f\n",R)
 
-R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + param[['lambda']] * colSums(abs(alpha)))
-.printf("objective function: %f\n",R)
+quit()
 
 #### SECOND EXPERIMENT ####
 .printf("*********** SECOND EXPERIMENT ***********\n")

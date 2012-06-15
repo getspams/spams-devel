@@ -19,7 +19,7 @@ done
 
 nom=spams
 pkdir=pkg/$nom
-INC="-I../linalg"
+
 rfiles="zzz.R r_$nom.R ${nom}.R"
 if [ $debug -eq 0 ]; then
     OPT_DBG=""
@@ -28,11 +28,10 @@ else
     rfiles="$rfiles r_debug.R"
     export OPT_DBG
 fi    
-#export PKG_CXXFLAGS=$INC
 export PKG_LIBS="-lblas -llapack"
 rm -rf $pkdir
 if [ $nswg -eq 0 ]; then
-    swig -c++ -r $INC $OPT_DBG -o ${nom}.cpp $nom.i
+    swig -c++ -r $OPT_DBG -o ${nom}.cpp $nom.i
     [ $? -ne 0 ] && exit 1
 fi
 [ -d $pkdir ] || mkdir -p $pkdir/R

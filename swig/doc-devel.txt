@@ -1,0 +1,74 @@
+Ce fichier décrit les mécanismes utilisés pour la réalisation
+des interfaces python et R de spams.
+
+Les APIs:
+---------
+
+Les APIs sont définies respectivement dans python/spams.py
+et R/r_spams.R
+Les fonctions définies ici sont les mêmes que celles définies pour matlab
+au nommage et aux mécanismes de passage d'arguments près
+(pour respecter les conventions des langages).
+En R et python les noms de foction commencent par une minuscule.
+En R les noms sont préfixés par 'spams.'.
+En python on construit un module spams, ce qui introduit le même préfixe 'spams.'
+Par exemple les fonctions matlab mexSort et mexLassoMask deviennent
+spams.sort et spams.lassoMask
+
+Les arguments optionnels, en particulier ceux qui correspondent 
+à la structure param de matlab apparaissent explicitement avec leurs 
+valeurs par défaut dans la définitions des fonctions.
+Lors de l'appel des fonctions, ces paramètres sont optionnels, mais doivent être
+nommés.
+
+valeurs de retour multiples:
+---------------------------
+- python : on retourne un n-uplet
+   ex: (W, optim_info) = spams.fistaFlat(....)
+- R : on retourne une liste; il faut ensuite extraire les résultats de cette liste
+   ex : res = spams.fistaFlat(....)
+        W = res[[1]]
+  	optim_info = res[[2]]
+
+Concrètement, il n'y a qu'une ou deux valeurs de retour.
+Dans le cas où la 2e valeur n'est pas obligatoire, on a introduit une variable
+booléenne.
+  Ex : (alpha,path) = spams.lasso(X,return_reg_path = True,...)
+
+Construction des interfaces avec SWIG
+=====================================
+
+Principe : 
+----------
+Le fichier spams.h encapsule les fonctions SPAMS qui doivent être interfacées :
+   vérification de validité, conversion de paramètres (transformation des références en pointeurs,
+   remplissage des structures param, ...)
+Pour chaque fonction de spams.h SWIG construit une interface python qui est utilisée
+par les fonctions de spams.py ou r_spams.R
+Exemples:
+	 spams.invSym (spams.py) -> spams_wrap.invSym (swig) -> _invSym (spams.h) -> Matrix<T>::invSym (linalg.h)
+	 spams.fistaFlat (r_spams.R) -> fistaFlat (swig) -> _fistaFlat (spams.h) -> FISTA::solver (fista.h)
+
+
+Les fichiers:
+-------------
+a) communs:
+----------
+spams.h 
+spams.i, spamstools.i : fichiers de config pour SWIG
+
+b) spécifiques python:
+----------------------
+py_typemaps.i : config pour SWIG
+numpy.i : extrait du package numpy pour quelques macros utiles à SWIG
+spams.py : définitions des APIs "officielle".
+
+
+principe du build:
+
+python:
+  swig -c++ -python -o spams_wrap.cpp spams.i
+  fabrication de compilation de _spams_wrap.so à partir de spams_wrap.cpp
+  Installation de spams.py et _spams_wrap.so dans un endroit connu de python
+
+R:

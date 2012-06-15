@@ -48,10 +48,18 @@ test_fistaFlat <- function() {
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.05, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'elastic-net',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1)),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
-  .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+  .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
 
   .printf("\nFISTA + Group Lasso L2\n")
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.05, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'group-lasso-l2',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,size_group = 2)),n = 1)
+  W = res[[1]]
+  optim_info = res[[2]]
+  .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+
+  .printf("\nFISTA + Group Lasso L2 with variable size of groups\n")
+  groups = matrix(sample(1:5,ncol(X),replace=TRUE),nrow = 1)
+  res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.5, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'group-lasso-l2',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,size_group = 2,
+    groups = groups)),n = 1)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
@@ -60,6 +68,7 @@ test_fistaFlat <- function() {
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, number of iterations: %f\n",optim_info[1],optim_info[4])
+  
 ###
   .printf("\nFISTA + Regression Fused-Lasso\n")
   res = Xtest1('spams',quote(spams.fistaFlat(Y,X,W0,TRUE,numThreads = 1,verbose = TRUE,lambda1 = 0.05, it0 = it0, max_it = max_it,L0 = 0.1, tol = 1e-3, intercept = FALSE,pos = FALSE,compute_gram = TRUE, loss = 'square',regul = 'fused-lasso',ista = FALSE,subgrad = FALSE,a = 0.1, b = 1000,lambda2 = 0.1,lambda3 = 0.1,size_group = 5)),n = 1)

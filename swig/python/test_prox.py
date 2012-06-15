@@ -31,6 +31,7 @@ def test_fistaFlat():
     # param.regul='group-lasso-l2';
     # param.size_group=10;
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
+    print "XX %s" %str(optim_info.shape);return None
     print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:],0))
 ###
     print '\nISTA + Regression l1'
@@ -75,13 +76,21 @@ def test_fistaFlat():
     param['regul'] = 'group-lasso-l2'
     param['size_group'] = 2
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
-    print 'mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:]))
+    print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:],0))
     
+    print '\nFISTA + Group Lasso L2 with variable size of groups'
+    param['regul'] = 'group-lasso-l2'
+    param2=param
+    param2['groups'] = np.array(np.random.random_integers(1,5,X.shape[1]),dtype = np.int32)
+    param2['lambda1'] *= 10
+    (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
+    print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:],0))
+
     print '\nFISTA + Trace Norm'
     param['regul'] = 'trace-norm-vec'
     param['size_group'] = 5
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
-    print 'mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:]))
+    print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:]))
     
 ####    
    

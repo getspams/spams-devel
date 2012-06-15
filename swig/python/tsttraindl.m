@@ -15,7 +15,7 @@ param.lambda=0.15;
 param.numThreads=4; % number of threads
 param.batchsize=400;
 
-param.iter=1000;  % let us see what happens after 1000 iterations.
+param.iter=100;  % let us see what happens after 1000 iterations.
 
 tic
 D = mexTrainDL(X,param);
@@ -27,6 +27,8 @@ fprintf('Evaluating cost function...\n');
 alpha=mexLasso(X,D,param);
 R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
 fprintf('objective function: %f\n',R);
+return;
+
 fprintf('*********** SECOND EXPERIMENT ***********\n');
 
 %%%%%%%%%% SECOND EXPERIMENT %%%%%%%%%%%

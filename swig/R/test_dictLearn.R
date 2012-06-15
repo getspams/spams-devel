@@ -152,7 +152,34 @@ test_trainDL_Memory <- function() {
 }
 
 #
+test_nmf <- function() {
+  I = readPNG(paste(.imagesDir,'boat.png',sep= '/'))
+  if (length(dim(I)) == 3) {
+    A = matrix(I,nrow = nrow(I),ncol = 3 * ncol(I))
+  } else {
+    A = I
+  }
+  m = 16;n = 16;
+  X = spams.im2col_sliding(A,m,n)
+  X = X[,seq(from = 1,to = ncol(X),by = 10)]
+  X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+  
+########## FIRST EXPERIMENT ###########
+  tic = proc.time()
+  res <- spams.nmf(X,return_lasso= TRUE,K = 49,numThreads=4,iter = -5)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  U = res[[1]]
+  V = res[[2]]
+  .printf("Evaluating cost function...\n")
+  R = mean(0.5 * colSums((X - U %*% V) ^ 2))
+  .printf("objective function: %f\n",R)
+  return(NULL)
+}
+
 
 test_dictLearn.tests = list('trainDL' = test_trainDL,
-  'trainDL_Memory' = test_trainDL_Memory
+  'trainDL_Memory' = test_trainDL_Memory,
+  'nmf' = test_nmf
   )

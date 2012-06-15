@@ -79,7 +79,8 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
     Vector<ctype> *Lambda,
     Vector<ctype> *eta_g,
     Vector<ctype> *own_variables,
-    Vector<ctype> *N_own_variables
+    Vector<ctype> *N_own_variables,
+    Vector<ctype> *groups
 %enddef
 %define inplace_spmatrices(ctype)
     SpMatrix<ctype> *A,

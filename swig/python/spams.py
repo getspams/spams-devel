@@ -234,7 +234,7 @@ def fistaFlat(
     compute_gram=False,lin_admm=False,admm=False,intercept=False,
     resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
     log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-    inner_weights=np.array([0.]),size_group=1,sqrt_step=True,transpose=False):
+    inner_weights=np.array([0.]),size_group=1,groups = None,sqrt_step=True,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ("max_it" , 1000),('L0',1.0),
 #                 ('fixed_step',False),
@@ -251,8 +251,10 @@ def fistaFlat(
 #
 ##    params = __param_struct(paramlist,param)
 #    W = np.empty((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+    if groups == None:
+        groups = np.array([],dtype=np.int32,order="FORTRAN")
     W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
-    optim_info = spams_wrap.fistaFlat(Y,X,W0,W,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
+    optim_info = spams_wrap.fistaFlat(Y,X,W0,W,groups,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
     if(return_optim_info != None):
         return(W,optim_info)
     else:
@@ -281,7 +283,7 @@ def fistaTree(
 
 def proximalFlat(U,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=False,resetflow=False,regul="",verbose=False,
-                 pos=False,clever=True,eval= None,size_group=1,transpose=False):
+                 pos=False,clever=True,eval= None,size_group=1,groups = None,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ('lambda',1.0),('lambda2',0.),
 #                 ('lambda3',0.),('intercept',False),('resetflow',False),
@@ -290,10 +292,13 @@ def proximalFlat(U,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.
 #                 ('size_group',1),('transpose',False)]
 #    params = __param_struct(paramlist,param)
 
+    if groups == None:
+        groups = np.array([],dtype=np.int32,order="FORTRAN")
+
     if eval == None:
         eval = return_val_loss
     alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
-    val_loss = spams_wrap.proximalFlat(U,alpha,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
+    val_loss = spams_wrap.proximalFlat(U,alpha,groups,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
     if return_val_loss:
         return(alpha,val_loss)
     else:
@@ -331,7 +336,7 @@ def proximalTree(U,tree,return_val_loss = False,numThreads =-1,lambda1=1.0,lambd
 
 ###########  dictLearn ##################
 def __allTrainDL(X,return_model= None,model= None,in_memory= False,
-                 D = np.array([[],[]],dtype=np.float64,order="FORTRAN"),numThreads = -1,
+                 D = None,numThreads = -1,
                  batchsize = -1,K= -1,lambda1= None,lambda2= 10e-10,iter=-1,t0=1e-5,
                  mode=spams_wrap.PENALTY,posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,
                  whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,
@@ -348,6 +353,9 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
 #                 ('logName','')
 #                 ]
 #    params = __param_struct(paramlist,param)
+
+    if D == None:
+        D = np.array([[],[]],dtype=np.float64,order="FORTRAN")
     if lambda1 == None:
         raise ValueError("trainDL : lambda1 must be defined")
 
@@ -373,8 +381,8 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
         return x
 
 def trainDL(
-    X,return_model= False,model= None,D = np.array([[],[]],dtype=np.float64,
-    order="FORTRAN"),numThreads = -1,batchsize = -1,K= -1,lambda1= None,
+    X,return_model= False,model= None,D = None,
+    numThreads = -1,batchsize = -1,K= -1,lambda1= None,
     lambda2= 10e-10,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,posAlpha=False,posD=False,
     expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,
     rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,
@@ -383,13 +391,36 @@ def trainDL(
     return __allTrainDL(X,return_model,model,False,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
 
-def trainDL_Memory(X,D = np.array([[],[]],dtype=np.float64,order="FORTRAN"),numThreads = -1,batchsize = -1,
+def trainDL_Memory(X,D = None,numThreads = -1,batchsize = -1,
                    K= -1,lambda1= None,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,
                    posD=False,expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
     lambda2= 10e-10
     verbose = False
     posAlpha = False
+
     return __allTrainDL(X,False,None,True,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
+
+def nmf(X,return_lasso= False,model= None,D = None,
+        numThreads = -1,batchsize = -1,K= -1,
+        iter=-1,t0=1e-5,clean=True,rho=1.0,modeParam=0,batch=False):
+
+    lambda1 = 0
+    if D == None:
+        D = np.array([[],[]],dtype=np.float64,order="FORTRAN")
+
+    U = trainDL(X,model = model,D = D,numThreads = numThreads,batchsize = batchsize,
+                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=False, 
+                modeParam = modeParam,batch = batch, lambda1 = lambda1,
+                mode = spams_wrap.PENALTY, posAlpha=True,posD=True,whiten=False)
+    if not return_lasso:
+        return U
+
+    if ssp.issparse(X):
+        raise ValueError("sparse matrix for lasso not yet implemented")
+    else:
+        V = lasso(X,D = U,return_reg_path = False, numThreads = numThreads,
+                  lambda1 = lambda1,mode = spams_wrap.PENALTY, pos=True)
+    return(U,V)
 
 ###########  END dictLearn ##############
 def im2col_sliding(A,m,n,RGB = False):
