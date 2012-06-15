@@ -95,7 +95,6 @@ tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param2);
 t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
-return;
 
 fprintf('\nFISTA + Trace Norm\n');
 param.regul='trace-norm-vec';
