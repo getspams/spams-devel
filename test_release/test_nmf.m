@@ -7,7 +7,6 @@ X=X(:,1:10:end);
 X=X ./ repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
 
 param.K=49;  % learns a dictionary with 100 elements
-param.lambda=0.15;
 param.numThreads=4; % number of threads
 
 param.iter=-5;  % let us see what happens after 100 iterations.
