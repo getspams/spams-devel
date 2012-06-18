@@ -1,23 +1,31 @@
 #!/bin/sh
 case $1 in -x) set -x;shift;;esac
 
-usage() {
-    echo "Usage: $0 [-tar]"
-    echo " prepare a spams-python/ for distribution in ./dist/"
-    echo "  -tar : make a tar file"
+die () {
+    echo $*
     exit 1
 }
 
-mktar=0
+usage() {
+    echo "Usage: $0 [-f]"
+    echo " prepare a spams-python/ for distribution in ./dist/"
+    echo "  -f : do not rebuild the doc from scratch"
+    exit 1
+}
+
+rmdoc=1
 case $1 in
-    -tar) mktar=1;shift;;
+    -f) rmdoc=0;shift;;
 esac
 [ $# -gt 0 ] && usage
+
+[ -x ./mkdist ] || die "You must be in the directory containing mkdist"
 
 nom=spams
 /bin/rm -rf dist
 swig -c++ -python -o ${nom}_wrap.cpp $nom.i
 python setup.py sdist
+[ $? -eq 0 ] || die "setup error; cannot continue"
 cdir=`/bin/pwd`
 cd dist
 tar zxf *.tar.gz
@@ -33,7 +41,7 @@ cp -p INSTALL-package $tmpd
 rm -f $tmpd/README
 # doc
 cd $cdir
-[ $mktar -ne 0 ] && /bin/rm -rf tmp-doc
+[ $rmdoc -ne 0 ] && /bin/rm -rf tmp-doc
 ../mkdoc
 doc=tmp-doc
 mkdir $tmpd/sphinx
@@ -44,7 +52,7 @@ cp -p $doc/build/latex/SPAMS.pdf $tmpd/python-interface.pdf
 cd dist
 name=spams-python
 mv $dir $name
-[ $mktar -eq 0 ] && exit 0
+
 tgz=$name-v2.3-svn`date +%Y-%m-%d`.tar.gz
 tar zcf $tgz $name
 cp -p $tgz ../${name}_svn.tar.gz

@@ -191,7 +191,7 @@ sub parse_args {
     my @res = ();
     for(my $i = 0;$i <= $#$lines;$i++) {
 	my $s = $$lines[$i];
-	if($s =~ s/^\s*([^\s:]+)\s*:\s*//) {
+	if($s =~ s/^\s*([^\s:]+)\s*:\s+//) {
 	    my $v = $1;
 	    if($in_var) {
 		push(@res,"}}");

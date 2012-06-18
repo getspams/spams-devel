@@ -400,15 +400,13 @@ def trainDL_Memory(X,D = None,numThreads = -1,batchsize = -1,
 
     return __allTrainDL(X,False,None,True,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
-def nmf(X,return_lasso= False,model= None,D = None,
+def nmf(X,return_lasso= False,model= None,
         numThreads = -1,batchsize = -1,K= -1,
         iter=-1,t0=1e-5,clean=True,rho=1.0,modeParam=0,batch=False):
 
     lambda1 = 0
-    if D == None:
-        D = np.array([[],[]],dtype=np.float64,order="FORTRAN")
 
-    U = trainDL(X,model = model,D = D,numThreads = numThreads,batchsize = batchsize,
+    U = trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
                 K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=False, 
                 modeParam = modeParam,batch = batch, lambda1 = lambda1,
                 mode = spams_wrap.PENALTY, posAlpha=True,posD=True,whiten=False)

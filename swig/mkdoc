@@ -5,7 +5,12 @@ die () {
     echo "$1"
     exit 1
 }
-
+R_usage () {
+    echo "Usage: $0 [-s|-t]"
+    echo "   -s : sphinx doc only"
+    echo "   -t : latex doc only"
+    exit 1
+}
 [ -x ../mkdoc ] || die "This script must be in the parent dirtectory"
 export PYTHONPATH=""
 
@@ -25,7 +30,7 @@ if [ $r_mode -eq 0 ];then
 	case $1 in
 	    -s) flg_doc=1;;
 	    -t) flg_doc=2;;
-	    *) die "Usage: $0 [-s|-t]";;
+	    *) R_usage;;
 	esac
 	shift
     done

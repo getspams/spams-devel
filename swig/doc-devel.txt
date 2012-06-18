@@ -35,20 +35,29 @@ Dans le cas où la 2e valeur n'est pas obligatoire, on a introduit une variable
 booléenne.
   Ex : (alpha,path) = spams.lasso(X,return_reg_path = True,...)
 
+
 Construction des interfaces avec SWIG
 =====================================
 
 Principe : 
 ----------
-Le fichier spams.h encapsule les fonctions SPAMS qui doivent être interfacées :
+Le fichier spams.h encapsule les fonctions (template) SPAMS qui doivent être interfacées :
    vérification de validité, conversion de paramètres (transformation des références en pointeurs,
    remplissage des structures param, ...)
 Pour chaque fonction de spams.h SWIG construit une interface python qui est utilisée
 par les fonctions de spams.py ou r_spams.R
 Exemples:
-	 spams.invSym (spams.py) -> spams_wrap.invSym (swig) -> _invSym (spams.h) -> Matrix<T>::invSym (linalg.h)
-	 spams.fistaFlat (r_spams.R) -> fistaFlat (swig) -> _fistaFlat (spams.h) -> FISTA::solver (fista.h)
+	 spams.invSym (spams.py) -> spams_wrap.invSym ([SWIG] spams_wrap.py) -> _spams_wrap.invSym ([SWIG] spams_wrap.cpp)-> _invSym (spams.h) -> Matrix<T>::invSym (linalg.h)
+	 spams.fistaFlat (r_spams.R) -> fistaFlat ([SWIG] spams.R) -> R_swig_fistaFlat ([SWIG] spams.cpp) -> _fistaFlat (spams.h) -> FISTA::solver (fista.h)
 
+Valeurs retournées de type matrice ou vecteur:
+---------------------------------------------
+Dans la majoruté des cas les fonctions de spams.h sont de type void.
+Les retours se font par passage de pointeurs en argument des fonctions.
+Si la taille des matrices retournées est connue a priori, alors la matrice est créée 
+dans la fonction python ou R, de façon à déléguer la gestion mémoire au langage cible.
+Sauf exception, ausi bien en entrée qu'en sortie, il n'y a pas pas de recopie des données entre C++ et python/R,
+mais passage des pointeurs.
 
 Les fichiers:
 -------------
@@ -61,14 +70,78 @@ b) spécifiques python:
 ----------------------
 py_typemaps.i : config pour SWIG
 numpy.i : extrait du package numpy pour quelques macros utiles à SWIG
-spams.py : définitions des APIs "officielle".
+spams.py : définitions des APIs "officielles".
+
+b) spécifiques R:
+-----------------
+R_typemaps.i : config pour SWIG
+r_spams.R : définitions des APIs "officielles".
+
 
 
 principe du build:
-
+------------------
 python:
   swig -c++ -python -o spams_wrap.cpp spams.i
-  fabrication de compilation de _spams_wrap.so à partir de spams_wrap.cpp
+  Fabrication  de _spams_wrap.so à partir de spams_wrap.cpp
   Installation de spams.py et _spams_wrap.so dans un endroit connu de python
 
 R:
+ swig -c++ -r -o spams.cpp spams.i
+ Fabrication  de spams.so à partir de spams.cpp
+ Installation de r_spams.R et spams.so dans un endroit connu de R
+
+Configuration SWIG:
+-------------------
+Le fichier de config est spams.i . Il inclut spamstools.i et selon le langage 
+py_typemaps.i ou R_typemaps.i
+
+Les fonctions étant définies sous forme de template, il faut indiquer à swig
+comment les instancier : une directive %template par fonction et par type à instancier.
+En pratique on se limite à <double>
+La macro INSTANTIATE_DATA définie dans py_typemaps.i et R_typemaps.i
+est appliquée à toutes les fonctions dans spams.i
+
+La façon de transmettre les arguments est régie par des "typemaps"
+Les typemaps sont définis dans py_typemaps.i et R_typemaps.i et appliqués dans spamstools.i.
+
+%typemap(argtype) (type-expression) [(initialisations)] { code à insérer}
+argtype = type d'argument : in, out (argument recevant une valeur en sortie), argout (retour de fonction C++)
+type-expression : la chaine de caractères décrivant les arguments à traiter (par ex Matrix<double> *INPLACE_MATRIX). C'est l'identifiant du typemap.
+
+%apply  type-expression { liste des arguments effectif }
+Par ex 'Matrix<double> *INPLACE_MATRIX' sera appliqué à 'Matrix<double> *A', 'Matrix<double> *B'.
+
+Pour chaque argument détecté, le code indiqué dans %typemap sera inséré, après quelques substitutions
+($1 = nom de l'argument de la fonction, arg$argnum : nom de la variable généré par swig)
+
+Pour une écriture plus compacte on définit un certain nombre de macros.
+
+
+Fabrication des packages:
+==========================
+
+Dans chacun des répertoires python et R, un script mkdist, à exécuter dans ce répertoire permet 
+de générer le package dans le format standard du langage.
+./mkdist produit un fichier spams-<lang>_svn.tar.gz et un fichier dist/spams-<lang>-<version>-svn<aaaa-mm-jj>.tar.gz
+Le contenu du .tar.gz reste dans dist/spams-<lang>
+La doc de type "help" est produite par appel à docmatlab2python ou docmatlab2R,
+et la doc html et pdf par appal à ../mkdoc
+
+Pour des fins de test, il est possible de générer une interface en local (sans le help online):
+python:
+------
+ ./mkpy spams
+  Les 3 fichiers du package (spams.py, spams_wrap.py, _spams_wrap.so) sont alors
+   dans le directory courant.
+
+R:
+--
+./mybuild
+  résulta dans ./lib/spams (export R_LIBS=./lib/spams
+
+Dans le cas de R, avant toute nouvelle distrib, il faut appliquer une procédure de vérification :
+./docmatlab2R r_spams
+./mybuild -nb
+R CMD check pkg/spams
+

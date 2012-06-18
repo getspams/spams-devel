@@ -166,7 +166,7 @@ sub read_test {
 #      $myprog = name of non matlab function
 # out : $doc (hash) = arrays of lines by doc section 
 sub get_doc {
-    my($mlab_prog,$r_mode,$mlab_prog,$myprog,$doc) = @_;
+    my($mlab_prog,$r_mode,$myprog,$doc) = @_;
     my $f = "$main::mlab_dir/mex$mlab_prog.m";
     if(! open(IN,"<$f") ) {
 	my $f1 = "$main::mlab_dir/$mlab_prog.m";
@@ -271,7 +271,7 @@ sub get_doc {
 		    my $p2 = $2;
 		    $n = $$deltas[$#$deltas];
 		    push(@$deltas,$n);
-		    push(@$tmp,"$p1:");
+		    push(@$tmp,"$p1: ");
 		    s/^param\.[\w]+\s*,\s*param\.[\w]+\s*/$p2: /;
 		} else {
 		    if (! /^param\.([^\s]+)\s*=/) {
@@ -306,6 +306,8 @@ sub set_indent {
     if($main::alignments{$key} eq 'ONKEY') { return length($key);}
     $main::alignments{$key}; # it must be a nb of spaces
 }
+
+# wextract function definition
 sub get_def {
     my ($spams,$progdefs,$myprog,$idt) = @_;
     my $x;
@@ -526,7 +528,7 @@ sub prepare_doc {
     my($r_mode,$mlab_prog,$myprog,$doc,$format,$spams,$progdefs) = @_;
     my $fref = "./refman/$myprog.in";
     my %modifs = ();
-    get_doc($mlab_prog,$r_mode,$mlab_prog,$myprog,$doc) || return;
+    get_doc($mlab_prog,$r_mode,$myprog,$doc) || return;
     split_description($doc);
 
     get_modifs($r_mode,$fref,$myprog,\%modifs,$spams,$progdefs);

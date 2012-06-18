@@ -443,14 +443,11 @@ spams.trainDL_Memory <- function(X,D = NULL,numThreads = -1,batchsize = -1,
   return (.TrainDL(X,FALSE,NULL,TRUE,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
 }
 
-spams.nmf <- function(X,return_lasso= FALSE,model= NULL,D = NULL,numThreads = -1,batchsize = -1,K= -1,
+spams.nmf <- function(X,return_lasso= FALSE,model= NULL,numThreads = -1,batchsize = -1,K= -1,
     iter=-1,t0=1e-5,clean=TRUE,rho=1.0,modeParam=0,batch=FALSE) {
   lambda1 = 0
-  if (is.null(D)) {
-    D = matrix(c(0.),nrow = 0,ncol=0)
-  }
 
-  U = spams.trainDL(X,model = model,D = D,numThreads = numThreads,batchsize = batchsize,
+  U = spams.trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
     K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=FALSE, 
     modeParam = modeParam,batch = batch, lambda1 = lambda1,
     mode = 'PENALTY', posAlpha=TRUE,posD=TRUE,whiten=FALSE)

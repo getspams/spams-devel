@@ -264,7 +264,7 @@ sub parse_args {
     my $rmblk = "";
     for(my $i = 0;$i <= $#$lines;$i++) {
 	my $s = $$lines[$i];
-	if($s =~ s/^\s*([^\s:]+)\s*:\s*//) {
+	if($s =~ s/^\s*([^\s:]+)\s*:\s+//) {
 	    my $v = $1;
 	    push(@res,"$v: $s");
 	    next;
@@ -280,7 +280,7 @@ sub parse_spx_args {
     my $rmblk = "";
     for(my $i = 0;$i <= $#$lines;$i++) {
 	my $s = $$lines[$i];
-	if($s =~ s/^\s*([^\s:]+)\s*:\s*//) {
+	if($s =~ s/^\s*([^\s:]+)\s*:\s+//) {
 	    my $v = $1;
 	    push(@res,":param **$v**: $s");
 	    next;
