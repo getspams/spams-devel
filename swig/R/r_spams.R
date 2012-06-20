@@ -289,6 +289,23 @@ spams.cd  <- function(X,D,A0,lambda1 = NULL,mode= 'PENALTY',itermax=100,tol = 0.
   return(alpha)
 
 }
+
+spams.somp  <- function(X,D,list_groups,L = NULL,eps = 0.,numThreads = -1){
+  if(is.null(L)) {
+    stop("somp : L must be defined\n")
+  }
+  x = somp(X,D,list_groups,L,eps,numThreads)
+  indptr = x[[1]]
+  indices = x[[2]]
+  data = x[[3]]
+  shape = x[[4]]
+  alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  return(alpha)
+  
+}
+
+  
+
 ###########  END decomp ##############
 ##################################################
 

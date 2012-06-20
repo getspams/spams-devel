@@ -137,8 +137,8 @@ INSTANTIATE_DATA(lassoD)
 INSTANTIATE_DATA(lassoQq)
 INSTANTIATE_DATA(lassoMask)
 INSTANTIATE_DATA(lassoWeighted)
-INSTANTIATE_DATA(omp)
 INSTANTIATE_DATA(ompMask)
+INSTANTIATE_DATA(somp)
 INSTANTIATE_DATA(cd)
 /**** dictLearn ****/
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};

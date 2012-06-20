@@ -235,7 +235,13 @@ def  cd(X,D,A0,lambda1 = None,mode= spams_wrap.PENALTY,itermax=100,tol = 0.001,n
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     return alpha
 
-    
+def somp(X,D,list_groups,L = None,eps = 0.,numThreads = -1):
+    if L == None:
+        raise ValueError("somp : L must be defined")
+    (indptr,indices,data,shape) = spams_wrap.somp(X,D,list_groups,L,eps,numThreads)
+    alpha = ssp.csc_matrix((data,indices,indptr),shape)
+    return alpha
+
 ###########  END decomp ##############
 ##################################################
 

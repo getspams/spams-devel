@@ -199,6 +199,16 @@ test_ompMask <- function() {
 }
 
 test_somp <- function() {
+  set.seed(0)
+  X = matrix(rnorm(64 * 10000),nrow = 64,ncol = 10000,byrow = FALSE)
+  D = matrix(rnorm(64 * 200),nrow = 64,ncol = 200,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  ind_groups = as.vector(seq(from = 0,to = 9999,by = 10),mode= 'integer')
+  tic = proc.time()
+  alpha = spams.somp(X,D,ind_groups,L = 10,eps = 0.1,numThreads=-1)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
   return(NULL)
 }
 

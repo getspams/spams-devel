@@ -226,6 +226,16 @@ def test_ompMask():
     return None
 
 def test_somp():
+    np.random.seed(0)
+    X = np.asfortranarray(np.random.normal(size = (64,10000)))
+    D = np.asfortranarray(np.random.normal(size = (64,200)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    ind_groups = np.array(xrange(0,10000,10),dtype=np.int32)
+    tic = time.time()
+    alpha = spams.somp(X,D,ind_groups,L = 10,eps = 0.1,numThreads=-1)
+    tac = time.time()
+    t = tac - tic
+    print "%f signals processed per second" %(X.shape[1] / t)
     return None
 
 

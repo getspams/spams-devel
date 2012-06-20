@@ -233,7 +233,7 @@ throw(const char *)
 }
 
 template <typename T>
-SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_path,bool given_L,Vector<int>*L,bool given_eps,Vector<T>*eps,bool given_Lambda,Vector<T>*Lambda,const int numThreads) {
+SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_path,bool given_L,Vector<int>*L,bool given_eps,Vector<T>*eps,bool given_Lambda,Vector<T>*Lambda,const int numThreads) throw(const char *){
   SpMatrix<T> *alpha = new SpMatrix<T>();
     int n = X->m();
     int M = X->n();
@@ -279,7 +279,7 @@ SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_pat
 }
 
 template <typename T>
-SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path,bool return_reg_path,bool given_L,Vector<int>*L,bool given_eps,Vector<T>*eps,bool given_Lambda,Vector<T>*Lambda,const int numThreads) {
+SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path,bool return_reg_path,bool given_L,Vector<int>*L,bool given_eps,Vector<T>*eps,bool given_Lambda,Vector<T>*Lambda,const int numThreads) throw(const char *){
   SpMatrix<T> *alpha = new SpMatrix<T>();
     int n = X->m();
     int M = X->n();
@@ -328,7 +328,7 @@ SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path
     return alpha;
 }
 template <typename T>
-SpMatrix<T> *_cd(Matrix<T> *X,Matrix<T> *D,SpMatrix<T>*alpha,T lambda1, constraint_type mode, int itermax, T tol,int numThreads) {
+SpMatrix<T> *_cd(Matrix<T> *X,Matrix<T> *D,SpMatrix<T>*alpha,T lambda1, constraint_type mode, int itermax, T tol,int numThreads) throw(const char *){
   int n = X->m();
   int M = X->n();
   int nD = D->m();
@@ -344,6 +344,64 @@ SpMatrix<T> *_cd(Matrix<T> *X,Matrix<T> *D,SpMatrix<T>*alpha,T lambda1, constrai
   ist((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha0),lambda1,mode,itermax,tol,numThreads);
   return alpha0;
 }
+
+template <typename T>
+SpMatrix<T> *_somp(Matrix<T> *X,Matrix<T> *D,Vector<int> *groups,int LL, T eps, int numThreads) throw(const char *){
+  int *list_groups = groups->rawX();
+  int Ng = groups->n();
+  int n = X->m();
+  int M = X->n();
+  int nD = D->m();
+  T *prX = X->rawX();
+  if (nD != n) throw("_somp : wrong size for argument 2");
+  int K = D->n();
+  Matrix<T>* Y = new Matrix<T>[Ng];
+  if (list_groups[0] != 0)
+    throw("somp : First group index should be zero");
+  for (int i = 0; i<Ng-1; ++i) {
+    if (list_groups[i] >= M) 
+      throw("Size of groups is not consistent");
+    if (list_groups[i] >= list_groups[i+1]) 
+      throw("Group indices should be a strictly non-decreasing sequence");
+    Y[i].setData(prX+list_groups[i]*n,n,list_groups[i+1]-list_groups[i]);
+  }
+  Y[Ng-1].setData(prX+list_groups[Ng-1]*n,n,M-list_groups[Ng-1]);
+  SpMatrix<T>* spAlpha = new SpMatrix<T>[Ng];
+
+  somp(Y,(Matrix<T> &)(*D),spAlpha,Ng,LL,eps,numThreads);
+  int nzmax=0;
+   for (int i = 0; i<Ng; ++i) {
+     nzmax += spAlpha[i].nzmax();
+   }
+  SpMatrix<T> *alpha = new SpMatrix<T>(K,M,nzmax);
+  T *Pr = alpha->v();
+  int *Ir = alpha->r();
+  int *Jc = alpha->pB();
+     int count=0;
+   int countcol=0;
+   int offset=0;
+   for (int i = 0; i<Ng; ++i) {
+     const T* v = spAlpha[i].v();
+     const int* r = spAlpha[i].r();
+     const int* pB = spAlpha[i].pB();
+     int nn = spAlpha[i].n();
+     nzmax = spAlpha[i].nzmax();
+     if (nn != 0) {
+       for (int j = 0; j<pB[nn]; ++j) {
+	 Pr[count]=static_cast<double>(v[j]);
+	 Ir[count++]=static_cast<mwSize>(r[j]);
+       }
+       for (int j = 0; j<=nn; ++j) 
+	 Jc[countcol++]=static_cast<mwSize>(offset+pB[j]);
+       --countcol;
+       offset = Jc[countcol];
+     }
+   }
+   delete[] Y;
+   delete[] spAlpha;
+   return alpha;
+}
+
 /* end decomp */
 
 /* from prox */
