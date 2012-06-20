@@ -117,6 +117,24 @@ Pour chaque argument détecté, le code indiqué dans %typemap sera inséré, après q
 
 Pour une écriture plus compacte on définit un certain nombre de macros.
 
+Documentation:
+==============
+Elle est fabriquée automatiquement à partir de celle de SPAMS et de l'interface matlab.
+
+
+Interface d'un nouvelle fonction:
+=================================
+Pour une fonction matlab de nom mexAaaaBbbb :
+- créer une fonction aaaaBbbb dans python/spams.py et spams.aaaaBbbb dans R/r_spams.R
+et un template C++ dont le nom commence par '_' dans spams.h (par exemple _aaaaBbbb)
+- Ajouter une ligne INSTANTIATE_DATA(aaaaBbbb) à la fin de spams.i
+- Vérifier que tous les arguments de type vecteur ou matrice du template C++
+  sont bien présents dans l'une des macros inplace_matrices, inplace_vectors, etc de spams.i,
+  sinon rajouter les définitions qui manquent.
+- ajouter la correspondance de nom avec matlab à %main::conv_names dans doclib.ph
+- utiliser R pour faire un test valgrind :
+  créer un fichier de test (tst.R)
+  R -d "valgrind --tool=memcheck --log-file=log" --vanilla < tst.R
 
 Fabrication des packages:
 ==========================
@@ -144,4 +162,5 @@ Dans le cas de R, avant toute nouvelle distrib, il faut appliquer une procédure 
 ./docmatlab2R r_spams
 ./mybuild -nb
 R CMD check pkg/spams
-
+Ça permet notamment de vérifier que la doc des fonctions est cohérente
+avec leur définition.

@@ -327,7 +327,23 @@ SpMatrix<T> *_ompMask(Matrix<T> *X,Matrix<T> *D,Matrix<bool> *B,Matrix<T> **path
     }
     return alpha;
 }
-
+template <typename T>
+SpMatrix<T> *_cd(Matrix<T> *X,Matrix<T> *D,SpMatrix<T>*alpha,T lambda1, constraint_type mode, int itermax, T tol,int numThreads) {
+  int n = X->m();
+  int M = X->n();
+  int nD = D->m();
+  int K = D->n();
+  if (n != nD)
+    throw("cd : incompatible X D matrices dimensions");
+  int Ka = alpha->m();
+  int Ma = alpha->n();
+  if (Ma != M || Ka != K) 
+    throw("cd : incompatible X D A0 matrices dimensions");
+  SpMatrix<T> *alpha0 = new SpMatrix<T>();
+  alpha0->copy((SpMatrix<T> &)(*alpha));
+  ist((Matrix<T> &)(*X),(Matrix<T> &)(*D),(SpMatrix<T> &)(*alpha0),lambda1,mode,itermax,tol,numThreads);
+  return alpha0;
+}
 /* end decomp */
 
 /* from prox */

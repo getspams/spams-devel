@@ -353,7 +353,6 @@ sub get_def {
 #      $f = data file
 # $spams : array of python or R file
 # $progdefs (hash)  key = progname, val = (i1,i2) indexes of first and last line of a function def
-# special replacement of %DEF% in Usage section
 # 
 # out : $modifs (hash) = modifications by doc section
 sub get_modifs {
@@ -379,7 +378,7 @@ sub get_modifs {
     }
     close(IN);
     my $inblock = 0;
-    my ($tmp,$key,,$deltas,$op,$prev_indent);
+    my ($tmp,$key,$deltas,$op,$prev_indent);
     my $expr = "";
     foreach $_ (@lines) {
 	(/^\s*$/) && next;
@@ -403,36 +402,21 @@ sub get_modifs {
 	    if($key eq 'Usage' && ! $r_mode) {
 		s/<-/=/;
 	    }
-	    if(/%DEF%/) {
-		my $name = $r_mode ? "spams.$myprog" : $myprog;
-		s/%DEF%.*$/spams.$myprog\(/;
-		my $n = length($_);
-		my $idt = " " x $n;
-		my @def = get_def($spams,$progdefs,$myprog,$n);
-		$_ .= shift(@def);
-		push(@$tmp,$_);
-		push(@$deltas,0);
-		foreach $_ (@def) {
-		    push(@$tmp,"$idt$_");
-		    push(@$deltas,0);
+	    my $d = 0;
+	    s/^(\s*)//;
+	    my $n = length($1);
+	    if(! (/^$/)) {
+		$d = $n - $prev_indent;
+		if($d < 0 && $#$tmp < 0) {
+		    $d = 0;
 		}
-	    } else {
-		my $d = 0;
-		s/^(\s*)//;
-		my $n = length($1);
-		if(! (/^$/)) {
-		    $d = $n - $prev_indent;
-		    if($d < 0 && $#$tmp < 0) {
-			$d = 0;
-		    }
-		    $prev_indent = $n;
-		    if($key eq "Param" && ($_ =~ /:\s*$/)) {
-			s/$/    undocumented; modify at your own risks!/;
-		    }
+		$prev_indent = $n;
+		if($key eq "Param" && ($_ =~ /:\s*$/)) {
+		    s/$/    undocumented; modify at your own risks!/;
 		}
-		push(@$tmp,$_);
-		push(@$deltas,$d);
 	    }
+	    push(@$tmp,$_);
+	    push(@$deltas,$d);
 	} else {
 	    (/^begin\s+([^\s]+)\s+([^\s]+)$/) || next;
 	    $op = $1;
@@ -445,6 +429,26 @@ sub get_modifs {
     }
 }
 
+sub set_usage {
+    my($r_mode,$myprog,$modifs,$spams,$progdefs) = @_;
+    # systematically force usage from founction definition
+    my $key = "Usage";
+    my $name = $r_mode ? "spams.$myprog" : $myprog;
+    $_ = "spams.$myprog(";
+    my $n = length($_);
+    my $idt = " " x $n;
+    my @def = get_def($spams,$progdefs,$myprog,$n);
+    $_ .= shift(@def);
+    my $tmp = [()];
+    my $deltas = [()];
+    push(@$tmp,$_);
+    push(@$deltas,0);
+    foreach $_ (@def) {
+	push(@$tmp,"$idt$_");
+	push(@$deltas,0);
+    }
+    $$modifs{$key} = { 'op' => 'repl', 'lines' => $tmp, 'deltas' => $deltas};
+}
 # try to split Description into short description and detail
 sub split_description {
     my($doc) = @_;
@@ -532,6 +536,7 @@ sub prepare_doc {
     split_description($doc);
 
     get_modifs($r_mode,$fref,$myprog,\%modifs,$spams,$progdefs);
+    set_usage($r_mode,$myprog,\%modifs,$spams,$progdefs);
     # apply modifs
     apply_modifs($doc,$format,\%modifs);
 }

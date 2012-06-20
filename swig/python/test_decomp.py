@@ -1,16 +1,11 @@
 import sys
 import numpy as np
 import scipy
-import scipy.sparse
+import scipy.sparse as ssp
 
 import spams
 import time
 from test_utils import *
-
-if not ('rand' in scipy.sparse.__dict__):
-    import myscipy_rand as ssp
-else:
-    import scipy.sparse as ssp
 
 def test_sparseProject():
     np.random.seed(0)
@@ -66,9 +61,39 @@ def test_sparseProject():
     return None
 
 def test_cd():
+    np.random.seed(0)
+    X = np.asfortranarray(np.random.normal(size = (64,100)))
+    X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
+    D = np.asfortranarray(np.random.normal(size = (64,100)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    # parameter of the optimization procedure are chosen
+    lambda1 = 0.015
+    mode = spams.PENALTY
+    tic = time.time()
+    alpha = spams.lasso(X,D,lambda1 = lambda1,mode = mode,numThreads = 4)
+    tac = time.time()
+    t = tac - tic
+    xd = X - D * alpha
+    E = np.mean(0.5 * (xd * xd).sum(axis=0) + lambda1 * np.abs(alpha).sum(axis=0))
+    print "%f signals processed per second for LARS" %(X.shape[1] / t)
+    print 'Objective function for LARS: %g' %E
+    tol = 0.001
+    itermax = 1000
+    tic = time.time()
+#    A0 = ssp.csc_matrix(np.empty((alpha.shape[0],alpha.shape[1])))
+    A0 = ssp.csc_matrix((alpha.shape[0],alpha.shape[1]))
+    alpha2 = spams.cd(X,D,A0,lambda1 = lambda1,mode = mode,tol = tol, itermax = itermax,numThreads = 4)
+    tac = time.time()
+    t = tac - tic
+    print "%f signals processed per second for CD" %(X.shape[1] / t)
+    xd = X - D * alpha2
+    E = np.mean(0.5 * (xd * xd).sum(axis=0) + lambda1 * np.abs(alpha).sum(axis=0))
+    print 'Objective function for CD: %g' %E
+    print 'With Random Design, CD can be much faster than LARS'
+
     return None
 
-def test_L1L2BCD():
+def test_l1L2BCD():
     return None
 
 def test_lasso():
@@ -89,7 +114,7 @@ def test_lasso():
         'lambda1' : 0.15, # not more than 20 non-zeros coefficients
         'numThreads' : -1, # number of processors/cores to use; the default choice is -1
         # and uses all the cores of the machine
-        'mode' : 2}        # penalized formulation
+        'mode' : spams.PENALTY}        # penalized formulation
 
     tic = time.time()
     alpha = spams.lasso(X,D = D,return_reg_path = False,**param)
@@ -122,7 +147,7 @@ def test_lassoMask():
         'lambda1' : 0.15, # not more than 20 non-zeros coefficients
         'numThreads' : -1, # number of processors/cores to use; the default choice is -1
         # and uses all the cores of the machine
-        'mode' : 2}        # penalized formulation
+        'mode' : spams.PENALTY}        # penalized formulation
     tic = time.time()
     alpha = spams.lassoMask(X,D,mask,**param)
     tac = time.time()
@@ -143,7 +168,7 @@ def test_lassoWeighted():
     D = np.asfortranarray(np.random.normal(size=(64,256)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
     param = { 'L' : 20,
-        'lambda1' : 0.15, 'numThreads' : 8, 'mode' : 2} 
+        'lambda1' : 0.15, 'numThreads' : 8, 'mode' : spams.PENALTY} 
     W = np.asfortranarray(np.random.random(size = (D.shape[1],X.shape[1])))
     tic = time.time()
     alpha = spams.lassoWeighted(X,D,W,**param)
@@ -207,11 +232,11 @@ def test_somp():
 tests = {
     'sparseProject' : test_sparseProject,
     'cd' : test_cd,
-    'L1L2BCD' : test_L1L2BCD,
+    'L1L2BCD' : test_l1L2BCD,
     'lasso' : test_lasso,
     'lassoMask' : test_lassoMask,
     'lassoWeighted' : test_lassoWeighted,
     'omp' : test_omp,
     'ompMask' : test_ompMask,
-    'somp' : test_somp,
+    'somp' : test_somp
     }

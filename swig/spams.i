@@ -84,6 +84,7 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
 %enddef
 %define inplace_spmatrices(ctype)
     SpMatrix<ctype> *A,
+    SpMatrix<ctype> *alpha,
     SpMatrix<ctype> *groups
 %enddef
 %define inplace_dspmatrices(ctype)
@@ -138,7 +139,7 @@ INSTANTIATE_DATA(lassoMask)
 INSTANTIATE_DATA(lassoWeighted)
 INSTANTIATE_DATA(omp)
 INSTANTIATE_DATA(ompMask)
-
+INSTANTIATE_DATA(cd)
 /**** dictLearn ****/
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};
 INSTANTIATE_DATA(alltrainDL)

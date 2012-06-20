@@ -1,6 +1,3 @@
-begin repl Usage
-%DEF%
-end
 begin addlast Param
 intercept:
 delta:

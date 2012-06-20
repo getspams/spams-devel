@@ -46,6 +46,41 @@ test_sparseProject <- function () {
   return(NULL)
 }
 
+test_cd <- function() {
+  set.seed(0)
+  X = matrix(rnorm(64 * 100),nrow = 64,ncol = 100,byrow = FALSE)
+  X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+  D = matrix(rnorm(64 * 100),nrow = 64,ncol = 100,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  # parameter of the optimization procedure are chosen
+  lambda1 = 0.015
+  mode = 'PENALTY'
+  tic = proc.time()
+  alpha = spams.lasso(X,D,lambda1 = lambda1,mode = mode,numThreads = 4)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second for LARS\n", (ncol(X) / t))
+  E = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
+  .printf("Objective function for LARS: %g\n",E)
+  tol = 0.001
+  itermax = 1000
+  A0 = as(matrix(c(0),nrow = nrow(alpha),ncol = ncol(alpha)),'CsparseMatrix')
+  cat ("XXX\n")
+  tic = proc.time()
+  alpha2 = spams.cd(X,D,A0,lambda1 = lambda1,mode = mode,tol = tol, itermax = itermax,numThreads = 4)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second for CD\n", (ncol(X) / t))
+  E = mean(0.5 * colSums((X - D %*% alpha2) ^ 2) + lambda1 * colSums(abs(alpha2)))
+  .printf("Objective function for CD: %g\n",E)
+  .printf("With Random Design, CD can be much faster than LARS\n")
+  return(NULL)
+}
+
+test_l1L2BCD <- function() {
+  return(NULL)
+}
+
 test_lasso <- function() {
   set.seed(0)
   .printf("test lasso\n")
@@ -163,12 +198,19 @@ test_ompMask <- function() {
 
 }
 
+test_somp <- function() {
+  return(NULL)
+}
+
 #
 test_decomp.tests =list( 
   'sparseProject' = test_sparseProject,
+  'cd' = test_cd,
+  'L1L2BCD' = test_l1L2BCD,
   'lasso' = test_lasso,
   'lassoMask' = test_lassoMask,
   'lassoWeighted' = test_lassoWeighted,
   'omp' = test_omp,
-  'ompMask' = test_ompMask
+  'ompMask' = test_ompMask,
+  'somp' = test_somp
   )

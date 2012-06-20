@@ -170,6 +170,7 @@ spams.lassoMask <- function(X,D,B,L= -1,lambda1= NULL,lambda2= 0.,
   indices = x[[2]]
   data = x[[3]]
   shape = x[[4]]
+  cat("LASSO : ", length(shape),"\n")
   alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
   return(alpha)
 }
@@ -275,6 +276,19 @@ spams.ompMask <- function(X,D,B,L = NULL,eps = NULL,lambda1 = NULL,return_reg_pa
     return(alpha)
 }
 
+spams.cd  <- function(X,D,A0,lambda1 = NULL,mode= 'PENALTY',itermax=100,tol = 0.001,numThreads =-1) {
+  if(is.null(lambda1)) {
+    stop("ERROR cd : lambda1 must be defined\n")
+  }
+  x = cd(X,D,A0,lambda1,mode,itermax,tol,numThreads)
+  indptr = x[[1]]
+  indices = x[[2]]
+  data = x[[3]]
+  shape = x[[4]]
+  alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  return(alpha)
+
+}
 ###########  END decomp ##############
 ##################################################
 

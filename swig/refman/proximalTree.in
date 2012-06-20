@@ -1,6 +1,3 @@
-begin repl Usage
- %DEF%
-end
 include proximal.inc
 begin addlast Output
 [R]val_loss:        vector of size ncol(U)

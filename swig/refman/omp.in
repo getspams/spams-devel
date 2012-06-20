@@ -1,6 +1,3 @@
-begin repl Usage
-%DEF%
-end
 begin addlast Inputs
 return_reg_path:     
 [R]		      if true the function will return 2 matrices in a list.

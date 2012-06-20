@@ -24,4 +24,4 @@ D = matrix(l,nrow = m,ncol = k,byrow = TRUE)
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
-alpha
+#alpha

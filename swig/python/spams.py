@@ -84,6 +84,14 @@ def normalize(A):
 ##################################################
 
 ###########  decomp ##################
+#### constraint_type definitions
+L1COEFFS = spams_wrap.L1COEFFS
+L2ERROR = spams_wrap.L2ERROR
+PENALTY = spams_wrap.PENALTY
+SPARSITY = spams_wrap.SPARSITY
+L2ERROR2 = spams_wrap.L2ERROR2
+PENALTY2 = spams_wrap.PENALTY2
+####
 
 def  sparseProject(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,
                    lambda3 = 0.0,pos = 0,numThreads = -1):
@@ -219,6 +227,14 @@ def ompMask(X,D,B,L=None,eps= None,lambda1 = None,return_reg_path = False, numTh
         return (alpha,path)
     else:
         return alpha
+   
+def  cd(X,D,A0,lambda1 = None,mode= spams_wrap.PENALTY,itermax=100,tol = 0.001,numThreads =-1):
+    if lambda1 == None:
+        raise ValueError("cd : lambda1 must be defined")
+    (indptr,indices,data,shape) = spams_wrap.cd(X,D,A0,lambda1,mode,itermax,tol,numThreads)
+    alpha = ssp.csc_matrix((data,indices,indptr),shape)
+    return alpha
+
     
 ###########  END decomp ##############
 ##################################################

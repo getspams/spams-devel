@@ -1,7 +1,3 @@
-begin repl Usage
-%DEF%
-[P]spams.lasso(X,D = NULL,Q = Q,q = q,return_reg_path = FALSE,....)
-end
 begin addlast Inputs
 Q:    	       p x p double matrix (Q = D'D)
 q:	       p x n double matrix (q = D'X)
@@ -20,8 +16,10 @@ begin addlast Output
 [R]      path <- v[[2]]
 end
 begin subst detail
-[P] s/\s*if\s.*called this way.*$/    If the function is called this way spams.lasso(X,D = D, Q = None,...),/
-[R] s/\s*if\s.*called this way.*$/    If the function is called this way spams.lasso(X,D = D, Q = NULL,...),/
+[P] s/\s*if\s.*called this way.*X,D,/    If the function is called this way spams.lasso(X,D = D, Q = None,...),/
+[P] s/\s*if\s.*called this way.*X,Q,q/    If the function is called this way spams.lasso(X,D = None, Q = Q, q = q,...),/
+[R] s/\s*if\s.*called this way.*X,D,/    If the function is called this way spams.lasso(X,D = D, Q = NULL,...),/
+[R] s/\s*if\s.*called this way.*X,Q,q,/    If the function is called this way spams.lasso(X,D = NULL, Q = Q, q = q,...),/
 end
 
 [R]begin addlast Examples

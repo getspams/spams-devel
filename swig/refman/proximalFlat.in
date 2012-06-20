@@ -1,6 +1,3 @@
-begin repl Usage
-%DEF%
-end
 # modif Inputs & Params
 include proximal.inc
 begin addlast Output
