@@ -73,6 +73,7 @@ fi
 mkdir -p $doc/source/_static $doc/source/_templates $doc/build
 [ -d $doc/source ] || die "Cannot create doc directory"
 
+# make html and tex doc with sphinx
 cd doc-src
 cp Makefile make.bat $cdir/$doc
 cp conf.py $cdir/$doc/source

@@ -16,10 +16,10 @@ begin addlast Output
 [R]      path <- v[[2]]
 end
 begin subst detail
-[P] s/\s*if\s.*called this way.*X,D,/    If the function is called this way spams.lasso(X,D = D, Q = None,...),/
-[P] s/\s*if\s.*called this way.*X,Q,q/    If the function is called this way spams.lasso(X,D = None, Q = Q, q = q,...),/
-[R] s/\s*if\s.*called this way.*X,D,/    If the function is called this way spams.lasso(X,D = D, Q = NULL,...),/
-[R] s/\s*if\s.*called this way.*X,Q,q,/    If the function is called this way spams.lasso(X,D = NULL, Q = Q, q = q,...),/
+[P] s/^\s*if\s.*called this way.*X,D,.*$/If the function is called this way spams.lasso(X,D = D, Q = None,...),/
+[P] s/^\s*if\s.*called this way.*X,Q,q.*$/If the function is called this way spams.lasso(X,D = None, Q = Q, q = q,...),/
+[R] s/\s*if\s.*called this way.*X,D,.*$/If the function is called this way spams.lasso(X,D = D, Q = NULL,...),/
+[R] s/\s*if\s.*called this way.*X,Q,q,.*$/If the function is called this way spams.lasso(X,D = NULL, Q = Q, q = q,...),/
 end
 
 [R]begin addlast Examples

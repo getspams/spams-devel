@@ -379,7 +379,6 @@ sub get_modifs {
     close(IN);
     my $inblock = 0;
     my ($tmp,$key,$deltas,$op,$prev_indent);
-    my $expr = "";
     foreach $_ (@lines) {
 	(/^\s*$/) && next;
 	(/^\s*\#/) && next;
@@ -392,11 +391,6 @@ sub get_modifs {
 	    if(/^end/) {
 		$inblock = 0;
 		$$modifs{$key} = { 'op' => $op, 'lines' => $tmp, 'deltas' => $deltas};
-		if("$expr") {
-		    my $x = $$modifs{$key};
-		    $$x{'subst'} = $expr;
-		    $expr = "";
-		}
 		next;
 	    }
 	    if($key eq 'Usage' && ! $r_mode) {
@@ -506,12 +500,15 @@ sub apply_modifs {
 		push(@$ddeltas,@$deltas);
 		$$doc{$key} = {'lines' => $lst, 'deltas' => $ddeltas};
 	    } elsif ( $op eq "subst") {
-		my $e = $$tmp[0];
-		$e =~ s/^\s+//;
 		for(my$i = 0;$i <= $#$lst;$i++) {
 		    my $s = $$lst[$i];
-		    eval("\$s =~ $e");
-		    $$lst[$i] = $s;
+		    ($s =~ /^\s*$/) && next;
+		    foreach my $e (@$tmp) {
+			$e =~ s/^\s+//;
+			($e =~ /^\s*$/) && next;
+			eval("\$s =~ $e");
+			$$lst[$i] = $s;
+		    }
 		}
 	    } else {
 		die "Unknown op $op\n";
