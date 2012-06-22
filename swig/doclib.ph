@@ -18,8 +18,6 @@ my %undocumented = ("mult",1,"im2col_sliding",1);
     "Normalize", "normalize",
     "SparseProject", "sparseProject",
     "Lasso", "lasso",
-    "FistaFlat", "fistaFlat",
-    "ProximalFlat", "proximalFlat",
     "TrainDL", "trainDL",
     "TrainDL_Memory", "trainDL_Memory",
     "nmf", "nmf",
@@ -31,10 +29,19 @@ my %undocumented = ("mult",1,"im2col_sliding",1);
     "OMPMask", "ompMask",
     "SOMP", "somp",
     "L1L2BCD", "l1L2BCD",
+    "FistaFlat", "fistaFlat",
     "FistaGraph", "fistaGraph",
     "FistaTree", "fistaTree",
+    "FistaPathCoding", "fistaPathCoding",
+    "ProximalFlat", "proximalFlat",
     "ProximalGraph", "proximalGraph",
     "ProximalTree", "proximalTree",
+    "ProximalPathCoding", "proximalPathCoding",
+    "CountConnexComponents", "countConnexComponents",
+    "CountPathsDAG", "countPathsDAG",
+    "RemoveCyclesGraph", "removeCyclesGraph",
+    "EvalPathCoding", "evalPathCoding",
+
 );
 
 @main::tests = ("linalg","decomp","prox","dictLearn");
@@ -189,12 +196,16 @@ sub get_doc {
 	    (s/^Usage\s*:\s*//) || next;
 	    $stat = 1;
 	}
-	if(/mex([A-Z][_A-z]+)/) { # replace mex*
+	if(/mex([A-Z][_A-z\d]+)/) { # replace mex*
 	    my $s = $1;
 	    (defined($main::conv_names{$s}) ) || die "Inconnu : $s\n";
 	    my $s1 = $main::conv_names{$s};
 	    s/mex$s/$prefix$s1/g;
 	}
+	# replace lambda
+	if(s/lambda([^\d])/lambda1\1/g) {print "XX <$_>\n";}
+	s/lambda$/lambda1/;
+
 	push(@lines,$_);
 	if(/^Author:/) {last;}
     }
@@ -265,7 +276,8 @@ sub get_doc {
 		$prev_indent = $n;
 	    }
 	    s/^(\s*)tree:\s*struct\s*/$1tree: named list /;
-	    s/param\.lambda([^\w])/param.lambda1$1/;
+#	    s/lambda([^\d])/lambda1\1/g;
+##	    s/param\.lambda([^\w])/param.lambda1$1/;
 	    s/(param\.[^\s:]+)\s*:/$1/;
 	    if($key eq "Param") {
 		if(/^param\.([\w]+)\s*,\s*param\.([\w]+)\s*/) {
@@ -761,7 +773,7 @@ sub modif_tex_src {
 	} else {
 	    my $s1 = "";
 	    my $x = "";
-	    if(/mex([A-Z][_A-z]+)/) {
+	    if(/mex([A-Z][_A-z\d]+)/) {
 		my $s = $1;
 		$x = $s;
 		$x =~ s/\\_/_/;

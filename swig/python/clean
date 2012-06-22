@@ -3,5 +3,4 @@ case $1 in -x) set -x;shift;;esac
 
 nom=spams
 /bin/rm -f $nom.o ${nom}_wrap.o ${nom}_wrap.py $nom.pyc ${nom}_wrap.cpp _${nom}_wrap.so *.pyc
-/bin/rm -rf build dist tmp-doc
-
+/bin/rm -rf build dist tmp-doc spams_*.tar.gz
