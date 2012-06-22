@@ -1,5 +1,4 @@
 begin addlast Param
-intercept:
 delta:
 c:
 max_iter_backtracking:
