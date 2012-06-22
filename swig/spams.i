@@ -141,6 +141,7 @@ INSTANTIATE_DATA(lassoWeighted)
 INSTANTIATE_DATA(ompMask)
 INSTANTIATE_DATA(somp)
 INSTANTIATE_DATA(cd)
+INSTANTIATE_DATA(l1L2BCD)
 /**** dictLearn ****/
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};
 INSTANTIATE_DATA(alltrainDL)

@@ -304,6 +304,16 @@ spams.somp  <- function(X,D,list_groups,L = NULL,eps = 0.,numThreads = -1){
   
 }
 
+spams.l1L2BCD  <- function(X,D,alpha0,list_groups,lambda1 = NULL, mode= 'PENALTY', itermax = 100, tol = 1e-3,numThreads = -1) {
+  if(is.null(lambda1)) {
+    stop("l1L2BCD : lambda1 must be defined\n")
+  }
+  alpha = matrix(alpha0,nrow = nrow(alpha0),ncol = ncol(alpha0))
+  l1L2BCD(X,D,alpha,list_groups,lambda1,mode,itermax,tol,numThreads)
+  return(alpha)
+  
+}
+
   
 
 ###########  END decomp ##############
@@ -535,6 +545,25 @@ spams.nmf <- function(X,return_lasso= FALSE,model= NULL,numThreads = -1,batchsiz
   return (list(U,V))
 }
 
+spams.nnsc <- function(X,return_lasso= FALSE,model= NULL,lambda1= NULL,
+                       numThreads = -1,batchsize = -1,K= -1,iter=-1,t0=1e-5,
+                       clean=TRUE,rho=1.0,modeParam=0,batch=FALSE) {
+  
+  if(is.null(lambda1)) {
+    stop("ERROR nnsc : lambda1 must be defined\n")
+  }
+  U = spams.trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
+                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=FALSE, 
+                modeParam = modeParam,batch = batch, lambda1 = lambda1,
+                mode = 'PENALTY', posAlpha=TRUE,posD=TRUE,whiten=FALSE)
+  if (! return_lasso) {
+    return(U)
+  }
+  V = spams.lasso(X,D = U,return_reg_path = FALSE, numThreads = numThreads,
+                  lambda1 = lambda1,mode = 'PENALTY')
+  return (list(U,V))
+
+}
 
 ###########  END dictLearn ##############
 spams.im2col_sliding <- function(A,m,n,RGB = FALSE) {

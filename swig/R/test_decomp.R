@@ -78,6 +78,25 @@ test_cd <- function() {
 }
 
 test_l1L2BCD <- function() {
+  set.seed(0)
+  X = matrix(rnorm(64 * 100),nrow = 64,ncol = 100,byrow = FALSE)
+  D = matrix(rnorm(64 * 200),nrow = 64,ncol = 200,byrow = FALSE)
+  D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+  ind_groups = as.vector(seq(from = 0,to = ncol(X) - 1,by = 10),mode= 'integer')#indices of the first signals in each group
+  itermax = 100
+  tol = 1e-3
+  mode = 'PENALTY'
+  lambda1 = 0.15 # squared norm of the residual should be less than 0.1
+  numThreads = -1 # number of processors/cores to use the default choice is -1
+                    # and uses all the cores of the machine
+
+  alpha0 = matrix(c(0),nrow = ncol(D), ncol = ncol(X),byrow = FALSE)
+  tic = proc.time()
+  alpha = spams.l1L2BCD(X,D,alpha0,ind_groups,lambda1 = lambda1,mode = mode,itermax = itermax,tol = tol,numThreads = numThreads)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
+  
   return(NULL)
 }
 
@@ -216,7 +235,7 @@ test_somp <- function() {
 test_decomp.tests =list( 
   'sparseProject' = test_sparseProject,
   'cd' = test_cd,
-  'L1L2BCD' = test_l1L2BCD,
+  'l1L2BCD' = test_l1L2BCD,
   'lasso' = test_lasso,
   'lassoMask' = test_lassoMask,
   'lassoWeighted' = test_lassoWeighted,

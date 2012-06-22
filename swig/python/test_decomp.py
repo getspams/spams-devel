@@ -94,6 +94,25 @@ def test_cd():
     return None
 
 def test_l1L2BCD():
+    np.random.seed(0)
+    X = np.asfortranarray(np.random.normal(size = (64,100)))
+    D = np.asfortranarray(np.random.normal(size = (64,200)))
+    D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
+    ind_groups = np.array(xrange(0,X.shape[1],10),dtype=np.int32) #indices of the first signals in each group
+    # parameters of the optimization procedure are chosen
+    itermax = 100
+    tol = 1e-3
+    mode = spams.PENALTY
+    lambda1 = 0.15 # squared norm of the residual should be less than 0.1
+    numThreads = -1 # number of processors/cores to use the default choice is -1
+                    # and uses all the cores of the machine
+    alpha0 = np.zeros((D.shape[1],X.shape[1]),dtype=np.float64,order="FORTRAN")
+    tic = time.time()
+    alpha = spams.l1L2BCD(X,D,alpha0,ind_groups,lambda1 = lambda1,mode = mode,itermax = itermax,tol = tol,numThreads = numThreads)
+    tac = time.time()
+    t = tac - tic
+    print "%f signals processed per second" %(X.shape[1] / t)
+
     return None
 
 def test_lasso():
@@ -242,7 +261,7 @@ def test_somp():
 tests = {
     'sparseProject' : test_sparseProject,
     'cd' : test_cd,
-    'L1L2BCD' : test_l1L2BCD,
+    'l1L2BCD' : test_l1L2BCD,
     'lasso' : test_lasso,
     'lassoMask' : test_lassoMask,
     'lassoWeighted' : test_lassoWeighted,

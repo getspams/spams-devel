@@ -242,6 +242,13 @@ def somp(X,D,list_groups,L = None,eps = 0.,numThreads = -1):
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     return alpha
 
+def l1L2BCD(X,D,alpha0,list_groups,lambda1 = None, mode= spams_wrap.PENALTY, itermax = 100, tol = 1e-3,numThreads = -1):
+    if lambda1 == None:
+        raise ValueError("l1L2BCD : lambda1 must be defined")
+    alpha = np.copy(alpha0)
+    spams_wrap.l1L2BCD(X,D,alpha,list_groups,lambda1,mode,itermax,tol,numThreads)
+    return alpha
+
 ###########  END decomp ##############
 ##################################################
 
@@ -475,6 +482,21 @@ def nmf(X,return_lasso= False,model= None,
     else:
         V = lasso(X,D = U,return_reg_path = False, numThreads = numThreads,
                   lambda1 = lambda1,mode = spams_wrap.PENALTY, pos=True)
+    return(U,V)
+
+def nnsc(X,return_lasso= False,model= None,lambda1= None,
+         numThreads = -1,batchsize = -1,K= -1,
+        iter=-1,t0=1e-5,clean=True,rho=1.0,modeParam=0,batch=False):
+    if lambda1 == None:
+        raise ValueError("nnsc : lambda1 must be defined")
+    U = trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
+                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=False, 
+                modeParam = modeParam,batch = batch, lambda1 = lambda1,
+                mode = spams_wrap.PENALTY, posAlpha=True,posD=True,whiten=False)
+    if not return_lasso:
+        return U
+    V = lasso(X,D = U,return_reg_path = False, numThreads = numThreads,
+                  lambda1 = lambda1,mode = spams_wrap.PENALTY)
     return(U,V)
 
 ###########  END dictLearn ##############

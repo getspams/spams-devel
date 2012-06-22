@@ -68,12 +68,6 @@ template<typename T> void _normalize(Matrix<T> *A) {
   A->normalize();
 }
 
-#if 0
-// swig ne sait pas gérer ce type de surcharge
-template<typename T> void _normalize(Vector<T> *x) {
-  x->normalize();
-}
-#endif
 /* end linalg */
 
 /* from decomp */
@@ -400,6 +394,40 @@ SpMatrix<T> *_somp(Matrix<T> *X,Matrix<T> *D,Vector<int> *groups,int LL, T eps, 
    delete[] Y;
    delete[] spAlpha;
    return alpha;
+}
+template <typename T>
+void _l1L2BCD(Matrix<T> *X,Matrix<T> *D,Matrix<T>*alpha0,Vector<int> *groups,T lambda1, constraint_type mode,int itermax,T tol,int numThreads) throw(const char *){
+  int n = X->m();
+  int M = X->n();
+  int nD = D->m();
+  int K = D->n();
+  T *prX = X->rawX();
+  T *pr_alpha = alpha0->rawX();
+  if(nD != n)
+    throw("l1L2BCD : wrong size for argument 2");
+  int Ka = alpha0->m();
+  int Ma = alpha0->n();
+  if (Ma != M || Ka != K)
+    throw("l1L2BCD : wrong size for argument 3");
+  int Ng = groups->n();
+  int *list_groups = groups->rawX();
+  Matrix<T>* Y = new Matrix<T>[Ng];
+  Matrix<T>* alpha = new Matrix<T>[Ng];
+  if (list_groups[0] != 0)
+    throw("l1L2BCD : First group index should be zero");
+  for (int i = 0; i<Ng-1; ++i) {
+    if (list_groups[i] >= M) 
+      throw("l1L2BCD : size of groups is not consistent");
+    if (list_groups[i] >= list_groups[i+1]) 
+      throw("l1L2BCD : group indices should be a strictly non-decreasing sequence");
+    Y[i].setData(prX+list_groups[i]*n,n,list_groups[i+1]-list_groups[i]);
+    alpha[i].setData(pr_alpha+list_groups[i]*K,K,list_groups[i+1]-list_groups[i]);
+  }
+  Y[Ng-1].setData(prX+list_groups[Ng-1]*n,n,M-list_groups[Ng-1]);
+  alpha[Ng-1].setData(pr_alpha+list_groups[Ng-1]*K,K,M-list_groups[Ng-1]);
+  ist_groupLasso<T>(Y,(Matrix<T> &)(*D),alpha,Ng,lambda1,mode,itermax,tol,numThreads);
+  delete[] (Y);
+  delete[](alpha);
 }
 
 /* end decomp */
