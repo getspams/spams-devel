@@ -303,9 +303,29 @@ def fistaTree(
     else:
         return W
 
+def fistaGraph(
+    Y,X,W0,graph,return_optim_info = False,numThreads =-1,max_it =1000,L0=1.0,
+    fixed_step=False,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
+    a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
+    compute_gram=False,lin_admm=False,admm=False,intercept=False,
+    resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
+    log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
+    inner_weights=np.array([0.]),size_group=1,sqrt_step=True,transpose=False):
+    if(len(graph) != 3):
+        raise ValueError("fistaGraph : graph should be a list of 3 elements")
+    eta_g = graph['eta_g']
+    groups = graph['groups']
+    groups_var = graph['groups_var']
+    W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+    optim_info = spams_wrap.fistaGraph(Y,X,W0,W,eta_g,groups,groups_var,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
+    if return_optim_info:
+        return(W,optim_info)
+    else:
+        return W
+
 def proximalFlat(U,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=False,resetflow=False,regul="",verbose=False,
-                 pos=False,clever=True,eval= None,size_group=1,groups = None,transpose=False):
+                 pos=False,clever=True,size_group=1,groups = None,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ('lambda',1.0),('lambda2',0.),
 #                 ('lambda3',0.),('intercept',False),('resetflow',False),
@@ -317,8 +337,7 @@ def proximalFlat(U,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.
     if groups == None:
         groups = np.array([],dtype=np.int32,order="FORTRAN")
 
-    if eval == None:
-        eval = return_val_loss
+    eval = return_val_loss
     alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
     val_loss = spams_wrap.proximalFlat(U,alpha,groups,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
     if return_val_loss:
@@ -328,7 +347,7 @@ def proximalFlat(U,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.
 
 def proximalTree(U,tree,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=False,resetflow=False,regul="",verbose=False,
-                 pos=False,clever=True,eval= None,size_group=1,transpose=False):
+                 pos=False,clever=True,size_group=1,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ('lambda',1.0),('lambda2',0.),
 #                 ('lambda3',0.),('intercept',False),('resetflow',False),
@@ -337,8 +356,7 @@ def proximalTree(U,tree,return_val_loss = False,numThreads =-1,lambda1=1.0,lambd
 #                 ('size_group',1),('transpose',False)]
 #    params = __param_struct(paramlist,param)
 
-    if eval == None:
-        eval = return_val_loss
+    eval = return_val_loss
     alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
     if(len(tree) != 4):
         raise ValueError("proximalTree : tree should be a named list of 4 elements")
@@ -347,6 +365,23 @@ def proximalTree(U,tree,return_val_loss = False,numThreads =-1,lambda1=1.0,lambd
     own_variables = tree['own_variables']
     N_own_variables = tree['N_own_variables']
     val_loss = spams_wrap.proximalTree(U,alpha,eta_g,groups,own_variables,N_own_variables,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
+    if return_val_loss:
+        return(alpha,val_loss)
+    else:
+        return alpha
+
+def proximalGraph(U,graph,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.,
+                 lambda3=0.,intercept=False,resetflow=False,regul="",verbose=False,
+                 pos=False,clever=True,eval= None,size_group=1,transpose=False):
+
+    eval = return_val_loss
+    if(len(graph) != 3):
+        raise ValueError("proximalGraph : tree should be a named list of 3 elements")
+    eta_g = graph['eta_g']
+    groups = graph['groups']
+    groups_var = graph['groups_var']
+    alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+    val_loss = spams_wrap.proximalGraph(U,alpha,eta_g,groups,groups_var,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
     if return_val_loss:
         return(alpha,val_loss)
     else:

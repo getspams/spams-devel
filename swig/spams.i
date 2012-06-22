@@ -39,7 +39,8 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
 	Matrix<bool> *B
 %enddef
 %define inplace_bool_spmatrices
-    SpMatrix<bool> *groups
+    SpMatrix<bool> *groups,
+    SpMatrix<bool> *groups_var
 %enddef
 
 %define inplace_matrices(ctype)
@@ -147,5 +148,7 @@ INSTANTIATE_DATA(alltrainDL)
 /**** prox ****/
 INSTANTIATE_DATA(fistaFlat)
 INSTANTIATE_DATA(fistaTree)
+INSTANTIATE_DATA(fistaGraph)
 INSTANTIATE_DATA(proximalFlat)
 INSTANTIATE_DATA(proximalTree)
+INSTANTIATE_DATA(proximalGraph)

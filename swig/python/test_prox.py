@@ -150,8 +150,6 @@ def test_fistaFlat():
 # can be used of course with other regularization functions, intercept,...
 #!    pause
     
-    
-
     print '\nFISTA + Logistic l1 + sparse matrix'
     param['loss'] = 'logistic'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,ssp.csc_matrix(X),W0,True,**param)',locals())
@@ -236,10 +234,225 @@ def test_fistaFlat():
     
 #############
 def test_fistaGraph():
+    np.random.seed(0)
+    num_threads = -1 # all cores (-1 by default)
+    verbose = False   # verbosity, false by default
+    lambda1 = 0.1 # regularization ter
+    it0 = 1      # frequency for duality gap computations
+    max_it = 100 # maximum number of iterations
+    L0 = 0.1
+    tol = 1e-5
+    intercept = False
+    pos = False
+
+    eta_g = np.array([1, 1, 1, 1, 1],dtype=np.float64)
+
+    groups = ssp.csc_matrix(np.array([[0, 0, 0, 1, 0],
+                       [0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0],
+                       [0, 0, 1, 0, 0]],dtype=np.bool),dtype=np.bool)
+
+    groups_var = ssp.csc_matrix(np.array([[1, 0, 0, 0, 0],
+                           [1, 0, 0, 0, 0],
+                           [1, 0, 0, 0, 0],
+                           [1, 1, 0, 0, 0],
+                           [0, 1, 0, 1, 0],
+                           [0, 1, 0, 1, 0],
+                           [0, 1, 0, 0, 1],
+                           [0, 0, 0, 0, 1],
+                           [0, 0, 0, 0, 1],
+                           [0, 0, 1, 0, 0]],dtype=np.bool),dtype=np.bool)
+
+    graph = {'eta_g': eta_g,'groups' : groups,'groups_var' : groups_var}
+
+    verbose = True
+    X = np.asfortranarray(np.random.normal(size = (100,10)))
+    X = np.asfortranarray(X - np.tile(np.mean(X,0),(X.shape[0],1)))
+    X = spams.normalize(X)
+    Y = np.asfortranarray(np.random.normal(size = (100,1)))
+    Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)))
+    Y = spams.normalize(Y)
+    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="FORTRAN")
+    # Regression experiments 
+    # 100 regression problems with the same design matrix X.
+    print '\nVarious regression experiments'
+    compute_gram = True
+#
+    print '\nFISTA + Regression graph'
+    loss = 'square'
+    regul = 'graph'
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+#
+    print '\nADMM + Regression graph'
+    admm = True
+    lin_admm = True
+    c = 1
+    delta = 1
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+#
+    admm = False
+    max_it = 5
+    it0 = 1
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+#
+#  works also with non graph-structured regularization. graph is ignored
+    print '\nFISTA + Regression Fused-Lasso'
+    regul = 'fused-lasso'
+    lambda2 = 0.01
+    lambda3 = 0.01
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,
+        lambda2 = lambda2,lambda3 = lambda3,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),t,np.mean(optim_info[3,:]))
+#
+    print '\nFISTA + Regression graph with intercept'
+    regul = 'graph'
+    intercept = True
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,
+        lambda2 = lambda2,lambda3 = lambda3,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+    intercept = False
+
+# Classification
+    print '\nOne classification experiment'
+    Y = np.asfortranarray( 2 * np.asfortranarray(np.random.normal(size = (100,Y.shape[1])) > 0,dtype = np.float64) -1)
+    print '\nFISTA +  Logistic + graph-linf'
+    loss = 'logistic'
+    regul = 'graph'
+    lambda1 = 0.01
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,
+        lambda2 = lambda2,lambda3 = lambda3,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+#
+# can be used of course with other regularization functions, intercept,...
+
+# Multi-Class classification
+    
+    Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,Y.shape[1]))) - 1)
+    loss = 'multi-logistic'
+    regul = 'graph'
+    print '\nFISTA + Multi-Class Logistic + graph'
+    nclasses = np.max(Y) + 1
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=np.float64,order="FORTRAN")
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,
+        lambda2 = lambda2,lambda3 = lambda3,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+#
+# can be used of course with other regularization functions, intercept,...
+# Multi-Task regression
+    Y = np.asfortranarray(np.random.normal(size = (100,Y.shape[1])))
+    Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)))
+    Y = spams.normalize(Y)
+    W0 = W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="FORTRAN")
+    compute_gram = False
+    verbose = True
+    loss = 'square'
+    print '\nFISTA + Regression multi-task-graph'
+    regul = 'multi-task-graph'
+    lambda2 = 0.01
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,
+        lambda2 = lambda2,lambda3 = lambda3,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+#
+# Multi-Task Classification
+    print '\nFISTA + Logistic + multi-task-graph'
+    regul = 'multi-task-graph'
+    lambda2 = 0.01
+    loss = 'logistic'
+    Y = np.asfortranarray( 2 * np.asfortranarray(np.random.normal(size = (100,Y.shape[1])) > 0,dtype = np.float64) -1)
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,
+        lambda2 = lambda2,lambda3 = lambda3,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+# Multi-Class + Multi-Task Regularization
+    verbose = False
+    print '\nFISTA + Multi-Class Logistic +multi-task-graph'
+    Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,Y.shape[1]))) - 1)
+    loss = 'multi-logistic'
+    regul = 'multi-task-graph'
+    nclasses = np.max(Y) + 1
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=np.float64,order="FORTRAN")
+    tic = time.time()
+    (W, optim_info) = spams.fistaGraph(
+        Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
+        lambda1 = lambda1,it0 = it0,max_it = max_it,L0 = L0,tol = tol,
+        intercept = intercept,pos = pos,compute_gram = compute_gram,
+        loss = loss,regul = regul,admm = admm,lin_admm = lin_admm,c = c,
+        lambda2 = lambda2,lambda3 = lambda3,delta = delta)
+    tac = time.time()
+    t = tac - tic
+    print 'mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),t,np.mean(optim_info[3,:]))
+# can be used of course with other regularization functions, intercept,...
+
     return None
 
 def test_fistaTree():
-    param = {'numThreads' : 1,'verbose' : False,
+    param = {'numThreads' : -1,'verbose' : False,
              'lambda1' : 0.001, 'it0' : 10, 'max_it' : 200,
              'L0' : 0.1, 'tol' : 1e-5, 'intercept' : False,
              'pos' : False}
@@ -448,6 +661,78 @@ def test_proximalFlat():
     return None
 
 def test_proximalGraph():
+    np.random.seed(0)
+    lambda1 = 0.1 # regularization parameter
+    num_threads = -1 # all cores (-1 by default)
+    verbose = True   # verbosity, false by default
+    pos = False       # can be used with all the other regularizations
+    intercept = False # can be used with all the other regularizations     
+
+    U = np.asfortranarray(np.random.normal(size = (10,100)))
+    print 'First graph example'
+# Example 1 of graph structure
+# groups:
+# g1= {0 1 2 3}
+# g2= {3 4 5 6}
+# g3= {6 7 8 9}
+    eta_g = np.array([1, 1, 1],dtype=np.float64)
+    groups = ssp.csc_matrix(np.zeros((3,3)),dtype = np.bool)
+    groups_var = ssp.csc_matrix(
+        np.array([[1, 0, 0],
+                  [1, 0, 0],
+                  [1, 0, 0],
+                  [1, 1, 0],
+                  [0, 1, 0],
+                  [0, 1, 0],
+                  [0, 1, 1],
+                  [0, 0, 1],
+                  [0, 0, 1],
+                  [0, 0, 1]],dtype=np.bool),dtype=np.bool)
+    graph = {'eta_g': eta_g,'groups' : groups,'groups_var' : groups_var}
+
+    print '\ntest prox graph'
+    regul='graph'
+    alpha = Xtest1('spams','spams.proximalGraph(U,graph,False,lambda1 = lambda1,numThreads  = num_threads ,verbose = verbose,pos = pos,intercept = intercept,regul = regul)',locals())
+
+# Example 2 of graph structure
+# groups:
+# g1= {0 1 2 3}
+# g2= {3 4 5 6}
+# g3= {6 7 8 9}
+# g4= {0 1 2 3 4 5}
+# g5= {6 7 8}
+    eta_g = np.array([1, 1, 1, 1, 1],dtype=np.float64)
+    groups = ssp.csc_matrix(
+        np.array([[0, 0, 0, 1, 0],
+                  [0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0],
+                  [0, 0, 1, 0, 0]],dtype=np.bool),dtype=np.bool)
+
+    groups_var = ssp.csc_matrix(
+        np.array([[1, 0, 0, 0, 0],
+                  [1, 0, 0, 0, 0],
+                  [1, 0, 0, 0, 0],
+                  [1, 1, 0, 0, 0],
+                  [0, 1, 0, 1, 0],
+                  [0, 1, 0, 1, 0],
+                  [0, 1, 0, 0, 1],
+                  [0, 0, 0, 0, 1],
+                  [0, 0, 0, 0, 1],
+                  [0, 0, 1, 0, 0]],dtype=np.bool),dtype=np.bool)
+    graph = {'eta_g': eta_g,'groups' : groups,'groups_var' : groups_var}
+    print '\ntest prox graph'
+    alpha = Xtest1('spams','spams.proximalGraph(U,graph,False,lambda1 = lambda1,numThreads  = num_threads ,verbose = verbose,pos = pos,intercept = intercept,regul = regul)',locals())
+#
+    print '\ntest prox multi-task-graph'
+    regul = 'multi-task-graph'
+    lambda2 = 0.1
+    alpha = Xtest1('spams','spams.proximalGraph(U,graph,False,lambda1 = lambda1,lambda2 = lambda2,numThreads  = num_threads ,verbose = verbose,pos = pos,intercept = intercept,regul = regul)',locals())
+#
+    print '\ntest no regularization'
+    regul = 'none'
+    alpha = Xtest1('spams','spams.proximalGraph(U,graph,False,lambda1 = lambda1,lambda2 = lambda2,numThreads  = num_threads ,verbose = verbose,pos = pos,intercept = intercept,regul = regul)',locals())
+    
     return None
 
 def test_proximalTree():

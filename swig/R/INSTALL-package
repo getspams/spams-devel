@@ -24,12 +24,8 @@ cd $R_LIB/spams/test
 Rscript test_spams.R -help
 Rscript test_spams.R
 
-Warning : for now the R interface is only available for a subset of the functions
+Warning : for now the R interface is mising a little subset of the functions
 	described in the documentation of SPAMS.
-toolbox linalg : all functions
-toolbox decomp : spams.sparseProject spams.lasso spams.lassoMask spams.lassoWeighted spams.omp spams.ompMask
-toolbox prox : spams.fistaFlat spams.fistaTree spams.proximalFlat spams.proximalTree
-toolbox dictLearn : spams.TrainDL spams.TrainDL_Memory
 
 # Notes:
 As the C++ interface is built by Swig, I must add

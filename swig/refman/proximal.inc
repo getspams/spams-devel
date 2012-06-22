@@ -1,7 +1,6 @@
 begin addlast Param
 resetflow:
 clever:
-eval:
 end
 begin addlast Inputs
 return_val_loss:     

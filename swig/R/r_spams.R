@@ -361,17 +361,39 @@ spams.fistaTree <- function(Y,X,W0,tree,return_optim_info = FALSE,numThreads =-1
     return (W)
 }
 
-
+spams.fistaGraph <- function(Y,X,W0,graph,return_optim_info = FALSE,numThreads =-1,max_it =1000,L0=1.0,
+              fixed_step=FALSE,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
+              a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
+              compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
+              resetflow=FALSE,regul="",loss="",verbose=FALSE,pos=FALSE,clever=FALSE,
+              log=FALSE,ista=FALSE,subgrad=FALSE,logName="",is_inner_weights=FALSE,
+              inner_weights=c(0.),size_group=1,sqrt_step=TRUE,transpose=FALSE) {
+  if (length(graph) != 3) {
+    stop("fistaGraph : graph should be a list of 3 elements")
+  }
+  eta_g = graph[['eta_g']]
+  groups = graph[['groups']]
+  groups_var = graph[['groups_var']]
+  m = nrow(W0)
+  n = ncol(W0)
+#  W = matrix(rep(0,m * n),nrow = m,ncol = n)
+  W = matrix(c(0),nrow = m,ncol = n)
+  optim_info = fistaGraph(Y,X,W0,W,eta_g,groups,groups_var,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
+  if(return_optim_info == TRUE)
+    return(list(W,optim_info))
+  else
+    return (W)
+  
+}
+  
 spams.proximalFlat <- function(U,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
-                 pos=FALSE,clever=TRUE,eval= NULL,size_group=1,groups = NULL,transpose=FALSE) {
+                 pos=FALSE,clever=TRUE,size_group=1,groups = NULL,transpose=FALSE) {
 
   if (is.null(groups)) {
     groups = vector(mode = 'integer')
   }
-  if(is.null(eval)) {
-    eval = return_val_loss
-  }
+  eval = return_val_loss
   m = nrow(U)
   n = ncol(U)
 #  alpha = matrix(rep(0,m * n),nrow = m,ncol = n)
@@ -387,10 +409,8 @@ spams.proximalFlat <- function(U,return_val_loss = FALSE,numThreads =-1,lambda1=
 
 spams.proximalTree <- function(U,tree,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
-                 pos=FALSE,clever=TRUE,eval= NULL,size_group=1,transpose=FALSE) {
-  if(is.null(eval)) {
-    eval = return_val_loss
-  }
+                 pos=FALSE,clever=TRUE,size_group=1,transpose=FALSE) {
+  eval = return_val_loss
   if (length(tree) != 4) {
     stop("proximalTree : tree should be a list of 4 elements")
   }
@@ -404,6 +424,27 @@ spams.proximalTree <- function(U,tree,return_val_loss = FALSE,numThreads =-1,lam
   alpha = matrix(c(0),nrow = m,ncol = n)
 ##  val_loss = .mycall('proximalFlat',c('U','alpha',params))
   val_loss = proximalTree(U,alpha,eta_g,groups,own_variables,N_own_variables,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
+  if(return_val_loss == TRUE)
+    return(list(alpha,val_loss))
+  else
+    return (alpha)
+  
+}
+
+spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
+                 lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
+                 pos=FALSE,clever=TRUE,size_group=1,transpose=FALSE) {
+  eval = return_val_loss
+  if (length(graph) != 3) {
+    stop("proximalGraph : graph should be a list of 4 elements")
+  }
+  eta_g = graph[['eta_g']]
+  groups = graph[['groups']]
+  groups_var = graph[['groups_var']]
+  m = nrow(U)
+  n = ncol(U)
+  alpha = matrix(c(0),nrow = m,ncol = n)
+  val_loss = proximalGraph(U,alpha,eta_g,groups,groups_var,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
   if(return_val_loss == TRUE)
     return(list(alpha,val_loss))
   else

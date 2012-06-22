@@ -722,6 +722,162 @@ using namespace FISTA;
 }
 
 template<typename T> 
+Matrix<T> *_fistaGraph(
+	     Matrix<T> *X,AbstractMatrixB<T> *D,Matrix<T> *alpha0,
+	     Matrix<T> *alpha, // tree :
+	     Vector<double> *eta_g,SpMatrix<bool> *groups,SpMatrix<bool> *groups_var, // params :
+	     int num_threads,
+	     int max_it,
+	     T L0,
+	     bool fixed_step,
+	     T gamma,
+	     T _lambda,
+	     T delta,
+	     T lambda2,
+	     T lambda3,
+	     T a,
+	     T b,
+	     T c,
+	     T tol,
+	     int it0,
+	     int max_iter_backtracking,
+	     bool compute_gram,
+	     bool lin_admm,
+	     bool admm,
+	     bool intercept,
+	     bool resetflow,
+	     char* name_regul,
+	     char* name_loss,
+	     bool verbose,
+	     bool pos,
+	     bool clever,
+	     bool log,
+	     bool ista,
+	     bool subgrad,
+	     char* logName,
+	     bool is_inner_weights,
+	     Vector<T> *inner_weights,
+	     int size_group,
+	     bool sqrt_step,
+	     bool transpose
+)
+throw(const char *) 
+{
+  using namespace FISTA;
+  int mD = D->m();
+  int p = D->n();
+  int m = X->m();
+  int n = X->n();
+  int pAlpha = alpha0->m();
+  int nAlpha = alpha0->n();
+  FISTA::ParamFISTA<T> param;
+  param.max_it = max_it;
+  param.L0 = L0;
+  param.fixed_step = fixed_step;
+  param.gamma = gamma;
+  param.lambda = _lambda;
+  param.delta = delta;
+  param.lambda2 = lambda2;
+  param.lambda3 = lambda3;
+  param.a = a;
+  param.b = b;
+  param.c = c;
+  param.tol = tol;
+  param.it0 = it0;
+  param.max_iter_backtracking = max_iter_backtracking;
+  param.loss = loss_from_string(name_loss);
+  if (param.loss==INCORRECT_LOSS)
+    throw("fistaGraph: Unknown loss");
+  param.compute_gram = compute_gram;
+  param.lin_admm = lin_admm;
+  param.admm = admm;
+  param.intercept = intercept;
+  param.resetflow = resetflow;
+  param.regul = regul_from_string(name_regul);
+
+  if (param.regul==INCORRECT_REG) {
+      throw("fistaGraph: Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+  }
+  strncpy(param.name_regul,name_regul,param.length_names);
+  strncpy(param.name_loss,name_loss,param.length_names);
+  param.verbose = verbose;
+  param.pos = pos;
+  param.clever = clever;
+
+  if(param.log = log) {
+    int n = strlen(logName);
+    if(n == 0) 
+      throw("fistaGraph : missing field logName");
+    param.logName = new char[n+1];
+    strcpy(param.logName,logName);
+  }
+  param.ista = ista;
+  param.subgrad = subgrad;
+  param.is_inner_weights = is_inner_weights;
+
+  if(is_inner_weights) {
+    if(inner_weights == NULL)
+      throw("fistaGraph : missing inner_heights ");
+    param.inner_weights = inner_weights->rawX();
+  }
+
+  param.eval = false;
+  param.size_group = size_group;
+  param.sqrt_step = sqrt_step;
+  param.transpose = transpose;
+
+  if ((param.loss != CUR && param.loss != MULTILOG) && (pAlpha != p || nAlpha != n || mD != m)) { 
+      throw("fistaGraph : Argument sizes are not consistent");
+   } else if (param.loss == MULTILOG) {
+    Vector<T> Xv;
+    X->toVect(Xv);
+    int maxval = static_cast<int>(Xv.maxval());
+    int minval = static_cast<int>(Xv.minval());
+    if (minval != 0)
+      throw("fistaGraph : smallest class should be 0");
+    if (maxval*X->n() > nAlpha || mD != m) {
+      cerr << "Number of classes: " << maxval << endl;
+      //cerr << "Alpha: " << pAlpha << " x " << nAlpha << endl;
+         //cerr << "X: " << X.m() << " x " << X.n() << endl;
+      throw("fistaGraph : Argument sizes are not consistent");
+    }
+  } else if (param.loss == CUR && (pAlpha != D->n() || nAlpha != D->m())) {
+      throw("fistaGraph : Argument sizes are not consistent");
+   }
+   if (param.num_threads == -1) {
+      param.num_threads=1;
+#ifdef _OPENMP
+      param.num_threads =  MIN(MAX_THREADS,omp_get_num_procs());
+#endif
+   }
+
+   if (param.regul==TREE_L0 || param.regul==TREEMULT || param.regul==TREE_L2 || param.regul==TREE_LINF) 
+      throw("fistaGraph error: fistaTree should be used instead");
+
+  if (param.regul==GRAPHMULT && abs<T>(param.lambda2 - 0) < 1e-20) 
+      throw("fistaGraph error: with multi-task-graph, lambda2 should be > 0");
+  if(groups->m() != groups->n())
+    throw("fistaGraph error: size of field groups is not consistent");
+  GraphStruct<T> graph;
+  graph.Nv = groups_var->m();
+  graph.Ng = groups_var->n();
+  graph.weights = eta_g->rawX();
+  graph.gg_ir = groups->r();
+  graph.gg_jc = groups->pB();
+  graph.gv_ir = groups_var->r();
+  graph.gv_jc = groups_var->pB();
+  if (graph.Nv <= 0 || graph.Ng != groups->n())
+    throw("fistaGraph error: size of field groups_var is not consistent");
+  if (eta_g->n() != groups_var->n())
+    throw("fistaGraph error: size of field eta_g is not consistent");
+
+  Matrix<T> *duality_gap = new Matrix<T>();
+  FISTA::solver<T>((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*duality_gap),&graph);
+  if (param.log) delete[](param.logName);
+  return duality_gap;
+}
+
+template<typename T> 
 Vector<T> *_proximalFlat(Matrix<T> *alpha0,Matrix<T> *alpha, 
 		 Vector<int> *groups,  // params
 		int num_threads,
@@ -808,6 +964,10 @@ using namespace FISTA;
   strncpy(param.name_regul,name_regul,param.length_names);
   if (param.regul==GRAPH || param.regul==GRAPHMULT) 
     throw("proximalTree : proximalGraph should be used instead");
+  if (param.regul==TREEMULT && abs<T>(param.lambda2 - 0) < 1e-20) {
+    throw("proximalTree error: with multi-task-tree, lambda2 should be > 0");
+  }
+
   param.num_threads = (num_threads < 0) ? 1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
@@ -852,6 +1012,75 @@ using namespace FISTA;
    tree.groups_jc= groups->pB();
   Vector<T> *val_loss = new Vector<T>();
   FISTA::PROX<T>((Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Vector<T> &)(*val_loss),NULL,&tree);
+  return val_loss;
+}
+
+template<typename T> 
+Vector<T> *_proximalGraph(Matrix<T> *alpha0,Matrix<T> *alpha, // graph
+		Vector<double> *eta_g,SpMatrix<bool> *groups,SpMatrix<bool> *groups_var, // params :	 
+		int num_threads,
+		T lambda1,
+		T lambda2,
+		T lambda3,
+		bool intercept,
+		bool resetflow,
+		char* name_regul,
+		bool verbose,
+		bool pos,
+		bool clever,
+		bool eval,
+		int size_group,
+		bool transpose
+		) 
+throw(const char *) 
+{
+using namespace FISTA;
+  FISTA::ParamFISTA<T> param;
+  param.regul = regul_from_string(name_regul);
+  if (param.regul==INCORRECT_REG)
+    throw("proximalGraph : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+  strncpy(param.name_regul,name_regul,param.length_names);
+  if (param.regul==TREE_L0 || param.regul==TREEMULT || param.regul==TREE_L2 || param.regul==TREE_LINF) 
+    throw("proximalGraph : proximalTree should be used instead");
+  if (param.regul==TREEMULT && abs<T>(param.lambda2 - 0) < 1e-20) {
+      throw("proximalGraph error: with multi-task-graph, lambda2 should be > 0");
+  }
+  param.num_threads = (num_threads < 0) ? 1 : num_threads;
+  param.lambda = lambda1;
+  param.lambda2 = lambda2;
+  param.lambda3 = lambda3;
+  param.intercept = intercept;
+  param.resetflow = resetflow;
+  param.verbose = verbose;
+  param.pos = pos;
+  param.clever = clever;
+  param.eval = eval;
+  param.size_group = size_group;
+  param.transpose = transpose;
+  if (param.num_threads == -1) {
+    param.num_threads=1;
+#ifdef _OPENMP
+      param.num_threads =  MIN(MAX_THREADS,omp_get_num_procs());
+#endif
+   }
+  int pAlpha = alpha0->m();
+  if(groups->m() != groups->n())
+    throw("proximalGraph error: size of field groups is not consistent");
+  GraphStruct<T> graph;
+  graph.Nv = groups_var->m();
+  graph.Ng = groups_var->n();
+  graph.weights = eta_g->rawX();
+  graph.gg_ir = groups->r();
+  graph.gg_jc = groups->pB();
+  graph.gv_ir = groups_var->r();
+  graph.gv_jc = groups_var->pB();
+  if (graph.Nv <= 0 || graph.Ng != groups->n())
+    throw("proximalGraph error: size of field groups_var is not consistent");
+  if (eta_g->n() != groups_var->n())
+    throw("proximalGraph error: size of field eta_g is not consistent");
+
+  Vector<T> *val_loss = new Vector<T>();
+  FISTA::PROX<T>((Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Vector<T> &)(*val_loss),&graph);
   return val_loss;
 }
 

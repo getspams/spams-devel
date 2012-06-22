@@ -53,3 +53,8 @@ ceiling(X)
 i1:i2:i3
 xrange(i1,i3+1,i2)   (ou xrange(i1-1,i3,i2))
 seq(from = i1,to = i3,by = i2)
+
+Y=double(ceil(5*rand(100,size(Y,2)))-1)
+Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,Y.shape[1]))) - 1)
+Y = ceiling(5 * matrix(runif(100 * ncol(Y),0,1),nrow = 100,ncol = ncol(Y),byrow = FALSE)) - 1
+
