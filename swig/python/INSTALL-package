@@ -5,8 +5,11 @@ The interface consists of 4 files : spams.py myscipy_rand.py spams_wrap.py _spam
 Note: myscipy_rand.py supplies a random generator for sparse matrix
       for some old scipy distributions
 WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
-----------------------------------
-Interface building :
+########################################
+Interface building (tested on Linux-ubuntu and Mac OS X 10.8):
+
+Packages required: numpy, scipy, blas + lapack (preferably from atlas).
+
 tar zxf spams-python.tar.gz
 cd spams-python
 python setup.py build
@@ -14,7 +17,7 @@ python setup.py build
 inst=<your-python-install-dir>
 python setup.py install --prefix=$inst
 
-----------------------------------------
+########################################
 Testing the interface :
 export PYTHONPATH=$inst/lib/python2.6/site-packages
 cd $inst/test
@@ -26,7 +29,7 @@ python test_spams.py name1 name2 ... : run named tests
 Warning : for now the python interface is mising a little subset of the functions
 	described in the documentation of SPAMS.
 
-----------------------------------------
+########################################
 Using the interface :
 setup your PYTHONPATH
 
