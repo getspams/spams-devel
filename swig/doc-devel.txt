@@ -8,8 +8,8 @@ Les APIs sont définies respectivement dans python/spams.py
 et R/r_spams.R
 Les fonctions définies ici sont les mêmes que celles définies pour matlab
 au nommage et aux mécanismes de passage d'arguments près
-(pour respecter les conventions des langages).
-En R et python les noms de foction commencent par une minuscule.
+(pour respecter les conventions de chaque langage).
+En R et python les noms de fonction commencent par une minuscule.
 En R les noms sont préfixés par 'spams.'.
 En python on construit un module spams, ce qui introduit le même préfixe 'spams.'
 Par exemple les fonctions matlab mexSort et mexLassoMask deviennent
@@ -18,8 +18,8 @@ spams.sort et spams.lassoMask
 Les arguments optionnels, en particulier ceux qui correspondent 
 à la structure param de matlab apparaissent explicitement avec leurs 
 valeurs par défaut dans la définitions des fonctions.
-Lors de l'appel des fonctions, ces paramètres sont optionnels, mais doivent être
-nommés.
+Lors de l'appel des fonctions, ces paramètres sont optionnels, 
+mais ceux qui sont présents doivent être nommés.
 
 valeurs de retour multiples:
 ---------------------------
@@ -34,7 +34,7 @@ Concrètement, il n'y a qu'une ou deux valeurs de retour.
 Dans le cas où la 2e valeur n'est pas obligatoire, on a introduit une variable
 booléenne.
   Ex : (alpha,path) = spams.lasso(X,return_reg_path = True,...)
-
+Si la variable vaut False, le résultat est rendu directement (sans n-uplet ou liste).
 
 Construction des interfaces avec SWIG
 =====================================
@@ -47,8 +47,13 @@ Le fichier spams.h encapsule les fonctions (template) SPAMS qui doivent être int
 Pour chaque fonction de spams.h SWIG construit une interface python qui est utilisée
 par les fonctions de spams.py ou r_spams.R
 Exemples:
-	 spams.invSym (spams.py) -> spams_wrap.invSym ([SWIG] spams_wrap.py) -> _spams_wrap.invSym ([SWIG] spams_wrap.cpp)-> _invSym (spams.h) -> Matrix<T>::invSym (linalg.h)
-	 spams.fistaFlat (r_spams.R) -> fistaFlat ([SWIG] spams.R) -> R_swig_fistaFlat ([SWIG] spams.cpp) -> _fistaFlat (spams.h) -> FISTA::solver (fista.h)
+	 spams.invSym (spams.py) -> spams_wrap.invSym ([SWIG] spams_wrap.py) 
+	 -> _spams_wrap.invSym ([SWIG] spams_wrap.cpp)-> _invSym (spams.h) 
+	 -> Matrix<T>::invSym (linalg.h)
+
+	 spams.fistaFlat (r_spams.R) -> fistaFlat ([SWIG] spams.R) 
+	 -> R_swig_fistaFlat ([SWIG] spams.cpp) -> _fistaFlat (spams.h) 
+	 -> FISTA::solver (fista.h)
 
 Valeurs retournées de type matrice ou vecteur:
 ---------------------------------------------
@@ -91,6 +96,9 @@ R:
  Fabrication  de spams.so à partir de spams.cpp
  Installation de r_spams.R et spams.so dans un endroit connu de R
 
+Note: l'installation des package ne fait pas appel à swig :
+      les fichiers générés par swig sont intégrés à la distribution.
+
 Configuration SWIG:
 -------------------
 Le fichier de config est spams.i . Il inclut spamstools.i et selon le langage 
@@ -99,8 +107,8 @@ py_typemaps.i ou R_typemaps.i
 Les fonctions étant définies sous forme de template, il faut indiquer à swig
 comment les instancier : une directive %template par fonction et par type à instancier.
 En pratique on se limite à <double>
-La macro INSTANTIATE_DATA définie dans py_typemaps.i et R_typemaps.i
-est appliquée à toutes les fonctions dans spams.i
+La macro INSTANTIATE_DATA, définie dans py_typemaps.i et R_typemaps.i,
+est appliquée aux fonctions à interfacer dans spams.i
 
 La façon de transmettre les arguments est régie par des "typemaps"
 Les typemaps sont définis dans py_typemaps.i et R_typemaps.i et appliqués dans spamstools.i.
