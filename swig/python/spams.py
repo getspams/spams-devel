@@ -403,7 +403,7 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
                  D = None,numThreads = -1,
                  batchsize = -1,K= -1,lambda1= None,lambda2= 10e-10,iter=-1,t0=1e-5,
                  mode=spams_wrap.PENALTY,posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,
-                 whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,
+                 whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,
                  stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
 
 #    paramlist = [("D",np.array([[],[]],dtype=np.float64,order="FORTRAN")),("numThreads" ,-1),("batchsize", -1),
@@ -449,15 +449,20 @@ def trainDL(
     numThreads = -1,batchsize = -1,K= -1,lambda1= None,
     lambda2= 10e-10,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,posAlpha=False,posD=False,
     expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,
-    rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,
+    rho=1.0,iter_updateD=None,stochastic_deprecated=False,modeParam=0,batch=False,
     log_deprecated=False,logName=''):
 
+    if iter_updateD == None:
+        if batch:
+            iter_updateD = 5
+        else:
+            iter_updateD = 1
     return __allTrainDL(X,return_model,model,False,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
 
 def trainDL_Memory(X,D = None,numThreads = -1,batchsize = -1,
                    K= -1,lambda1= None,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,
-                   posD=False,expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
+                   posD=False,expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
     lambda2= 10e-10
     verbose = False
     posAlpha = False

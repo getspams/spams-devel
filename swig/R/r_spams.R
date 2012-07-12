@@ -468,7 +468,7 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
 ###########  dictLearn ##################
 .TrainDL <- function(X,return_model= NULL,model = NULL,in_memory= FALSE,D = NULL,numThreads = -1,batchsize = -1,
                  K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
-                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
+                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
   # We can only have simple objects in the param list of .mycall
 
   if (is.null(D)) {
@@ -511,14 +511,21 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
 
 spams.trainDL <- function(X,return_model= FALSE,model= NULL,D = NULL,numThreads = -1,batchsize = -1,
             K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
-                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
+                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=None,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
   
+  if (is.null(iter_updateD)) {
+    if(batch) {
+      iter_updateD = 5
+    } else {
+      iter_updateD = 1
+    }
+  }
   return (.TrainDL(X,return_model,model,FALSE,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
 }
 
 spams.trainDL_Memory <- function(X,D = NULL,numThreads = -1,batchsize = -1,
             K= -1,lambda1= NULL,iter=-1,t0=1e-5,mode='PENALTY',
-                 posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1.,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
+                 posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
   lambda2 = 10e-10
   verbose = FALSE
   posAlpha = FALSE

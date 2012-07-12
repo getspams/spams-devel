@@ -1136,7 +1136,7 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
 		    double gamma1,
 		    double gamma2,
 		    T rho,
-		    double iter_updateD,
+		    int iter_updateD,
 		    bool stochastic,
 		    int modeParam,
 		    bool batch,
@@ -1187,6 +1187,7 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   param.stochastic = stochastic;
   param.modeParam = static_cast<mode_compute>(modeParam);
   param.batch = batch;
+  param.iter_updateD = iter_updateD;
   if(param.log = log) {
     int n = strlen(logName);
     if(n == 0) 
