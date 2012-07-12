@@ -3,8 +3,8 @@ to the functions of spams library already interfaced with matlab.
 
 This file describes how to build the interface from sources.
 
-To install the SPAMS puthon package you can also just untar spams-python.tar.gz
-(see INSTALL-package)
+To install the SPAMS puthon package you can also just download the tar.gz archive
+and follow instructions from INSTALL-package.
 
 ----------------------------------------
 Building from sources:
