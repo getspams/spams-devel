@@ -26,7 +26,7 @@
 namespace FISTA {
 
    enum loss_t { SQUARE, SQUARE_MISSING, LOG, LOGWEIGHT, MULTILOG, CUR, HINGE, INCORRECT_LOSS};
-   enum regul_t { L0, L1, RIDGE, L2, LINF, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG, GRAPH_PATH_L0, GRAPH_PATH_CONV};
+   enum regul_t { L0, L1, RIDGE, L2, LINF, L1CONSTRAINT, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG, GRAPH_PATH_L0, GRAPH_PATH_CONV};
 
    regul_t regul_from_string(char* regul) {
       if (strcmp(regul,"l0")==0) return L0;
@@ -34,6 +34,7 @@ namespace FISTA {
       if (strcmp(regul,"l2")==0) return RIDGE;
       if (strcmp(regul,"linf")==0) return LINF;
       if (strcmp(regul,"l2-not-squared")==0) return L2;
+      if (strcmp(regul,"l1-constraint")==0) return L1CONSTRAINT;
       if (strcmp(regul,"elastic-net")==0) return ELASTICNET;
       if (strcmp(regul,"fused-lasso")==0) return FUSEDLASSO;
       if (strcmp(regul,"group-lasso-l2")==0) return GROUPLASSO_L2;
@@ -97,6 +98,7 @@ namespace FISTA {
          case L1: cout << "L1 regularization" << endl; break;
          case RIDGE: cout << "L2-squared regularization" << endl; break;
          case L2: cout << "L2-not-squared regularization" << endl; break;
+         case L1CONSTRAINT: cout << "L1 constraint regularization" << endl; break;
          case LINF: cout << "Linf regularization" << endl; break;
          case ELASTICNET: cout << "Elastic-net regularization" << endl; break;
          case FUSEDLASSO: cout << "Fused Lasso or total variation regularization" << endl; break;
@@ -151,6 +153,7 @@ namespace FISTA {
          transpose=false;
          fixed_step=false;
          copied=false;
+         eval_dual_norm=false;
          groups=NULL;
          ngroups=0;
       }
@@ -199,6 +202,7 @@ namespace FISTA {
       bool sqrt_step;
       bool transpose;
       bool fixed_step;
+      bool eval_dual_norm;
       int* groups;
       int ngroups;
    };
@@ -637,6 +641,7 @@ namespace FISTA {
             virtual T fenchel(const Vector<T>& input) const {
                T sum = 0;
                if (weighted) {
+               // TODO : check that
                   for (int i = 0; i<input.n(); ++i) {
                      T prod = _y[i]>0 ? input[i]/_weightpos : -input[i]/_weightneg;
                      sum += _y[i] >0 ? _weightpos*(xlogx(1.0+prod)+xlogx(-prod)) : _weightneg*(xlogx(1.0+prod)+xlogx(-prod));
@@ -1043,11 +1048,14 @@ namespace FISTA {
             /// returns phi^star( input ) and ouput=input if the fenchel is unconstrained
             /// returns 0 and scale input such that phi^star(output)=0 otherwise
             virtual void fenchel(const D& input, T& val, T& scal) const = 0;
-            virtual bool is_fenchel() const { return !_pos; };
+            virtual bool is_fenchel() const { return true; };
             virtual bool is_intercept() const { return _intercept; };
             virtual bool is_subgrad() const { return false; };
             virtual void sub_grad(const D& input, D& output) const {  };
             virtual T eval_paths(const D& x, SpMatrix<T>& paths_mat) const { return this->eval(x); };
+            virtual T eval_dual_norm(const D& x) const { return 0; };
+            // TODO complete for all norms
+            virtual T eval_dual_norm_paths(const D& x, SpMatrix<T>& path) const { return this->eval_dual_norm(x); };
 
          protected:
             bool _pos;
@@ -1077,10 +1085,11 @@ namespace FISTA {
             void inline fenchel(const Vector<T>& input, T& val, T& scal) const {
                Vector<T> output;
                output.copy(input);
-               if (this->_intercept) output[output.n()-1]=0;
+               if (this->_pos) output.thrsPos();
                T mm = output.fmaxval();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
+               if (this->_intercept & abs<T>(output[output.n()-1]) > EPSILON) val=INFINITY; 
             };
             virtual bool is_subgrad() const { return true; };
             virtual void sub_grad(const Vector<T>& input, Vector<T>& output) const {  
@@ -1096,6 +1105,33 @@ namespace FISTA {
                }
                if (this->_intercept) output[output.n()-1]=0;
             }
+      };
+
+   template <typename T> 
+      class LassoConstraint : public Regularizer<T> {
+         public:
+            LassoConstraint(const ParamReg<T>& param) : Regularizer<T>(param) { };
+            virtual ~LassoConstraint() { };
+
+            void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
+ //              y.copy(x);
+ //              if (this->_pos) y.thrsPos();
+ //              y.softThrshold(lambda);
+ //              if (this->_intercept) y[y.n()-1] = x[y.n()-1];
+            };
+            T inline eval(const Vector<T>& x) const { 
+               return (this->_intercept ? x.asum() - abs(x[x.n()-1]) : x.asum());
+            };
+            virtual bool is_fenchel() const { return false; };
+            void inline fenchel(const Vector<T>& input, T& val, T& scal) const { };
+           //    Vector<T> output;
+           //    output.copy(input);
+           //    if (this->_intercept) output[output.n()-1]=0;
+           //    T mm = output.fmaxval();
+           //    scal= mm > 1.0 ? T(1.0)/mm : 1.0;
+           //    val=0;
+           // };
+            virtual bool is_subgrad() const { return false; };
       };
 
    template <typename T> 
@@ -1158,8 +1194,12 @@ namespace FISTA {
                return (this->_intercept ? 0.5*x.nrm2sq() - 0.5*x[x.n()-1]*x[x.n()-1] : 0.5*x.nrm2sq());
             };
             void inline fenchel(const Vector<T>& input, T& val, T& scal) const {
-               val=this->eval(input);
+               Vector<T> tmp;
+               tmp.copy(input);
+               if (this->_pos) tmp.thrsPos();
+               val=this->eval(tmp);
                scal=T(1.0);
+               if (this->_intercept & abs<T>(tmp[tmp.n()-1]) > EPSILON) val=INFINITY; 
             };
             virtual bool is_subgrad() const { return true; };
             virtual void sub_grad(const Vector<T>& input, Vector<T>& output) const {  
@@ -1202,10 +1242,11 @@ namespace FISTA {
             void inline fenchel(const Vector<T>& input, T& val, T& scal) const {
                Vector<T> output;
                output.copy(input);
-               if (this->_intercept) output[output.n()-1]=0;
+               if (this->_pos) output.thrsPos();
                T mm = output.nrm2();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
+               if (this->_intercept & abs<T>(output[output.n()-1]) > EPSILON) val=INFINITY; 
             };
       };
 
@@ -1233,10 +1274,11 @@ namespace FISTA {
             void inline fenchel(const Vector<T>& input, T& val, T& scal) const {
                Vector<T> output;
                output.copy(input);
-               if (this->_intercept) output[output.n()-1]=0;
+               if (this->_pos) output.thrsPos();
                T mm = output.asum();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
+               if (this->_intercept & abs<T>(output[output.n()-1]) > EPSILON) val=INFINITY; 
             };
       };
 
@@ -1391,11 +1433,15 @@ namespace FISTA {
                }
                gr->reset_flow();
                gr->restore_capacities();
-               T mm = gr->dual_norm_inf(input,_weights);
+               Vector<T> output;
+               output.copy(input);
+               if (this->_pos) output.thrsPos();
+               T mm = gr->dual_norm_inf(output,_weights);
                if (!_resetflow)
                   gr->restore_flow();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
+               if (this->_intercept & abs<T>(input[input.n()-1]) > EPSILON) val=INFINITY; 
             };
 
             virtual void init(const Vector<T>& y) { };
@@ -1506,9 +1552,13 @@ namespace FISTA {
                   } else {
                      yp.setData(y.rawX(),y.n());
                   }
-                  T mm = const_cast<Tree_Seq<T>* >(&_tree)->dual_norm_inf(yp);
+                  Vector<T> yp2;
+                  yp2.copy(yp);
+                  if (this->_pos) yp2.thrsPos();
+                  T mm = const_cast<Tree_Seq<T>* >(&_tree)->dual_norm_inf(yp2);
                   scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                   val=0;
+                  if (this->_intercept & abs<T>(y[y.n()-1]) > EPSILON) val=INFINITY; 
                } 
             };
             virtual bool is_fenchel() const {
@@ -1768,11 +1818,18 @@ namespace FISTA {
             };
             void inline fenchel(const Matrix<T>& input, T& val, T& scal) const {
                Vector<T> norm;
-               input.norm_2_rows(norm);
-               if (this->_intercept) norm[norm.n()-1]=0;
+               if (this->_pos) {
+                  Matrix<T> output;
+                  output.copy(input);
+                  output.thrsPos();
+                  output.norm_2_rows(norm);
+               } else {
+                  input.norm_2_rows(norm);
+               }
                T mm = norm.fmaxval();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0; 
                val=0;
+               if (this->_intercept & abs<T>(norm[norm.n()-1]) > EPSILON) val=INFINITY; 
             };
       };
 
@@ -1805,11 +1862,19 @@ namespace FISTA {
             }
             void inline fenchel(const Matrix<T>& input, T& val, T& scal) const {
                Vector<T> norm;
-               input.norm_l1_rows(norm);
+               if (this->_pos) {
+                  Matrix<T> output;
+                  output.copy(input);
+                  output.thrsPos();
+                  output.norm_l1_rows(norm);
+               } else {
+                  input.norm_l1_rows(norm);
+               }
                if (this->_intercept) norm[norm.n()-1]=0;
                T mm = norm.fmaxval();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0; 
                val=0;
+               if (this->_intercept & abs<T>(norm[norm.n()-1]) > EPSILON) val=INFINITY; 
             };
             virtual bool is_subgrad() const { return true; };
             virtual void sub_grad(const Matrix<T>& input, Matrix<T>& output) const { 
@@ -2037,6 +2102,9 @@ namespace FISTA {
              T inline eval(const Vector<T>& x) const { 
                 return const_cast<GraphPath<T>* >(&_graph)->eval_conv(x.rawX());
              };
+             T inline eval_dual_norm(const Vector<T>& x) const { 
+                return const_cast<GraphPath<T>* >(&_graph)->eval_dual_norm(x.rawX(),NULL);
+             };
              T inline eval_paths(const Vector<T>& x, SpMatrix<T>& paths_mat) const { 
                 List<Path<long long>*> paths;
                 T val=const_cast<GraphPath<T>* >(&_graph)->eval_conv(x.rawX(),&paths);
@@ -2045,10 +2113,31 @@ namespace FISTA {
                       it_path != paths.end(); ++it_path) delete(*it_path);
                 return val;
              };
+             T inline eval_dual_norm_paths(const Vector<T>& x, SpMatrix<T>& paths_mat) const { 
+                Path<long long> path;
+                T val=const_cast<GraphPath<T>* >(&_graph)->eval_dual_norm(x.rawX(),&path.nodes);
+                List<Path<long long>*> paths;
+                paths.push_back(&path);
+                path.flow_int=1;
+                path.flow=double(1.0);
+                convert_paths_to_mat<T>(paths,paths_mat,_graph.n());
+                return val;
+             };
+             virtual bool is_fenchel() const { return true; };
+
              void inline fenchel(const Vector<T>& input, T& val, T& scal) const {
-                T mm = const_cast<GraphPath<T>* >(&_graph)->eval_dual_norm(input.rawX());
+                T mm;
+                if (this->_pos) {
+                   Vector<T> output;
+                   output.copy(input);
+                   output.thrsPos();
+                   mm = const_cast<GraphPath<T>* >(&_graph)->eval_dual_norm(output.rawX(),NULL);
+                } else {
+                   mm = const_cast<GraphPath<T>* >(&_graph)->eval_dual_norm(input.rawX(),NULL);
+                }
                 scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                 val=0;
+                if (this->_intercept & abs<T>(input[input.n()-1]) > EPSILON) val=INFINITY; 
              };
           private:
              GraphPath<T> _graph;
@@ -2444,7 +2533,7 @@ namespace FISTA {
          grad1.scal(scal);
          dual -= loss.fenchel(grad1);
          dual = MAX(dual,best_dual);
-         T delta= primal == 0 ? 0 : (primal-dual)/primal;
+         T delta= primal == 0 ? 0 : (primal-dual)/abs<T>(primal);
          if (verbose) {
             cout << "Relative duality gap: " << delta << endl;
             flush(cout);
@@ -3097,6 +3186,7 @@ namespace FISTA {
          switch (param.regul) {
             case L0: reg=new Lzero<T>(param_reg); break;
             case L1: reg=new Lasso<T>(param_reg); break;
+            case L1CONSTRAINT: reg=new LassoConstraint<T>(param_reg); break;
             case L2: reg=new normL2<T>(param_reg); break;
             case LINF: reg=new normLINF<T>(param_reg); break;
             case RIDGE: reg=new Ridge<T>(param_reg); break;
@@ -3144,6 +3234,7 @@ namespace FISTA {
          switch (param.regul) {
             case L0: reg=new RegMat<T, Lzero<T> >(param_reg); break;
             case L1: reg=new RegMat<T, Lasso<T> >(param_reg); break;
+            case L1CONSTRAINT: reg=new RegMat<T, LassoConstraint<T> >(param_reg); break;
             case L2: reg=new RegMat<T, normL2<T> >(param_reg); break;
             case LINF: reg=new RegMat<T, normLINF<T> >(param_reg); break;
             case RIDGE: reg=new RegMat<T, Ridge<T> >(param_reg); break;
@@ -3538,6 +3629,7 @@ namespace FISTA {
          if (param.verbose) {
             print_regul(param.regul);
             if (param.intercept) cout << "with intercept" << endl;
+            if (param.eval_dual_norm) cout << "Evaluate the dual norm only" << endl;
             flush(cout);
          }
          int num_threads=MIN(alpha0.n(),param.num_threads);
@@ -3562,9 +3654,17 @@ namespace FISTA {
                alpha0.refCol(i,alphai);
                regularizers[numT]->reset();
                if (i==0 && paths) {
-                  val_loss[i]=regularizers[numT]->eval_paths(alphai,*paths);
+                  if (param.eval_dual_norm) {
+                     val_loss[i]=regularizers[numT]->eval_dual_norm_paths(alphai,*paths);
+                  } else {
+                     val_loss[i]=regularizers[numT]->eval_paths(alphai,*paths);
+                  }
                } else {
-                  val_loss[i]=regularizers[numT]->eval(alphai);
+                  if (param.eval_dual_norm) {
+                     val_loss[i]=regularizers[numT]->eval_dual_norm(alphai);
+                  } else {
+                     val_loss[i]=regularizers[numT]->eval(alphai);
+                  }
                }
             }
             for (i = 0; i<num_threads; ++i) {

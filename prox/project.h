@@ -3283,7 +3283,7 @@ T GraphPath<T,Int>::eval_dual_norm(const T* variables, list_int* path_out) {
          if (*it  < _n) gamma+=abs<T>(variables[*it]);
       }
       T new_tau=gamma/(delta+gamma/tau);
-      if (abs<T>(delta) < 1e-12 || abs<T>(new_tau-tau) < 1e-12 || (!first && (new_tau <= tau))) exit_loop=true;
+      if (abs<T>(new_tau) < 1e-12 || abs<T>(delta) < 1e-12 || abs<T>(new_tau-tau) < 1e-12 || (!first && (new_tau <= tau))) exit_loop=true;
       tau=new_tau;
       first=false;
    }

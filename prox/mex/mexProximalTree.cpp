@@ -95,7 +95,6 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    param.lambda2= getScalarStructDef<T>(prhs[2],"lambda2",0.0);
    param.lambda3= getScalarStructDef<T>(prhs[2],"lambda3",0.0);
    param.size_group= getScalarStructDef<int>(prhs[2],"size_group",1);
-
    param.intercept = getScalarStructDef<bool>(prhs[2],"intercept",false);
    param.resetflow = getScalarStructDef<bool>(prhs[2],"resetflow",false);
    param.verbose = getScalarStructDef<bool>(prhs[2],"verbose",false);

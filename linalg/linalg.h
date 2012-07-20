@@ -96,6 +96,10 @@ static inline T hardThrs(const T x, const T lambda) {
    return (x > lambda || x < -lambda) ? x : 0;
 };
 
+template <typename T>
+static inline T alt_log(const T x);
+template <> inline double alt_log<double>(const double x) { return log(x); };
+template <> inline float alt_log<float>(const float x) { return logf(x); };
 
 template <typename T>
 static inline T xlogx(const T x) {
@@ -104,7 +108,7 @@ static inline T xlogx(const T x) {
    } else if (x < 1e-20) {
       return 0;
    } else {
-      return x*log(x);
+      return x*alt_log<T>(x);
    }
 }
 
@@ -113,7 +117,7 @@ static inline T logexp(const T x) {
    if (x < -30) {
       return 0;
    } else if (x < 30) {
-      return log( T(1.0) + exp_alt<T>( x ) );
+      return alt_log<T>( T(1.0) + exp_alt<T>( x ) );
    } else {
       return x;
    }
@@ -686,6 +690,8 @@ template<typename T> class Vector {
    inline void neg();
    /// replace each value by its exponential
    inline void exp();
+   /// replace each value by its logarithm
+   inline void log();
    /// replace each value by its exponential
    inline void logexp();
    /// replace each value by its exponential
@@ -791,10 +797,10 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    inline T asum() const;
    /// compute the sum of the matrix elements
    inline T normFsq() const;
-   /// Direct access to _pE
-   inline int* pE() const { return _pE; };
    /// Direct access to _pB
    inline int* pB() const { return _pB; };
+   /// Direct access to _pE
+   inline int* pE() const { return _pE; };
    /// Direct access to _r
    inline int* r() const { return _r; };
    /// Direct access to _v
@@ -3279,13 +3285,18 @@ template <typename T> inline void Vector<T>::exp() {
    vExp<T>(_n,_X,_X);
 };
 
+/// replace each value by its logarithm
+template <typename T> inline void Vector<T>::log() {
+   for (int i=0; i<_n; ++i) _X[i]=alt_log<T>(_X[i]);
+};
+
 /// replace each value by its exponential
 template <typename T> inline void Vector<T>::logexp() {
    for (int i = 0; i<_n; ++i) {
       if (_X[i] < -30) {
          _X[i]=0;
       } else if (_X[i] < 30) {
-         _X[i]= log( T(1.0) + exp_alt<T>( _X[i] ) );
+         _X[i]= alt_log<T>( T(1.0) + exp_alt<T>( _X[i] ) );
       }
    }
 };
@@ -3302,7 +3313,7 @@ template <typename T> inline T Vector<T>::softmax(const int y) {
    } else {
       _X[y]=T(0.0);
       this->exp();
-      return log(this->sum());
+      return alt_log<T>(this->sum());
    }
 };
 
@@ -4811,7 +4822,6 @@ template <typename T> inline void SpMatrix<T>::convert2(
       _pE[i]=count;
    }
    for (int i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
-
 };
 
 /// returns the l2 norms ^2 of the columns

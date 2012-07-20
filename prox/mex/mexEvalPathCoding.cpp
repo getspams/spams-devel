@@ -82,6 +82,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
       mexErrMsgTxt("Unknown regularization");
    param.intercept = getScalarStructDef<bool>(prhs[2],"intercept",false);
    param.verbose = getScalarStructDef<bool>(prhs[2],"verbose",false);
+   param.eval_dual_norm = getScalarStructDef<bool>(prhs[2],"dual_norm",false);
 
    if (param.regul != GRAPH_PATH_L0 && param.regul != GRAPH_PATH_CONV)
       mexErrMsgTxt("Use a different mexEvalGraphPath function");

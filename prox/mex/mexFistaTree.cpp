@@ -140,7 +140,6 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    param.lambda2= getScalarStructDef<T>(prhs[4],"lambda2",0.0);
    param.lambda3= getScalarStructDef<T>(prhs[4],"lambda3",0.0);
    param.size_group= getScalarStructDef<int>(prhs[4],"size_group",1);
-
    param.delta = getScalarStructDef<T>(prhs[4],"delta",1.0);
    param.admm = getScalarStructDef<bool>(prhs[4],"admm",false);
    param.lin_admm = getScalarStructDef<bool>(prhs[4],"lin_admm",false);
