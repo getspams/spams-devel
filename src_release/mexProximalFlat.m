@@ -23,6 +23,8 @@
 %                               ...  lambda_2||v||_1 + lambda_3||v||_2^2
 %         if param.regul='linf'
 %             argmin 0.5||u-v||_2^2 + lambda||v||_inf
+%         if param.regul='l1-constraint'
+%             argmin 0.5||u-v||_2^2 s.t. ||v||_1 <= lambda
 %         if param.regul='l2-not-squared'
 %             argmin 0.5||u-v||_2^2 + lambda||v||_2
 %         if param.regul='group-lasso-l2'  

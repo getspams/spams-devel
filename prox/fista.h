@@ -208,11 +208,12 @@ namespace FISTA {
    };
 
    template <typename T> struct ParamReg { 
-      ParamReg() { size_group=1; lambda2d1 = 0; lambda3d1 = 0; pos=false; intercept=false; num_cols=1; graph_st=NULL; tree_st=NULL;
+      ParamReg() { size_group=1; lambda2d1 = 0; lambda=0; lambda3d1 = 0; pos=false; intercept=false; num_cols=1; graph_st=NULL; tree_st=NULL;
       graph_path_st=NULL; resetflow=false; clever=false; linf=true; transpose=false; ngroups=0;
-      groups=NULL;};
+      groups=NULL; };
       T lambda2d1;
       T lambda3d1;
+      T lambda;
       int size_group;
       bool pos;
       bool intercept;
@@ -1110,28 +1111,33 @@ namespace FISTA {
    template <typename T> 
       class LassoConstraint : public Regularizer<T> {
          public:
-            LassoConstraint(const ParamReg<T>& param) : Regularizer<T>(param) { };
+            LassoConstraint(const ParamReg<T>& param) : Regularizer<T>(param) { _thrs=param.lambda; };
             virtual ~LassoConstraint() { };
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
- //              y.copy(x);
- //              if (this->_pos) y.thrsPos();
- //              y.softThrshold(lambda);
- //              if (this->_intercept) y[y.n()-1] = x[y.n()-1];
+               Vector<T> tmp;
+               tmp.copy(x);
+               if (this->_intercept) {
+                  tmp[tmp.n()-1]=0;
+                  tmp.sparseProject(y,_thrs,1,0,0,0,this->_pos);
+                  y[y.n()-1] = x[y.n()-1];
+               } else {
+                  tmp.sparseProject(y,_thrs,1,0,0,0,this->_pos);
+               }
             };
-            T inline eval(const Vector<T>& x) const { 
-               return (this->_intercept ? x.asum() - abs(x[x.n()-1]) : x.asum());
+            T inline eval(const Vector<T>& x) const {
+               return 0;
             };
-            virtual bool is_fenchel() const { return false; };
-            void inline fenchel(const Vector<T>& input, T& val, T& scal) const { };
-           //    Vector<T> output;
-           //    output.copy(input);
-           //    if (this->_intercept) output[output.n()-1]=0;
-           //    T mm = output.fmaxval();
-           //    scal= mm > 1.0 ? T(1.0)/mm : 1.0;
-           //    val=0;
-           // };
+            void inline fenchel(const Vector<T>& input, T& val, T& scal) const { 
+               scal=1.0;
+               Vector<T> output;
+               output.copy(input);
+               if (this->_intercept) output[output.n()-1]=0;
+               val = _thrs*(this->_pos ? MAX(output.maxval(),0) : output.fmaxval());
+            };
             virtual bool is_subgrad() const { return false; };
+         private:
+            T _thrs;
       };
 
    template <typename T> 
@@ -3172,6 +3178,7 @@ namespace FISTA {
          ParamReg<T> param_reg;
          param_reg.pos=param.pos;
          param_reg.intercept=param.intercept;
+         param_reg.lambda=param.lambda;
          param_reg.lambda2d1=param.lambda2/param.lambda;
          param_reg.lambda3d1=param.lambda3/param.lambda;
          param_reg.size_group=param.size_group;

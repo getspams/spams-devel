@@ -31,6 +31,7 @@ tic
 t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
 
+param.regul='l1';
 fprintf('\nISTA + Regression l1\n');
 param.ista=true;
 tic
