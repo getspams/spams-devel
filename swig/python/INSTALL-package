@@ -6,9 +6,9 @@ Note: myscipy_rand.py supplies a random generator for sparse matrix
       for some old scipy distributions
 WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
 ########################################
-Interface building (tested on Linux-ubuntu and Mac OS X 10.8):
+Interface building 
 
-Packages required: numpy, scipy, blas + lapack (preferably from atlas).
+Packages required: python-numpy, python-scipy, blas + lapack (preferably from atlas).
 
 tar zxf spams-python.tar.gz
 cd spams-python
@@ -17,6 +17,28 @@ python setup.py build
 inst=<your-python-install-dir>
 python setup.py install --prefix=$inst
 
+################################
+Linux : 
+      carefully install atlas. For example on my ubuntu I had to do
+      apt-get install libatlas-dev libatlas3gf-base libatlas-3gf.so
+      If you don't have libblas.so and liblapack.so in /lib or /usr/lib,
+      you need to edit setup.py
+
+MacOS:
+	the build has been tested with MacOS 10 (Lion) and required
+	packages installed with 'port install'
+	port install atlas;port install py26-numpy;install py26-scipy
+
+Windows:
+	You must install MinGW.
+	You will find binary distributions for MinGW on www.mingw.org,
+	python-2.7 on www.python.org .
+	Unfortunately, I did not find a binary distro for atlas.
+	I found dlls for blas and lapcak on http://icl.cs.utk.edu/lapack-for-windows/lapack.
+	They work fine, but are slower than their atlas version.
+	Lastly, all dlls needed by module spams must be in directories
+	present in teh variable SPAMS
+	
 ########################################
 Testing the interface :
 export PYTHONPATH=$inst/lib/python2.6/site-packages

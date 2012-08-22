@@ -1,7 +1,6 @@
 Package: spams
-Type: Package
 Title: R interface to some functions of library spams
-Version: 1.0
+Version: 2.3
 Date: 2011-11-16
 Author: Julien MAYRAL for C++ SPAMS code, with contribution
 	from Jean-Paul CHIEZE for interface to language R

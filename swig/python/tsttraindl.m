@@ -21,7 +21,7 @@ tic
 D = mexTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
-
+ImD=displayPatches(D)
 param.approx=0;
 fprintf('Evaluating cost function...\n');
 alpha=mexLasso(X,D,param);

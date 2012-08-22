@@ -57,3 +57,7 @@ tgz=$name-v2.3-svn`date +%Y-%m-%d`.tar.gz
 tar zcf $tgz $name
 cp -p $tgz ../${name}_svn.tar.gz
 exit 0
+# zip :
+zname=$name-v2.3-svn`date +%Y-%m-%d`.zip
+find $name | zip -@ $zname
+exit 0

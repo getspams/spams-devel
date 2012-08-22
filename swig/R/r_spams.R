@@ -511,7 +511,7 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
 
 spams.trainDL <- function(X,return_model= FALSE,model= NULL,D = NULL,numThreads = -1,batchsize = -1,
             K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
-                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=None,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
+                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=NULL,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
   
   if (is.null(iter_updateD)) {
     if(batch) {

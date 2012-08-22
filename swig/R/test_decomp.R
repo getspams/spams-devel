@@ -65,7 +65,6 @@ test_cd <- function() {
   tol = 0.001
   itermax = 1000
   A0 = as(matrix(c(0),nrow = nrow(alpha),ncol = ncol(alpha)),'CsparseMatrix')
-  cat ("XXX\n")
   tic = proc.time()
   alpha2 = spams.cd(X,D,A0,lambda1 = lambda1,mode = mode,tol = tol, itermax = itermax,numThreads = 4)
   tac = proc.time()

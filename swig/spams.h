@@ -1,6 +1,25 @@
 #ifndef SPAMS_H
 #define SPAMS_H
 
+#ifdef WIN32
+#define random rand
+#define srandom srand
+#ifdef CYGWIN
+// the gcc compiler of cygwin has some defines that conflicts with spams,
+// But we preferably use mingw
+#include <fstream>
+#include <list>
+#include <vector>
+#include <math.h>
+#include <iostream>
+
+#undef _X
+#undef _L
+#undef _N
+#undef _B
+#endif
+#endif
+
 #include "dicts.h"
 #include "fista.h"
 #include "decomp.h"
@@ -987,15 +1006,6 @@ throw(const char *)
 using namespace FISTA;
   FISTA::ParamFISTA<T> param;
   param.regul = regul_from_string(name_regul);
-  if (param.regul==INCORRECT_REG)
-    throw("proximalTree : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
-  strncpy(param.name_regul,name_regul,param.length_names);
-  if (param.regul==GRAPH || param.regul==GRAPHMULT) 
-    throw("proximalTree : proximalGraph should be used instead");
-  if (param.regul==TREEMULT && abs<T>(param.lambda2 - 0) < 1e-20) {
-    throw("proximalTree error: with multi-task-tree, lambda2 should be > 0");
-  }
-
   param.num_threads = (num_threads < 0) ? 1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
@@ -1015,6 +1025,16 @@ using namespace FISTA;
 #endif
    }
   int pAlpha = alpha0->m();
+
+  if (param.regul==INCORRECT_REG)
+    throw("proximalTree : Unknown regularization.\n  For valid names see source code of regul_from_string in spams/src/spams/prox/fista.h\n");
+  strncpy(param.name_regul,name_regul,param.length_names);
+  if (param.regul==GRAPH || param.regul==GRAPHMULT) 
+    throw("proximalTree : proximalGraph should be used instead");
+  if (param.regul==TREEMULT && abs<T>(param.lambda2 - 0) < 1e-20) {
+    throw("proximalTree error: with multi-task-tree, lambda2 should be > 0");
+  }
+
   TreeStruct<T> tree;
   tree.Nv=0;
   int num_groups = own_variables->n();

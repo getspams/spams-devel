@@ -97,15 +97,15 @@ def test_normalize():
     res2 = Xtest1('spams','spams.normalize(A)',locals())
     return None
 
-tests = {
-    'sort' : test_sort,
-    'calcAAt' : test_calcAAt,
-    'calcXAt' : test_calcXAt,
-    'calcXY' : test_calcXY,
-    'calcXYt' : test_calcXYt,
-    'calcXtY' : test_calcXtY,
-    'bayer' : test_bayer,
-    'conjGrad' : test_conjGrad,
-    'invSym' : test_invSym,
-    'normalize' : test_normalize,
-    }
+tests = [
+    'sort' , test_sort,
+    'calcAAt' , test_calcAAt,
+    'calcXAt' , test_calcXAt,
+    'calcXY' , test_calcXY,
+    'calcXYt' , test_calcXYt,
+    'calcXtY' , test_calcXtY,
+    'bayer' , test_bayer,
+    'conjGrad' , test_conjGrad,
+    'invSym' , test_invSym,
+    'normalize' , test_normalize,
+    ]

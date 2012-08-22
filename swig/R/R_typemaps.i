@@ -5,7 +5,9 @@ extern "C" {
 #include <Rdefines.h>
 #include <R_ext/Rdynload.h>
 #include <Rembedded.h>
+#ifndef WIN32
 #include <Rinterface.h>
+#endif
 #include <R_ext/RS.h>
 #include <R_ext/Error.h>
 }

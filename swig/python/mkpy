@@ -1,22 +1,51 @@
 #!/bin/bash
-case $1 in -x) set -x;shift;;esac
+optx=""
+case $1 in -x) optx=-x;set -x;shift;;esac
 
 debug=0
-
 macos=0
+flg_clear=0
+flg_swig=1
+
+if [ -x /cygdrive/c/MinGW/msys/1.0/bin/bash ]; then
+    exec /cygdrive/c/MinGW/msys/1.0/bin/bash $0 $optx $*
+fi
 
 INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn"
+INC_PYTHON=-I/usr/include/python2.6
 XCCFLAGS=""
 XLINKFLAGS=""
 # on MacOS, use following definition instead.
-
+DBLAS=""
+BLAS="-lblas -llapack"
+OPTWIN=""
+# bin module extension
+EXTL=so
+CCFLAGS="-fPIC -fopenmp"
 if [ -d /System/Library/Frameworks ]; then  
  # MacOs
     macos=1
-    INC="$INC -I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include"
+    INC_PYTHON="-I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include"
     XCCFLAGS="-m32"
     XLINKFLAGS="-m32 -framework Python"
 fi
+case `uname` in
+    CYGWIN*|MINGW*) 
+	OPTWIN=-mwindows
+	EXTL=pyd
+	flg_swig=0
+	#LDIR=''
+#	BLAS='-L"C:/Program Files/R/R-2.15.1/bin/i386" -lRblas -lRlapack'
+	PATH=/c/MinGW/bin:/c/MinGW/msys/1.0/bin
+	DBLAS='-LC:/Program Files/R/R-2.15.1/bin/i386'
+	BLAS='-lRblas -lRlapack'
+	if [ -d C:\Python27 ]; then
+	    CCFLAGS="-DWIN32 -fopenmp"  
+	    INC_PYTHON="-IC:\Python27\include -IC:\Python27\Lib\site-packages\numpy\core\include"
+	    LIBS=" -LC:\Python27\libs -lpython27"
+	fi
+	;;
+esac
 
 die () {
     echo "$1"
@@ -28,8 +57,6 @@ usage () {
     die "   -ns : don't redo swig"
 }
 
-flg_clear=0
-flg_swig=1
 lst=""
 optc="-O -DNDEBUG"
 #CXX=g++-4.2
@@ -71,9 +98,9 @@ for nom in $lst; do
 	src=${nom}_wrap.cpp
 	obj=${nom}_wrap.o
     fi
-    $CXX -c -fPIC $optc -DUSE_BLAS_LIB -fopenmp $OPT_DBG -I/usr/include/python2.6 $INC $src $XCCFLAGS
+    $CXX $OPTWIN $CCFLAGS -c $optc -DUSE_BLAS_LIB  $OPT_DBG $INC_PYTHON $INC $src $XCCFLAGS
     err=$?;[ $err -eq 0 ] || break
-    $CXX -fopenmp -shared $obj -o _${nom}_wrap.so -lstdc++ -lblas -llapack $XLINKFLAGS
+    $CXX $OPTWIN -fopenmp -shared $obj -o _${nom}_wrap.$EXTL -lstdc++ $LIBS $BLAS $XLINKFLAGS
     err=$?;[ $err -eq 0 ] || break
  #   /bin/rm -f $nom.o ${nom}_wrap.o
 done

@@ -31,7 +31,7 @@ def test_fistaFlat():
     # param.regul='group-lasso-l2';
     # param.size_group=10;
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
-    print "XX %s" %str(optim_info.shape);return None
+##    print "XX %s" %str(optim_info.shape);return None
     print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:],0))
 ###
     print '\nISTA + Regression l1'
@@ -80,7 +80,7 @@ def test_fistaFlat():
     
     print '\nFISTA + Group Lasso L2 with variable size of groups'
     param['regul'] = 'group-lasso-l2'
-    param2=param
+    param2=param.copy()
     param2['groups'] = np.array(np.random.random_integers(1,5,X.shape[1]),dtype = np.int32)
     param2['lambda1'] *= 10
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
@@ -791,7 +791,7 @@ def test_proximalTree():
                     [0,0,0,0,1,0,0,0],
                     [0,0,0,0,0,0,1,0]],dtype = np.bool)
     groups = ssp.csc_matrix(groups,dtype=np.bool)
-    tree = {'eta_g': eta_g,'groups' : groups,'own_variables' : own_variables,
+    tree = {'eta_g': eta_g,'groups' : groups, 'own_variables' : own_variables,
             'N_own_variables' : N_own_variables}
     print '\ntest prox tree-l0'
     param['regul'] = 'tree-l0'
@@ -818,16 +818,15 @@ def test_proximalTree():
     param['lambda2'] = param['lambda1']
     param['regul'] = 'multi-task-tree'
     alpha = Xtest1('spams','spams.proximalTree(U,tree,False,**param)',locals())
-
     return None
 
 
 
-tests = {
-    'fistaFlat' : test_fistaFlat,
-    'fistaGraph' : test_fistaGraph,
-    'fistaTree' : test_fistaTree,
-    'proximalFlat' : test_proximalFlat,
-    'proximalGraph' : test_proximalGraph,
-    'proximalTree' : test_proximalTree,
-    }
+tests = [
+    'fistaFlat' , test_fistaFlat,
+    'fistaGraph' , test_fistaGraph,
+    'fistaTree' , test_fistaTree,
+    'proximalFlat' , test_proximalFlat,
+    'proximalGraph' , test_proximalGraph,
+    'proximalTree' , test_proximalTree,
+    ]

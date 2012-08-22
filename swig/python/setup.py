@@ -11,16 +11,31 @@ incs = ['.'] + map(lambda x: os.path.join('spams',x),[ 'linalg', 'prox', 'decomp
 osname = distutils.util.get_platform()
 cc_flags = []
 link_flags = []
+libs = ['stdc++', 'blas', 'lapack' ]
+libdirs = []
+
 if osname.startswith("macosx"):
     cc_flags = ['-m32']
     link_flags = ['-m32', '-framework', 'Python']
+
+if osname.startswith("win32"):
+    cc_flags = ['-DWIN32']
+    link_flags = ['-mwindows']
+    path = os.environ['PATH']
+    os.environ['PATH'] = 'C:/MinGW/bin;' + path
+    libs = ['stdc++', 'Rblas', 'Rlapack' ]
+    libdirs = ['C:/Program Files/R/R-2.15.1/bin/i386']
+
+    path = os.environ['PATH']
+    print "XX %s, path %s" %(osname,path)
 
 spams_wrap = Extension(
     '_spams_wrap',
     sources = ['spams_wrap.cpp'],
     include_dirs = incs,
     extra_compile_args = ['-fPIC', '-fopenmp', '-DNDEBUG', '-DUSE_BLAS_LIB'] + cc_flags,
-    libraries = ['stdc++', 'blas', 'lapack', ],
+    library_dirs = libdirs,
+    libraries = libs,
     # strip the .so
     extra_link_args = [ '-fopenmp', '-s' ] + link_flags,
     language = 'c++',
@@ -46,9 +61,9 @@ def mkhtml(d = None,base = 'sphinx'):
 
 
 setup (name = 'spams',
-       version= '0.1',
+       version= '2.3',
        description='Python interface for SPAMS',
-       author = ['Julien Mairal'],
+       author = 'Julien Mairal',
        author_email = 'nomail',
        url = 'http://',
        ext_modules = [spams_wrap,],

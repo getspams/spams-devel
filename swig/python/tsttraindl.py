@@ -22,7 +22,7 @@ X = X - np.tile(np.mean(X,0),(X.shape[0],1))
 X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)))
 param = { 'K' : 100, # learns a dictionary with 100 elements
           'lambda1' : 0.15, 'numThreads' : 4, 'batchsize' : 400,
-          'iter' : 100}
+          'iter' : 10}
 paramL = {'lambda1' : 0.15, 'numThreads' : 4}
 
 ########## FIRST EXPERIMENT ###########
@@ -35,12 +35,17 @@ print 'time of computation for Dictionary Learning: %f' %t
 #param['approx'] = 0
 print 'Evaluating cost function...'
 alpha = spams.lasso(X,D,**paramL)
-print "XX D %s, alpha %s" %(str(D.shape),str(alpha.shape))
+print "XX X %s, D %s, alpha %s" %(str(X.shape),str(D.shape),str(alpha.shape))
 xd = X - D * alpha
 R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
-# display ????
-
 print "objective function: %f" %R
+# display ????
+img = spams.displayPatches(D)
+print "IMG %s" %str(img.shape)
+x = np.uint8(img[:,:,0] * 255.)
+#image = Image.fromarray(x,mode = 'L')
+image = Image.fromarray(x,mode = 'L')
+image.save('xx.png')
 exit()
 #### SECOND EXPERIMENT ####
 print "*********** SECOND EXPERIMENT ***********"

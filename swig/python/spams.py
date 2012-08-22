@@ -221,7 +221,7 @@ def ompMask(X,D,B,L=None,eps= None,lambda1 = None,return_reg_path = False, numTh
     if return_reg_path:
         ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     else:
-        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,Lambda,numThreads)
+        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
@@ -362,7 +362,6 @@ def proximalTree(U,tree,return_val_loss = False,numThreads =-1,lambda1=1.0,lambd
 #                 ('clever',True),('eval',return_val_loss),
 #                 ('size_group',1),('transpose',False)]
 #    params = __param_struct(paramlist,param)
-
     eval = return_val_loss
     alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
     if(len(tree) != 4):
@@ -513,5 +512,52 @@ def im2col_sliding(A,m,n,RGB = False):
     B = np.empty((M,N),dtype=A.dtype,order="FORTRAN")
     spams_wrap.im2col_sliding(A,B,m,n,RGB)
     return B
+
+def displayPatches(D):
+    V = 1
+    (n,K) = D.shape
+    sizeEdge = np.sqrt(n/V)
+    if int(sizeEdge) != sizeEdge:
+        V = 3
+        sizeEdge=np.sqrt(n/V)
+        
+        
+    for ii in xrange(0,D.shape[1]):
+        if D[0,ii] > 0:
+            D[:,ii] = - D[:,ii]
+    p = 4.5
+    M = np.max(D)
+    m = np.min(D)
+    if (m >= 0):
+        me = 0
+        sig = np.sqrt(np.mean(D * D))
+    else:
+        me = np.mean(D)
+        sig = np.sqrt(np.mean((D - me) * (D -me)))
+    D = D - me
+    D = np.minimum(np.maximum(D, -p * sig),p * sig)
+    M = np.max(D)
+    m = np.min(D)
+    D = (D - m)/ (M - m)
+    nBins = int(np.sqrt(K))
+    tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
+    patch = np.zeros(sizeEdge,sizeEdge)
+    mm = sizeEdge * sizeEdge
+    for ii in xrange(0,nBins):
+        for jj in xrange(0,nBins):
+            io = ii
+            jo = jj
+            offsetx = 0
+            offsety = 0
+            ii = (ii + offsetx) % nBins
+            jj = (jj + offsety) % nBins
+            patchCol = D[0:n,io*nBins+jo]
+            patchCol = patchCol.reshape((sizeEdge,sizeEdge,V))
+            tmp[ii * (sizeEdge+1)+ 1 : (ii + 1)*(sizeEdge+1),
+                jj * (sizeEdge+1)+1:(jj + 1) * (sizeEdge+1),:] = patchCol;
+            ii = io
+            jj = jo
+ #   tmp = 255 * tmp
+    return tmp
 
 ##################################################

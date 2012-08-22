@@ -84,7 +84,7 @@ def test_trainDL():
     print "objective function: %f" %R
 
     # Then reuse the learned model to retrain a few iterations more.
-    param2 = param
+    param2 = param.copy()
     param2['D'] = D
     tic = time.time()
     (D,model) = spams.trainDL(X2,return_model = True,model = model,**param2)
@@ -227,8 +227,8 @@ def test_nmf():
     print 'objective function: %f' %R
     return None
 
-tests = {
-    'trainDL' : test_trainDL,
-    'trainDL_Memory' : test_trainDL_Memory,
-    'nmf' : test_nmf,
-}
+tests = [
+    'trainDL' , test_trainDL,
+    'trainDL_Memory' , test_trainDL_Memory,
+    'nmf' , test_nmf,
+]

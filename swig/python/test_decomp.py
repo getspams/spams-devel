@@ -156,10 +156,10 @@ def test_lassoMask():
 # Decomposition of a large number of signals
 ##############################################
 # data generation
-    X = np.asfortranarray(np.random.normal(size=(100,100)))
+    X = np.asfortranarray(np.random.normal(size=(300,300)))
     # X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
-    D = np.asfortranarray(np.random.normal(size=(100,20)))
+    D = np.asfortranarray(np.random.normal(size=(300,50)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
     mask = np.asfortranarray((X > 0))  # generating a binary mask
     param = {
@@ -228,9 +228,9 @@ def test_ompMask():
 ########################################    
 # Decomposition of a large number of signals
 ########################################    
-    X = np.asfortranarray(np.random.normal(size=(100,100)))
+    X = np.asfortranarray(np.random.normal(size=(300,300)))
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)))
-    D = np.asfortranarray(np.random.normal(size=(100,20)))
+    D = np.asfortranarray(np.random.normal(size=(300,50)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)))
     mask = np.asfortranarray((X > 0))  # generating a binary mask
     L = 20
@@ -258,14 +258,14 @@ def test_somp():
     return None
 
 
-tests = {
-    'sparseProject' : test_sparseProject,
-    'cd' : test_cd,
-    'l1L2BCD' : test_l1L2BCD,
-    'lasso' : test_lasso,
-    'lassoMask' : test_lassoMask,
-    'lassoWeighted' : test_lassoWeighted,
-    'omp' : test_omp,
-    'ompMask' : test_ompMask,
-    'somp' : test_somp
-    }
+tests = [
+    'sparseProject' , test_sparseProject,
+    'cd' , test_cd,
+    'l1L2BCD' , test_l1L2BCD,
+    'lasso' , test_lasso,
+    'lassoMask' , test_lassoMask,
+    'lassoWeighted' , test_lassoWeighted,
+    'omp' , test_omp,
+    'ompMask' , test_ompMask,
+    'somp' , test_somp
+    ]

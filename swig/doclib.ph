@@ -2,7 +2,7 @@
 use strict;
 $main::mlab_dir = "../../src_release";
 
-my %undocumented = ("mult",1,"im2col_sliding",1);
+my %undocumented = ("mult",1,"im2col_sliding",1,"displayPatches",1);
 
 
 %main::conv_names = (
@@ -203,7 +203,8 @@ sub get_doc {
 	    s/mex$s/$prefix$s1/g;
 	}
 	# replace lambda
-	if(s/lambda([^\d])/lambda1\1/g) {print "XX <$_>\n";}
+##	if(s/lambda([^\d])/lambda1\1/g) {print "XX <$_>\n";}
+	s/lambda([^\d])/lambda1\1/g;
 	s/lambda$/lambda1/;
 
 	push(@lines,$_);

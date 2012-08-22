@@ -46,7 +46,7 @@ cp -p NAMESPACE DESCRIPTION $pkdir
 cp -p ../../COPYING $pkdir/LICENSE
 cp -a man $pkdir
 rfiles="zzz.R r_$nom.R ${nom}.R"
-cfiles="$nom.h ${nom}.cpp Makevars"
+cfiles="$nom.h ${nom}.cpp Makevars Makevars.win"
 cp $rfiles $pkdir/R
 cp $cfiles $pkdir/src
 mkdir -p $pkdir/inst/test $pkdir/inst/doc $pkdir/inst/extdata
