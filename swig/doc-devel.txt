@@ -113,6 +113,19 @@ est appliquée aux fonctions à interfacer dans spams.i
 La façon de transmettre les arguments est régie par des "typemaps"
 Les typemaps sont définis dans py_typemaps.i et R_typemaps.i et appliqués dans spamstools.i.
 
+Les valeurs de retour vecteurs ou matrices, éventuellement multiples 
+des fonctions de l'interface R ou python,
+peuvent être gérées de 2 plusieurs façons :
+1) retour de la fonction C++, recopié dans un objet python créé dans l'interface swig
+2) objet dont on connait la taille a priori : il est alloué dans la fonction R ou python,
+   swig alloue un objet C++ à partir du pointeur de data et le passe à la fonction C++.
+3) objet dont on ne connait pas la taille a priori.
+   et le pointeur
+ 
+Tous les args multi-dimensionnels de type * doivent être listés
+ dans les macros inplace_*.
+Tous les arguments multi-dimensionnels de type ** doivent l'être dans argout_*
+
 %typemap(argtype) (type-expression) [(initialisations)] { code à insérer}
 argtype = type d'argument : in (argument d'appel contenant des données
 ou recevant un résultat de taille connue en sortie),
