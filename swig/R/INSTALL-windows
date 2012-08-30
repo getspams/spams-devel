@@ -1,11 +1,19 @@
-Installation of the binary windows package (spams_2.3.zip)
+Installation of the binary windows package (spams_2.3.zip, for i386 and x64)
  a) in the GUI interface of R, select Packages/'Inatsll from zip file'
   and choose spams_2.3.zip
- b) in R console type :
+ or b) in R console type :
     install.packages('spams_2.3.zip',repos=NULL)
 
+Note : for a global install under windows-7, you must start R with adminastrator
+privileges (right click on the icon)
+
+
 To run the given examples, open a "command" window and type :
+a) on a 32bits system :
 cd C:\Program Files\R\R-2.15.1\library\spams\test
 ..\..\..\bin\Rscript test_spams.R -h
 ..\..\..\bin\Rscript test_spams.R 
 
+b) on a 64 bits system
+..\..\..\bin\x64\Rscript test_spams.R -h
+..\..\..\bin\x64\Rscript test_spams.R 

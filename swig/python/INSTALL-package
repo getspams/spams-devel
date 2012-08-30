@@ -30,23 +30,40 @@ MacOS:
 	port install atlas;port install py26-numpy;install py26-scipy
 
 Windows:
-	You must install MinGW.
+	You need packages MinGW, python-2.7, scipy and numpy for python-2.7
+	
 	You will find binary distributions for MinGW on www.mingw.org,
-	python-2.7 on www.python.org .
+	python-2.7 on www.python.org,
+	numpy and scipy on www.numpy.org (or www.scipy.org)
 	Unfortunately, I did not find a binary distro for atlas.
+`	I use blas and lapack dlls fron the package R (2.15.1).
 	I found dlls for blas and lapcak on http://icl.cs.utk.edu/lapack-for-windows/lapack.
-	They work fine, but are slower than their atlas version.
-	Lastly, all dlls needed by module spams must be in directories
-	present in teh variable SPAMS
+	They work fine, but are slower.
+	
+ 	To make a binary windows installer (spams-2.3.win32-py2.7.exe0 :
+	- open a mingw console
+	- extract files from the .tar.gz source distribution (tar zxf ...)
+	- enter directory spams-python
+	- execute ./win-build.sh
+	 Note : you may need to modify the script if you have different versions of python and R.
+	- when you installer is build, you may remove the package R.
 	
 ########################################
 Testing the interface :
+
+- Linux or Mac :
 export PYTHONPATH=$inst/lib/python2.6/site-packages
 cd $inst/test
 python test_spams.py -h : to get help
 python test_spams.py  : will run all the tests
 python test_spams.py linalg : test of linalg functions
 python test_spams.py name1 name2 ... : run named tests
+
+- Windows (binary install) :
+  cd C:\Python27\test
+  ..\python.exe test_spams.py -h
+  ..\python.exe test_spams.py
+  	  ...
 
 Warning : for now the python interface is mising a little subset of the functions
 	described in the documentation of SPAMS.

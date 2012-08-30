@@ -10,7 +10,7 @@ cd spams-R
 export R_LIBS=$rlib
 R CMD INSTALL --html -l $R_LIBS spams
 
-This should work on linux and MacOS.
+This should work on linux and MacOS. For windows see below.
 However, if you have undefined symbols, you can add extra libraries
 by modifying, in spams/src/Makevars the line
 EXTRA_LIBS=
@@ -33,3 +33,19 @@ dummy documentations for 3 class S4 methods
 (I could not avoid warnings in R CMD check).
 If you have a version of R lower than 2.13, there will remain
 one warning with R CMD check, because SHLIB_OPENMP_CXXFLAGS must be manually defined.
+
+----------------------------------------
+Installing on windows :
+
+you need MinGW (www.mingw.org)
+
+To build a binary package :
+- open a MinGW console and extract files from the tar source package (tar zxf ....)
+- open a windows "command tool" and :
+  - enter directory spams-R
+  - execute win-build.bat
+  You will obtain spams_2.3.zip
+
+To install the binary package:
+ start R and type
+ install.packages('spams_2.3.zip',repos=NULL)

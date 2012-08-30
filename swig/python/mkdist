@@ -37,7 +37,7 @@ cp -p spams.h $tmpd
 ./docmatlab2python $tmpd/spams
 mv $tmpd/spams.new.py $tmpd/spams.py
 cp -p ../extdata/* $tmpd
-cp -p INSTALL-package $tmpd
+cp -p INSTALL-package INSTALL-windows win-build.bat win-build.sh $tmpd
 rm -f $tmpd/README
 # doc
 cd $cdir

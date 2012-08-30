@@ -114,7 +114,11 @@ La façon de transmettre les arguments est régie par des "typemaps"
 Les typemaps sont définis dans py_typemaps.i et R_typemaps.i et appliqués dans spamstools.i.
 
 %typemap(argtype) (type-expression) [(initialisations)] { code à insérer}
-argtype = type d'argument : in, out (argument recevant une valeur en sortie), argout (retour de fonction C++)
+argtype = type d'argument : in (argument d'appel contenant des données
+ou recevant un résultat de taille connue en sortie),
+out (argument renvoyé par la fonction C++),
+argout (argument d'appel de type **, qui contiendra une valeur de retour, alloué
+au retour de la fonction C++).
 type-expression : la chaine de caractères décrivant les arguments à traiter (par ex Matrix<double> *INPLACE_MATRIX). C'est l'identifiant du typemap.
 
 %apply  type-expression { liste des arguments effectif }

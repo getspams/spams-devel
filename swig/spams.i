@@ -13,16 +13,6 @@ Use of spams functions should only be done through module spams."
 
 %{
 #define SWIG_FILE_WITH_INIT
-/* !!!!!!!!!!!
-*  HACK en attendant une modif de Julien : les sorties sur cerr font segfault
-En fait c'est un pb plus general de non init de donnees statiques de la libc++
-(on le retrouve avec les exceptions levées par le c++)
-il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.so.6
-*/
-//#ifdef SWIGR
-//#define cerr cout
-//#endif
-/* !!!! */
 
 #include "spams.h"
 #ifdef DEBUG
@@ -34,6 +24,17 @@ il faut mettre -lstdc++ en t^ete des libs au link ou faire LD_PRELOAD=libstdc++.
 	Vector<ctype> **omiter
 %enddef
 
+/*
+   Following macros define which typemap must be applied to arguments of C++ functions are converted.
+   args of type inplace_* may containt input data or are ready (allocated)
+    to receive output data. Typemaps of type 'in' are applied to them.
+   args of type argout_* are used when multiple return values are needed.
+    they are of type **; their storage is allocated on return of the C++ function.
+     Typemaps of type 'argout' are applied to them.
+  The third type ('out') of typemaps used is applied to return values of C++ functions.
+*****
+
+*/
 // list of arguments of type INPLACE_MATRIX
 %define inplace_bool_matrices
 	Matrix<bool> *B

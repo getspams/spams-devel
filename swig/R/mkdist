@@ -54,7 +54,7 @@ cp -p test_*.R $pkdir/inst/test
 cp -p $doc/doc_spams.pdf $pkdir/inst/doc
 cp -a $doc/html $pkdir/inst/doc
 cp -p ../extdata/*   $pkdir/inst/extdata
-cp INSTALL-package $dir
+cp -p INSTALL-package INSTALL-windows win-build.bat win-build.sh $dir
 pngpkg=png_0.1-4.tar.gz
 if [ -r $pngpkg ]; then
     cp -p $pngpkg $dir
