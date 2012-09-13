@@ -246,6 +246,7 @@ sub get_doc {
 	    $key = $x;
 	    if ($x eq "Author") {
 		$$tmp[0] =~ s/$/ (spams, matlab interface and documentation)/;
+		$$tmp[0] =~ s/Mairal/MAIRAL/;
 		push(@$tmp,"Jean-Paul CHIEZE 2011-2012 ($lang interface)");
 #		push(@$tmp,"");
 		$deltas = [(0,0)];
