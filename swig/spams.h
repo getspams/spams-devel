@@ -12,6 +12,8 @@
 #include <vector>
 #include <math.h>
 #include <iostream>
+typedef unsigned int uint32_t;
+typedef int int32_t;
 
 #undef _X
 #undef _L

@@ -176,7 +176,7 @@ extern "C" {
         ) ? 1 : 0;
   }
   const int check_matrix(PyObject* input,int data_typecode) {
-   is_array(input) && (array_numdims(input) == 2) && PyArray_EquivTypenums(array_type(input),data_typecode);
+   return (is_array(input) && (array_numdims(input) == 2) && PyArray_EquivTypenums(array_type(input),data_typecode));
   }
 }
 

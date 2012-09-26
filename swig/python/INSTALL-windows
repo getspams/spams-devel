@@ -1,8 +1,9 @@
-Installation of the binary windows package (spams-2.3.win32-py2.7.exe)
+Installation of the binary windows package 
+  (spams-2.3.win32-py2.7.exe or spams-2.3.win-amd64-py2.7.exe)
 This package is for python-2.7
 
-Just download and execute spams-2.3.win32-py2.7.exe
-All external DLLs need are included and will be installed in 
+Just download and execute the file corresponding to your architecture.
+All external DLLs needed are included and will be installed in 
  C:\Python27\Lib\site-packages
 But you need to install packages numpy and scipy for python-2.7 from http://www.numpy.org
 
@@ -10,4 +11,5 @@ To run the given examples, open a "command" window and type :
 cd C:\Python27\test
 ..\python test_spams.py -h
 ..\python test_spams.py
+      ...
 

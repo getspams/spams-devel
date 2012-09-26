@@ -1,6 +1,7 @@
+import os
+#os.environ['DISTUTILS_DEBUG'] = "1"
 from distutils.core import setup, Extension
 import distutils.util
-import os
 import numpy
 
 # includes numpy : package numpy.distutils , numpy.get_include()
@@ -9,35 +10,41 @@ import numpy
 incs = ['.'] + map(lambda x: os.path.join('spams',x),[ 'linalg', 'prox', 'decomp', 'dictLearn']) + [numpy.get_include()]
 
 osname = distutils.util.get_platform()
-cc_flags = []
-link_flags = []
+cc_flags = ['-fPIC', '-fopenmp']
+link_flags = ['-fopenmp', '-s' ]
 libs = ['stdc++', 'blas', 'lapack' ]
 libdirs = []
 
 if osname.startswith("macosx"):
-    cc_flags = ['-m32']
+    cc_flags = ['-fPIC', '-fopenmp','-m32']
     link_flags = ['-m32', '-framework', 'Python']
 
 if osname.startswith("win32"):
-    cc_flags = ['-DWIN32']
-    link_flags = ['-mwindows']
+    cc_flags = ['-fPIC', '-fopenmp','-DWIN32']
+    link_flags = ['-fopenmp', '-mwindows']
     path = os.environ['PATH']
     os.environ['PATH'] = 'C:/MinGW/bin;' + path
     libs = ['stdc++', 'Rblas', 'Rlapack' ]
     libdirs = ['C:/Program Files/R/R-2.15.1/bin/i386']
 
-    path = os.environ['PATH']
-    print "XX %s, path %s" %(osname,path)
+if osname.startswith("win-amd64"):
+    cc_flags = ['-openmp', '-DWIN32', '-DCYGWIN', '-DWINDOWS', '-I','C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/include']
+    link_flags = []
+    libs = [ 'Rblas', 'Rlapack' ]
+    libdirs = ['C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/lib/amd64','C:/Program Files/R/R-2.15.1/bin/x64']
+
+
+##path = os.environ['PATH']; print "XX OS %s, path %s" %(osname,path)
 
 spams_wrap = Extension(
     '_spams_wrap',
     sources = ['spams_wrap.cpp'],
     include_dirs = incs,
-    extra_compile_args = ['-fPIC', '-fopenmp', '-DNDEBUG', '-DUSE_BLAS_LIB'] + cc_flags,
+    extra_compile_args = ['-DNDEBUG', '-DUSE_BLAS_LIB'] + cc_flags,
     library_dirs = libdirs,
     libraries = libs,
     # strip the .so
-    extra_link_args = [ '-fopenmp', '-s' ] + link_flags,
+    extra_link_args = link_flags,
     language = 'c++',
     depends = ['spams.h'],
 )
