@@ -45,6 +45,8 @@ Windows 32bits:
 	- extract files from the .tar.gz source distribution (tar zxf ...)
 	- enter directory spams-python
 	- execute ./win-build.sh
+	  you will obtain dist/spams-2.3.win32-py2.7.exe
+
 	 Note : you may need to modify the script if you have different versions of python and R.
 	- when your installer is built, you may remove the package R.
 

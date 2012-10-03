@@ -93,7 +93,7 @@ extern "C" {
 	/* we cannot use require_fortran, because it convert a numpy C array to a numpy 
 	fortran array by just modifying the strides */
 	if (!array || !require_dimensions(array,2) || !array_is_fortran(array) || !require_native(array)) {
-	SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"matrix arg $argnum must be a 2d Fortran Array"); SWIG_fail;
+	SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"matrix arg $argnum must be a 2d float64 Fortran Array"); SWIG_fail;
 	}
 	$1 = new Matrix<DATA_TYPE> ((DATA_TYPE *)array_data(array),(int)array_size(array,0),(int)array_size(array,1));
 
@@ -123,7 +123,7 @@ extern "C" {
     memcpy(data,idata,m * n * sizeof(DATA_TYPE));
     delete result;
     if (! require_fortran(array)) {
-       SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"Cannot set make a fortran out matrix"); SWIG_fail;}
+       SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"Cannot make a fortran out matrix"); SWIG_fail;}
     $result = SWIG_Python_AppendOutput($result,(PyObject*)array);
  	
 }
@@ -157,7 +157,7 @@ extern "C" {
 	    PyArrayObject * array = (PyArrayObject * )PyArray_SimpleNewFromData(2, dims, DATA_TYPECODE,(void*)data);
 	   if (!array) SWIG_fail;
 	   if (! require_fortran(array)) {
-       	      SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"Cannot set make a fortran argout matrix"); SWIG_fail;}
+       	      SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"Cannot make a fortran argout matrix"); SWIG_fail;}
 
            $result = SWIG_Python_AppendOutput($result,(PyObject*)array);
         }
