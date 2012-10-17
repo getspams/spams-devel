@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 case $1 in -x) set -x;shift;; esac
 
 debug=0
@@ -6,13 +6,25 @@ debug=0
 nswg=0
 build=1
 mkvar=Makevars
+
+usage() {
+    echo "Usage : $0 [-ns] [-nb] [-g] [-D]"
+    echo " prepare source in pkg/spams, make a binary package (as .tar.gz)"
+    echo "  and install it in ./lib"
+    echo "  -ns : no swig"
+    echo "  -nb : no build (don't run 'R CMD build')"
+    echo "   -g : compile with -g"
+    echo "   -D : compile with -DDEBUG"
+    exit 1
+}
+
 while [ $# -gt 0 ]; do
     case $1 in 
 	-ns) nswg=1;; 
 	-nb) build=0;; 
 	-D)debug=1;;
 	-g) mkvar=Makevars-g;;
-	-*) echo "BAD OPTION $1";exit 2;;
+	-*) echo "BAD OPTION $1";usage;;
     esac
     shift
 done
@@ -76,4 +88,4 @@ R CMD build --binary pkg/spams
 [ $? -ne 0 ] && exit 1
 rm -rf lib;mkdir lib
 cd lib
-tar zxf ../spams_1.0_R_x86_64-pc-linux-gnu.tar.gz
+tar zxf ../spams_2.3_R_x86_64-pc-linux-gnu.tar.gz

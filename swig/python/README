@@ -15,7 +15,7 @@ Building from sources:
 - inst=$HOME/python
 - python setup.py install --prefix=$inst
 
-Toy will find in $inst
+you will find in $inst
 - doc/ : a copy of the pdf documentation of spams
 - extdata/ : 2 images used by the tests of dictLearn toolbox 
 - test/ : a bunch of test programs where you can find examples of usage
