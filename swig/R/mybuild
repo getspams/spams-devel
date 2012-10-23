@@ -31,6 +31,8 @@ done
 
 nom=spams
 pkdir=pkg/$nom
+DATE=`date +%Y-%m-%d`
+VERSION=`cat ../Version`
 
 rfiles="zzz.R r_$nom.R ${nom}.R"
 if [ $debug -eq 0 ]; then
@@ -50,7 +52,8 @@ fi
 [ -d $pkdir/src ] || mkdir $pkdir/src
 [ -d $pkdir/R ] || mkdir $pkdir/R
 
-cp -p NAMESPACE DESCRIPTION $pkdir
+cp -p NAMESPACE  $pkdir
+sed <DESCRIPTION.in >$pkdir/DESCRIPTION "s/%VERSION%/$VERSION/;s/%DATE%/$DATE/"
 cp -p ../../COPYING $pkdir/LICENSE
 /bin/rm -rf $pkdir/man;cp -a man $pkdir
 
@@ -88,4 +91,4 @@ R CMD build --binary pkg/spams
 [ $? -ne 0 ] && exit 1
 rm -rf lib;mkdir lib
 cd lib
-tar zxf ../spams_2.3_R_x86_64-pc-linux-gnu.tar.gz
+tar zxf ../spams_${VERSION}_R_x86_64-pc-linux-gnu.tar.gz

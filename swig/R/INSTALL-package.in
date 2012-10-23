@@ -1,11 +1,11 @@
 This directory contains files to build the R interfaces
-to the functions of V2.3 SPAMS library already interfaced with matlab.
+to the functions of SPAMS library already interfaced with matlab.
 
 WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
 
 ##################################################
 
-tar zxf spams-R.tar.gz
+tar zxf spams-R-%FULLVERSION%.tar.gz
 cd spams-R
 # rlib=install-directory
 export R_LIBS=$rlib
@@ -43,13 +43,14 @@ On a 32bits windowssystem:
 -------------------------
 
 you need MinGW (www.mingw.org)
+and GnuWin32 zip (http://gnuwin32.sourceforge.net/packages/zip.htm)
 
 To build a binary package :
 - open a MinGW console and extract files from the tar source package (tar zxf ....)
-- open a windows "command tool" and :
   - enter directory spams-R
-  - execute win-build.bat
-  You will obtain spams_2.3.zip
+  - execute win-build.sh
+  You will obtain spams-R-%FULLVERSION%.win32.exe (and spams_%VERSION%.zip)
+  The .exe contains the .zip will automatically the module in R.
 
 On a 64bits windows system :
 ---------------------------
@@ -67,12 +68,15 @@ and GnuWin32 unzip (http://gnuwin32.sourceforge.net/packages/unzip.htm)
 - cd spams-R
   ./win-build.sh
 
-You will obtain spams_2.3.zip which contains 32 and 64 bits versions
+You will obtain spams-R-%FULLVERSION%.win32+amd64.exe (and spams_%VERSION%.zip)
+  which contains 32 and 64 bits versions
+  Note : the .exe file will only install the R module corresponding
+  to the architecture of the system.
 
-To install the binary package:
-=============================
+To manually install the binary package:
+=======================================
  - in R gui, select "install package from file" in menu "Packages"
  - or start R and type
-   install.packages('spams_2.3.zip',repos=NULL)
+   install.packages('spams-installation-path/spams_%VERSION%.zip',repos=NULL)
 
 NB: on windows7, you must execute R as admin.

@@ -1,6 +1,9 @@
-Installation of the binary windows package 
-  (spams-2.3.win32-py2.7.exe or spams-2.3.win-amd64-py2.7.exe)
-This package is for python-2.7
+Installation of the binary windows packages
+==========================================
+They are named spams-python-%FULLVERSION%.win32-py2.7.exe and
+   spams-python-%FULLVERSION%.win-amd64-py2.7.exe
+
+These packages are for python-2.7
 
 Just download and execute the file corresponding to your architecture.
 All external DLLs needed are included and will be installed in 

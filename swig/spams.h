@@ -599,10 +599,10 @@ using namespace FISTA;
   if (param.regul==TREE_L0 || param.regul==TREEMULT || param.regul==TREE_L2 || param.regul==TREE_LINF) 
       throw("Error: fistaFlat should be used instead");
 
-  Matrix<T> *duality_gap = new Matrix<T>();
-  FISTA::solver((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*duality_gap));
+  Matrix<T> *optim_info = new Matrix<T>();
+  FISTA::solver((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*optim_info));
   if (param.log) delete[](param.logName);
-  return duality_gap;
+  return optim_info;
 }
 
 template<typename T> 
@@ -764,10 +764,10 @@ using namespace FISTA;
    tree.groups_ir= groups->r();
    tree.groups_jc= groups->pB();
 
-  Matrix<T> *duality_gap = new Matrix<T>();
-  FISTA::solver<T>((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*duality_gap),NULL,&tree);
+  Matrix<T> *optim_info = new Matrix<T>();
+  FISTA::solver<T>((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*optim_info),NULL,&tree);
   if (param.log) delete[](param.logName);
-  return duality_gap;
+  return optim_info;
 }
 
 template<typename T> 
@@ -920,10 +920,10 @@ throw(const char *)
   if (eta_g->n() != groups_var->n())
     throw("fistaGraph error: size of field eta_g is not consistent");
 
-  Matrix<T> *duality_gap = new Matrix<T>();
-  FISTA::solver<T>((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*duality_gap),&graph);
+  Matrix<T> *optim_info = new Matrix<T>();
+  FISTA::solver<T>((Matrix<T> &)(*X),(AbstractMatrixB<T> &)(*D),(Matrix<T> &)(*alpha0),(Matrix<T> &)(*alpha),param,(Matrix<T> &)(*optim_info),&graph);
   if (param.log) delete[](param.logName);
-  return duality_gap;
+  return optim_info;
 }
 
 template<typename T> 
@@ -1244,6 +1244,15 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
 
 /* end  dictLearn */
 /* utility : equivalent of matlab im2col in 'sliding' mode */
+/* 
+   input:
+     A : image as matrix of mm lines of nn values (for rgb nn = 3 * dimx)
+     RGB : true if image is true color (3 values per pixel)
+     m,n : size of chunks (typically 8x8)
+  output:
+     B : matrix of all possible mxn blocs, size = m*n lines of (mm - m + 1) * (nn -n + 1) values;
+     stored by columns.
+*/
 void im2col_sliding(Matrix<double>  *A,Matrix<double>  *B,int m, int n,bool RGB)  throw(const char *){
   /* if RGB is true A has 3*n columns, R G B columns are consecutives 
    */

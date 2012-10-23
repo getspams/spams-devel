@@ -19,6 +19,9 @@ esac
 [ $# -gt 0 ] && usage
 
 [ -x ./mkdist ] || die "You must be in the directory containing mkdist"
+[ -x ../mkRelease ] || die "No prog ../mkRelease"
+
+fullvers=`../mkRelease -f`
 
 ext=src;
 pkg=spams-R
@@ -42,7 +45,8 @@ doc=tmp-doc
 swig -c++ -r -o ${nom}.cpp $nom.i
 [ $? -ne 0 ] && exit 1
 mkdir -p $pkdir/R $pkdir/src
-cp -p NAMESPACE DESCRIPTION $pkdir
+cp -p NAMESPACE  $pkdir
+../setRelease DESCRIPTION.in >$pkdir/DESCRIPTION 
 cp -p ../../COPYING $pkdir/LICENSE
 cp -a man $pkdir
 rfiles="zzz.R r_$nom.R ${nom}.R"
@@ -54,7 +58,10 @@ cp -p test_*.R $pkdir/inst/test
 cp -p $doc/doc_spams.pdf $pkdir/inst/doc
 cp -a $doc/html $pkdir/inst/doc
 cp -p ../extdata/*   $pkdir/inst/extdata
-cp -p INSTALL-package INSTALL-windows win-build.bat win-build.sh $dir
+../setRelease INSTALL-package.in >$dir/INSTALL-package
+../setRelease INSTALL-windows.in >$dir/INSTALL-windows
+../setRelease spams-R.iss.in >$dir/spams-R.iss
+cp -p win-build.sh $dir
 pngpkg=png_0.1-4.tar.gz
 if [ -r $pngpkg ]; then
     cp -p $pngpkg $dir
@@ -64,11 +71,12 @@ for d in decomp  dictLearn  linalg  prox;do
     mkdir $d
     cp -p ../../../../../../../$d/*.h $d
 done
-cd $cdir
 
 cd $wdir
-tgz=$pkg-v2.3-svn`date +%Y-%m-%d`.tar.gz
+echo "$fullvers" >$dir/Release-name
+
+tgz=$pkg-$fullvers.tar.gz
 tar zcf $tgz $pkg
-cp -p $tgz ../${pkg}_svn.tar.gz
+#cp -p $tgz ../${pkg}_svn.tar.gz
 exit 0
 

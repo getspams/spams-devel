@@ -11,8 +11,10 @@ die () {
 [ -d "$RBASE" ] || die "No dir $RBASE. You should install R from http://cran.r-project.org/"
 
 x64=0
+name=win32
 if [ -d /c/Windows/SysWOW64 ]; then
     x64=1
+    name=win-amd64
 fi
 
 if [ $x64 -ne 0 ]; then
@@ -43,3 +45,11 @@ fi
 
 cp -p "$RDIR"/*.dll $dstd
 /c/Python27/python setup.py bdist_wininst
+if [ -r Release-name ]; then
+    vers=`cat Release-name`
+    f=`/bin/ls dist/*$name*.exe`
+    tl=`echo $f | sed "s|^dist/.*\.$name||"`
+    mv $f spams-python-$vers.$name$tl
+fi
+exit 0
+

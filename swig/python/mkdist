@@ -20,6 +20,10 @@ esac
 [ $# -gt 0 ] && usage
 
 [ -x ./mkdist ] || die "You must be in the directory containing mkdist"
+[ -x ../mkRelease ] || die "No prog ../mkRelease"
+[ -x ../setRelease ] || die "No prog ../setRelease"
+fullvers=`../mkRelease -f`
+../setRelease setup.py.in > setup.py
 
 nom=spams
 /bin/rm -rf dist
@@ -37,7 +41,10 @@ cp -p spams.h $tmpd
 ./docmatlab2python $tmpd/spams
 mv $tmpd/spams.new.py $tmpd/spams.py
 cp -p ../extdata/* $tmpd
-cp -p INSTALL-package INSTALL-windows win-build.bat win-build.sh $tmpd
+../setRelease INSTALL-package.in >$tmpd/INSTALL-package
+../setRelease INSTALL-windows.in >$tmpd/INSTALL-windows
+
+cp -p win-build.sh $tmpd
 rm -f $tmpd/README
 # doc
 cd $cdir
@@ -49,13 +56,14 @@ cp -a $doc/build/html/* $tmpd/sphinx
 cp -a $doc/html $tmpd
 cp -p $doc/doc_spams.pdf $tmpd
 cp -p $doc/build/latex/SPAMS.pdf $tmpd/python-interface.pdf
+
+echo "$fullvers" >$tmpd/Release-name
 cd dist
 name=spams-python
 mv $dir $name
-
-tgz=$name-v2.3-svn`date +%Y-%m-%d`.tar.gz
+tgz=$name-$fullvers.tar.gz
 tar zcf $tgz $name
-cp -p $tgz ../${name}_svn.tar.gz
+#cp -p $tgz ../${name}_svn.tar.gz
 exit 0
 # zip :
 zname=$name-v2.3-svn`date +%Y-%m-%d`.zip
