@@ -28,6 +28,11 @@ MacOS:
 	the build has been tested with MacOS 10 (Lion) and required
 	packages were installed with 'port install' :
 	port install atlas;port install py26-numpy;install py26-scipy
+	I have added /opt/local/bin to my PATH
+	and specified the compiler by setting CC and CXX, for example:
+	export CC=/opt/local/bin/gcc-mp-4.3;export CXX=/opt/local/bin/g++-mp-4.3
+
+	
 
 Windows 32bits:
 	You need packages MinGW, python-2.7, and scipy + numpy for python-2.7

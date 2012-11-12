@@ -36,6 +36,12 @@ If you have a version of R lower than 2.13, there will remain
 one warning with R CMD check, because SHLIB_OPENMP_CXXFLAGS must be manually defined.
 
 ##################################################
+Installing on macOS:
+====================
+	I have tested it on macosx-10 64bits, kernel 10.8.0 :
+	I have installed R with popt, and added /opt/local/bin to my PATH
+	and "R CMD INSTALL" worked fine.
+
 Installing on windows :
 ======================
 

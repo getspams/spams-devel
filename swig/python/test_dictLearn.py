@@ -24,6 +24,21 @@ def _extract_lasso_param(f_param):
         if x in f_param:
             l_param[x] = f_param[x]
     return l_param
+
+def _objective(X,D,param,imgname = None):
+    print 'Evaluating cost function...'
+    lparam = _extract_lasso_param(param)
+    alpha = spams.lasso(X,D = D,**lparam)
+    xd = X - D * alpha
+    R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
+    print "objective function: %f" %R
+    #* display ?
+    if imgname != None:
+        img = spams.displayPatches(D)
+        print "IMG %s" %str(img.shape)
+        x = np.uint8(img[:,:,0] * 255.)
+        image = Image.fromarray(x,mode = 'L')
+        image.save("%s.png" %imgname)
     
 def test_trainDL():
     img_file = '../extdata/boat.png'
@@ -57,14 +72,8 @@ def test_trainDL():
     print 'time of computation for Dictionary Learning: %f' %t
 
     ##param['approx'] = 0
-    print 'Evaluating cost function...'
-    lparam = _extract_lasso_param(param)
-    alpha = spams.lasso(X,D = D,**lparam)
-    xd = X - D * alpha
-    R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
-    #* display ????
-
-    print "objective function: %f" %R
+    # save dictionnary as dict.png
+    _objective(X,D,param,'dict')
 
     #### SECOND EXPERIMENT ####
     print "*********** SECOND EXPERIMENT ***********"
@@ -77,11 +86,8 @@ def test_trainDL():
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f\n' %t
-    print 'Evaluating cost function...'
-    alpha = spams.lasso(X,D = D,**lparam)
-    xd = X - D * alpha
-    R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
-    print "objective function: %f" %R
+
+    _objective(X,D,param,'dict1')
 
     # Then reuse the learned model to retrain a few iterations more.
     param2 = param.copy()
@@ -91,11 +97,7 @@ def test_trainDL():
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
-    print 'Evaluating cost function...'
-    alpha = spams.lasso(X,D = D,**lparam)
-    xd = X - D * alpha
-    R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
-    print "objective function: %f" %R
+    _objective(X,D,param,'dict2')
 
     #################### THIRD & FOURTH EXPERIMENT ######################
     # let us add sparsity to the dictionary itself
@@ -111,11 +113,7 @@ def test_trainDL():
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
-    print 'Evaluating cost function...'
-    alpha = spams.lasso(X,D = D,**lparam)
-    xd = X - D * alpha
-    R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
-    print "objective function: %f" %R
+    _objective(X,D,param)
 
     #* DISPLAY
     print '*********** FOURTH EXPERIMENT ***********'
@@ -129,12 +127,7 @@ def test_trainDL():
     tac = time.time()
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
-    print 'Evaluating cost function...'
-    alpha = spams.lasso(X,D = D,**lparam)
-    xd = X - D * alpha
-    R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
-    print "objective function: %f" %R
-
+    _objective(X,D,param)
     
     return None
 

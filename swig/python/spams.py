@@ -522,9 +522,9 @@ def displayPatches(D):
         sizeEdge=np.sqrt(n/V)
         
         
-    for ii in xrange(0,D.shape[1]):
-        if D[0,ii] > 0:
-            D[:,ii] = - D[:,ii]
+#    for ii in xrange(0,D.shape[1]):
+#        if D[0,ii] > 0:
+#            D[:,ii] = - D[:,ii]
     p = 4.5
     M = np.max(D)
     m = np.min(D)
@@ -539,9 +539,12 @@ def displayPatches(D):
     M = np.max(D)
     m = np.min(D)
     D = (D - m)/ (M - m)
-    nBins = int(np.sqrt(K))
+    nb1 = np.sqrt(K)
+    nBins = int(nb1)
+    if nBins != nb1:
+        nBins += 1
     tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
-    patch = np.zeros(sizeEdge,sizeEdge)
+#    patch = np.zeros(sizeEdge,sizeEdge)
     mm = sizeEdge * sizeEdge
     for ii in xrange(0,nBins):
         for jj in xrange(0,nBins):
@@ -551,8 +554,11 @@ def displayPatches(D):
             offsety = 0
             ii = (ii + offsetx) % nBins
             jj = (jj + offsety) % nBins
-            patchCol = D[0:n,io*nBins+jo]
-            patchCol = patchCol.reshape((sizeEdge,sizeEdge,V))
+            ix = io*nBins+jo
+            if ix >= K:
+                break
+            patchCol = D[0:n,ix]
+            patchCol = patchCol.reshape((sizeEdge,sizeEdge,V),order= 'F')
             tmp[ii * (sizeEdge+1)+ 1 : (ii + 1)*(sizeEdge+1),
                 jj * (sizeEdge+1)+1:(jj + 1) * (sizeEdge+1),:] = patchCol;
             ii = io

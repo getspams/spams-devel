@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
+use strict;
 
 sub usage {
     print "Usage: $0 file\n",
