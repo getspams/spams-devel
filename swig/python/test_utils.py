@@ -4,6 +4,12 @@ import time
 import numpy as np
 import scipy.sparse as ssp
 
+myfloat = np.float64
+
+def set_float32():
+    global myfloat
+    myfloat = np.float32
+
 def test1(txt,func,*args):
     tic = time.time()
     res  = func(*args)

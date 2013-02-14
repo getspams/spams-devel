@@ -93,7 +93,7 @@ extern "C" {
 	/* we cannot use require_fortran, because it convert a numpy C array to a numpy 
 	fortran array by just modifying the strides */
 	if (!array || !require_dimensions(array,2) || !array_is_fortran(array) || !require_native(array)) {
-	SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"matrix arg $argnum must be a 2d float64 Fortran Array"); SWIG_fail;
+	SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"matrix arg $argnum must be a 2d DATA_TYPE Fortran Array"); SWIG_fail;
 	}
 	$1 = new Matrix<DATA_TYPE> ((DATA_TYPE *)array_data(array),(int)array_size(array,0),(int)array_size(array,1));
 
@@ -426,5 +426,5 @@ extern "C" {
 %define INSTANTIATE_DATA( f_name )
 %feature("autodoc","1") _ ## f_name;
 %template(f_name) _ ## f_name<double>;
-//%template(f_name) _ ## f_name<float>;
+%template(f_name) _ ## f_name<float>;
 %enddef

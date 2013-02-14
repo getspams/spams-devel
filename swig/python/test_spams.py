@@ -1,27 +1,20 @@
 import sys
 import time
+import test_utils
 
 all_modules = ['linalg', 'decomp', 'prox', 'dictLearn']
 
 modules = []
 
-for s in all_modules:
-    try:
-        exec ('import test_%s' %s)
-        modules.append(s)
-    except:
-        print "Removing %s" %s
 # for debug
 simul = False
 
-def usage():
-    print "Usage : %s [test-or-group-name]+" %sys.argv[0]
+def usage(lst):
+    print "Usage : %s [-32] [test-or-group-name]+" %sys.argv[0]
     print '  Run specified test or group of tests (all by default)'
+    print '    -32 : use float32 instead of float64'
     print '  Available groups and tests are:'
-    for m in modules:
-        print "%s :" %m
-        exec('lstm = test_%s.tests' %m)
-        print '  %s' %(' '.join([ lstm[i] for i in xrange(0,len(lstm),2)]))
+    print '%s ' '\n'.join(lst)
     print '\nExamples:'
     print '%s linalg' %sys.argv[0]
     print '%s sort calcAAt' %sys.argv[0]
@@ -38,10 +31,28 @@ def run_test(testname,prog):
 def main(argv):
     tic = time.time()
     lst = []
+    is_ok = True
     for s in argv:
         if s[0] == '-':
-            usage()
+            if s == '-32':
+                test_utils.set_float32()
+            else:
+                is_ok = False
+            continue
         lst.append(s)
+    for s in all_modules:
+        try:
+            exec ('import test_%s' %s)
+            modules.append(s)
+        except:
+            print "Removing %s" %s
+    if not is_ok:
+        l = []
+        for m in modules:
+            l.append("%s :" %m)
+            exec('lstm = test_%s.tests' %m)
+            l.append('  %s' %(' '.join([ lstm[i] for i in xrange(0,len(lstm),2)])))
+        usage(l)
     if(len(lst) == 0):
         lst = modules
     for testname in lst:

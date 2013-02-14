@@ -1,10 +1,12 @@
 #!/usr/bin/perl -w
 use strict;
 
+$main::first_rev = 29;
 sub usage {
     print "Usage: $0 [-svn][-t dates-file]\n",
     " makes changelo\n",
-    "\t-svn : get raw log from svn and appends it to Changelog.log\n",
+    "\t-svn : get last raw log from svn and appends it to Changelog.log\n",
+    "\t   if Changelog.log is emmpty, get log since $main::first_rev\n",
     "\t-t : Converts Changelog.log to Changelog.txt, with dates as revisions flags\n";
     exit 1;
 }
@@ -28,10 +30,8 @@ while($#ARGV >= 0) {
     usage();
 }
 
-my$rev = 28;
 if($log_svn) { 
-#    $rev = get_last_rev($raw_file);
-    $rev++;
+    my $rev = get_last_rev($raw_file);
     system "svn log  --incremental -r $rev:HEAD >>$raw_file";
     print "XX $rev\n";
 }
@@ -84,7 +84,7 @@ close(OUT);
 exit 0;
 sub get_last_rev {
     my($f) = @_;
-    my $rev = 28;
+    my $rev = $main::first_rev;
     if(! open(IN,"<$f")) {return $rev;}
     my $line = 0;
     while(<IN>) {
@@ -96,6 +96,7 @@ sub get_last_rev {
 	    chomp;
 	    (/^r(\d+)\s\|/) || die "Bad log line ($line)\n";
 	    $rev = $1;
+	    $rev++;
 	}
     }
     close(IN);

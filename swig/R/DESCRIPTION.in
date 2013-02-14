@@ -2,7 +2,7 @@ Package: spams
 Title: R interface to some functions of library spams
 Version: %VERSION%
 Date: %DATE%
-Author: Julien MAYRAL for C++ SPAMS code, with contribution
+Author: Julien MAIRAL for C++ SPAMS code, with contribution
 	from Jean-Paul CHIEZE for interface to language R
 Maintainer: <jean-paul.chieze@inria.fr>
 Description: R interface to the SPArse Modeling Software library

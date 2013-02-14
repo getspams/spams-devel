@@ -114,7 +114,7 @@ Use of spams functions should only be done through module spams."
 
 
 %include <spams.h>
-void im2col_sliding(Matrix<double>  *,Matrix<double>  *,int,int,bool);
+//void im2col_sliding(Matrix<double>  *,Matrix<double>  *,int,int,bool);
 #ifdef DEBUG
 %include <spams-tst.h>
 Matrix<double> *tst(Matrix<double> **,bool,AbstractMatrixB<double> *);
@@ -157,3 +157,7 @@ INSTANTIATE_DATA(fistaGraph)
 INSTANTIATE_DATA(proximalFlat)
 INSTANTIATE_DATA(proximalTree)
 INSTANTIATE_DATA(proximalGraph)
+
+/* */
+INSTANTIATE_DATA(im2col_sliding)
+

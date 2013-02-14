@@ -62,7 +62,7 @@ def bayer(X,offset):
 def conjGrad(A,b,x0 = None,tol = 1e-10,itermax = None):
     n = A.shape[1]
     if x0 == None:
-        x = np.zeros((n),dtype = np.float64)
+        x = np.zeros((n),dtype = A.dtype)
     else:
         x = np.copy(x0)
     if itermax == None:
@@ -173,17 +173,17 @@ def omp(X,D,L=None,eps= None,lambda1 = None,return_reg_path = False, numThreads 
         if str(type(L)) != "<type 'numpy.ndarray'>":
             L = np.array([L],dtype=np.int32)
     if eps == None:
-        eps = np.array([0.],dtype=np.float64)
+        eps = np.array([0.],dtype=X.dtype)
     else:
         given_eps = True
         if str(type(eps)) != "<type 'numpy.ndarray'>":
-            eps = np.array([eps],dtype=np.float64)
+            eps = np.array([eps],dtype=X.dtype)
     if lambda1 == None:
-        lambda1 = np.array([0.],dtype=np.float64)
+        lambda1 = np.array([0.],dtype=X.dtype)
     else:
         given_lambda1 = True
         if str(type(lambda1)) != "<type 'numpy.ndarray'>":
-            lambda1 = np.array([lambda1],dtype=np.float64)
+            lambda1 = np.array([lambda1],dtype=X.dtype)
     if return_reg_path:
         ((indptr,indices,data,shape),path) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     else:
@@ -207,17 +207,17 @@ def ompMask(X,D,B,L=None,eps= None,lambda1 = None,return_reg_path = False, numTh
         if str(type(L)) != "<type 'numpy.ndarray'>":
             L = np.array([L],dtype=np.int32)
     if eps == None:
-        eps = np.array([0.],dtype=np.float64)
+        eps = np.array([0.],dtype=X.dtype)
     else:
         given_eps = True
         if str(type(eps)) != "<type 'numpy.ndarray'>":
-            eps = np.array([eps],dtype=np.float64)
+            eps = np.array([eps],dtype=X.dtype)
     if lambda1 == None:
-        lambda1 = np.array([0.],dtype=np.float64)
+        lambda1 = np.array([0.],dtype=X.dtype)
     else:
         given_lambda1 = True
         if str(type(lambda1)) != "<type 'numpy.ndarray'>":
-            lambda1 = np.array([lambda1],dtype=np.float64)
+            lambda1 = np.array([lambda1],dtype=X.dtype)
     if return_reg_path:
         ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     else:
@@ -263,7 +263,7 @@ def fistaFlat(
     compute_gram=False,lin_admm=False,admm=False,intercept=False,
     resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
     log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-    inner_weights=np.array([0.]),size_group=1,groups = None,sqrt_step=True,transpose=False):
+    inner_weights=None ,size_group=1,groups = None,sqrt_step=True,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ("max_it" , 1000),('L0',1.0),
 #                 ('fixed_step',False),
@@ -280,11 +280,13 @@ def fistaFlat(
 #
 ##    params = __param_struct(paramlist,param)
 #    W = np.empty((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+    if inner_weights == None:
+        inner_weights = np.array([0.],dtype=X.dtype)
     if groups == None:
         groups = np.array([],dtype=np.int32,order="FORTRAN")
     W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
     optim_info = spams_wrap.fistaFlat(Y,X,W0,W,groups,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
-    if(return_optim_info != None):
+    if return_optim_info:
         return(W,optim_info)
     else:
         return W
@@ -296,9 +298,12 @@ def fistaTree(
     compute_gram=False,lin_admm=False,admm=False,intercept=False,
     resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
     log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-    inner_weights=np.array([0.]),size_group=1,sqrt_step=True,transpose=False):
+    inner_weights=None,size_group=1,sqrt_step=True,transpose=False):
+
     if(len(tree) != 4):
         raise ValueError("fistaTree : tree should be a list of 4 elements")
+    if inner_weights == None:
+        inner_weights = np.array([0.],dtype=X.dtype)
     eta_g = tree['eta_g']
     groups = tree['groups']
     own_variables = tree['own_variables']
@@ -317,9 +322,12 @@ def fistaGraph(
     compute_gram=False,lin_admm=False,admm=False,intercept=False,
     resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
     log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-    inner_weights=np.array([0.]),size_group=1,sqrt_step=True,transpose=False):
+    inner_weights=None,size_group=1,sqrt_step=True,transpose=False):
+
     if(len(graph) != 3):
         raise ValueError("fistaGraph : graph should be a list of 3 elements")
+    if inner_weights == None:
+        inner_weights = np.array([0.],dtype=X.dtype)
     eta_g = graph['eta_g']
     groups = graph['groups']
     groups_var = graph['groups_var']
@@ -418,13 +426,13 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
 #    params = __param_struct(paramlist,param)
 
     if D == None:
-        D = np.array([[],[]],dtype=np.float64,order="FORTRAN")
+        D = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
     if lambda1 == None:
         raise ValueError("trainDL : lambda1 must be defined")
 
     if model == None:
-        m_A = np.array([[],[]],dtype=np.float64,order="FORTRAN")
-        m_B = np.array([[],[]],dtype=np.float64,order="FORTRAN")
+        m_A = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+        m_B = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
         m_iter = 0
     else:
         m_A = model['A']

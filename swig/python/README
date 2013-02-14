@@ -22,13 +22,15 @@ you will find in $inst
   of each function of the toolbox
 
 ----------------------------------------
-Running test programs :
+Running test programs (double precision by default):
 
 cd $inst/test
 python test_spams.py -h : to get help
 python test_spams.py  : will run all the tests
 python test_spams.py linalg : test of linalg functions
 python test_spams.py name1 name2 ... : run named tests
+
+option -32 will run the tests in single precision
   .....
 
 ========================================
@@ -55,4 +57,4 @@ python test_spams.py -h : to get help
 python test_spams.py  : will run all the tests
 python test_spams.py linalg : test of linalg functions
 python test_spams.py name1 name2 ... : run named tests
-
+python test_spams.py -32 .... : use single precision

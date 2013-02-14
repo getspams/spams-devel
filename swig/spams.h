@@ -403,7 +403,7 @@ SpMatrix<T> *_somp(Matrix<T> *X,Matrix<T> *D,Vector<int> *groups,int LL, T eps, 
      nzmax = spAlpha[i].nzmax();
      if (nn != 0) {
        for (int j = 0; j<pB[nn]; ++j) {
-	 Pr[count]=static_cast<double>(v[j]);
+	 Pr[count]=static_cast<T>(v[j]);
 	 Ir[count++]=static_cast<mwSize>(r[j]);
        }
        for (int j = 0; j<=nn; ++j) 
@@ -609,7 +609,7 @@ template<typename T>
 Matrix<T> *_fistaTree(
 	     Matrix<T> *X,AbstractMatrixB<T> *D,Matrix<T> *alpha0,
 	     Matrix<T> *alpha, // tree :
-	     Vector<double> *eta_g,SpMatrix<bool> *groups,Vector<int> *own_variables,
+	     Vector<T> *eta_g,SpMatrix<bool> *groups,Vector<int> *own_variables,
 	     Vector<int> *N_own_variables, // params :
 	     int num_threads,
 	     int max_it,
@@ -774,7 +774,7 @@ template<typename T>
 Matrix<T> *_fistaGraph(
 	     Matrix<T> *X,AbstractMatrixB<T> *D,Matrix<T> *alpha0,
 	     Matrix<T> *alpha, // tree :
-	     Vector<double> *eta_g,SpMatrix<bool> *groups,SpMatrix<bool> *groups_var, // params :
+	     Vector<T> *eta_g,SpMatrix<bool> *groups,SpMatrix<bool> *groups_var, // params :
 	     int num_threads,
 	     int max_it,
 	     T L0,
@@ -915,7 +915,7 @@ throw(const char *)
   graph.gg_jc = groups->pB();
   graph.gv_ir = groups_var->r();
   graph.gv_jc = groups_var->pB();
-  if (graph.Nv <= 0 || graph.Ng != groups->n())
+  if (graph.Nv != p || graph.Ng != groups->n())
     throw("fistaGraph error: size of field groups_var is not consistent");
   if (eta_g->n() != groups_var->n())
     throw("fistaGraph error: size of field eta_g is not consistent");
@@ -987,7 +987,7 @@ using namespace FISTA;
 
 template<typename T> 
 Vector<T> *_proximalTree(Matrix<T> *alpha0,Matrix<T> *alpha, // tree
-		Vector<double> *eta_g,SpMatrix<bool> *groups,Vector<int> *own_variables,
+		Vector<T> *eta_g,SpMatrix<bool> *groups,Vector<int> *own_variables,
 		Vector<int> *N_own_variables, // params :	 
 		int num_threads,
 		T lambda1,
@@ -1067,7 +1067,7 @@ using namespace FISTA;
 
 template<typename T> 
 Vector<T> *_proximalGraph(Matrix<T> *alpha0,Matrix<T> *alpha, // graph
-		Vector<double> *eta_g,SpMatrix<bool> *groups,SpMatrix<bool> *groups_var, // params :	 
+		Vector<T> *eta_g,SpMatrix<bool> *groups,SpMatrix<bool> *groups_var, // params :	 
 		int num_threads,
 		T lambda1,
 		T lambda2,
@@ -1124,7 +1124,7 @@ using namespace FISTA;
   graph.gg_jc = groups->pB();
   graph.gv_ir = groups_var->r();
   graph.gv_jc = groups_var->pB();
-  if (graph.Nv <= 0 || graph.Ng != groups->n())
+  if (graph.Nv != pAlpha || graph.Ng != groups->n())
     throw("proximalGraph error: size of field groups_var is not consistent");
   if (eta_g->n() != groups_var->n())
     throw("proximalGraph error: size of field eta_g is not consistent");
@@ -1138,7 +1138,7 @@ using namespace FISTA;
 
 /* from dictLearn */
 template<typename T> 
-Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **omB,Vector<int> **omiter,bool return_model,Matrix<double> *m_A,Matrix<double> *m_B,int m_iter,
+Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **omB,Vector<int> **omiter,bool return_model,Matrix<T> *m_A,Matrix<T> *m_B,int m_iter,
 		    Matrix<T> *D1,
 		    int num_threads,
 		    int batch_size,
@@ -1253,7 +1253,8 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
      B : matrix of all possible mxn blocs, size = m*n lines of (mm - m + 1) * (nn -n + 1) values;
      stored by columns.
 */
-void im2col_sliding(Matrix<double>  *A,Matrix<double>  *B,int m, int n,bool RGB)  throw(const char *){
+template<typename T> 
+void _im2col_sliding(Matrix<T>  *A,Matrix<T>  *B,int m, int n,bool RGB)  throw(const char *){
   /* if RGB is true A has 3*n columns, R G B columns are consecutives 
    */
   int mm = A->m();
@@ -1263,8 +1264,8 @@ void im2col_sliding(Matrix<double>  *A,Matrix<double>  *B,int m, int n,bool RGB)
   int N = (mm - m + 1) * (nn -n + 1);
   if (M != B->m() || N != B->n())
     throw("im2col_sliding : incompatible dimensions for output matrix\n");
-  double *po = B->rawX();
-  double *pi = A->rawX();
+  T *po = B->rawX();
+  T *pi = A->rawX();
   for(int j = 0; j <= nn - n;j++) {
     for(int i = 0;i <= mm - m; i++) {
       for(int kj = j;kj < j + n;kj++) {

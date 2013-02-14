@@ -29,6 +29,7 @@ def _objective(X,D,param,imgname = None):
     print 'Evaluating cost function...'
     lparam = _extract_lasso_param(param)
     alpha = spams.lasso(X,D = D,**lparam)
+    # NB : as alpha is sparse, D*alpha is the dot product
     xd = X - D * alpha
     R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
     print "objective function: %f" %R
@@ -59,7 +60,7 @@ def test_trainDL():
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
-    X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)))
+    X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)),dtype = myfloat)
     param = { 'K' : 100, # learns a dictionary with 100 elements
               'lambda1' : 0.15, 'numThreads' : 4, 'batchsize' : 400,
               'iter' : 1000}
@@ -151,7 +152,7 @@ def test_trainDL_Memory():
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
     X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)))
-    X = np.asfortranarray(X[:,np.arange(0,X.shape[1],10)])
+    X = np.asfortranarray(X[:,np.arange(0,X.shape[1],10)],dtype = myfloat)
 
     param = { 'K' : 200, # learns a dictionary with 100 elements
           'lambda1' : 0.15, 'numThreads' : 4,
@@ -197,16 +198,16 @@ def test_nmf():
         return None
     I = np.array(img) / 255.
     if I.ndim == 3:
-        A = np.asfortranarray(I.reshape((I.shape[0],I.shape[1] * I.shape[2])))
+        A = np.asfortranarray(I.reshape((I.shape[0],I.shape[1] * I.shape[2])),dtype = myfloat)
         rgb = True
     else:
-        A = np.asfortranarray(I)
+        A = np.asfortranarray(I,dtype = myfloat)
         rgb = False
 
     m = 16;n = 16;
     X = spams.im2col_sliding(A,m,n,rgb)
     X = X[:,::10]
-    X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)))
+    X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)),dtype = myfloat)
     ########## FIRST EXPERIMENT ###########
     tic = time.time()
     (U,V) = spams.nmf(X,return_lasso= True,K = 49,numThreads=4,iter = -5)
