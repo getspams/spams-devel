@@ -50,6 +50,7 @@ def test_fistaFlat():
     param['it0'] = 50
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print 'mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:]))
+    exit()
     param['subgrad'] = False
     param['max_it'] = max_it
     param['it0'] = it0

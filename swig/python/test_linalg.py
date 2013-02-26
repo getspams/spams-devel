@@ -24,7 +24,7 @@ def test_calcAAt():
     """
     m=200; n = 200000; d= 0.05
     A = ssprand(m,n,density=d,format='csc',dtype=myfloat)
-    return Xtest('np.dot(A,A.T)','spams.calcAAt(A)',locals())
+    return Xtest('A * A.T','spams.calcAAt(A)',locals())
 
 def test_calcXAt():
     m=200; n = 200000; d= 0.05
