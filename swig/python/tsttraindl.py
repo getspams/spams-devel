@@ -34,7 +34,7 @@ D = spams.trainDL(X,**param)
 tac = time.time()
 t = tac - tic
 print 'time of computation for Dictionary Learning: %f' %t
-
+print "DTYPE %s" %str(D.dtype)
 #param['approx'] = 0
 print 'Evaluating cost function...'
 alpha = spams.lasso(X,D,**paramL)
@@ -49,10 +49,10 @@ print "XXa %s" %str(a.shape)
 Da = np.dot(D,a)
 #Da = D * alpha
 xd = y - Da
-print "YY D %s Da %s y %s alpah %s xd %s %s" %(str(D.shape),str(Da.shape),str(y.shape),str(alpha.shape),str(xd.shape),type(xd))
+print "YY D %s Da %s y %s %s alpah %s xd %s %s" %(str(D.shape),str(Da.shape),str(y.shape),type(y),str(alpha.shape),str(xd.shape),type(xd))
 #R = np.mean(0.5 * (xd * xd).sum(axis=0) + param['lambda1'] * np.abs(alpha).sum(axis=0))
 #R = 0.5 * (xd * xd).sum(axis=0)
-R = xd * xd
+R = np.multiply(xd,xd)
 R = R.sum(axis=0)
 R += param['lambda1'] * np.abs(alpha).sum(axis=0)
 R = np.mean(R)
@@ -160,3 +160,4 @@ param = { 'K' : 200, # learns a dictionary with 100 elements
           'lambda1' : 0.15, 'numThreads' : 4,
           'iter' : 100}
 D = spams.trainDL_Memory(X,param)
+print "DTYPE %s" %str(D.dtype)
