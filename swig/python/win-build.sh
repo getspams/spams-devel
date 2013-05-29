@@ -10,6 +10,9 @@ die () {
 
 [ -d "$RBASE" ] || die "No dir $RBASE. You should install R from http://cran.r-project.org/"
 
+if [ -r spams_wrap-windows.cpp ]; then
+    mv spams_wrap-windows.cpp spams_wrap.cpp
+fi
 x64=0
 name=win32
 if [ -d /c/Windows/SysWOW64 ]; then

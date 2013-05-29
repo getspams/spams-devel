@@ -422,9 +422,19 @@ extern "C" {
 %datamatrix_typemaps(float, NPY_FLOAT)
 %datamatrix_typemaps(double, NPY_DOUBLE)
 
-// template avec meme nom : OK malgré warning
-%define INSTANTIATE_DATA( f_name )
-%feature("autodoc","1") _ ## f_name;
-%template(f_name) _ ## f_name<double>;
-%template(f_name) _ ## f_name<float>;
-%enddef
+// In case of multiple instantiation :
+// template with same name : OK in spite of warning
+// But the args are checked to choose between implementations
+// special type need a typecheck typemap
+#ifndef WINDOWS
+       %define INSTANTIATE_DATA( f_name )
+       %feature("autodoc","1") _ ## f_name;
+       %template(f_name) _ ## f_name<double>;
+       %template(f_name) _ ## f_name<float>;
+       %enddef
+#else
+	%define INSTANTIATE_DATA( f_name )
+	%feature("autodoc","1") _ ## f_name;
+	%template(f_name) _ ## f_name<double>;
+	%enddef
+#endif

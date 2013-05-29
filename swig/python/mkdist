@@ -27,6 +27,7 @@ fullvers=`../mkRelease -f`
 
 nom=spams
 /bin/rm -rf dist
+swig -c++ -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
 swig -c++ -python -o ${nom}_wrap.cpp $nom.i
 python setup.py sdist
 [ $? -eq 0 ] || die "setup error; cannot continue"
@@ -41,6 +42,7 @@ cp -p spams.h $tmpd
 ./docmatlab2python $tmpd/spams
 mv $tmpd/spams.new.py $tmpd/spams.py
 cp -p ../extdata/* $tmpd
+cp -p spams_wrap-windows.cpp $tmpd
 ../setRelease INSTALL-package.in >$tmpd/INSTALL-package
 ../setRelease INSTALL-windows.in >$tmpd/INSTALL-windows
 
