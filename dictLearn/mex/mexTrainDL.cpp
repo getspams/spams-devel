@@ -184,10 +184,10 @@ template <typename T>
    }
 
    void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {
-      if (nrhs < 2 && nrhs > 3)
+      if (nrhs < 2 || nrhs > 3)
          mexErrMsgTxt("Bad number of inputs arguments");
 
-      if ((nlhs < 1) && (nlhs > 2))
+      if ((nlhs < 1) || (nlhs > 2))
          mexErrMsgTxt("Bad number of output arguments");
 
       if (mxGetClassID(prhs[0]) == mxDOUBLE_CLASS) {

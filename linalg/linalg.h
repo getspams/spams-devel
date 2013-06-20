@@ -1335,7 +1335,8 @@ template <typename T> inline void Matrix<T>::scal(const T a) {
 /// make a copy of the matrix mat in the current matrix
 template <typename T> inline void Matrix<T>::copy(const Matrix<T>& mat) {
    resize(mat._m,mat._n);
-   cblas_copy<T>(_m*_n,mat._X,1,_X,1);
+//   cblas_copy<T>(_m*_n,mat._X,1,_X,1);
+   memcpy(_X,mat._X,_m*_n*sizeof(T));
 };
 
 /// make a copy of the matrix mat in the current matrix
@@ -2861,7 +2862,8 @@ template <typename T> inline T Vector<T>::operator[] (const int i) const {
 /// make a copy of x
 template <typename T> inline void Vector<T>::copy(const Vector<T>& x) {
    this->resize(x.n());
-   cblas_copy<T>(_n,x._X,1,_X,1);
+   //cblas_copy<T>(_n,x._X,1,_X,1);
+   memcpy(_X,x._X,_n*sizeof(T));
 };
 
 /// Set all values to zero

@@ -1605,7 +1605,8 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
             const T schur =
                T(1.0)/(pr_Gs[i*LL+i]-cblas_dot<T>(i,pr_u,1,pr_Gs+i*LL,1));
             pr_invGs[i*LL+i]=schur;
-            cblas_copy<T>(i,pr_u,1,pr_invGs+i*LL,1);
+//            cblas_copy<T>(i,pr_u,1,pr_invGs+i*LL,1);
+            memcpy(pr_invGs+i*LL,pr_u,i*sizeof(T));
             cblas_scal<T>(i,-schur,pr_invGs+i*LL,1);
             cblas_syr<T>(CblasColMajor,CblasUpper,i,schur,pr_u,1,
                   pr_invGs,LL);
@@ -1633,8 +1634,10 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       T current_correlation = abs<T>(pr_DtR[pr_ind[0]]);
       cblas_gemv<T>(CblasColMajor,CblasNoTrans,K,i+1,T(1.0),pr_Ga,
             K,pr_u,1,T(0.0),pr_work+2*K,1);
-      cblas_copy<T>(K,pr_work+2*K,1,pr_work+K,1);
-      cblas_copy<T>(K,pr_work+2*K,1,pr_work,1);
+      memcpy(pr_work+K,pr_work+2*K,K*sizeof(T));
+      memcpy(pr_work,pr_work+K,K*sizeof(T));
+//      cblas_copy<T>(K,pr_work+2*K,1,pr_work+K,1);
+ //     cblas_copy<T>(K,pr_work+2*K,1,pr_work,1);
 
      for (int j = 0; j<=i; ++j) {
          pr_work[pr_ind[j]]=INFINITY;
@@ -2042,6 +2045,54 @@ void ist(const Matrix<T>& X, const Matrix<T>& D,
    delete[](spAlphaT);
 
 }
+
+/*template <typename T>
+inline void generalCD(const AbstractMatrix<T>& G, Vector<T>& DtRv, Vector<T>& coeffsv,
+      const T lambda, const int itermax, const T tol) {
+
+   Vector<T> diag;
+   G.diag(diag);
+   const int K = G.n();
+   T* const coeffs = coeffsv.rawX();
+   T* const DtR = DtRv.rawX();
+   
+   for (int iter=0; iter < itermax; ++iter) {
+      if (iter % 5 == 0) {
+         T eps1=DtRv.fmaxval()/lambda-1;
+         if (eps1 <= tol) {
+            T eps2=1e10;
+            for (int jj=0; jj<K; ++jj) {
+               if (coeffs[jj] > 0) {
+                  eps2=MIN(DtR[jj],eps2);
+               } else if (coeffs[jj] < 0) {
+                  eps2=MIN(-DtR[jj],eps2);
+               }
+            }
+            eps2=-(eps2/lambda-1);
+            if (eps2 <= tol) 
+               break;
+         }
+      }
+      for (int j = 0; j <K; ++j) {
+         T crit=DtR[j]+coeffs[j]*diag[j];
+         if (crit > lambda) {
+            T diff=coeffs[j];
+            coeffs[j]=(crit-lambda)/diag[j];
+            diff-=coeffs[j];
+            G.add_rawCol(j,DtR,diff);
+         } else if (crit < -lambda) {
+            T diff=coeffs[j];
+            coeffs[j]=(crit+lambda)/diag[j];
+            diff-=coeffs[j];
+            G.add_rawCol(j,DtR,diff);
+         } else if (coeffs[j]) {
+            G.add_rawCol(j,DtR,coeffs[j]);
+            coeffs[j]=T();
+         }
+      }
+   }
+}*/
+
 
 template <typename T>
 inline void coreIST(const AbstractMatrix<T>& G, Vector<T>& DtRv, Vector<T>& coeffsv,

@@ -175,7 +175,7 @@ DEFBLAS='';
 if strcmp(blas,'mkl') 
    DEFBLAS='-DUSE_BLAS_LIB';
    if strcmp(arch,'GLNXA64')
-      blas_link = sprintf('-Wl,--start-group %slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group',path_to_blas,path_to_blas,path_to_blas);
+      blas_link = sprintf('-Wl,--start-group %slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
    elseif strcmp(arch,'GLNX86')
       blas_link = sprintf('-Wl,--start-group %slibmkl_intel.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group',path_to_blas,path_to_blas,path_to_blas);
    elseif strcmp(arch,'MACI64')
