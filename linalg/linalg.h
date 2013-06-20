@@ -525,6 +525,8 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// extract the rows of a matrix corresponding to a binary mask
    inline void copyMask(Matrix<T>& out, Vector<bool>& mask) const;
 
+   typedef Vector<T> col;
+
    protected:
    /// Forbid lazy copies
    explicit Matrix<T>(const Matrix<T>& matrix);
@@ -651,6 +653,8 @@ template<typename T> class Vector {
    /// A <- x .^ 2
    inline void sqr(const Vector<T>& x);
    /// A <- 1 ./ sqrt(x) 
+   inline void sqr();
+   /// A <- 1 ./ sqrt(A) 
    inline void Sqrt(const Vector<T>& x);
    /// A <- 1 ./ sqrt(x) 
    inline void Sqrt();
@@ -692,6 +696,8 @@ template<typename T> class Vector {
    inline void exp();
    /// replace each value by its logarithm
    inline void log();
+   /// replace each value by its absolute value
+   inline void abs_vec();
    /// replace each value by its exponential
    inline void logexp();
    /// replace each value by its exponential
@@ -740,6 +746,8 @@ template<typename T> class Vector {
    inline void toSparse(SpVector<T>& vec) const;
    /// extract the rows of a matrix corresponding to a binary mask
    inline void copyMask(Vector<T>& out, Vector<bool>& mask) const;
+
+
 
    private:
    /// = operator, 
@@ -888,6 +896,8 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    inline void addVecToCols(const Vector<T>& diag, const T a = 1.0);
    inline void addVecToColsWeighted(const Vector<T>& diag, const T* weights, const T a = 1.0);
 
+   typedef SpVector<T> col;
+
    private:
    /// forbid copy constructor
    explicit SpMatrix(const SpMatrix<T>& matrix);
@@ -959,6 +969,10 @@ template <typename T> class SpVector {
    inline void sqr();
    /// dot product
    inline T dot(const SpVector<T>& vec) const;
+   /// dot product
+   inline T dot(const Vector<T>& vec) const;
+   /// dot product
+   inline void scal(const T a);
 
    /// Modifiers
    /// clears the vector
@@ -2961,7 +2975,6 @@ template <typename T> inline void Vector<T>::thrsabsmin(const T nu) {
       _X[i]=MAX(MIN(_X[i],nu),-nu);
 }
 
-
 /// performs thresholding of the vector
 template <typename T> inline void Vector<T>::thrshold(const T nu) {
    for (int i = 0; i<_n; ++i) 
@@ -3076,6 +3089,11 @@ template <typename T> inline void Vector<T>::div(const Vector<T>& x, const Vecto
 template <typename T> inline void Vector<T>::sqr(const Vector<T>& x) {
    this->resize(x._n);
    vSqr<T>(_n,x._X,_X);
+}
+
+/// A <- x .^ 2
+template <typename T> inline void Vector<T>::sqr() {
+   vSqr<T>(_n,_X,_X);
 }
 
 /// A <- x .^ 2
@@ -3285,6 +3303,11 @@ template <typename T> inline void Vector<T>::neg() {
 /// replace each value by its exponential
 template <typename T> inline void Vector<T>::exp() {
    vExp<T>(_n,_X,_X);
+};
+
+/// replace each value by its absolute value
+template <typename T> inline void Vector<T>::abs_vec() {
+   vAbs<T>(_n,_X,_X);
 };
 
 /// replace each value by its logarithm
@@ -4933,6 +4956,11 @@ template <typename T> inline void SpVector<T>::sqr() {
 };
 
 template <typename T>
+inline void SpVector<T>::scal(const T a) {
+   cblas_scal<T>(_L,a,_v,1);
+};
+
+template <typename T>
 inline T SpVector<T>::dot(const SpVector<T>& vec) const {
    T sum=T();
    int countI = 0;
@@ -4950,6 +4978,15 @@ inline T SpVector<T>::dot(const SpVector<T>& vec) const {
          ++countJ;
       }
    }
+   return sum;
+};
+
+template <typename T>
+inline T SpVector<T>::dot(const Vector<T>& vec) const {
+   T sum=T();
+   int countI = 0;
+   while (countI < _L) 
+      sum+=_v[countI++]*vec[_r[countI]];
    return sum;
 };
 

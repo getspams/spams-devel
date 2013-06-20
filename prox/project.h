@@ -1,4 +1,3 @@
-
 /* Software SPAMS v2.1 - Copyright 2009-2011 Julien Mairal 
  *
  * This file is part of SPAMS.

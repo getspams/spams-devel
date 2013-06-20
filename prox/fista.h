@@ -1168,6 +1168,7 @@ namespace FISTA {
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
                y.copy(x);
+               if (this->_pos) y.thrsPos();
             };
             T inline eval(const Vector<T>& x) const {  return 0; };
             void inline fenchel(const Vector<T>& input, T& val, T& scal) const {  };
