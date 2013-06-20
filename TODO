@@ -1,7 +1,0 @@
-update documentation scripts for R and Python
-update R/Python compilation scripts for lasso, trainDL (not a lot of changes)
-check that there is no bug with trainDL, option penalty2 (confusion with l2error2) line 326, dist/spams-R/spams/R/spams.R 
-add script make_R_package.sh, similar to make_matlab_package.sh 
-add script make_python_package.sh, similar to make_matlab_package.sh
-add R/Python interface for omp (most important function among the non-interfaced functions)
-
