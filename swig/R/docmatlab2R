@@ -214,6 +214,7 @@ sub write_man {
     my($f,$prog,$doc,$rdformat) = @_;
     my($rdf,$i,$key,$tmp,$deltas);
     open(OUT,">$f") || die "$f create err $!\n";
+    print OUT "\\encoding{latin1}\n";
     print OUT "\\name{$prog}\n\\alias{$prog}\n";
     my $l = $$doc{'Inputs'};
     my ($doci,$dlti) = ($$l{'lines'},$$l{'deltas'});

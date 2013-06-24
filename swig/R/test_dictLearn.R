@@ -3,6 +3,20 @@ if (! (library(png,logical.return= TRUE))) {
   LOADED <- FALSE
 }
 .imagesDir = "../extdata"
+.objective <- function(X,D,lambda1,imgname = NULL) {
+  .printf("Evaluating cost function...\n")
+  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+
+  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
+  .printf("objective function: %f\n",R)
+  if(! is.null(imgname)) {
+    img = spams.displayPatches(D)
+    cat("IMG ",dim(img),"\n")
+    .printf("XX %f - %f\n",min(img),max(img))
+    writePNG(imgname + '.png')
+  }
+ 
+}
 test_trainDL <- function() {
   I = readPNG(paste(.imagesDir,'boat.png',sep= '/'))
   if (length(dim(I)) == 3) {
@@ -25,11 +39,7 @@ test_trainDL <- function() {
   tac = proc.time()
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
-
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n",R)
+  .objective(X,D,lambda1)
 
 #### SECOND EXPERIMENT ####
   .printf("*********** SECOND EXPERIMENT ***********\n")
@@ -45,11 +55,7 @@ test_trainDL <- function() {
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
-
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n",R)
+  .objective(X,D,lambda1)
 
                                         # Then reuse the learned model to retrain a few iterations more.
 
@@ -61,11 +67,7 @@ test_trainDL <- function() {
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
-
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n",R)
+  .objective(X,D,lambda1)
 
 
 #################### THIRD & FOURTH EXPERIMENT ######################
@@ -79,11 +81,7 @@ test_trainDL <- function() {
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
-
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n",R)
+  .objective(X,D,lambda1)
 
   .printf('*********** FOURTH EXPERIMENT ***********\n')
 
@@ -93,11 +91,7 @@ test_trainDL <- function() {
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
-
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n",R)
+  .objective(X,D,lambda1)
 
   return(NULL)
 }
@@ -129,11 +123,7 @@ test_trainDL_Memory <- function() {
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
-
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n\n",R)
+  .objective(X,D,lambda1)
 
 #### SECOND EXPERIMENT ####
   tic = proc.time()
@@ -142,12 +132,161 @@ test_trainDL_Memory <- function() {
   t = (tac - tic)[['elapsed']]
   .printf("time of computation for Dictionary Learning: %f\n",t)
 
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+  .objective(X,D,lambda1)
 
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n",R)
+  return(NULL)
+}
 
+#####
+test_structTrainDL <- function() {
+  I = readPNG(paste(.imagesDir,'boat.png',sep= '/'))
+  if (length(dim(I)) == 3) {
+    A = matrix(I,nrow = nrow(I),ncol = 3 * ncol(I))
+  } else {
+    A = I
+  }
+
+  m = 8;n = 8;
+  X = spams.im2col_sliding(A,m,n)
+
+  X = X - matrix(rep(colMeans(X),nrow(X)),nrow(X),ncol(X),byrow = T)
+  X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+
+  lambda1 = 0.05
+  K = 64
+  tol = 1e-3
+  iter = 20
+########## FIRST EXPERIMENT ###########
+  regul = 'l1'
+  .printf("with Fista Regression %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+#
+  regul = 'l2'
+  .printf("with Fista Regression %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+#
+  regul = 'elastic-net'
+  .printf("with Fista  %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+
+   # pause :
+   # readline("pause ")
+   ########### GRAPH
+  lambda1 = 0.1
+  tol = 1e-5
+  K = 10
+  eta_g = as.vector(c(1, 1, 1, 1, 1),mode='double')
+  groups = as(matrix(as.vector(c(0, 0, 0, 1, 0,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+    0, 0, 1, 0, 0),mode='logical'),ncol = 5,byrow = T),'CsparseMatrix')
+
+  groups_var = as(matrix(as.vector(c(1, 0, 0, 0, 0,
+    1, 0, 0, 0, 0,
+    1, 0, 0, 0, 0,
+    1, 1, 0, 0, 0,
+    0, 1, 0, 1, 0,
+    0, 1, 0, 1, 0,
+    0, 1, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 0, 0, 1,
+    0, 0, 1, 0, 0),mode='logical'),ncol = 5,byrow = T),'CsparseMatrix')
+  graph = list('eta_g'= eta_g,'groups' = groups,'groups_var' = groups_var)
+  
+  regul = 'graph'
+  .printf("with Fista  %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul, graph = graph)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+#
+  regul = 'graph-ridge'
+  .printf("with Fista  %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul, graph = graph)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+   # pause :
+   # readline("pause ")
+   ###########   TREE
+
+  lambda1 = 0.001
+  tol = 1e-5
+  treedata = "0 1. [] -> 1 4
+1 1. [0 1 2] -> 2 3
+4 2. [] -> 5 6
+2 1. [3 4]
+3 2. [5]
+5 2. [6 7]
+6 2.5 [8] -> 7
+7 2.5 [9]
+"
+  own_variables = as.vector(c(0, 0, 3, 5, 6, 6, 8, 9),mode= 'integer')
+  N_own_variables = as.vector(c(0,3,2,1,0,2,1,1),mode= 'integer')
+  eta_g = as.vector(c(1,1,1,2,2,2,2.5,2.5),mode = 'double')
+  groups = matrix(as.vector(c(0,0,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,
+    0,1,0,0,0,0,0,0,
+    0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,
+    0,0,0,0,1,0,0,0,
+    0,0,0,0,1,0,0,0,
+    0,0,0,0,0,0,1,0),mode='logical'),ncol = 8,byrow = T)
+  groups = as(groups,'CsparseMatrix')
+  tree = list('eta_g'= eta_g,'groups' = groups,'own_variables' = own_variables,
+    'N_own_variables' = N_own_variables)
+
+  #
+  regul = 'tree-l0'
+  .printf("with Fista  %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul, tree = tree)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+#
+  gstruct = spams.groupStructOfString(treedata)
+  x = spams.treeOfGroupStruct(gstruct)
+  tree = x[[2]]
+  regul = 'tree-l2'
+  .printf("with Fista  %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul, tree = tree)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+#
+  regul = 'tree-linf'
+  .printf("with Fista  %s\n",regul)
+  tic = proc.time()
+  D <- spams.structTrainDL(X,K = K,lambda1 = lambda1, tol = tol,numThreads = 4, batchsize = 400,iter = iter,regul = regul, tree = tree)
+  tac = proc.time()
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Dictionary Learning: %f\n",t)
+  .objective(X,D,lambda1)
+  
   return(NULL)
 }
 
@@ -181,5 +320,6 @@ test_nmf <- function() {
 
 test_dictLearn.tests = list('trainDL' = test_trainDL,
   'trainDL_Memory' = test_trainDL_Memory,
+  'structTrainDL' = test_structTrainDL,
   'nmf' = test_nmf
   )

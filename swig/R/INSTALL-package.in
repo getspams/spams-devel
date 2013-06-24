@@ -25,7 +25,7 @@ cd $R_LIB/spams/test
 Rscript test_spams.R -help
 Rscript test_spams.R
 
-Warning : for now the R interface is mising a little subset of the functions
+Warning : for now the R interface is missing a little subset of the functions
 	described in the documentation of SPAMS.
 
 # Notes:
@@ -40,7 +40,8 @@ Installing on macOS:
 ====================
 	I have tested it on macosx-10 64bits, kernel 10.8.0 :
 	I have installed R with popt, and added /opt/local/bin to my PATH
-	and "R CMD INSTALL" worked fine.
+	and "R CMD INSTALL" worked fine,
+	but I had to redefine TMPDIR (export TMPDIR=/var/tmp)
 
 Installing on windows :
 ======================

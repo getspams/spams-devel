@@ -85,7 +85,7 @@ SEXP appendOutput(SEXP value,SEXP result) {
 	$1 = 1;
 
 }
-%typemap(in) (Vector<DATA_TYPE> **ARGOUT_VECTOR)
+%typemap(in,numinputs=0) (Vector<DATA_TYPE> **ARGOUT_VECTOR)
 	     (Vector<DATA_TYPE>  *data_temp)
 {
     $1 = &data_temp;
@@ -183,7 +183,7 @@ SEXP appendOutput(SEXP value,SEXP result) {
 	$1 = 1;
 
 }
-%typemap(in) (Matrix<DATA_TYPE> **ARGOUT_MATRIX)
+%typemap(in,numinputs=0) (Matrix<DATA_TYPE> **ARGOUT_MATRIX)
 	     (Matrix<DATA_TYPE>  *data_temp)
 {
     $1 = &data_temp;
@@ -321,6 +321,48 @@ SEXP appendOutput(SEXP value,SEXP result) {
     $result = output;
     UNPROTECT(5);
 }
+
+%typemap(freearg)
+  (SpMatrix<DATA_TYPE> *INPLACE_SPMATRIX)
+{
+	delete arg$argnum;
+}
+// ARGOUT
+%typemap(in,numinputs=0) (SpMatrix<DATA_TYPE> **ARGOUT_SPMATRIX ) 
+(SpMatrix<DATA_TYPE> *data_temp)
+{
+	$1 = &data_temp;
+}
+%typemap(argout) (SpMatrix<DATA_TYPE> **ARGOUT_SPMATRIX ) 
+{
+  if(data_temp$argnum != NULL) {
+    R_len_t m = data_temp$argnum->m();
+    R_len_t n = data_temp$argnum->n();
+    R_len_t nzmax = data_temp$argnum->nzmax();
+    SEXP indptr, indices, vdata, dims, output;
+    PROTECT(indptr = Rf_allocVector(INTSXP,n + 1));
+    PROTECT(indices = Rf_allocVector(INTSXP,nzmax));
+    PROTECT(vdata = Rf_allocVector(R_TYPE,nzmax));
+    PROTECT(dims = Rf_allocVector(VECSXP,2));
+    SET_VECTOR_ELT(dims,0,Rf_ScalarInteger(m));
+    SET_VECTOR_ELT(dims,1,Rf_ScalarInteger(n));
+
+    DATA_TYPE *xdata = data_temp$argnum->v();
+    memcpy(R_CAST(vdata),xdata,nzmax * sizeof(DATA_TYPE));
+    int *pB = data_temp$argnum->pB();
+    int *r = data_temp$argnum->r();
+    memcpy(INTEGER(indices),r,nzmax * sizeof(int));
+    memcpy(INTEGER(indptr),pB,(n + 1) * sizeof(int));
+    delete data_temp$argnum;
+    PROTECT(output = Rf_allocVector(VECSXP,4));
+    SET_VECTOR_ELT(output,0,indptr);
+    SET_VECTOR_ELT(output,1,indices);
+    SET_VECTOR_ELT(output,2,vdata);
+    SET_VECTOR_ELT(output,3,dims);
+    MYADD_OUTPUT_ARG($result,output);
+    UNPROTECT(5);
+  }
+}
 %enddef /* %spmatrix_typemaps */
 
 %define %dspmatrix_typemaps(R_TYPE,R_CAST,DATA_TYPE)
@@ -383,6 +425,86 @@ SEXP appendOutput(SEXP value,SEXP result) {
 
 %enddef /* %datamatrix_typemaps */
 
+%define %node_typemaps(R_TYPE,R_CAST,DATA_TYPE)
+%typemap(out) (std::vector<StructNodeElem<DATA_TYPE> *> *)
+{	      
+  int n = result->size();
+  SEXP node_list;
+  PROTECT(node_list = Rf_allocVector(VECSXP,n));
+  int i = 0;
+  for(std::vector<StructNodeElem<DATA_TYPE> *>::iterator it = result->begin();it != result->end();it++, i++) {
+    SEXP vars, children, elem;
+    PROTECT(elem = Rf_allocVector(VECSXP,4));
+    StructNodeElem<DATA_TYPE> *node = *it;
+    int inode = node->node_num;
+    SET_VECTOR_ELT(elem,0,Rf_ScalarInteger(inode));
+    SET_VECTOR_ELT(elem,1,Rf_ScalarReal(node->weight));
+    int k = node->vars->size();
+    PROTECT(vars = Rf_allocVector(INTSXP,k));
+    int * rvars = (int *)INTEGER(vars);
+    memcpy(rvars,node->vars->data(),k * sizeof(int));
+    SET_VECTOR_ELT(elem,2,vars);
+
+    k = node->children->size();
+    PROTECT(children = Rf_allocVector(INTSXP,k));
+    int * rchildren = (int *)INTEGER(children);
+    memcpy(rchildren,node->children->data(),k * sizeof(int));
+    SET_VECTOR_ELT(elem,3,children);
+    
+    SET_VECTOR_ELT(node_list,i,elem);
+    UNPROTECT(3);
+  }
+  del_gstruct(result);
+  $result = node_list;
+  UNPROTECT(1);
+}
+
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER)
+    (std::vector<StructNodeElem<DATA_TYPE> *> *TREE)
+{
+    $1 = (TYPEOF($input) == VECSXP && Rf_isVector($input) ) ? 1 : 0;
+}
+%typemap(in)
+  (std::vector<StructNodeElem<DATA_TYPE> *> *TREE) 
+{
+  SEXP rtree = $input;
+  if(TYPEOF(rtree) != VECSXP || ! Rf_isVector(rtree)) {
+    myerr("Expected VECSXP Vector as argument %d",$argnum);
+  }
+  $1 = new std::vector<StructNodeElem<DATA_TYPE> *>;
+  int n = Rf_length(rtree);
+  for (int i = 0;i < n;i++) {
+    SEXP rnode = VECTOR_ELT(rtree,i);
+    if(TYPEOF(rnode) != VECSXP || ! Rf_isVector(rnode)) {
+      myerr("Bad type for node elem in arg %d",$argnum);
+    }
+    if(Rf_length(rnode) != 4) {
+      myerr("A node must have 4 elements in arg %d",$argnum);
+    }
+    int inode = *((int *) INTEGER(VECTOR_ELT(rnode,0)));
+    double w = *((double *)REAL(VECTOR_ELT(rnode,1)));
+    std::vector<int> *vars = new std::vector<int>;
+    std::vector<int> *children = new std::vector<int>;
+    SEXP rvars = VECTOR_ELT(rnode,2);
+    SEXP rchildren = VECTOR_ELT(rnode,3);
+    int *pvars = (int *) INTEGER(rvars);
+    int *pchildren = (int *) INTEGER(rchildren);
+    for(int i = 0;i < Rf_length(rvars);i++)
+      vars->push_back(*pvars++);
+    for(int i = 0;i < Rf_length(rchildren);i++)
+      children->push_back(*pchildren++);
+    StructNodeElem<DATA_TYPE> *node = new StructNodeElem<DATA_TYPE>(inode,w,vars,children);
+    $1->push_back(node);
+  }
+}
+
+%typemap(freearg)
+  (std::vector<StructNodeElem<DATA_TYPE> *> *TREE)
+{
+  del_gstruct(arg$argnum);
+}
+%enddef /* %node_typemaps */
+
 /* ********************** */
 
 %vector_typemaps(REALSXP,REAL,float)
@@ -403,8 +525,34 @@ SEXP appendOutput(SEXP value,SEXP result) {
 %datamatrix_typemaps(REALSXP,REAL,float)
 %datamatrix_typemaps(REALSXP,REAL,double)
 
+%node_typemaps(REALSXP,REAL,float)
+%node_typemaps(REALSXP,REAL,double)
+
 // must instatiate templates with different names, else generated R file will do bad dispatching
 %define INSTANTIATE_DATA( f_name )
 %template(## f_name) _ ## f_name<double>;
 //%template(f_ ## f_name) _ ## f_name<float>;
 %enddef
+
+
+
+// ARGOUTVIEW_ARRAY1
+%typemap(in,numinputs=0) (int** ARGOUTVIEW_ARRAY1,int* DIM1)
+  (int *data_temp, int dim_temp)
+{
+	$1 = &data_temp;
+	$2 = &dim_temp;
+}
+%typemap(argout) (int** ARGOUTVIEW_ARRAY1,int* DIM1) 
+{
+  SEXP perm;
+  if(data_temp$argnum != NULL) {
+    int n = dim_temp$argnum;
+    PROTECT(perm = Rf_allocVector(INTSXP,n));
+    int *pperm = INTEGER(perm);
+    memcpy(pperm,data_temp$argnum,n * sizeof(int));
+    delete []data_temp$argnum;
+    UNPROTECT(1);
+  } else perm = R_NilValue;
+  MYADD_OUTPUT_ARG($result,perm);
+}

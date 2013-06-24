@@ -132,11 +132,11 @@ spams.lasso <- function(X,D= NULL,Q = NULL,q = NULL,return_reg_path = FALSE,L= -
   x = NULL
   if(! is.null(q)) {
 ##    x = do.call(spams_wrap.lassoQq,c(list(X,D,q,0,return_reg_path),params))
-    x = lassoQq(X,Q,q,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
+    x = lassoQq(X,Q,q,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
 ##    x = .mycall('lassoQq',c('X','D','q',0,'return_reg_path',params))
   } else {
 ##    x = do.call(spams_wrap.lassoD,c(list(X,D,0,return_reg_path),params))
-    x = lassoD(X,D,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
+    x = lassoD(X,D,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
 ##    x = .mycall('lassoD',c('X','D',0,'return_reg_path',params))
   }
   if(return_reg_path) {
@@ -222,7 +222,7 @@ spams.omp <- function(X,D,L = NULL,eps = NULL,lambda1 = NULL,return_reg_path = F
 #  if(! is.vector(eps)) {
 #    eps = as.vector(c(eps),mode='double')
 #  }
-  x = omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1, numThreads)
+  x = omp(X,D,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1, numThreads)
   if(return_reg_path) {
     path = x[[2]]
   }
@@ -261,7 +261,7 @@ spams.ompMask <- function(X,D,B,L = NULL,eps = NULL,lambda1 = NULL,return_reg_pa
     given_lambda1 = TRUE
   }
 
-  x = ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1, numThreads)
+  x = ompMask(X,D,B,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1, numThreads)
   if(return_reg_path) {
     path = x[[2]]
   }
@@ -466,9 +466,14 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
 ##################################################
 
 ###########  dictLearn ##################
-.TrainDL <- function(X,return_model= NULL,model = NULL,in_memory= FALSE,D = NULL,numThreads = -1,batchsize = -1,
-                 K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
-                 posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
+.TrainDL <- function(X,return_model= NULL,model = NULL,in_memory= FALSE,D = NULL,
+                     graph= NULL, tree = NULL,numThreads = -1,
+                     tol = 0.000001,fixed_step = True,ista = False,
+                     batchsize = -1,K= -1,lambda1= NULL,lambda2= 10e-10,lambda3 = 0.,iter=-1,t0=1e-5,
+                     mode='PENALTY',regul= "none",posAlpha=FALSE,posD=FALSE,
+                     expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,
+                     gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,stochastic_deprecated=FALSE,
+                     modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
   # We can only have simple objects in the param list of .mycall
 
   if (is.null(D)) {
@@ -480,7 +485,36 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
   
   .verif_enum(modeD,'constraint_type_D','modeD in TrainDL')
   .verif_enum(mode,'constraint_type','mode in TrainDL')
-
+  if(is.null(graph) && is.null(tree)) {
+    eta_g = vector(mode = 'double',length = 0)
+    groups = as(matrix(c(FALSE),nrow = 1,ncol = 1),'CsparseMatrix')
+  }
+  if( is.null(tree)) {
+    own_variables = vector(mode= 'integer',length = 0)
+    N_own_variables = vector(mode= 'integer',length = 0)
+  } else {
+    eta_g = tree[['eta_g']]
+    groups = tree[['groups']]
+    own_variables = tree[['own_variables']]
+    N_own_variables = tree[['N_own_variables']]
+    if (is.null(eta_g) || is.null(groups) || is.null(own_variables) ||
+        is.null(N_own_variables)) {
+      stop("structTrainDL : incorrect tree structure\n")
+    }
+    if(! is.null(graph)) {
+      stop("structTrainDL : only one of tree or graph can be given\n")
+    }
+  }
+  if( is.null(graph)) {
+    groups_var = as(matrix(c(FALSE),nrow = 1,ncol = 1),'CsparseMatrix')
+  } else {
+    eta_g = graph[['eta_g']]
+    groups = graph[['groups']]
+    groups_var = graph[['groups_var']]
+    if(is.null(eta_g) || is.null(groups) || is.null(groups_var)) {
+      stop("structTrainDL : incorrect graph structure\n")
+    }
+  }
   if (is.null(model)) {
     m_A = matrix(c(0.),nrow = 0,ncol=0)
     m_B = matrix(c(0.),nrow = 0,ncol=0)
@@ -492,10 +526,13 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
   }
 #  x =  .mycall('alltrainDL',c('X',in_memory,0,0,0,'return_model','m_A','m_B','m_iter','D',params))
   x = alltrainDL(
-        X,in_memory,0,0,0,return_model,m_A,m_B,m_iter,
-        D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,
-        expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,
-        stochastic_deprecated,modeParam,batch,log_deprecated,logName)
+    X,in_memory,return_model,m_A,m_B,m_iter,D,
+    eta_g, groups, groups_var, own_variables, N_own_variables,
+    numThreads,tol,fixed_step,ista,batchsize,K,lambda1,lambda2,lambda3,
+    iter,t0,mode,regul,posAlpha,posD,
+    expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,
+    stochastic_deprecated,modeParam,batch,log_deprecated,logName)
+  
   D = x[[1]]
   if(return_model) {
     A = x[[2]]
@@ -520,7 +557,10 @@ spams.trainDL <- function(X,return_model= FALSE,model= NULL,D = NULL,numThreads 
       iter_updateD = 1
     }
   }
-  return (.TrainDL(X,return_model,model,FALSE,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
+  lambda3 = 0.
+  regul = "undef"
+
+  return (.TrainDL(X,return_model,model,FALSE,D,NULL,NULL,numThreads,0.000001,TRUE,FALSE,batchsize,K,lambda1,lambda2,lambda3,iter,t0,mode,regul,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
 }
 
 spams.trainDL_Memory <- function(X,D = NULL,numThreads = -1,batchsize = -1,
@@ -529,7 +569,28 @@ spams.trainDL_Memory <- function(X,D = NULL,numThreads = -1,batchsize = -1,
   lambda2 = 10e-10
   verbose = FALSE
   posAlpha = FALSE
-  return (.TrainDL(X,FALSE,NULL,TRUE,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
+  lambda3 = 0.
+  regul = "undef"
+
+  return (.TrainDL(X,FALSE,NULL,TRUE,D,NULL,NULL,numThreads,0.000001,TRUE,FALSE,batchsize,K,lambda1,lambda2,lambda3,iter,t0,mode,regul,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
+}
+
+spams.structTrainDL <- function(X,return_model= FALSE,model= NULL,D = NULL,
+               graph = NULL, tree = NULL,numThreads = -1,
+               tol = 0.000001,fixed_step = TRUE,ista = FALSE,batchsize = -1,
+               K= -1,lambda1= NULL,lambda2= 10e-10,lambda3 = 0.,iter=-1,t0=1e-5,regul='none',
+               posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,
+               verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=NULL,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
+  
+  if (is.null(iter_updateD)) {
+    if(batch) {
+      iter_updateD = 5
+    } else {
+      iter_updateD = 1
+    }
+  }
+
+  return (.TrainDL(X,return_model,model,FALSE,D,graph,tree,numThreads,0.000001,TRUE,FALSE,batchsize,K,lambda1,lambda2,lambda3,iter,t0,'FISTAMODE',regul,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
 }
 
 spams.nmf <- function(X,return_lasso= FALSE,model= NULL,numThreads = -1,batchsize = -1,K= -1,
@@ -573,6 +634,7 @@ spams.nnsc <- function(X,return_lasso= FALSE,model= NULL,lambda1= NULL,
 }
 
 ###########  END dictLearn ##############
+# utility functions
 spams.im2col_sliding <- function(A,m,n,RGB = FALSE) {
   mm = nrow(A)
   nn = ncol(A)
@@ -583,4 +645,107 @@ spams.im2col_sliding <- function(A,m,n,RGB = FALSE) {
   return(B)
 }
 
+spams.displayPatches <- function(D) {
+  V = 1
+  n = nrow(D)
+  K = ncol(D)
+  sizeEdge = sqrt(n)
+  if( as.integer(sizeEdge) != sizeEdge) {
+    V = 3
+    sizeEdge = sqrt(n/V)
+  }
+  p = 4.5
+  M = max(D)
+  m = min(D)
+  if (m >= 0) {
+    me = 0
+    sig = sqrt(mean(D * D))
+  } else {
+    me = mean(D)
+    sig = sqrt(mean((D - me) * (D -me)))
+  }
+  D = D - me
+  D = matrix(mapply(function(x,y) min(x,y),mapply(function(x,y) max(x,y),D,-p * sig),p * sig),nrow = nrow(D),ncol = ncol(D))
+  M = max(D)
+  m = min(D)
+  D = (D - m)/ (M - m)
+  nb1 = sqrt(K)
+  nBins = as.integer(nb1)
+  if (nBins != nb1) {
+    nBins = nBins + 1
+  }
+  tmp = array(c(0),dim = c((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V))
+  mm = sizeEdge * sizeEdge
+  for (ii in 1:nBins) {
+    for (jj in 1:nBins) {
+      io = ii
+      jo = jj
+      offsetx = 0
+      offsety = 0
+      ii = ((ii - 1 + offsetx) %% nBins) + 1
+      jj = ((jj - 1 + offsety) %% nBins) + 1
+      ix = (io-1)*nBins+jo
+      if(ix > K) {
+        break
+      }
+      patchCol = D[1:n,ix]
+      patchCol = array(patchCol,c(sizeEdge,sizeEdge,V))
+      x1 = (ii-1)*(sizeEdge+1) + 2
+      x2 = ii*(sizeEdge+1)
+      y1 = (jj-1)*(sizeEdge+1) + 2
+      y2 = jj*(sizeEdge+1)
+      tmp[x1:x2,y1:y2,] = patchCol
+      ii = io
+      jj = jo;
+    }
+  }
+#
+  return(tmp)
+  
+}
+
 ##################################################
+spams.simpleGroupTree <- function(degrees) {
+  return ( simpleGroupTree(degrees,length(degrees)))
+}
+spams.readGroupStruct <- function(file) {
+  return ( readGroupStruct(file))
+}
+spams.groupStructOfString <- function(s) {
+  return ( groupStructOfString(s))
+}
+spams.graphOfGroupStruct <- function(gstruct) {
+  x = graphOfGroupStruct(gstruct)
+  eta_g = x[[1]]
+  lg = x[[2]]
+  lv = x[[3]]
+  indptr = lg[[1]]
+  indices = lg[[2]]
+  data = lg[[3]]
+  shape = lg[[4]]
+  groups = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  indptr = lv[[1]]
+  indices = lv[[2]]
+  data = lv[[3]]
+  shape = lv[[4]]
+  groups_var = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  graph = list('eta_g'= x[[1]],'groups' = groups,'groups_var' = groups_var)
+  return(graph)
+}
+spams.treeOfGroupStruct <- function(gstruct) {
+  x = treeOfGroupStruct(gstruct)
+  nbvars = x[[1]]
+  perm = x[[2]]
+  eta_g = x[[3]]
+  lg = x[[4]]
+  own_variables= x[[5]]
+  N_own_variables = x[[6]]
+  indptr = lg[[1]]
+  indices = lg[[2]]
+  data = lg[[3]]
+  shape = lg[[4]]
+  groups = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+  tree = list('eta_g'= eta_g,'groups' = groups,'own_variables' = own_variables,
+                'N_own_variables' = N_own_variables)
+  return (list(perm,tree,nbvars))
+}
