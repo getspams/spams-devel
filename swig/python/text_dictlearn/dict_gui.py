@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dict_gui.ui'
 #
-# Created: Mon Jun 24 10:18:45 2013
+# Created: Mon Jun 24 10:26:14 2013
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!

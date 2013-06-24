@@ -5,7 +5,10 @@ die () {
     echo $*
     exit 1
 }
-ddir=dist/text_dictlearn
+
+[ -x ./mkdist -o ! -r qtext-dict.py ] || die "You must be in the source directory"
+cdir=`/bin/pwd`
+ddir=$cdir/dist/text_dictlearn
 [ -d $ddir ] && rm -rf $ddir
 mkdir -p $ddir/doc/user $ddir/doc/devel
 ui_files="dict_gui  dparams_gui  viewdecomp_gui  viewdict_gui"
@@ -22,7 +25,9 @@ cp -a $files $datafiles $pyfiles $ddir
 cp -a doc/doc_dictlearn.pdf doc/html $ddir/doc/user
 cp -a devel-doc/build/html devel-doc/build/latex/text-dict.pdf $ddir/doc/devel
 
-cd dist
-tar zcf text_dictlearn.tgz text_dictlearn
+fullvers=`../../mkRelease -f`
+cd $cdir/dist
+echo "$fullvers" >$ddir/Release-name
+tar zcf text_dictlearn-$fullvers.tar.gz text_dictlearn
 exit 0
 # viewer.py
