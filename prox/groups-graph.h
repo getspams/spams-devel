@@ -278,19 +278,19 @@ std::vector<StructNodeElem<T> *> *_simpleGroupTree(int *degr, int n) throw(const
   for(int id = 0;id < nb_levels;id++) {
     if ((id + 1) < nb_levels)
       k = level_starts[id + 1];
-    std::vector<int> lst2;
+    std::vector<int> lstx;
     for(std::vector<int>::iterator it = lst.begin();it < lst.end();it++) {
       int inode = *it;
       std::vector<int> *children = new std::vector<int>;
       for (int j = 0;j < degrees[id];j++) {
 	children->push_back(k);
-	lst2.push_back(k);
+	lstx.push_back(k);
 	k++;
       }
       StructNodeElem<T> *node = new StructNodeElem<T>(inode,1.,new std::vector<int>(1,inode),children);
       gstruct->push_back(node);
     }
-    lst = lst2;
+    lst = lstx;
   }
   delete []level_starts;
   return gstruct;
