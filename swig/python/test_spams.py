@@ -14,7 +14,7 @@ def usage(lst):
     print '  Run specified test or group of tests (all by default)'
     print '    -32 : use float32 instead of float64'
     print '  Available groups and tests are:'
-    print '%s ' %('\n'.join(lst))
+    print '%s ' '\n'.join(lst)
     print '\nExamples:'
     print '%s linalg' %sys.argv[0]
     print '%s sort calcAAt' %sys.argv[0]

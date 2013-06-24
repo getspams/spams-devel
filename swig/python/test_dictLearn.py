@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import scipy
-import scipy.sparse
+import scipy.sparse as ssp
 try:
     from PIL import Image
 except Exception as e:
@@ -12,10 +12,11 @@ import spams
 import time
 from test_utils import *
 
-if not ('rand' in scipy.sparse.__dict__):
-    import myscipy_rand as ssp
+if not ('rand' in ssp.__dict__):
+    import myscipy_rand
+    ssprand = myscipy_rand.rand
 else:
-    import scipy.sparse as ssp
+    ssprand = ssp.rand
 
 def _extract_lasso_param(f_param):
     lst = [ 'L','lambda1','lambda2','mode','pos','ols','numThreads','length_path','verbose','cholesky']
@@ -189,6 +190,177 @@ def test_trainDL_Memory():
 
     return None
 
+def test_structTrainDL():
+    img_file = '../extdata/lena.png'
+    try:
+        img = Image.open(img_file)
+    except Exception as e:
+        print "Cannot load image %s (%s) : skipping test" %(img_file,e)
+        return None
+    I = np.array(img) / 255.
+    if I.ndim == 3:
+        A = np.asfortranarray(I.reshape((I.shape[0],I.shape[1] * I.shape[2])),dtype = myfloat)
+        rgb = True
+    else:
+        A = np.asfortranarray(I,dtype = myfloat)
+        rgb = False
+
+    m = 8;n = 8;
+    X = spams.im2col_sliding(A,m,n,rgb)
+
+    X = X - np.tile(np.mean(X,0),(X.shape[0],1))
+    X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)),dtype = myfloat)
+    param = { 'K' : 64, # learns a dictionary with 100 elements
+              'lambda1' : 0.05, 'tol' : 1e-3,
+              'numThreads' : 4, 'batchsize' : 400,
+              'iter' : 20}
+    paramL = {'lambda1' : 0.05, 'numThreads' : 4}
+
+    param['regul'] = 'l1'
+    print "with Fista Regression %s" %param['regul']
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+    _objective(X,D,param)
+
+#    
+    param['regul'] = 'l2'
+    print "with Fista Regression %s" %param['regul']
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    _objective(X,D,param)
+
+#    
+    param['regul'] = 'elastic-net'
+    print "with Fista %s" %param['regul']
+    param['lambda2'] = 0.1
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    _objective(X,D,param)
+## if we want a pause :
+##    s = raw_input("graph> ")
+########### GRAPH
+    param['lambda1'] = 0.1
+    param['tol'] = 1e-5
+    param['K'] = 10
+    eta_g = np.array([1, 1, 1, 1, 1],dtype=myfloat)
+
+    groups = ssp.csc_matrix(np.array([[0, 0, 0, 1, 0],
+                       [0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0],
+                       [0, 0, 1, 0, 0]],dtype=np.bool),dtype=np.bool)
+
+    groups_var = ssp.csc_matrix(np.array([[1, 0, 0, 0, 0],
+                           [1, 0, 0, 0, 0],
+                           [1, 0, 0, 0, 0],
+                           [1, 1, 0, 0, 0],
+                           [0, 1, 0, 1, 0],
+                           [0, 1, 0, 1, 0],
+                           [0, 1, 0, 0, 1],
+                           [0, 0, 0, 0, 1],
+                           [0, 0, 0, 0, 1],
+                           [0, 0, 1, 0, 0]],dtype=np.bool),dtype=np.bool)
+
+    graph = {'eta_g': eta_g,'groups' : groups,'groups_var' : groups_var}
+    param['graph'] = graph
+    param['tree'] = None
+
+    param['regul'] = 'graph'
+    print "with Fista %s" %param['regul']
+
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    _objective(X,D,param)
+
+    param['regul'] = 'graph-ridge'
+    print "with Fista %s" %param['regul']
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    _objective(X,D,param)
+## if we want a pause :
+##    s = raw_input("tree> ")
+##### TREE
+    tree_data = """0 1. [] -> 1 4
+1 1. [0 1 2] -> 2 3
+4 2. [] -> 5 6
+2 1. [3 4]
+3 2. [5]
+5 2. [6 7]
+6 2.5 [8] -> 7
+7 2.5 [9]
+"""
+    param['lambda1'] = 0.001
+    param['tol'] = 1e-5
+    own_variables =  np.array([0,0,3,5,6,6,8,9],dtype=np.int32)
+    N_own_variables =  np.array([0,3,2,1,0,2,1,1],dtype=np.int32)
+    eta_g = np.array([1,1,1,2,2,2,2.5,2.5],dtype=myfloat)
+    groups = np.asfortranarray([[0, 0, 0, 0, 0, 0, 0, 0],
+              [1, 0, 0, 0, 0, 0, 0, 0],
+              [0, 1, 0, 0, 0, 0, 0, 0],
+              [0, 1, 0, 0, 0, 0, 0, 0],
+              [1, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 1, 0, 0, 0],
+              [0, 0, 0, 0, 1, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 1, 0]],dtype = np.bool)
+    groups = ssp.csc_matrix(groups,dtype=np.bool)
+    tree = {'eta_g': eta_g,'groups' : groups,'own_variables' : own_variables,
+            'N_own_variables' : N_own_variables}
+    param['tree'] = tree
+    param['graph'] = None
+    param['regul'] = 'tree-l0'
+    print "with Fista %s" %param['regul']
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    _objective(X,D,param)
+
+    gstruct = spams.groupStructOfString(tree_data)
+    (perm,tree,nbvars) = spams.treeOfGroupStruct(gstruct)
+    param['tree'] = tree
+
+    param['regul'] = 'tree-l2'
+    print "with Fista %s" %param['regul']
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    _objective(X,D,param)
+    
+    param['regul'] = 'tree-linf'
+    print "with Fista %s" %param['regul']
+    tic = time.time()
+    D = spams.structTrainDL(X,**param)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Dictionary Learning: %f' %t
+
+    _objective(X,D,param)
+
+
 def test_nmf():
     img_file = '../extdata/boat.png'
     try:
@@ -224,5 +396,6 @@ def test_nmf():
 tests = [
     'trainDL' , test_trainDL,
     'trainDL_Memory' , test_trainDL_Memory,
+    'structTrainDL', test_structTrainDL,
     'nmf' , test_nmf,
 ]

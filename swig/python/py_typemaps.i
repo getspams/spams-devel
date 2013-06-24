@@ -39,8 +39,8 @@ extern "C" {
 %typemap(out) (Vector<DATA_TYPE> *) 
 {
     npy_intp n = result->n();
-    npy_intp dims[2] = {1,n};
-    PyArrayObject * array = (PyArrayObject * )PyArray_SimpleNew(2, dims, DATA_TYPECODE);
+    npy_intp dims[1] = {n};
+    PyArrayObject * array = (PyArrayObject * )PyArray_SimpleNew(1, dims, DATA_TYPECODE);
     DATA_TYPE *data = (DATA_TYPE *)array->data;
     DATA_TYPE *idata = result->rawX();
     memcpy(data,idata,n * sizeof(DATA_TYPE));
@@ -61,7 +61,7 @@ extern "C" {
 
 }
 
-%typemap(in,fragment="NumPy_Fragments") (Vector<DATA_TYPE> **ARGOUT_VECTOR)
+%typemap(in,numinputs=0,fragment="NumPy_Fragments") (Vector<DATA_TYPE> **ARGOUT_VECTOR)
 (Vector<DATA_TYPE>  *data_temp)
 {
 	# argout in
@@ -78,7 +78,7 @@ extern "C" {
 	    PyArrayObject * array = (PyArrayObject * )PyArray_SimpleNewFromData(1, dims, DATA_TYPECODE,(void*)data);
 	   if (!array) SWIG_fail;
            $result = SWIG_Python_AppendOutput($result,(PyObject*)array);
-        }
+	  }
 }
 
 %enddef /* %vector_typemaps */
@@ -139,7 +139,7 @@ extern "C" {
 
 }
 
-%typemap(in,fragment="NumPy_Fragments") (Matrix<DATA_TYPE> **ARGOUT_MATRIX)
+%typemap(in,numinputs=0,fragment="NumPy_Fragments") (Matrix<DATA_TYPE> **ARGOUT_MATRIX)
 (Matrix<DATA_TYPE>  *data_temp)
 {
 	# argout in
@@ -186,7 +186,7 @@ extern "C" {
             PyObject_HasAttrString(sparray, "indices") &&
             PyObject_HasAttrString(sparray, "data") &&
 		PyObject_HasAttrString(sparray, "shape"))) {
-	  SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"not a column compressed sparse matrix");
+	  SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"arg $argnum : not a column compressed sparse matrix");
 	  return NULL;
 	}
 	
@@ -320,7 +320,55 @@ extern "C" {
 {
 	delete arg$argnum;
 }
-
+// ARGOUT
+%typemap(in,numinputs=0) (SpMatrix<DATA_TYPE> **ARGOUT_SPMATRIX ) 
+(SpMatrix<DATA_TYPE> *data_temp)
+{
+	$1 = &data_temp;
+}
+%typemap(argout) (SpMatrix<DATA_TYPE> **ARGOUT_SPMATRIX ) 
+{
+# test argout
+  if(data_temp$argnum != NULL) {
+    npy_intp m = data_temp$argnum->m();
+    npy_intp n = data_temp$argnum->n();
+    npy_intp nzmax = data_temp$argnum->nzmax();
+    npy_intp dims[2] = {m,n};
+    dims[0] = n + 1;
+    PyArrayObject *indptr = (PyArrayObject * )PyArray_SimpleNew(1,dims, NPY_INT);
+    dims[0] = nzmax;
+    PyArrayObject *indices = (PyArrayObject * )PyArray_SimpleNew(1,dims, NPY_INT);
+    PyArrayObject *vdata = (PyArrayObject * )PyArray_SimpleNew(1,dims, DATA_TYPECODE);
+    if (! indptr || !indices || !vdata) SWIG_fail;
+    int i;
+    DATA_TYPE *xdata = data_temp$argnum->v();
+    DATA_TYPE *data = (DATA_TYPE *)array_data(vdata);
+    memcpy(data,xdata,nzmax * sizeof(DATA_TYPE));
+    npy_int *pi = (npy_int *)array_data(indices);
+    int *r = data_temp$argnum->r();
+    int *pB = data_temp$argnum->pB();
+    if(sizeof(npy_int) == sizeof(int)) {
+       memcpy(pi,r,nzmax * sizeof(int));
+       pi = (npy_int *)array_data(indptr);
+       memcpy(pi,pB,(n + 1) * sizeof(int));
+    } else {
+      for(i = 0;i< nzmax;i++) 
+    	  *(pi+i) = (npy_int) *(r+i);
+      pi = (npy_int *)array_data(indptr);
+      for(i = 0;i< n + 1;i++) 
+    	  *(pi+i) = (npy_int) *(pB+i);
+    }
+    PyObject* tuple = PyTuple_New(4);
+    PyObject* shape = PyTuple_New(2);
+    PyTuple_SetItem(shape, 0,  PyInt_FromLong((long)m));
+    PyTuple_SetItem(shape, 1,  PyInt_FromLong((long)n));
+    PyTuple_SetItem(tuple,0, (PyObject* )indptr);
+    PyTuple_SetItem(tuple,1,(PyObject* )indices);
+    PyTuple_SetItem(tuple,2,(PyObject* )vdata);
+    PyTuple_SetItem(tuple,3,shape);
+    $result = SWIG_Python_AppendOutput($result,tuple);
+  }
+}
 %enddef /* %spmatrix_typemaps */
 
 %define %dspmatrix_typemaps(DATA_TYPE,DATA_TYPECODE)
@@ -404,6 +452,78 @@ extern "C" {
 
 %enddef /* %datamatrix_typemaps */
 
+%define %node_typemaps(DATA_TYPE,DATA_TYPECODE)
+%typecheck(SWIG_TYPECHECK_DOUBLE_ARRAY,
+           fragment="NumPy_Macros") (std::vector<StructNodeElem<DATA_TYPE> *> *TREE)
+{
+	$1 = PyList_Check($input);
+
+}
+
+%typemap(in) (std::vector<StructNodeElem<DATA_TYPE> *> *TREE) 
+{
+  PyObject* pytree = $input;
+  if(!PyList_Check(pytree)) {
+    SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"arg $argnum must be a list");SWIG_fail;
+  }
+  $1 = new std::vector<StructNodeElem<DATA_TYPE> *>;
+  for(Py_ssize_t i = 0;i < PyList_Size(pytree);i++) {
+    PyObject* pynode = PyList_GetItem(pytree,i);
+    if(! PyTuple_Check(pynode) || (PyTuple_Size(pynode) != 4)) {
+      SWIG_Python_SetErrorMsg(PyExc_RuntimeError,"List elements of arg $argnum must be tuples of size 4");SWIG_fail;
+    }
+    long inode = PyInt_AsLong(PyTuple_GetItem(pynode,(Py_ssize_t)0));
+    DATA_TYPE w = PyFloat_AsDouble(PyTuple_GetItem(pynode,(Py_ssize_t)1));
+    std::vector<int> *vars = new std::vector<int>;
+    std::vector<int> *children = new std::vector<int>;
+    PyObject* pyvars = PyTuple_GetItem(pynode,(Py_ssize_t)2);
+    PyObject* pychildren = PyTuple_GetItem(pynode,(Py_ssize_t)3);
+    for(Py_ssize_t j = 0;j < PyList_Size(pyvars);j++)
+      vars->push_back(static_cast<int>(PyInt_AsLong(PyList_GetItem(pyvars,j))));
+    for(Py_ssize_t j = 0;j < PyList_Size(pychildren);j++)
+      children->push_back(static_cast<int>(PyInt_AsLong(PyList_GetItem(pychildren,j))));
+    StructNodeElem<DATA_TYPE> *node = new StructNodeElem<DATA_TYPE>(inode,w,vars,children);
+    $1->push_back(node);
+  }
+    
+}
+
+%typemap(out) (std::vector<StructNodeElem<DATA_TYPE> *> *)
+{	      
+  int n = result->size();
+  PyObject* node_list = PyList_New(0);
+  for(std::vector<StructNodeElem<DATA_TYPE> *>::iterator it = result->begin();it != result->end();it++) {
+    PyObject* tuple = PyTuple_New(4);
+    StructNodeElem<DATA_TYPE> *node = *it;
+    int inode = node->node_num;
+    PyTuple_SetItem(tuple,0, PyInt_FromLong((long)inode));
+    PyTuple_SetItem(tuple,1, PyFloat_FromDouble(node->weight));
+    int k = node->vars->size();
+    PyObject *vars = PyList_New(0);
+    std::vector<int> *pvars = node->vars;
+    for(int i = 0;i < k;i++)
+      PyList_Append(vars,PyInt_FromLong((long)(*pvars)[i]));
+    PyTuple_SetItem(tuple,2, (PyObject* )vars);
+    k = node->children->size();
+    pvars = node->children;
+    PyObject *children = PyList_New(0);
+    for(int i = 0;i < k;i++)
+      PyList_Append(children,PyInt_FromLong((long)(*pvars)[i]));
+    
+    PyTuple_SetItem(tuple,3,(PyObject* )children );
+    PyList_Append(node_list,tuple);
+  }
+  del_gstruct(result);
+  $result = SWIG_Python_AppendOutput($result,node_list);
+}
+
+%typemap(freearg)
+  (std::vector<StructNodeElem<DATA_TYPE> *> *TREE)
+{
+  del_gstruct(arg$argnum);
+}
+%enddef /* %node_typemaps */
+
 %vector_typemaps(float, NPY_FLOAT)
 %vector_typemaps(double, NPY_DOUBLE)
 %vector_typemaps(int, NPY_INT)
@@ -422,6 +542,9 @@ extern "C" {
 %datamatrix_typemaps(float, NPY_FLOAT)
 %datamatrix_typemaps(double, NPY_DOUBLE)
 
+%node_typemaps(float, NPY_FLOAT)
+%node_typemaps(double, NPY_DOUBLE)
+
 // In case of multiple instantiation :
 // template with same name : OK in spite of warning
 // But the args are checked to choose between implementations
@@ -438,3 +561,4 @@ extern "C" {
 	%template(f_name) _ ## f_name<double>;
 	%enddef
 #endif
+

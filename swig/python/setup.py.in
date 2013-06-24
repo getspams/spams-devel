@@ -28,7 +28,7 @@ if osname.startswith("win32"):
     libdirs = ['C:/Program Files/R/R-2.15.1/bin/i386']
 
 if osname.startswith("win-amd64"):
-    cc_flags = ['-openmp', '-DWIN32', '-DCYGWIN', '-DWINDOWS', '-I','C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/include']
+    cc_flags = ['-openmp', '-EHsc', '-DWIN32', '-DCYGWIN', '-DWINDOWS', '-I','C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/include']
     link_flags = []
     libs = [ 'Rblas', 'Rlapack' ]
     libdirs = ['C:/Program Files (x86)/Microsoft Visual Studio 9.0/VC/lib/amd64','C:/Program Files/R/R-2.15.1/bin/x64']

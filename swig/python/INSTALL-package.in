@@ -17,6 +17,10 @@ python setup.py build
 inst=<your-python-install-dir>
 python setup.py install --prefix=$inst
 
+Two documentations are installed in $inst/doc
+  - doc_spams.pdf and html/index.html : the detailed user documentation
+  - sphinx/index.html : the documentation of python function extracted by sphinx
+
 ################################
 Linux : 
       carefully install atlas. For example on my ubuntu I had to do
@@ -39,7 +43,10 @@ Windows 32bits:
 	
 	You will find binary distributions for MinGW on www.mingw.org,
 	python-2.7 on www.python.org,
-	numpy and scipy on www.numpy.org (or www.scipy.org)
+	numpy and scipy on www.numpy.org (or www.scipy.org).
+	If you want to run test_dictLearn.py, you must install
+	   Python Imaging Library (PIL) : http://www.pythonware.com/products/pil/
+
 	Unfortunately, I did not find a binary distro for atlas.
 `	I use blas and lapack dlls fron the package R (2.15.1).
 	I found dlls for blas and lapcak on http://icl.cs.utk.edu/lapack-for-windows/lapack.
@@ -81,11 +88,14 @@ Windows 64bits :
        "Microsoft Windows SDK for Windows 7 and .NET Framework 4"
        (winsdk_web.exe http://www.microsoft.com/en-us/download/confirmation.aspx?id=8279)
 
-   - create a file "/c/Program Files (x86)/Microsoft Visual Studio 9.0"/VC/bin/amd64/vcvarsamd64.bat 
+   - create a file "/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 9.0"/VC/bin/amd64/vcvarsamd64.bat 
      containing just the line
        call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /Release
    - get pexports and copy pexports.exe to C:/Windows/syatem32 or /c/mingw/bin
      (http://sourceforge.net/projects/mingw/files/MinGW/Extension/pexports/)
+
+   - install   a "Python Imaging Library" package (PIL), for example from
+      http://www.lfd.uci.edu/~gohlke/pythonlibs/
    
    - untar the source package of spams-python
    - cd spams-python

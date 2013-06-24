@@ -6,7 +6,6 @@ debug=0
 macos=0
 flg_clear=0
 flg_swig=1
-
 if [ -x /cygdrive/c/MinGW/msys/1.0/bin/bash ]; then
     exec /cygdrive/c/MinGW/msys/1.0/bin/bash $0 $optx $*
 fi
@@ -21,7 +20,8 @@ BLAS="-lblas -llapack"
 OPTWIN=""
 # bin module extension
 EXTL=so
-CCFLAGS="-fPIC -fopenmp"
+CCFLAGS="-fPIC"
+OMPFLAGS="-fopenmp"
 if [ -d /System/Library/Frameworks ]; then  
  # MacOs
     macos=1
@@ -65,7 +65,7 @@ while [ $# -gt 0 ]; do
     case $1 in
 	-cl) flg_clear=1;;
 	-ns) flg_swig=0;;
-	-g) optc="-g";;
+	-g) optc="-g";OMPFLAGS="";;
 	-D) debug=1;;
 	-*) usage;;
 	*) lst="$lst $1";;
@@ -98,9 +98,9 @@ for nom in $lst; do
 	src=${nom}_wrap.cpp
 	obj=${nom}_wrap.o
     fi
-    $CXX $OPTWIN $CCFLAGS -c $optc -DUSE_BLAS_LIB  $OPT_DBG $INC_PYTHON $INC $src $XCCFLAGS
+    $CXX $OPTWIN $CCFLAGS $OMPFLAGS -c $optc -DUSE_BLAS_LIB  $OPT_DBG $INC_PYTHON $INC $src $XCCFLAGS
     err=$?;[ $err -eq 0 ] || break
-    $CXX $OPTWIN -fopenmp -shared $obj -o _${nom}_wrap.$EXTL -lstdc++ $LIBS $BLAS $XLINKFLAGS
+    $CXX $OPTWIN $OMPFLAGS -shared $obj -o _${nom}_wrap.$EXTL -lstdc++ $LIBS $BLAS $XLINKFLAGS
     err=$?;[ $err -eq 0 ] || break
  #   /bin/rm -f $nom.o ${nom}_wrap.o
 done

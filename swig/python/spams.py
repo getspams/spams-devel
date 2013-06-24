@@ -124,14 +124,14 @@ def lasso(X,D= None,Q = None,q = None,return_reg_path = False,L= -1,lambda1= Non
     path = None
     if(q != None):
         if return_reg_path:
-            ((indptr,indices,data,shape),path) = spams_wrap.lassoQq(X,Q,q,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
+            ((indptr,indices,data,shape),path) = spams_wrap.lassoQq(X,Q,q,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
         else:
-            (indptr,indices,data,shape) = spams_wrap.lassoQq(X,Q,q,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
+            (indptr,indices,data,shape) = spams_wrap.lassoQq(X,Q,q,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
     else:
         if return_reg_path:
-            ((indptr,indices,data,shape),path) = spams_wrap.lassoD(X,D,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
+            ((indptr,indices,data,shape),path) = spams_wrap.lassoD(X,D,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
         else:
-            (indptr,indices,data,shape) = spams_wrap.lassoD(X,D,0,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
+            (indptr,indices,data,shape) = spams_wrap.lassoD(X,D,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
@@ -185,9 +185,9 @@ def omp(X,D,L=None,eps= None,lambda1 = None,return_reg_path = False, numThreads 
         if str(type(lambda1)) != "<type 'numpy.ndarray'>":
             lambda1 = np.array([lambda1],dtype=X.dtype)
     if return_reg_path:
-        ((indptr,indices,data,shape),path) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
+        ((indptr,indices,data,shape),path) = spams_wrap.omp(X,D,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     else:
-        (indptr,indices,data,shape) = spams_wrap.omp(X,D,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
+        (indptr,indices,data,shape) = spams_wrap.omp(X,D,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
@@ -219,9 +219,9 @@ def ompMask(X,D,B,L=None,eps= None,lambda1 = None,return_reg_path = False, numTh
         if str(type(lambda1)) != "<type 'numpy.ndarray'>":
             lambda1 = np.array([lambda1],dtype=X.dtype)
     if return_reg_path:
-        ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
+        ((indptr,indices,data,shape),path) = spams_wrap.ompMask(X,D,B,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     else:
-        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,0,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
+        (indptr,indices,data,shape) = spams_wrap.ompMask(X,D,B,return_reg_path,given_L,L,given_eps,eps,given_lambda1,lambda1,numThreads)
     alpha = ssp.csc_matrix((data,indices,indptr),shape)
     if return_reg_path:
         return (alpha,path)
@@ -254,8 +254,6 @@ def l1L2BCD(X,D,alpha0,list_groups,lambda1 = None, mode= spams_wrap.PENALTY, ite
 
 ###########  prox ##################
 
-# W = FistaFlat(Y,X,W0,param,return_optim_info = False)
-# (W,optim_info) = FistaFlat(Y,X,W0,param,return_optim_info = True)
 def fistaFlat(
     Y,X,W0,return_optim_info = False,numThreads =-1,max_it =1000,L0=1.0,
     fixed_step=False,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
@@ -263,7 +261,7 @@ def fistaFlat(
     compute_gram=False,lin_admm=False,admm=False,intercept=False,
     resetflow=False,regul="",loss="",verbose=False,pos=False,clever=False,
     log=False,ista=False,subgrad=False,logName="",is_inner_weights=False,
-    inner_weights=None ,size_group=1,groups = None,sqrt_step=True,transpose=False):
+    inner_weights=None,size_group=1,groups = None,sqrt_step=True,transpose=False):
 
 #    paramlist = [("numThreads" ,-1), ("max_it" , 1000),('L0',1.0),
 #                 ('fixed_step',False),
@@ -280,10 +278,10 @@ def fistaFlat(
 #
 ##    params = __param_struct(paramlist,param)
 #    W = np.empty((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
-    if inner_weights == None:
-        inner_weights = np.array([0.],dtype=X.dtype)
     if groups == None:
         groups = np.array([],dtype=np.int32,order="FORTRAN")
+    if inner_weights == None:
+        inner_weights = np.array([0.],dtype=X.dtype)
     W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
     optim_info = spams_wrap.fistaFlat(Y,X,W0,W,groups,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
     if return_optim_info:
@@ -326,10 +324,12 @@ def fistaGraph(
 
     if(len(graph) != 3):
         raise ValueError("fistaGraph : graph should be a list of 3 elements")
-    if inner_weights == None:
-        inner_weights = np.array([0.],dtype=X.dtype)
     eta_g = graph['eta_g']
     groups = graph['groups']
+    if groups == None:
+        groups = np.array([],dtype=np.int32,order="FORTRAN")
+    if inner_weights == None:
+        inner_weights = np.array([0.],dtype=X.dtype)
     groups_var = graph['groups_var']
     W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
     optim_info = spams_wrap.fistaGraph(Y,X,W0,W,eta_g,groups,groups_var,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
@@ -407,9 +407,10 @@ def proximalGraph(U,graph,return_val_loss = False,numThreads =-1,lambda1=1.0,lam
 
 ###########  dictLearn ##################
 def __allTrainDL(X,return_model= None,model= None,in_memory= False,
-                 D = None,numThreads = -1,
-                 batchsize = -1,K= -1,lambda1= None,lambda2= 10e-10,iter=-1,t0=1e-5,
-                 mode=spams_wrap.PENALTY,posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,
+                 D = None,graph= None, tree = None,numThreads = -1,
+                 tol = 0.000001,fixed_step = True,ista = False,
+                 batchsize = -1,K= -1,lambda1= None,lambda2= 10e-10,lambda3 = 0.,iter=-1,t0=1e-5,
+                 mode=spams_wrap.PENALTY,regul= "none",posAlpha=False,posD=False,expand=False,modeD=spams_wrap.L2,
                  whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,
                  stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
 
@@ -424,11 +425,36 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
 #                 ('logName','')
 #                 ]
 #    params = __param_struct(paramlist,param)
-
     if D == None:
         D = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
     if lambda1 == None:
         raise ValueError("trainDL : lambda1 must be defined")
+
+    if tree == None and graph == None:
+        eta_g = np.array([],dtype=X.dtype,order="FORTRAN")
+        groups = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
+    if tree != None:
+        if not ('eta_g' in tree and 'groups' in tree and 
+                'own_variables' in tree and 'N_own_variables' in tree):
+            raise ValueError("structTrainDL : incorrect tree structure")
+        if graph != None:
+            raise ValueError("structTrainDL : only one of tree or graph can be given")
+        eta_g = tree['eta_g']
+        groups = tree['groups']
+        own_variables = tree['own_variables']
+        N_own_variables = tree['N_own_variables']
+    else:
+        own_variables = np.array([],dtype=np.int32,order="FORTRAN")
+        N_own_variables = np.array([],dtype=np.int32,order="FORTRAN")
+
+    if graph != None:
+        if not ('eta_g' in graph and 'groups' in graph and 'groups_var' in graph):
+            raise ValueError("structTrainDL : incorrect graph structure")
+        eta_g = graph['eta_g']
+        groups = graph['groups']
+        groups_var = graph['groups_var']
+    else:
+        groups_var = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
 
     if model == None:
         m_A = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
@@ -439,8 +465,10 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
         m_B = model['B']
         m_iter = int(model['iter'])
     x = spams_wrap.alltrainDL(
-        X,in_memory,0,0,0,return_model,m_A,m_B,m_iter,
-        D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,
+        X,in_memory,return_model,m_A,m_B,m_iter,D,
+        eta_g, groups, groups_var, own_variables, N_own_variables,
+        numThreads,tol,fixed_step,ista,batchsize,K,lambda1,lambda2,lambda3,
+        iter,t0,mode,regul,posAlpha,posD,
         expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,
         stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
@@ -464,8 +492,27 @@ def trainDL(
             iter_updateD = 5
         else:
             iter_updateD = 1
-    return __allTrainDL(X,return_model,model,False,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
+    lambda3 = 0.
+    regul = None
+    return __allTrainDL(X,return_model,model,False,D,None,None,numThreads,0.000001,True,False,batchsize,K,lambda1,lambda2,lambda3,iter,t0,mode,regul,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
+def structTrainDL(
+    X,return_model= False,model= None,D = None,
+    graph = None, tree = None,
+    numThreads = -1,tol = 0.000001,fixed_step = True,ista = False,batchsize = -1,K= -1,lambda1= None,
+    lambda2= 10e-10,lambda3 = 0.,iter=-1,t0=1e-5,regul = "none",posAlpha=False,posD=False,
+    expand=False,modeD=spams_wrap.L2,whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,
+    rho=1.0,iter_updateD=None,stochastic_deprecated=False,modeParam=0,batch=False,
+    log_deprecated=False,logName=''):
+
+    if iter_updateD == None:
+        if batch:
+            iter_updateD = 5
+        else:
+            iter_updateD = 1
+    if regul == None:
+        regul = "none"
+    return __allTrainDL(X,return_model,model,False,D,graph,tree,numThreads,tol,fixed_step,ista,batchsize,K,lambda1,lambda2,lambda3,iter,t0,spams_wrap.FISTAMODE,regul,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
 def trainDL_Memory(X,D = None,numThreads = -1,batchsize = -1,
                    K= -1,lambda1= None,iter=-1,t0=1e-5,mode=spams_wrap.PENALTY,
@@ -473,8 +520,9 @@ def trainDL_Memory(X,D = None,numThreads = -1,batchsize = -1,
     lambda2= 10e-10
     verbose = False
     posAlpha = False
-
-    return __allTrainDL(X,False,None,True,D,numThreads,batchsize,K,lambda1,lambda2,iter,t0,mode,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
+    regul = None
+    lambda3 = 0.
+    return __allTrainDL(X,False,None,True,D,None,None,numThreads,0.000001,True,False,batchsize,K,lambda1,lambda2,lambda3,iter,t0,mode,regul,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName)
 
 def nmf(X,return_lasso= False,model= None,
         numThreads = -1,batchsize = -1,K= -1,
@@ -524,7 +572,7 @@ def im2col_sliding(A,m,n,RGB = False):
 def displayPatches(D):
     V = 1
     (n,K) = D.shape
-    sizeEdge = np.sqrt(n/V)
+    sizeEdge = np.sqrt(n)
     if int(sizeEdge) != sizeEdge:
         V = 3
         sizeEdge=np.sqrt(n/V)
@@ -575,3 +623,30 @@ def displayPatches(D):
     return tmp
 
 ##################################################
+# graph
+def simpleGroupTree(degrees):
+    gstruct = spams_wrap.simpleGroupTree(degrees)
+    return gstruct
+def readGroupStruct(file):
+    gstruct = spams_wrap.readGroupStruct(file)
+    return gstruct
+def groupStructOfString(s):
+    gstruct = spams_wrap.groupStructOfString(s)
+    return gstruct
+
+def graphOfGroupStruct(gstruct):
+    (eta_g,groups,groups_var) =  spams_wrap.graphOfGroupStruct(gstruct)
+    (indptr,indices,data,shape) = groups
+    groups = ssp.csc_matrix((data,indices,indptr),shape)
+    (indptr,indices,data,shape) = groups_var
+    groups_var = ssp.csc_matrix((data,indices,indptr),shape)
+    graph = {'eta_g': eta_g,'groups' : groups,'groups_var' : groups_var}
+    return graph
+
+def treeOfGroupStruct(gstruct):
+    (nbvars,perm,eta_g,groups,own_variables,N_own_variables) =  spams_wrap.treeOfGroupStruct(gstruct)
+    (indptr,indices,data,shape) = groups
+    groups = ssp.csc_matrix((data,indices,indptr),shape)
+    tree = {'eta_g': eta_g,'groups' : groups,'own_variables' : own_variables,
+                'N_own_variables' : N_own_variables}
+    return (perm,tree,nbvars)
