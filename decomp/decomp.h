@@ -80,7 +80,7 @@ void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<int>& ind,
 ///       - constraint on the l1 norm of the coefficients
 ///       - constraint on the reconstruction error
 ///       - l1-sparsity penalty 
-enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, L2ERROR2, PENALTY2};
+enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, L2ERROR2, PENALTY2,FISTAMODE};
 
 /// Implementation of LARS-Lasso for solving
 /// \forall i, \min_{\alpha_i} ||X_i-D\alpha_i||_2^2 

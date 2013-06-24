@@ -33,15 +33,69 @@
 #define DICTS_H
 
 #include <decomp.h>
+#include <fista.h>
 
 char buffer_string[50];
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};
 enum mode_compute { AUTO, PARAM1, PARAM2, PARAM3};
 
+struct regul_def {
+  const char *name;
+  FISTA::regul_t regul;
+} regul_table[] = {
+  {"l0", FISTA::L0},
+  {"l1", FISTA::L1},
+  {"l2", FISTA::L2},
+  {"linf", FISTA::LINF},
+  {"none", FISTA::NONE},
+  {"elastic-net", FISTA::ELASTICNET},
+  {"fused-lasso", FISTA::FUSEDLASSO},
+  {"graph", FISTA::GRAPH},
+  {"graph-ridge", FISTA::GRAPH_RIDGE},
+  {"tree-l0", FISTA::TREE_L0},
+  {"tree-l2", FISTA::TREE_L2},
+  {"tree-linf", FISTA::TREE_LINF},
+};
+#define NBREGUL sizeof(regul_table)/sizeof(struct regul_def)
+
+FISTA::regul_t regul_from_string(const char* regul) {
+  for(int i = 0;i < NBREGUL;i++)
+    if (strcmp(regul,regul_table[i].name)==0) return regul_table[i].regul;
+  return FISTA::INCORRECT_REG;
+}
+void regul_error(char *buffer, int bufsize,const char *message) {
+  int n1 = strlen(message);
+  int size = n1;
+  if(n1 < bufsize) {
+    // calculate size
+    for(int i = 0;i < NBREGUL;i++)
+      size += strlen(regul_table[i].name) + 1;
+  } 
+  if (size >= bufsize) {
+    n1 = bufsize - 1;
+    strncpy(buffer,"Invalid regularization\n",n1);
+  } else {
+    strncpy(buffer,message,n1);
+    for(int i = 0;i < NBREGUL;i++) {
+      int k = strlen(regul_table[i].name);
+      strncpy(&buffer[n1],regul_table[i].name,k);
+      buffer[n1+k] = ' ';
+      n1 += k + 1;
+    }
+    buffer[n1 - 1] = '\n';
+  }
+  buffer[n1] = 0;
+  return;
+}
+
 template <typename T> struct ParamDictLearn {
    public:
       ParamDictLearn() : 
          mode(PENALTY),
+	   regul(FISTA::RIDGE),
+	   tol(1.e-4),
+	   ista(false),
+	   fixed_step(true),
          posAlpha(false),
          modeD(L2),
          posD(false),
@@ -83,6 +137,10 @@ template <typename T> struct ParamDictLearn {
       int iter;
       T lambda;
       constraint_type mode;
+      FISTA::regul_t regul;
+      T tol;
+      bool ista;
+      bool fixed_step;
       bool posAlpha; 
       constraint_type_D modeD;
       bool posD;
@@ -138,9 +196,12 @@ template <typename T> class Trainer {
             const int NUM_THREADS);
 
       /// train or retrain using the matrix X
-      void train(const Data<T>& X, const ParamDictLearn<T>& param);
+      /* train with graph or tree */
+      void train(const Data<T>& X, const ParamDictLearn<T>& param,
+		 const GraphStruct<T>* graph_st = NULL, 
+		 const TreeStruct<T>* tree_st = NULL);
       void trainOffline(const Data<T>& X, const ParamDictLearn<T>& param);
-
+      
       /// train or retrain using the groups XT
       void train(const Data<T>& X, const vector_groups& groups,
             const int J, const constraint_type
@@ -289,7 +350,8 @@ void Trainer<T>::cleanDict(Matrix<T>& G) {
 
 
 template <typename T>
-void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
+void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param,
+		       const GraphStruct<T>* graph_st, const TreeStruct<T>* tree_st) {
 
    T rho = param.rho;
    T t0 = param.t0;
@@ -412,8 +474,33 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
    Matrix<T>* invGsT=new Matrix<T>[_NUM_THREADS];
    Matrix<T>* workT=new Matrix<T>[_NUM_THREADS];
    Vector<T>* uT=new Vector<T>[_NUM_THREADS];
+   FISTA::Loss<T>** losses = new FISTA::Loss<T>*[_NUM_THREADS];
+   FISTA::Regularizer<T>** regularizers= new FISTA::Regularizer<T>*[_NUM_THREADS];
+   Vector<T>* alphaT = new Vector<T>[_NUM_THREADS];
+   Matrix<T> G;
+   FISTA::ParamFISTA<T> param_fista;
+   if(param.mode == FISTAMODE) {
+     param_fista.regul = param.regul;
+     param_fista.pos = param.posAlpha;
+     param_fista.lambda = param.lambda;
+     param_fista.lambda2 = param.lambda2;
+     param_fista.lambda3 = param.lambda3;
+     //     param_fista.verbose = param.verbose;
+     param_fista.tol = param.tol;
+     param_fista.ista = param.ista;
+     param_fista.fixed_step = param.fixed_step;
+     if(param.fixed_step)
+       param_fista.L0 = (T)K;
+     else
+       param_fista.L0 = 1.;
+   }
+   if(FISTA::regul_for_matrices(param.regul)) {
+     cerr << "dicts.h : regul_for_matrices not implemented\n";
+     exit(1);
+   }
    for (int i = 0; i<_NUM_THREADS; ++i) {
       spcoeffT[i].resize(K);
+      alphaT[i].resize(K);
       DtRT[i].resize(K);
       XT[i].resize(n);
       BT[i].resize(n,K);
@@ -430,6 +517,8 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
       workT[i].setZeros();
       uT[i].resize(L);
       uT[i].setZeros();
+      regularizers[i]=FISTA::setRegularizerVectors(param_fista,graph_st,tree_st);
+      losses[i]=new FISTA::SqLoss<T>(_D,G);
    }
 
    Timer time, time2;
@@ -469,7 +558,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
       }
       time.start();
       
-      Matrix<T> G;
+      // !!      Matrix<T> G;
       _D.XtX(G);
       if (param.clean) 
          this->cleanDict(X,G,param.posD,
@@ -527,7 +616,17 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
             } else {
                coreLARS2(DtRj,G,Gs,Ga,invGs,u,coeffs_sparse,ind,work,normX,param.mode,param.lambda,param.posAlpha);
             }
-         } else {
+         } else if(param.mode == FISTAMODE) {
+	   Vector<T> optim_infoi(4);
+	   Vector<T> alpha0i(_D.n());
+	   alpha0i.setZeros();
+	   Vector<T>& alphai = alphaT[numT];
+	   losses[numT]->init(Xj);
+	   regularizers[numT]->reset();
+	   //	   alpha.refCol(j,alphai);
+	   FISTA::FISTA_Generic(*(losses[numT]),*(regularizers[numT]),alpha0i,alphai,optim_infoi,param_fista); 
+	   alphai.toSparse(spcoeffj);
+	 } else {
             if (param.mode == SPARSITY) {
                coreORMPB(DtRj,G,ind,coeffs_sparse,normX,L,T(0.0),T(0.0));
             } else if (param.mode==L2ERROR2) {
@@ -536,17 +635,20 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
                coreORMPB(DtRj,G,ind,coeffs_sparse,normX,L,T(0.0),param.lambda);
             }
          }
-         int count2=0;
-         for (int k = 0; k<L; ++k) 
-            if (ind[k] == -1) {
-               break;
-            } else {
-               ++count2;
-            }
-         sort(ind.rawX(),coeffs_sparse.rawX(),0,count2-1);
-         spcoeffj.setL(count2);
-         AT[numT].rank1Update(spcoeffj);
-         BT[numT].rank1Update(Xj,spcoeffj);
+	 if(param.mode != FISTAMODE) {
+	   int count2=0;
+	   for (int k = 0; k<L; ++k) 
+	     if (ind[k] == -1) {
+	       break;
+	     } else {
+	       ++count2;
+	     }
+	   sort(ind.rawX(),coeffs_sparse.rawX(),0,count2-1);
+	   spcoeffj.setL(count2);
+	 }
+	 AT[numT].rank1Update(spcoeffj);
+	 BT[numT].rank1Update(Xj,spcoeffj);
+	 
       }
 
       if (param.batch) {
@@ -707,6 +809,14 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
    delete[](uT);
    delete[](XT);
    delete[](workT);
+   for (int i = 0; i<_NUM_THREADS; ++i) {
+     delete (losses[i]);
+     losses[i] = NULL;
+     delete (regularizers[i]);
+     regularizers[i]=NULL;
+   }
+   delete[] (losses);
+   delete[] (regularizers);
 };
 
 
