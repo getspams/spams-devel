@@ -1,0 +1,28 @@
+#!/bin/sh
+case $1 in -x) set -x;shift;;esac
+
+die () {
+    echo $*
+    exit 1
+}
+ddir=dist/text_dictlearn
+[ -d $ddir ] && rm -rf $ddir
+mkdir -p $ddir/doc/user $ddir/doc/devel
+ui_files="dict_gui  dparams_gui  viewdecomp_gui  viewdict_gui"
+files="README"
+for f in $ui_files; do
+    python /usr/share/pyshared/PyQt4/uic/pyuic.py $f.ui -o $f.py -x
+    files="$files $f.ui $f.py"
+done
+./mkdoc
+#echo "$files"
+datafiles="example"
+pyfiles="dict_conf.py dictlib.py drawgraph.py  mylayout.py  qparams.py qtdict.py qtext-dict.py viewer.py"
+cp -a $files $datafiles $pyfiles $ddir
+cp -a doc/doc_dictlearn.pdf doc/html $ddir/doc/user
+cp -a devel-doc/build/html devel-doc/build/latex/text-dict.pdf $ddir/doc/devel
+
+cd dist
+tar zcf text_dictlearn.tgz text_dictlearn
+exit 0
+# viewer.py

@@ -1,0 +1,4 @@
+windows 64 bits :
+- install spams
+- install PyQt4 from http://www.lfd.uci.edu/~gohlke/pythonlibs/ (PyQt-Py2.7-x64-gpl-4.9.6-1.exe)
+- install PyOpengl from http://www.lfd.uci.edu/~gohlke/pythonlibs/ (PyOpenGL-3.0.2.win-amd64-py2.7.exe)
