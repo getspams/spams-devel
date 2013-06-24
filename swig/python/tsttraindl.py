@@ -64,7 +64,6 @@ x = np.uint8(img[:,:,0] * 255.)
 #image = Image.fromarray(x,mode = 'L')
 image = Image.fromarray(x,mode = 'L')
 image.save('xx.png')
-exit()
 #### SECOND EXPERIMENT ####
 print "*********** SECOND EXPERIMENT ***********"
 
@@ -75,6 +74,9 @@ tic = time.time()
 (D,model) = spams.trainDL(X1,return_model = True,**param)
 tac = time.time()
 t = tac - tic
+print "MODEL %s" %str(model['A'].dtype)
+exit()
+
 print 'time of computation for Dictionary Learning: %f\n' %t
 print 'Evaluating cost function...'
 alpha = spams.lasso(X,D,**param)

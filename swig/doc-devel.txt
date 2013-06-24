@@ -1,5 +1,7 @@
 Ce fichier décrit les mécanismes utilisés pour la réalisation
 des interfaces python et R de spams.
+Une bonne doc pour les équivalences matlab/python/R :
+http://mathesaurus.sourceforge.net/matlab-python-xref.pdf
 
 Les APIs:
 ---------

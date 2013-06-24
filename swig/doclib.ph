@@ -18,6 +18,7 @@ my %undocumented = ("mult",1,"im2col_sliding",1,"displayPatches",1);
     "Normalize", "normalize",
     "SparseProject", "sparseProject",
     "Lasso", "lasso",
+    "StructTrainDL", "structTrainDL",
     "TrainDL", "trainDL",
     "TrainDL_Memory", "trainDL_Memory",
     "nmf", "nmf",
@@ -41,6 +42,11 @@ my %undocumented = ("mult",1,"im2col_sliding",1,"displayPatches",1);
     "CountPathsDAG", "countPathsDAG",
     "RemoveCyclesGraph", "removeCyclesGraph",
     "EvalPathCoding", "evalPathCoding",
+    "SimpleGroupTree", "simpleGroupTree",
+    "ReadGroupStruct", "readGroupStruct",
+    "GraphOfGroupStruct", "graphOfGroupStruct",
+    "TreeOfGroupStruct", "treeOfGroupStruct",
+    "GroupStructOfString", "groupStructOfString",
 
 );
 
@@ -196,7 +202,7 @@ sub get_doc {
 	    (s/^Usage\s*:\s*//) || next;
 	    $stat = 1;
 	}
-	if(/mex([A-Z][_A-z\d]+)/) { # replace mex*
+	while(/mex([A-Z][_A-z\d]+)/) { # replace mex*
 	    my $s = $1;
 	    (defined($main::conv_names{$s}) ) || die "Inconnu : $s\n";
 	    my $s1 = $main::conv_names{$s};
@@ -204,7 +210,7 @@ sub get_doc {
 	}
 	# replace lambda
 ##	if(s/lambda([^\d])/lambda1\1/g) {print "XX <$_>\n";}
-	s/lambda([^\d])/lambda1\1/g;
+	s/lambda([^\d])/lambda1$1/g;
 	s/lambda$/lambda1/;
 
 	push(@lines,$_);
@@ -245,9 +251,11 @@ sub get_doc {
 	    }
 	    $key = $x;
 	    if ($x eq "Author") {
-		$$tmp[0] =~ s/$/ (spams, matlab interface and documentation)/;
-		$$tmp[0] =~ s/Mairal/MAIRAL/;
-		push(@$tmp,"Jean-Paul CHIEZE 2011-2012 ($lang interface)");
+		if(! ($$tmp[0] =~ /CHIEZE/)) {
+		    $$tmp[0] =~ s/$/ (spams, matlab interface and documentation)/;
+		    $$tmp[0] =~ s/Mairal/MAIRAL/;
+		    push(@$tmp,"Jean-Paul CHIEZE 2011-2012 ($lang interface)");
+		}
 #		push(@$tmp,"");
 		$deltas = [(0,0)];
 		$$doc{$x} = {'lines' => $tmp, 'deltas' => $deltas};
@@ -775,13 +783,14 @@ sub modif_tex_src {
 	} else {
 	    my $s1 = "";
 	    my $x = "";
-	    if(/mex([A-Z][_A-z\d]+)/) {
+	    while(/mex([A-Z][_A-z\d]+)/) {
 		my $s = $1;
 		$x = $s;
 		$x =~ s/\\_/_/;
 		$s =~ s/\\/\\\\/;
 		if (! defined($main::conv_names{$x}) ) {
 		    print STDERR "Unkown $s\n";
+		    last;
 		} else {
 		    $s1 = $main::conv_names{$x};
 		    $x = $s1;

@@ -53,7 +53,7 @@ Windows 32bits:
 	They work fine, but are slower.
 	
  	To make a binary windows installer (spams-%VERSION%.win32-py2.7.exe) :
-	- open a mingw console
+	- open a mingw console (msys.bat)
 	- extract files from the .tar.gz source distribution (tar zxf ...)
 	- enter directory spams-python
 	- execute ./win-build.sh

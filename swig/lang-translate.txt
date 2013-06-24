@@ -60,4 +60,8 @@ Y = ceiling(5 * matrix(runif(100 * ncol(Y),0,1),nrow = 100,ncol = ncol(Y),byrow 
 
 D = max(D(:),2.)
 D = np.maximum(D,2.)
+D =  matrix(mapply(function(x,y) min(x,y),D,2),nrow = nrow(D),ncol = ncol(D))
 
+
+P: if ('x' in lst):
+R: if (! is.null(l[['x']])) {

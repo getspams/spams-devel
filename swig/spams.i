@@ -15,13 +15,18 @@ Use of spams functions should only be done through module spams."
 #define SWIG_FILE_WITH_INIT
 
 #include "spams.h"
+#include "spams/prox/groups-graph.h"
+
 #ifdef DEBUG
 #include "spams-tst.h"
 #endif
 %}
 
 %define argout_vectors(ctype)
-	Vector<ctype> **omiter
+	Vector<ctype> **omiter,
+	Vector<ctype> **peta_g,
+	Vector<ctype> **pown_variables,
+	Vector<ctype> **pN_own_variables
 %enddef
 
 /*
@@ -68,8 +73,6 @@ Use of spams functions should only be done through module spams."
 %enddef
 %define argout_matrices(ctype)
      Matrix<ctype> **path,
-     Matrix<ctype> **path2,
-     Matrix<ctype> **path3,
      Matrix<ctype> **omA,
      Matrix<ctype> **omB
 %enddef
@@ -91,12 +94,21 @@ Use of spams functions should only be done through module spams."
     SpMatrix<ctype> *alpha,
     SpMatrix<ctype> *groups
 %enddef
+%define argout_spmatrices(ctype)
+    SpMatrix<ctype> **pgroups,
+    SpMatrix<ctype> **pgroups_var
+%enddef
+
 %define inplace_dspmatrices(ctype)
     AbstractMatrixB<ctype> *D
 %enddef
 
 %define inplace_datamatrices(ctype)
     Data<ctype> *X
+%enddef
+
+%define inplace_nodes(ctype)
+	std::vector<StructNodeElem<ctype> *> *gstruct
 %enddef
 
 #ifdef SWIGPYTHON
@@ -114,13 +126,23 @@ Use of spams functions should only be done through module spams."
 
 
 %include <spams.h>
+%include <spams/prox/groups-graph.h>
+
 //void im2col_sliding(Matrix<double>  *,Matrix<double>  *,int,int,bool);
+//std::vector<NodeElem *> *simpleGroupTree(int *degr, int n)throw(const char *);
+//std::vector<NodeElem *> *readGroupStruct(const char* file) throw(const char *);
+//std::vector<NodeElem *> *groupStructOfString(const char* data) throw(const char *);
+//Vector<double> * graphOfGroupStruct(std::vector<NodeElem *> *tree,SpMatrix<bool> **pgroups,SpMatrix<bool> **pgroups_var) throw(const char *);
+
+//int  treeOfGroupStruct(std::vector<StructNodeElem<double> *> *tree,int **pperm,int *pnb_vars,Vector<double> **peta_g,SpMatrix<bool> **pgroups,Vector<int> **pown_variables,Vector<int> **pN_own_variables) throw(const char *);
+
 #ifdef DEBUG
 %include <spams-tst.h>
 Matrix<double> *tst(Matrix<double> **,bool,AbstractMatrixB<double> *);
 //int xtst(Matrix<double> **,bool );
 SpMatrix<double> *xtst(Matrix<double> **,bool );
-Matrix<double> *ztst(Data<double> *,Matrix<double> **,Matrix<double> **,Vector<int> **,bool);
+Matrix<double> *ztst(Data<double> *,Matrix<double> **omA,Matrix<double> **,Vector<int> **,bool) throw(const char *);
+
 #endif
 
 // linalg
@@ -134,7 +156,7 @@ INSTANTIATE_DATA(invSym)
 INSTANTIATE_DATA(normalize)
 
 /**** decomp ****/
-enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, L2ERROR2, PENALTY2};
+enum constraint_type { L1COEFFS, L2ERROR, PENALTY, SPARSITY, L2ERROR2, PENALTY2, FISTAMODE};
 
 INSTANTIATE_DATA(sparseProject)
 INSTANTIATE_DATA(lassoD)
@@ -158,6 +180,14 @@ INSTANTIATE_DATA(proximalFlat)
 INSTANTIATE_DATA(proximalTree)
 INSTANTIATE_DATA(proximalGraph)
 
-/* */
+/* groups-graph */
+INSTANTIATE_DATA(simpleGroupTree)
+INSTANTIATE_DATA(readGroupStruct)
+INSTANTIATE_DATA(groupStructOfString)
+INSTANTIATE_DATA(graphOfGroupStruct)
+INSTANTIATE_DATA(treeOfGroupStruct)
+
+
+/* misc */
 INSTANTIATE_DATA(im2col_sliding)
 

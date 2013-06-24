@@ -22,16 +22,16 @@ param = {
     'lambda1' : 0.15, # not more than 20 non-zeros coefficients
     'numThreads' : -1, # number of processors/cores to use; the default choice is -1
     # and uses all the cores of the machine
-    'mode' : spams.PENALTY}        # penalized formulation
+    'mode' : 2}        # penalized formulation
+##
+X1 = X.reshape(m * n)
+f = open('datax','w')
+for x in X1:
+    print >> f,"%f" %x
+f.close()
+##
 ##
 if False:
-    X1 = X.reshape(m * n)
-    f = open('datax','w')
-    for x in X1:
-        print >> f,"%f" %x
-    f.close()
-##
-##
     X1 = D.reshape(m * nD)
     f = open('datay','w')
     for x in X1:
@@ -40,19 +40,13 @@ if False:
 ##
 
 tic = time.time()
-A = spams.lasso(X,D = D,return_reg_path = False,**param)
+(A,path) = spams.lasso(X,D = D,return_reg_path = True,**param)
 tac = time.time()
+print "XX A %s, path %s" %(str(A.dtype),str(path.dtype))
 t = tac - tic
 print "T= %f,%f signals processed per second\n" %(t,float(X.shape[1]) / t)
 ##
-X1 = np.asfortranarray(X,dtype = np.float32)
-D1 = np.asfortranarray(D,dtype = np.float32)
-(A1,path) = spams.lasso(X,D = D,return_reg_path = True,**param)
-print "XX X1 %s, D1 %s, A1 %s, path %s" %(X1.dtype,D1.dtype,A1.dtype,path.dtype)
-Y = (A - A1).todense()
-
-print "YY %f" %Y.sum()
-exit()
+exit
 X1 = np.asfortranarray(A.todense()).reshape(n * nD)
 f = open('dataw','w')
 for x in X1:

@@ -813,6 +813,7 @@ Matrix<T> *_fistaGraph(
 throw(const char *) 
 {
   using namespace FISTA;
+  cout << "FISTA\n";
   int mD = D->m();
   int p = D->n();
   int m = X->m();
@@ -915,6 +916,7 @@ throw(const char *)
   graph.gg_jc = groups->pB();
   graph.gv_ir = groups_var->r();
   graph.gv_jc = groups_var->pB();
+  cout << "GRAPH Nv Ng " << graph.Nv << " " << graph.Ng << endl;
   if (graph.Nv != p || graph.Ng != groups->n())
     throw("fistaGraph error: size of field groups_var is not consistent");
   if (eta_g->n() != groups_var->n())
@@ -1140,14 +1142,22 @@ using namespace FISTA;
 template<typename T> 
 Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **omB,Vector<int> **omiter,bool return_model,Matrix<T> *m_A,Matrix<T> *m_B,int m_iter,
 		    Matrix<T> *D1,
+		    Vector<T> *eta_g,SpMatrix<bool> *groups,
+		    SpMatrix<bool> *groups_var,
+		    Vector<int> *own_variables,Vector<int> *N_own_variables,
 		    int num_threads,
+		       T tol,
+		       bool fixed_step,
+		       bool ista,
 		    int batch_size,
 		    int K,
 		    double lambda1,
 		    double lambda2,
+		    double lambda3,
 		    int iter,
 		    double t0, 
 		    constraint_type mode,
+		    char* name_regul,
 		    bool posAlpha,
 		    bool posD,
 		    bool expand,
@@ -1193,9 +1203,20 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   ParamDictLearn<T> param;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
+  param.lambda3 = lambda3;
   param.iter = iter;
   param.t0 = t0;
   param.mode = mode;
+  if (mode == FISTAMODE) {
+    param.regul = regul_from_string(name_regul);
+    if (param.regul==FISTA::INCORRECT_REG) {
+      char message[1024];
+      regul_error(message,1024,"structTrainDL: Unknown regularization.\nValid names are: ");
+      //      throw("structTrainDL: Unknown regularization.\n  For valid names see source code of regul_from_string in dictLearn/dicts.h\n");
+      throw(message);
+    }
+  } else
+    param.regul = FISTA::NONE;
   param.posAlpha = posAlpha;
   param.posD = posD;
   param.expand = expand;
@@ -1217,10 +1238,70 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
     param.logName = new char[n+1];
     strcpy(param.logName,logName);
   }
+  if (param.regul==FISTA::TREEMULT && abs<T>(param.lambda2 - 0) < 1e-20) 
+    throw("structTrainDL error: with multi-task-tree, lambda2 should be > 0");
+
+  /* graph */
+  GraphStruct<T> *pgraph = (GraphStruct<T> *) 0;
+  GraphStruct<T> graph;
+  if (param.regul==FISTA::GRAPH || param.regul==FISTA::GRAPH_RIDGE || 
+      param.regul==FISTA::GRAPH_L2) {
+    if(eta_g->n() <=  0) 
+      throw("structTrainDL error: graph is required\n");
+    if(groups->m() != groups->n())
+      throw("structTrainDL error: size of graph field groups is not consistent");
+    
+    pgraph = &graph;
+    graph.Nv = groups_var->m();
+    graph.Ng = groups_var->n();
+    if(graph.Nv != K)
+      throw("structTrainDL error: number of variables in graph must be equal to K");
+    graph.weights = eta_g->rawX();
+    graph.gg_ir = groups->r();
+    graph.gg_jc = groups->pB();
+    graph.gv_ir = groups_var->r();
+    graph.gv_jc = groups_var->pB();
+    if (graph.Ng != groups->n())
+      throw("structTrainDL error: size of graph field groups_var is not consistent");
+    if (eta_g->n() != groups_var->n())
+      throw("structTrainDL error: size of field eta_g is not consistent");
+    
+  }
+  /* tree */
+  TreeStruct<T> tree;
+  TreeStruct<T> *ptree = (TreeStruct<T> *) 0;
+  tree.Nv=0;
+  int num_groups = own_variables->n();
+  if (param.regul==FISTA::TREE_L0 || param.regul==FISTA::TREE_L2 || param.regul==FISTA::TREE_LINF) {
+    if(num_groups<=  0) 
+      throw("structTrainDL error: tree is required\n");
+    if (num_groups != N_own_variables->n()) {
+      throw("structTrainDL error: in tree,  own_variables and N_own_variables must have same dimension");
+    }
+    ptree = &tree;
+    int *pr_N_own_variables = N_own_variables->rawX();
+    int num_var = 0;
+    for (int i = 0; i<num_groups; ++i)
+      num_var+=pr_N_own_variables[i];
+    if (K != num_var) 
+      throw("structTrainDL error: size of tree is inconsistent with K");
+    if(num_groups != eta_g->n())
+      throw("structTrainDL error: in tree, nb of groups incompatible with eta_g size");
+    if((num_groups != groups->n()) || (num_groups != groups->m()))
+      throw("structTrainDL error: in tree, nb of groups incompatible with groups size");
+    for (int i = 0; i<num_groups; ++i) tree.Nv+=pr_N_own_variables[i]; 
+    tree.Ng=num_groups;
+    tree.weights= eta_g->rawX();
+    tree.own_variables= own_variables->rawX();
+    tree.N_own_variables=pr_N_own_variables;
+    tree.groups_ir= groups->r();
+    tree.groups_jc= groups->pB();
+  }
+  /* */
   if (in_memory)
     trainer->trainOffline(*X,param);
   else
-    trainer->train(*X,param);
+    trainer->train(*X,param,pgraph,ptree);
   if (param.log) delete[](param.logName);
   Matrix<T> *D = new Matrix<T>();
   trainer->getD((Matrix<T> &)(*D));
@@ -1253,7 +1334,7 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
      B : matrix of all possible mxn blocs, size = m*n lines of (mm - m + 1) * (nn -n + 1) values;
      stored by columns.
 */
-template<typename T> 
+template<typename T>
 void _im2col_sliding(Matrix<T>  *A,Matrix<T>  *B,int m, int n,bool RGB)  throw(const char *){
   /* if RGB is true A has 3*n columns, R G B columns are consecutives 
    */
@@ -1283,6 +1364,5 @@ void _im2col_sliding(Matrix<T>  *A,Matrix<T>  *B,int m, int n,bool RGB)  throw(c
   }
 
 }
-
 
 #endif /* SPAMS_H */
