@@ -33,6 +33,9 @@ use_multithread=true;   % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
+use_64bits_integers=false;
+% only use this option if you have VERY large arrays/matrices causing some segfaults
+
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
@@ -112,8 +115,8 @@ out_dir='./build/';
 
 COMPILE = { 
             % compile dictLearn toolbox
-            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
-            '-I./linalg/ -I./decomp/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
+            '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
+            '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
             % compile dag toolbox
             '-I./dags/ -I./linalg/ dags/mex/mexRemoveCyclesGraph.cpp',
             '-I./dags/ -I./linalg/ dags/mex/mexCountPathsDAG.cpp',
@@ -175,15 +178,27 @@ DEFBLAS='';
 if strcmp(blas,'mkl') 
    DEFBLAS='-DUSE_BLAS_LIB';
    if strcmp(arch,'GLNXA64')
-      blas_link = sprintf('-Wl,--start-group %slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
+      if use_64bits_integers
+         blas_link = sprintf('-Wl,--start-group %slibmkl_intel_ilp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
+      else
+         blas_link = sprintf('-Wl,--start-group %slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
+      end
    elseif strcmp(arch,'GLNX86')
       blas_link = sprintf('-Wl,--start-group %slibmkl_intel.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group',path_to_blas,path_to_blas,path_to_blas);
    elseif strcmp(arch,'MACI64')
-      blas_link = sprintf('%slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a',path_to_blas,path_to_blas,path_to_blas);
+      if use_64bits_integers
+         blas_link = sprintf('%slibmkl_intel_ilp64.a %slibmkl_sequential.a %slibmkl_core.a',path_to_blas,path_to_blas,path_to_blas);
+      else
+         blas_link = sprintf('%slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a',path_to_blas,path_to_blas,path_to_blas);
+      end
    elseif strcmp(arch,'MACI') || strcmp(arch,'MAC')
       blas_link = sprintf('%slibmkl_intel.a %slibmkl_sequential.a %slibmkl_core.a',path_to_blas,path_to_blas,path_to_blas);
    elseif strcmp(arch,'PCWIN64')
-      blas_link = sprintf(' -L"%s" -lmkl_intel_lp64 -lmkl_sequential -lmkl_core',path_to_blas);
+      if use_64bits_integers
+         blas_link = sprintf(' -L"%s" -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core',path_to_blas);
+      else
+         blas_link = sprintf(' -L"%s" -lmkl_intel_lp64 -lmkl_sequential -lmkl_core',path_to_blas);
+      end
    elseif strcmp(arch,'PCWIN')
       blas_link = sprintf(' -L"%s" -lmkl_intel -lmkl_sequential -lmkl_core',path_to_blas);
    else
@@ -204,9 +219,19 @@ else
    'please provide a correct blas library';
    return;
 end
-if ~verLessThan('matlab','7.9.0')
-   DEFBLAS=[DEFBLAS ' -DNEW_MATLAB'];
+
+
+if strcmp(blas,'builtin')
+   if ~verLessThan('matlab','7.9.0')
+      DEFBLAS=[DEFBLAS ' -DNEW_MATLAB_BLAS'];
+   else
+      DEFBLAS=[DEFBLAS ' -DOLD_MATLAB_BLAS'];
+   end
 end
+if use_64bits_integers
+   DEFBLAS=[DEFBLAS ' -DINT_64BITS'];
+end
+
 
 links_lib=[blas_link];
 link_flags=' -O ';

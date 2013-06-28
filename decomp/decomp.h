@@ -62,14 +62,14 @@ void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, cons
 template <typename T>
 void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, 
       Matrix<T>& Un, Matrix<T>& Undn, Matrix<T>& Unds, Matrix<T>& Gs, 
-      Vector<T>& Rdn, const AbstractMatrix<T>& G, Vector<int>& ind, 
+      Vector<T>& Rdn, const AbstractMatrix<T>& G, Vector<INTM>& ind, 
       Vector<T>& RUn, T& normX, const T* eps, const int* L, const T* lambda,
       T* path = NULL);
 
 
 /// Auxiliary function of omp
 template <typename T>
-void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<int>& ind, 
+void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<INTM>& ind, 
       Vector<T>& coeffs, T& normX, const int L, const T eps, const T lambda = 0);
 
 /* **************
@@ -156,7 +156,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       Matrix<T>& invGs,
       Vector<T>& u,
       Vector<T>& coeffs,
-      Vector<int>& ind,
+      Vector<INTM>& ind,
       Matrix<T>& work,
       T& normX,
       const constraint_type mode,
@@ -171,7 +171,7 @@ void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
       Vector<T>& u,
       Vector<T>& coeffs,
       const Vector<T>& weights,
-      Vector<int>& ind,
+      Vector<INTM>& ind,
       Matrix<T>& work,
       T& normX,
       const constraint_type mode,
@@ -180,7 +180,7 @@ void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
 /// Auxiliary functoni for coreLARS (Cholesky downdate)
 template <typename T>
 void downDateLasso(int& j,int& minBasis,T& normX,const bool ols,
-      const bool pos, Vector<T>& Rdn, int* ind,
+      const bool pos, Vector<T>& Rdn, INTM* ind,
       T* coeffs, Vector<T>& sig, Vector<T>& av,
       Vector<T>& Xdn, Vector<T>& RUn,Matrix<T>& Unm, Matrix<T>& Gsm,
       Matrix<T>& Gsam, Matrix<T>& Undsm, Matrix<T>& Rm);
@@ -272,7 +272,7 @@ void somp(const Matrix<T>* X, const Matrix<T>& D, SpMatrix<T>* spalpha,
 template <typename T>
 void coreSOMP(const Matrix<T>& X, const Matrix<T>& D, const Matrix<T>& G,
       Matrix<T>& vM,
-      Vector<int>& rv, const int L, const T eps);
+      Vector<INTM>& rv, const int L, const T eps);
 
 /* *********************
  * Implementation of OMP
@@ -303,11 +303,11 @@ void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha,
    }
    spalpha.clear();
    if (L <= 0) return;
-   const int M = X.n();
-   const int K = D.n();
+   const INTM M = X.n();
+   const INTM K = D.n();
    L = MIN(X.m(),MIN(L,K));
    Matrix<T> vM(L,M);
-   Matrix<int> rM(L,M);
+   Matrix<INTM> rM(L,M);
 
    ProdMatrix<T> G(D, K < 25000 && M > 10);
 
@@ -345,7 +345,7 @@ void omp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha,
       X.refCol(i,Xi);
       T normX = Xi.nrm2sq();
 
-      Vector<int> ind;
+      Vector<INTM> ind;
       rM.refCol(i,ind);
       ind.set(-1);
 
@@ -391,7 +391,7 @@ void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, cons
    const int K = D.n();
    L = MIN(X.m(),MIN(L,K));
    Matrix<T> vM(L,M);
-   Matrix<int> rM(L,M);
+   Matrix<INTM> rM(L,M);
 
    ProdMatrix<T> G(D, K < 25000 && M > 10);
 
@@ -433,7 +433,7 @@ void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, cons
       Vector<T> Xi;
       X.refCol(i,Xi);
 
-      Vector<int> ind;
+      Vector<INTM> ind;
       rM.refCol(i,ind);
       ind.set(-1);
 
@@ -490,7 +490,7 @@ void omp_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, cons
 
 /// Auxiliary function of omp
 template <typename T>
-void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<int>& ind, 
+void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<INTM>& ind, 
       Vector<T>& coeffs, T& normX, const int L, const T eps, const T lambda) {
    const int K = G.n();
    Vector<T> scores(K);
@@ -509,7 +509,7 @@ template <typename T>
 void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
       Matrix<T>& Undn, Matrix<T>& Unds, Matrix<T>& Gs, Vector<T>& Rdn,
       const AbstractMatrix<T>& G,
-      Vector<int>& ind, Vector<T>& RUn, 
+      Vector<INTM>& ind, Vector<T>& RUn, 
        T& normX, const T* peps, const int* pL, const T* plambda,
       T* path) {
    const T eps = abs<T>(*peps);
@@ -649,10 +649,10 @@ void lasso(const Data<T>& X, const AbstractMatrix<T>& G,
       Matrix<T>* path, const int length_path) {
 
    spalpha.clear();
-   const int M = X.n();
-   const int K = G.n();
+   const INTM M = X.n();
+   const INTM K = G.n();
    Matrix<T> vM;
-   Matrix<int> rM;
+   Matrix<INTM> rM;
    vM.resize(L,M);
    rM.resize(L,M);
 
@@ -706,7 +706,7 @@ void lasso(const Data<T>& X, const AbstractMatrix<T>& G,
 #endif
       T normX = norms[i]; 
 
-      Vector<int> ind;
+      Vector<INTM> ind;
       rM.refCol(i,ind);
       Vector<T> coeffs;
       vM.refCol(i,coeffs);
@@ -745,7 +745,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
       Matrix<T>& Unm, Matrix<T>& Undsm, Matrix<T>& Gsm,
       Matrix<T>& Gsam, Matrix<T>& workm, Matrix<T>& Rm, 
       const AbstractMatrix<T>& Gm,T& normX, 
-      Vector<int>& indv,Vector<T>& coeffsv,const T constraint,
+      Vector<INTM>& indv,Vector<T>& coeffsv,const T constraint,
       const bool ols,const bool pos, constraint_type mode,
       T* path, int length_path) {
    if (mode == L2ERROR && normX < constraint) return;
@@ -769,7 +769,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
    T* const work = workm.rawX();
    //T* const G = Gm.rawX();
    T* const R = Rm.rawX();
-   int* ind = indv.rawX();
+   INTM* ind = indv.rawX();
    T* coeffs = coeffsv.rawX();
 
    coeffsv.setZeros();
@@ -782,7 +782,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
    int iter=1;
    T thrs = 0.0;
 
-   int* const ind_orig = ind;
+   INTM* const ind_orig = ind;
    T* const coeffs_orig = coeffs;
 
    int j;
@@ -994,7 +994,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
 template <typename T>
 inline void downDateLasso(int& j,int& minBasis,T& normX,const bool ols,
       const bool pos,
-      Vector<T>& Rdnv, int* ind,
+      Vector<T>& Rdnv, INTM* ind,
       T* coeffs, Vector<T>& sigv, Vector<T>& avv,
       Vector<T>& Xdnv, Vector<T>& RUnv,Matrix<T>& Unm, Matrix<T>& Gsm,
       Matrix<T>& Gsam, Matrix<T>& Undsm, Matrix<T>& Rm) {
@@ -1221,7 +1221,7 @@ void lassoWeight(const Matrix<T>& X, const Matrix<T>& D, const Matrix<T>& weight
    const int M = X.n();
    const int K = D.n();
    Matrix<T> vM;
-   Matrix<int> rM;
+   Matrix<INTM> rM;
    vM.resize(L,M);
    rM.resize(L,M);
    
@@ -1264,7 +1264,7 @@ void lassoWeight(const Matrix<T>& X, const Matrix<T>& D, const Matrix<T>& weight
       X.refCol(i,Xi);
       T normX = Xi.nrm2sq();
 
-      Vector<int> ind;
+      Vector<INTM> ind;
       rM.refCol(i,ind);
       Vector<T> coeffs;
       vM.refCol(i,coeffs);
@@ -1370,7 +1370,7 @@ void lasso_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, co
    const int M = X.n();
    const int K = D.n();
    Matrix<T> vM;
-   Matrix<int> rM;
+   Matrix<INTM> rM;
    vM.resize(L,M);
    rM.resize(L,M);
 
@@ -1415,7 +1415,7 @@ void lasso_mask(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, co
       X.refCol(i,Xi);
       Vector<bool> maski;
       mask.refCol(i,maski);
-      Vector<int> ind;
+      Vector<INTM> ind;
       rM.refCol(i,ind);
       Vector<T> coeffs;
       vM.refCol(i,coeffs);
@@ -1476,10 +1476,10 @@ void lasso2(const Data<T>& X, const AbstractMatrix<T>& G, const AbstractMatrix<T
       int L, const T constraint, constraint_type mode, const bool pos,
       const int numThreads, Matrix<T>* path, int length_path) {
    spalpha.clear();
-   const int M = X.n();
-   const int K = G.n();
+   const INTM M = X.n();
+   const INTM K = G.n();
    Matrix<T> vM;
-   Matrix<int> rM;
+   Matrix<INTM> rM;
    vM.resize(L,M);
    rM.resize(L,M);
 
@@ -1504,7 +1504,7 @@ void lasso2(const Data<T>& X, const AbstractMatrix<T>& G, const AbstractMatrix<T
       workT[i].resize(K,3);
       workT[i].setZeros();
    }
-   int i;
+   INTM i;
    Vector<T> norms;
    X.norm_2sq_cols(norms);
 #pragma omp parallel for private(i) 
@@ -1519,7 +1519,7 @@ void lasso2(const Data<T>& X, const AbstractMatrix<T>& G, const AbstractMatrix<T
     //  T normX = Xi.nrm2sq();
       T normX = norms[i];
 
-      Vector<int> ind;
+      Vector<INTM> ind;
       rM.refCol(i,ind);
       Vector<T> coeffs;
       vM.refCol(i,coeffs);
@@ -1554,7 +1554,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       Matrix<T>& invGs,
       Vector<T>& u,
       Vector<T>& coeffs,
-      Vector<int>& ind,
+      Vector<INTM>& ind,
       Matrix<T>& work,
       T& normX,
       const constraint_type mode,
@@ -1576,7 +1576,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
    T* const pr_u = u.rawX();
    T* const pr_DtR = DtR.rawX();
    T* const pr_coeffs = coeffs.rawX();
-   int* const pr_ind = ind.rawX();
+   INTM* const pr_ind = ind.rawX();
 
    // Find the most correlated element
    int currentInd = pos ? DtR.max() : DtR.fmax();
@@ -1766,7 +1766,7 @@ void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
       Vector<T>& u,
       Vector<T>& coeffs,
       const Vector<T>& weights,
-      Vector<int>& ind,
+      Vector<INTM>& ind,
       Matrix<T>& work,
       T& normX,
       const constraint_type mode,
@@ -1787,7 +1787,7 @@ void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
    T* const pr_DtR = DtR.rawX();
    T* const pr_coeffs = coeffs.rawX();
    T* const pr_weights = weights.rawX();
-   int* const pr_ind = ind.rawX();
+   INTM* const pr_ind = ind.rawX();
 
    DtR.div(weights);
 
@@ -2571,8 +2571,8 @@ void somp(const Matrix<T>* XT, const Matrix<T>& D, SpMatrix<T>* spalphaT,
       const int Ngroups, const int LL, const T* eps, const bool adapt,
       const int numThreads) {
    if (LL <= 0) return;
-   const int K = D.n();
-   const int L = MIN(D.m(),MIN(LL,K));
+   const INTM K = D.n();
+   const INTM L = MIN(D.m(),MIN(LL,K));
 
    if (!D.isNormalized()) {
       cerr << "Current implementation of OMP does not support non-normalized dictionaries" << endl;
@@ -2589,10 +2589,10 @@ void somp(const Matrix<T>* XT, const Matrix<T>& D, SpMatrix<T>* spalphaT,
 #pragma omp parallel for private(i) 
    for (i = 0; i< Ngroups; ++i) {
       const Matrix<T>& X = XT[i];
-      const int M = X.n();
+      const INTM M = X.n();
       SpMatrix<T>& spalpha = spalphaT[i];
       spalpha.clear();
-      Vector<int> rv;
+      Vector<INTM> rv;
       Matrix<T> vM;
       T thrs = adapt ? eps[i] : M*(*eps);
       coreSOMP(X,D,G,vM,rv,L,thrs);
@@ -2603,7 +2603,7 @@ void somp(const Matrix<T>* XT, const Matrix<T>& D, SpMatrix<T>* spalphaT,
 template <typename T>
 void coreSOMP(const Matrix<T>& X, const Matrix<T>& D, const Matrix<T>& G,
       Matrix<T>& v,
-      Vector<int>& r, const int L, const T eps) {
+      Vector<INTM>& r, const int L, const T eps) {
    const int K = G.n();
    const int n = D.m();
    const int M = X.n();

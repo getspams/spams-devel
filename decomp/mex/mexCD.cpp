@@ -51,18 +51,18 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[]) {
 
    T* prX=reinterpret_cast<T*>(mxGetPr(prhs[0]));
    const mwSize* dims=mxGetDimensions(prhs[0]);
-   int n=static_cast<int>(dims[0]);
-   int M=static_cast<int>(dims[1]);
+   INTM n=static_cast<INTM>(dims[0]);
+   INTM M=static_cast<INTM>(dims[1]);
 
    T * prD = reinterpret_cast<T*>(mxGetPr(prhs[1]));
    const mwSize* dimsD=mxGetDimensions(prhs[1]);
-   int nD=static_cast<int>(dimsD[0]);
+   INTM nD=static_cast<INTM>(dimsD[0]);
    if (nD != n) mexErrMsgTxt("wrong size for argument 2");
-   int K=static_cast<int>(dimsD[1]);
+   INTM K=static_cast<INTM>(dimsD[1]);
 
    const mwSize* dimsA=mxGetDimensions(prhs[2]);
-   int Ka = static_cast<int>(dimsA[0]);
-   int Ma = static_cast<int>(dimsA[1]);
+   INTM Ka = static_cast<INTM>(dimsA[0]);
+   INTM Ma = static_cast<INTM>(dimsA[1]);
    if (Ma != M || Ka != K) mexErrMsgTxt("wrong size for argument 3");
    double * alpha_v=static_cast<double*>(mxGetPr(prhs[2]));
    mwSize* alpha_r=mxGetIr(prhs[2]);
@@ -75,7 +75,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[]) {
    T tol = getScalarStructDef<T>(prhs[3],"tol",0.001);
    T lambda = getScalarStruct<T>(prhs[3],"lambda");
 
-   int* alpha_r2, *alpha_pB2, *alpha_pE2;
+   INTM* alpha_r2, *alpha_pB2, *alpha_pE2;
    T* alpha_v2;
    createCopySparse<T>(alpha_v2,alpha_r2,alpha_pB2,alpha_pE2,
          alpha_v,alpha_r,alpha_pB,alpha_pE,M);

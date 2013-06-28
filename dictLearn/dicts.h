@@ -597,7 +597,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param,
          Matrix<T>& invGs = invGsT[numT];
          Matrix<T>& work= workT[numT];
          Vector<T>& u = uT[numT];
-         Vector<int> ind;
+         Vector<INTM> ind;
          Vector<T> coeffs_sparse;
          spcoeffj.setL(L);
          spcoeffj.refIndices(ind);
@@ -636,19 +636,18 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param,
             }
          }
 	 if(param.mode != FISTAMODE) {
-	   int count2=0;
+	   INTM count2=0;
 	   for (int k = 0; k<L; ++k) 
 	     if (ind[k] == -1) {
 	       break;
 	     } else {
 	       ++count2;
 	     }
-	   sort(ind.rawX(),coeffs_sparse.rawX(),0,count2-1);
+	   sort(ind.rawX(),coeffs_sparse.rawX(),(INTM)0,count2-1);
 	   spcoeffj.setL(count2);
 	 }
 	 AT[numT].rank1Update(spcoeffj);
 	 BT[numT].rank1Update(Xj,spcoeffj);
-	 
       }
 
       if (param.batch) {

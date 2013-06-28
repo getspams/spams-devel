@@ -25,8 +25,8 @@
 
 template <typename T>
 int count_cc_graph(const SpMatrix<T>& G, Vector<T>& active) {
-   int nzmax=0;
-   for (int i = 0; i<active.n(); ++i)
+   INTM nzmax=0;
+   for (INTM i = 0; i<active.n(); ++i)
       if (active[i]) nzmax++;
    list_int** cc = new list_int*[nzmax];
    int* pr_list = new int[active.n()];
@@ -41,8 +41,8 @@ int count_cc_graph(const SpMatrix<T>& G, Vector<T>& active) {
          cc[count++]->push_back(i);
       }
    }
-   const int* pB = G.pB();
-   const int* r = G.r();
+   const INTM* pB = G.pB();
+   const INTM* r = G.r();
    const T* v = G.v();
 
    while (!list.empty()) {
@@ -81,8 +81,8 @@ void remove_cycles(const SpMatrix<T>& G1, SpMatrix<T>& G2) {
    memset(color,0,n*sizeof(int));
    int next=0;
    list_int list;
-   int* pB = G2.pB();
-   int* r = G2.r();
+   INTM* pB = G2.pB();
+   INTM* r = G2.r();
    T* v = G2.v();
 
    list_int current_path;
@@ -174,27 +174,27 @@ void remove_cycles(const SpMatrix<T>& G1, SpMatrix<T>& G2) {
 
 template <typename T>
 T count_paths_dags(const SpMatrix<T>& G) {
-   const int n = G.n();
+   const INTM n = G.n();
    T* num_paths = new T[n];
    memset(num_paths,0,n*sizeof(T));
-   const int* pB = G.pB();
-   const int* r = G.r();
+   const INTM* pB = G.pB();
+   const INTM* r = G.r();
    int* color = new int[n];
    memset(color,0,n*sizeof(int));
    list_int list;
-   for (int i = 0; i<n; ++i)
+   for (INTM i = 0; i<n; ++i)
       list.push_back(i);
 
    while (!list.empty()) {
-      const int node=list.front();
+      const INTM node=list.front();
       if (color[node]==0) {
-         for (int i = pB[node]; i<pB[node+1]; ++i) {
+         for (INTM i = pB[node]; i<pB[node+1]; ++i) {
             list.push_front(r[i]);
          }
          color[node]++;
       } else if (color[node]==1) {
          num_paths[node]=T(1.0);
-         for (int i = pB[node]; i<pB[node+1]; ++i) {
+         for (INTM i = pB[node]; i<pB[node+1]; ++i) {
             num_paths[node]+=num_paths[r[i]];
          }
          color[node]++;

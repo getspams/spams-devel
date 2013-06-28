@@ -46,20 +46,20 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
 
    T* prX = reinterpret_cast<T*>(mxGetPr(prhs[0]));
    const mwSize* dimsX=mxGetDimensions(prhs[0]);
-   int m=static_cast<int>(dimsX[0]);
-   int n=static_cast<int>(dimsX[1]);
+   INTM m=static_cast<INTM>(dimsX[0]);
+   INTM n=static_cast<INTM>(dimsX[1]);
    Matrix<T> X(prX,m,n);
 
    const mwSize* dimsD=mxGetDimensions(prhs[1]);
-   int mD=static_cast<int>(dimsD[0]);
-   int p=static_cast<int>(dimsD[1]);
+   INTM mD=static_cast<INTM>(dimsD[0]);
+   INTM p=static_cast<INTM>(dimsD[1]);
    AbstractMatrixB<T>* D;
    AbstractMatrixB<T>* D2 = NULL;
    AbstractMatrixB<T>* D3 = NULL;
 
    double* D_v;
    mwSize* D_r, *D_pB, *D_pE;
-   int* D_r2, *D_pB2, *D_pE2;
+   INTM* D_r2, *D_pB2, *D_pE2;
    T* D_v2;
    
    const int shifts = getScalarStructDef<int>(prhs[3],"shifts",1); // undocumented function
@@ -90,8 +90,8 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
 
    T* pr_alpha0 = reinterpret_cast<T*>(mxGetPr(prhs[2]));
    const mwSize* dimsAlpha=mxGetDimensions(prhs[2]);
-   int pAlpha=static_cast<int>(dimsAlpha[0]);
-   int nAlpha=static_cast<int>(dimsAlpha[1]);
+   INTM pAlpha=static_cast<INTM>(dimsAlpha[0]);
+   INTM nAlpha=static_cast<INTM>(dimsAlpha[1]);
    Matrix<T> alpha0(pr_alpha0,pAlpha,nAlpha);
 
    plhs[0]=createMatrix<T>(pAlpha,nAlpha);
@@ -174,8 +174,8 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    } else if (param.loss == MULTILOG) {
       Vector<T> Xv;
       X.toVect(Xv);
-      int maxval = static_cast<int>(Xv.maxval());
-      int minval = static_cast<int>(Xv.minval());
+      INTM maxval = static_cast<INTM>(Xv.maxval());
+      INTM minval = static_cast<INTM>(Xv.minval());
       if (minval != 0)
          mexErrMsgTxt("smallest class should be 0");
       if (maxval*X.n() > nAlpha || mD != m) {

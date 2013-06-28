@@ -54,19 +54,19 @@ template <typename T>
       
       T* prX = reinterpret_cast<T*>(mxGetPr(prhs[0]));
       const mwSize* dimsX=mxGetDimensions(prhs[0]);
-      int n=static_cast<int>(dimsX[0]);
-      int M=static_cast<int>(dimsX[1]);
+      INTM n=static_cast<INTM>(dimsX[0]);
+      INTM M=static_cast<INTM>(dimsX[1]);
 
       T* prD = reinterpret_cast<T*>(mxGetPr(prhs[1]));
       const mwSize* dimsD=mxGetDimensions(prhs[1]);
-      int nD=static_cast<int>(dimsD[0]);
-      int K=static_cast<int>(dimsD[1]);
+      INTM nD=static_cast<INTM>(dimsD[0]);
+      INTM K=static_cast<INTM>(dimsD[1]);
       if (n != nD) mexErrMsgTxt("argument sizes are not consistent");
 
       bool* prmask = reinterpret_cast<bool*>(mxGetPr(prhs[2]));
       const mwSize* dimsM=mxGetDimensions(prhs[2]);
-      int nM=static_cast<int>(dimsM[0]);
-      int mM=static_cast<int>(dimsM[1]);
+      INTM nM=static_cast<INTM>(dimsM[0]);
+      INTM mM=static_cast<INTM>(dimsM[1]);
       if (nM != n || mM != M) mexErrMsgTxt("argument sizes are not consistent");
 
       Matrix<T> X(prX,n,M);

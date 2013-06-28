@@ -52,14 +52,14 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[]) {
       
    T* prX=reinterpret_cast<T*>(mxGetPr(prhs[0]));
    const mwSize* dims=mxGetDimensions(prhs[0]);
-   int n=static_cast<int>(dims[0]);
-   int M=static_cast<int>(dims[1]);
+   INTM n=static_cast<INTM>(dims[0]);
+   INTM M=static_cast<INTM>(dims[1]);
 
    T * prD = reinterpret_cast<T*>(mxGetPr(prhs[1]));
    const mwSize* dimsD=mxGetDimensions(prhs[1]);
-   int nD=static_cast<int>(dimsD[0]);
+   INTM nD=static_cast<INTM>(dimsD[0]);
    if (nD != n) mexErrMsgTxt("wrong size for argument 2");
-   int K=static_cast<int>(dimsD[1]);
+   INTM K=static_cast<INTM>(dimsD[1]);
 
    const mwSize* dimsList = mxGetDimensions(prhs[2]);
    int Ng = static_cast<int>(dimsList[0]*dimsList[1]);
@@ -85,29 +85,29 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[]) {
 
    somp(X,D,spAlpha,Ng,L,eps,numThreads);
 
-   int nzmax=0;
-   for (int i = 0; i<Ng; ++i) {
+   INTM nzmax=0;
+   for (INTM i = 0; i<Ng; ++i) {
       nzmax += spAlpha[i].nzmax();
    }
    plhs[0]=mxCreateSparse(K,M,nzmax,mxREAL);
    double* Pr = mxGetPr(plhs[0]);
    mwSize* Ir = mxGetIr(plhs[0]);
    mwSize* Jc = mxGetJc(plhs[0]);
-   int count=0;
-   int countcol=0;
-   int offset=0;
-   for (int i = 0; i<Ng; ++i) {
+   INTM count=0;
+   INTM countcol=0;
+   INTM offset=0;
+   for (INTM i = 0; i<Ng; ++i) {
       const T* v = spAlpha[i].v();
-      const int* r = spAlpha[i].r();
-      const int* pB = spAlpha[i].pB();
-      int nn = spAlpha[i].n();
+      const INTM* r = spAlpha[i].r();
+      const INTM* pB = spAlpha[i].pB();
+      INTM nn = spAlpha[i].n();
       nzmax = spAlpha[i].nzmax();
       if (nn != 0) {
-         for (int j = 0; j<pB[nn]; ++j) {
+         for (INTM j = 0; j<pB[nn]; ++j) {
             Pr[count]=static_cast<double>(v[j]);
             Ir[count++]=static_cast<mwSize>(r[j]);
          }
-         for (int j = 0; j<=nn; ++j) 
+         for (INTM j = 0; j<=nn; ++j) 
             Jc[countcol++]=static_cast<mwSize>(offset+pB[j]);
          --countcol;
          offset = Jc[countcol];

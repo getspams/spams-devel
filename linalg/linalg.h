@@ -29,11 +29,11 @@
 #define LINALG_H
 
 #include "misc.h"
-#ifdef USE_BLAS_LIB
+//#ifdef USE_BLAS_LIB
 #include "cblas_alt_template.h"
-#else
-#include "cblas_template.h"   // this is obsolete
-#endif
+//#else
+//#include "cblas_template.h"   // this is obsolete
+//#endif
 #include <fstream>
 #ifdef WINDOWS
 #include <string>
@@ -43,13 +43,14 @@
 #include <list>
 #include <vector>
 
-#ifdef NEW_MATLAB
-   typedef ptrdiff_t INTT;
+#include <utils.h>
+
+#ifdef INT_64BITS
+#define INTM long long int 
 #else
-   typedef int INTT;
+#define INTM int
 #endif
 
-#include <utils.h>
 
 #undef max
 #undef min
@@ -65,7 +66,7 @@ template<typename T> class SpVector;
 
 
 
-typedef std::list< int > group;
+typedef std::list< INTM > group;
 typedef std::list< group > list_groups;
 typedef std::vector< group > vector_groups;
 
@@ -126,13 +127,13 @@ static inline T logexp(const T x) {
 /// Data class, abstract class, useful in the class image.
 template <typename T> class Data {
    public:
-      virtual void getData(Vector<T>& data, const int i) const = 0;
+      virtual void getData(Vector<T>& data, const INTM i) const = 0;
       virtual void getGroup(Matrix<T>& data, const vector_groups& groups,
-            const int i) const = 0;
-      virtual inline T operator[](const int index) const = 0;
-      virtual int n() const = 0;
-      virtual int m() const = 0;
-      virtual int V() const = 0;
+            const INTM i) const = 0;
+      virtual inline T operator[](const INTM index) const = 0;
+      virtual INTM n() const = 0;
+      virtual INTM m() const = 0;
+      virtual INTM V() const = 0;
       virtual void norm_2sq_cols(Vector<T>& norms) const { };
       virtual ~Data() { };
 };
@@ -140,8 +141,8 @@ template <typename T> class Data {
 /// Abstract matrix class
 template <typename T> class AbstractMatrixB {
    public:
-      virtual int n() const = 0;
-      virtual int m() const = 0;
+      virtual INTM n() const = 0;
+      virtual INTM m() const = 0;
 
       /// b <- alpha A'x + beta b
       virtual void multTrans(const Vector<T>& x, Vector<T>& b,
@@ -171,7 +172,7 @@ template <typename T> class AbstractMatrixB {
       /// XtX = A'*A
       virtual void XtX(Matrix<T>& XtX) const = 0;
 
-      virtual void copyRow(const int i, Vector<T>& x) const = 0;
+      virtual void copyRow(const INTM i, Vector<T>& x) const = 0;
 
       virtual void copyTo(Matrix<T>& copy) const = 0;
       virtual T dot(const Matrix<T>& x) const = 0;
@@ -184,18 +185,18 @@ template <typename T> class AbstractMatrixB {
 /// Abstract matrix class
 template <typename T> class AbstractMatrix {
    public:
-      virtual int n() const = 0;
-      virtual int m() const = 0;
-      /// copy X(:,i) into Xi
-      virtual void copyCol(const int i, Vector<T>& Xi) const = 0;
+      virtual INTM n() const = 0;
+      virtual INTM m() const = 0;
+      /// copy X(:,i) INTMo Xi
+      virtual void copyCol(const INTM i, Vector<T>& Xi) const = 0;
       /// compute X(:,i)<- X(:,i)+a*col;
-      virtual void add_rawCol(const int i, T* col, const T a) const = 0;
-      /// copy X(:,i) into Xi
-      virtual void extract_rawCol(const int i,T* Xi) const = 0;
+      virtual void add_rawCol(const INTM i, T* col, const T a) const = 0;
+      /// copy X(:,i) INTMo Xi
+      virtual void extract_rawCol(const INTM i,T* Xi) const = 0;
       /// extract diagonal
       virtual void diag(Vector<T>& diag) const = 0;
       //// extract X(index1,index2)
-      virtual inline T operator()(const int index1, const int index2) const = 0;
+      virtual inline T operator()(const INTM index1, const INTM index2) const = 0;
       virtual ~AbstractMatrix() { };
 };
 
@@ -205,9 +206,9 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    public:
 
    /// Constructor with existing data X of an m x n matrix
-   Matrix(T* X, int m, int n);
+   Matrix(T* X, INTM m, INTM n);
    /// Constructor for a new m x n matrix
-   Matrix(int m, int n);
+   Matrix(INTM m, INTM n);
    /// Empty constructor
    Matrix();
 
@@ -216,36 +217,36 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
 
    /// Accessors
    /// Number of rows
-   inline int m() const { return _m; };
+   inline INTM m() const { return _m; };
    /// Number of columns
-   inline int n() const { return _n; };
+   inline INTM n() const { return _n; };
    /// Return a modifiable reference to X(i,j)
-   inline T& operator()(const int i, const int j);
+   inline T& operator()(const INTM i, const INTM j);
    /// Return the value X(i,j)
-   inline T operator()(const int i, const int j) const;
+   inline T operator()(const INTM i, const INTM j) const;
    /// Return a modifiable reference to X(i) (1D indexing)
-   inline T& operator[](const int index) { return _X[index]; };
+   inline T& operator[](const INTM index) { return _X[index]; };
    /// Return the value X(i) (1D indexing)
-   inline T operator[](const int index) const { return _X[index]; };
+   inline T operator[](const INTM index) const { return _X[index]; };
    /// Copy the column i into x
-   inline void copyCol(const int i, Vector<T>& x) const;
+   inline void copyCol(const INTM i, Vector<T>& x) const;
    /// Copy the column i into x
-   inline void copyRow(const int i, Vector<T>& x) const;
+   inline void copyRow(const INTM i, Vector<T>& x) const;
    /// Copy the column i into x
-   inline void extract_rawCol(const int i, T* x) const;
+   inline void extract_rawCol(const INTM i, T* x) const;
    /// Copy the column i into x
-   virtual void add_rawCol(const int i, T* DtXi, const T a) const;
+   virtual void add_rawCol(const INTM i, T* DtXi, const T a) const;
    /// Copy the column i into x
-   inline void getData(Vector<T>& data, const int i) const;
+   inline void getData(Vector<T>& data, const INTM i) const;
    /// extract the group i
    virtual void getGroup(Matrix<T>& data, const vector_groups& groups,
-         const int i) const;
+         const INTM i) const;
    /// Reference the column i into the vector x
-   inline void refCol(int i, Vector<T>& x) const;
+   inline void refCol(INTM i, Vector<T>& x) const;
    /// Reference the column i to i+n into the Matrix mat
-   inline void refSubMat(int i, int n, Matrix<T>& mat) const;
+   inline void refSubMat(INTM i, INTM n, Matrix<T>& mat) const;
    /// extract a sub-matrix of a symmetric matrix
-   inline void subMatrixSym(const Vector<int>& indices, 
+   inline void subMatrixSym(const Vector<INTM>& indices, 
          Matrix<T>& subMatrix) const;
    /// reference a modifiable reference to the data, DANGEROUS
    inline T* rawX() const { return _X; };
@@ -267,13 +268,13 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// clean a dictionary matrix
    inline void clean();
    /// Resize the matrix
-   inline void resize(int m, int n);
+   inline void resize(INTM m, INTM n);
    /// Change the data in the matrix
-   inline void setData(T* X, int m, int n);
+   inline void setData(T* X, INTM m, INTM n);
    /// modify _m
-   inline void setm(const int m) { _m = m; }; //DANGEROUS
+   inline void setm(const INTM m) { _m = m; }; //DANGEROUS
    /// modify _n
-   inline void setn(const int n) { _n = n; }; //DANGEROUS
+   inline void setn(const INTM n) { _n = n; }; //DANGEROUS
    /// Set all the values to zero
    inline void setZeros();
    /// Set all the values to a scalar
@@ -301,9 +302,9 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    inline void fillSymmetric();
    inline void fillSymmetric2();
    /// change artificially the size of the matrix, DANGEROUS
-   inline void fakeSize(const int m, const int n) { _n = n; _m=m;};
+   inline void fakeSize(const INTM m, const INTM n) { _n = n; _m=m;};
    /// whiten
-   inline void whiten(const int V);
+   inline void whiten(const INTM V);
    /// whiten
    inline void whiten(Vector<T>& mean, const bool pattern = false);
    /// whiten
@@ -317,11 +318,11 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// Check wether the columns of the matrix are normalized or not
    inline bool isNormalized() const;
    /// return the 1D-index of the value of greatest magnitude
-   inline int fmax() const;
+   inline INTM fmax() const;
    /// return the 1D-index of the value of greatest magnitude
    inline T fmaxval() const;
    /// return the 1D-index of the value of lowest magnitude
-   inline int fmin() const;
+   inline INTM fmin() const;
 
    // Algebric operations
    /// Transpose the current matrix and put the result in the matrix
@@ -398,7 +399,7 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    inline void XXt(Matrix<T>& XXt) const;
    /// XXt = A*A' where A is an upper triangular matrix
    inline void upperTriXXt(Matrix<T>& XXt, 
-         const int L) const;
+         const INTM L) const;
    /// extract the diagonal
    inline void diag(Vector<T>& d) const;
    /// set the diagonal
@@ -492,9 +493,9 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// fill the matrix with the row given
    inline void fillRow(const Vector<T>& row);
    /// fill the matrix with the row given
-   inline void extractRow(const int i, Vector<T>& row) const;
-   inline void setRow(const int i, const Vector<T>& row);
-   inline void addRow(const int i, const Vector<T>& row, const T a=1.0);
+   inline void extractRow(const INTM i, Vector<T>& row) const;
+   inline void setRow(const INTM i, const Vector<T>& row);
+   inline void addRow(const INTM i, const Vector<T>& row, const T a=1.0);
    /// compute x, such that b = Ax, WARNING this function needs to be u
    /// updated
    inline void conjugateGradient(const Vector<T>& b, Vector<T>& x,
@@ -503,9 +504,9 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// updated, the temporary vectors are given.
    inline void drop(char* fileName) const;
    /// compute a Nadaraya Watson estimator
-   inline void NadarayaWatson(const Vector<int>& ind, const T sigma);
+   inline void NadarayaWatson(const Vector<INTM>& ind, const T sigma);
    /// performs soft-thresholding of the vector
-   inline void blockThrshold(const T nu, const int sizeGroup);
+   inline void blockThrshold(const T nu, const INTM sizeGroup);
    /// performs sparse projections of the columns 
    inline void sparseProject(Matrix<T>& out, const T thrs,   const int mode = 1, const T lambda1 = 0,
          const T lambda2 = 0, const T lambda3 = 0, const bool pos = false, const int numThreads=-1);
@@ -519,7 +520,7 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// make a reference of the matrix to a vector vec 
    inline void toVect(Vector<T>& vec) const;
    /// Accessor
-   inline int V() const { return 1;};
+   inline INTM V() const { return 1;};
    /// merge two dictionaries
    inline void merge(const Matrix<T>& B, Matrix<T>& C) const;
    /// extract the rows of a matrix corresponding to a binary mask
@@ -538,9 +539,9 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// pointer to the data
    T* _X;
    /// number of rows
-   int _m;
+   INTM _m;
    /// number of columns
-   int _n;
+   INTM _n;
 };
 
 /// Class for dense vector
@@ -552,9 +553,9 @@ template<typename T> class Vector {
    /// Empty constructor
    Vector();
    /// Constructor. Create a new vector of size n
-   Vector(int n);
+   Vector(INTM n);
    /// Constructor with existing data
-   Vector(T* X, int n);
+   Vector(T* X, INTM n);
    /// Copy constructor
    explicit Vector<T>(const Vector<T>& vec);
 
@@ -565,47 +566,47 @@ template<typename T> class Vector {
    /// Print the vector to std::cout
    inline void print(const char* name) const;
    /// returns the index of the largest value
-   inline int max() const;
+   inline INTM max() const;
    /// returns the index of the minimum value
-   inline int min() const;
+   inline INTM min() const;
    /// returns the maximum value
    inline T maxval() const;
    /// returns the minimum value
    inline T minval() const;
    /// returns the index of the value with largest magnitude
-   inline int fmax() const;
+   inline INTM fmax() const;
    /// returns the index of the value with smallest magnitude
-   inline int fmin() const;
+   inline INTM fmin() const;
    /// returns the maximum magnitude
    inline T fmaxval() const;
    /// returns the minimum magnitude
    inline T fminval() const;
    /// returns a reference to X[index]
-   inline T& operator[](const int index);
+   inline T& operator[](const INTM index);
    /// returns X[index]
-   inline T operator[](const int index) const;
+   inline T operator[](const INTM index) const;
    /// make a copy of x
    inline void copy(const Vector<T>& x);
    /// returns the size of the vector
-   inline int n() const { return _n; };
+   inline INTM n() const { return _n; };
    /// returns a modifiable reference of the data, DANGEROUS
    inline T* rawX() const { return _X; };
    /// change artificially the size of the vector, DANGEROUS
-   inline void fakeSize(const int n) { _n = n; };
+   inline void fakeSize(const INTM n) { _n = n; };
    /// generate logarithmically spaced values
-   inline void logspace(const int n, const T a, const T b);
-   inline int nnz() const;
+   inline void logspace(const INTM n, const T a, const T b);
+   inline INTM nnz() const;
 
    /// Modifiers
    /// Set all values to zero
    inline void setZeros();
    /// resize the vector
-   inline void resize(const int n);
+   inline void resize(const INTM n);
    /// change the data of the vector
-   inline void setPointer(T* X, const int n);
-   inline void setData(T* X, const int n) { this->setPointer(X,n); };
+   inline void setPointer(T* X, const INTM n);
+   inline void setData(T* X, const INTM n) { this->setPointer(X,n); };
    /// put a random permutation of size n (for integral vectors)
-   inline void randperm(int n);
+   inline void randperm(int n);  
    /// put random values in the vector (White Gaussian Noise)
    inline void setAleat();
    /// clear the vector
@@ -623,7 +624,7 @@ template<typename T> class Vector {
    inline void thrsPos();
    /// set each value of the vector to val
    inline void set(const T val);
-   inline void setn(const int n) { _n = n; }; //DANGEROUS
+   inline void setn(const INTM n) { _n = n; }; //DANGEROUS
    inline bool alltrue() const;
    inline bool allfalse() const;
 
@@ -679,7 +680,7 @@ template<typename T> class Vector {
    inline void whiten(Vector<T>& mean, const
          Vector<T>& mask);
    /// whiten
-   inline void whiten(const int V);
+   inline void whiten(const INTM V);
    /// whiten
    inline T mean();
    /// whiten
@@ -734,9 +735,9 @@ template<typename T> class Vector {
    /// sort the vector
    inline void sort(const bool mode);
    //// sort the vector
-   inline void sort2(Vector<T>& out, Vector<int>& key, const bool mode) const;
+   inline void sort2(Vector<T>& out, Vector<INTM>& key, const bool mode) const;
    /// sort the vector
-   inline void sort2(Vector<int>& key, const bool mode);
+   inline void sort2(Vector<INTM>& key, const bool mode);
    /// sort the vector
    inline void applyBayerPattern(const int offset);
 
@@ -758,7 +759,7 @@ template<typename T> class Vector {
    /// data
    T* _X;
    /// size of the vector
-   int _n;
+   INTM _n;
 };
 
 
@@ -768,9 +769,9 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    friend class SpVector<T>;
    public:
    /// Constructor, CSC format, existing data
-   SpMatrix(T* v, int* r, int* pB, int* pE, int m, int n, int nzmax);
+   SpMatrix(T* v, INTM* r, INTM* pB, INTM* pE, INTM m, INTM n, INTM nzmax);
    /// Constructor, new m x n matrix, with at most nzmax non-zeros values
-   SpMatrix(int m, int n, int nzmax);
+   SpMatrix(INTM m, INTM n, INTM nzmax);
    /// Empty constructor
    SpMatrix();
 
@@ -778,27 +779,27 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    ~SpMatrix();
 
    /// Accessors
-   /// reference the column i into vec
-   inline void refCol(int i, SpVector<T>& vec) const;
+   /// reference the column i INTMo vec
+   inline void refCol(INTM i, SpVector<T>& vec) const;
    /// returns pB[i]
-   inline int pB(const int i) const { return _pB[i]; };
+   inline INTM pB(const INTM i) const { return _pB[i]; };
    /// returns r[i]
-   inline int r(const int i) const { return _r[i]; };
+   inline INTM r(const INTM i) const { return _r[i]; };
    /// returns v[i]
-   inline T v(const int i) const { return _v[i]; };
+   inline T v(const INTM i) const { return _v[i]; };
    /// returns the maximum number of non-zero elements
-   inline int nzmax() const { return _nzmax; };
+   inline INTM nzmax() const { return _nzmax; };
    /// returns the number of rows
-   inline int n() const { return _n; };
+   inline INTM n() const { return _n; };
    /// returns the number of columns
-   inline int m() const { return _m; };
+   inline INTM m() const { return _m; };
    /// returns the number of columns
-   inline int V() const { return 1; };
+   inline INTM V() const { return 1; };
    /// returns X[index]
-   inline T operator[](const int index) const;
-   void getData(Vector<T>& data, const int index) const;
+   inline T operator[](const INTM index) const;
+   void getData(Vector<T>& data, const INTM index) const;
    void getGroup(Matrix<T>& data, const vector_groups& groups,
-         const int i) const ;
+         const INTM i) const ;
    /// print the sparse matrix
    inline void print(const string& name) const;
    /// compute the sum of the matrix elements
@@ -806,15 +807,15 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    /// compute the sum of the matrix elements
    inline T normFsq() const;
    /// Direct access to _pB
-   inline int* pB() const { return _pB; };
+   inline INTM* pB() const { return _pB; };
    /// Direct access to _pE
-   inline int* pE() const { return _pE; };
+   inline INTM* pE() const { return _pE; };
    /// Direct access to _r
-   inline int* r() const { return _r; };
+   inline INTM* r() const { return _r; };
    /// Direct access to _v
    inline T* v() const { return _v; };
    /// number of nonzeros elements
-   inline int nnz() const { return _pB[_n]; };
+   inline INTM nnz() const { return _pB[_n]; };
    inline void add_direct(const SpMatrix<T>& mat, const T a);
    inline void copy_direct(const SpMatrix<T>& mat);
    inline T dot_direct(const SpMatrix<T>& mat) const;
@@ -823,7 +824,7 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    /// clear the matrix
    inline void clear();
    /// resize the matrix
-   inline void resize(const int m, const int n, const int nzmax);
+   inline void resize(const INTM m, const INTM n, const INTM nzmax);
    /// scale the matrix by a
    inline void scal(const T a) const;
 
@@ -831,14 +832,14 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    /// aat <- A*A'
    inline void AAt(Matrix<T>& aat) const;
    /// aat <- A(:,indices)*A(:,indices)'
-   inline void AAt(Matrix<T>& aat, const Vector<int>& indices) const;
+   inline void AAt(Matrix<T>& aat, const Vector<INTM>& indices) const;
    /// aat <- sum_i w_i A(:,i)*A(:,i)'
    inline void wAAt(const Vector<T>& w, Matrix<T>& aat) const;
    /// XAt <- X*A'
    inline void XAt(const Matrix<T>& X, Matrix<T>& XAt) const;
    /// XAt <- X(:,indices)*A(:,indices)'
    inline void XAt(const Matrix<T>& X, Matrix<T>& XAt, 
-         const Vector<int>& indices) const;
+         const Vector<INTM>& indices) const;
    /// XAt <- sum_i w_i X(:,i)*A(:,i)'
    inline void wXAt( const Vector<T>& w, const Matrix<T>& X, 
          Matrix<T>& XAt, const int numthreads=-1) const;
@@ -871,7 +872,7 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    inline void copyTo(Matrix<T>& mat) const { this->toFull(mat); };
    /// dot product;
    inline T dot(const Matrix<T>& x) const;
-   inline void copyRow(const int i, Vector<T>& x) const;
+   inline void copyRow(const INTM i, Vector<T>& x) const;
    inline void sum_cols(Vector<T>& sum) const;
    inline void copy(const SpMatrix<T>& mat);
 
@@ -882,11 +883,11 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    inline void toFullTrans(Matrix<T>& matrix) const;
 
    /// use the data from v, r for _v, _r
-   inline void convert(const Matrix<T>&v, const Matrix<int>& r,
-         const int K);
+   inline void convert(const Matrix<T>&v, const Matrix<INTM>& r,
+         const INTM K);
    /// use the data from v, r for _v, _r
-   inline void convert2(const Matrix<T>&v, const Vector<int>& r,
-         const int K);
+   inline void convert2(const Matrix<T>&v, const Vector<INTM>& r,
+         const INTM K);
    /// returns the l2 norms ^2 of the columns
    inline void norm_2sq_cols(Vector<T>& norms) const;
    /// returns the l0 norms of the columns
@@ -908,17 +909,17 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    /// data
    T* _v;
    /// row indices 
-   int* _r;
+   INTM* _r;
    /// indices of the beginning of columns
-   int* _pB;
+   INTM* _pB;
    /// indices of the end of columns
-   int* _pE;
+   INTM* _pE;
    /// number of rows
-   int _m;
+   INTM _m;
    /// number of columns
-   int _n;
+   INTM _n;
    /// number of non-zero values
-   int _nzmax;
+   INTM _nzmax;
 };
 
 /// Sparse vector class
@@ -928,9 +929,9 @@ template <typename T> class SpVector {
    friend class Vector<T>;
    public:
    /// Constructor, of the sparse vector of size L.
-   SpVector(T* v, int* r, int L, int nzmax);
+   SpVector(T* v, INTM* r, INTM L, INTM nzmax);
    /// Constructor, allocates nzmax slots
-   SpVector(int nzmax);
+   SpVector(INTM nzmax);
    /// Empty constructor
    SpVector();
 
@@ -953,18 +954,18 @@ template <typename T> class SpVector {
    /// print the vector to std::cerr
    inline void print(const string& name) const;
    /// create a reference on the vector r
-   inline void refIndices(Vector<int>& indices) const;
+   inline void refIndices(Vector<INTM>& indices) const;
    /// creates a reference on the vector val
    inline void refVal(Vector<T>& val) const;
    /// access table r
-   inline int r(const int i) const { return _r[i]; };
+   inline INTM r(const INTM i) const { return _r[i]; };
    /// access table r
-   inline T v(const int i) const { return _v[i]; };
+   inline T v(const INTM i) const { return _v[i]; };
    inline T* rawX() const { return _v; };
    /// 
-   inline int L() const { return _L; };
+   inline INTM L() const { return _L; };
    /// 
-   inline void setL(const int L) { _L=L; };
+   inline void setL(const INTM L) { _L=L; };
    /// a <- a.^2
    inline void sqr();
    /// dot product
@@ -978,11 +979,11 @@ template <typename T> class SpVector {
    /// clears the vector
    inline void clear();
    /// resizes the vector
-   inline void resize(const int nzmax);
+   inline void resize(const INTM nzmax);
 
    /// resize the vector as a sparse matrix
    void inline toSpMatrix(SpMatrix<T>& out,
-         const int m, const int n) const;
+         const INTM m, const INTM n) const;
   /// resize the vector as a sparse matrix
    void inline toFull(Vector<T>& out) const;
 
@@ -997,11 +998,11 @@ template <typename T> class SpVector {
    /// data
    T* _v;
    /// indices
-   int* _r;
+   INTM* _r;
    /// length
-   int _L;
+   INTM _L;
    /// maximum number of nonzeros elements
-   int _nzmax;
+   INTM _nzmax;
 };
 
 
@@ -1025,23 +1026,23 @@ template<typename T> class ProdMatrix : public AbstractMatrix<T> {
       inline void setMatrices(const Matrix<T>& D, 
             const Matrix<T>& X, const bool high_memory=true);
       /// compute DtX(:,i)
-      inline void copyCol(const int i, Vector<T>& DtXi) const;
+      inline void copyCol(const INTM i, Vector<T>& DtXi) const;
       /// compute DtX(:,i)
-      inline void extract_rawCol(const int i,T* DtXi) const;
+      inline void extract_rawCol(const INTM i,T* DtXi) const;
       /// compute DtX(:,i)
-      virtual void add_rawCol(const int i, T* DtXi, const T a) const;
+      virtual void add_rawCol(const INTM i, T* DtXi, const T a) const;
       /// add something to the diagonal
       void inline addDiag(const T diag);
       /// add something to the diagonal
       void inline diag(Vector<T>& diag) const;
       /// returns the number of columns
-      inline int n() const { return _n;};
+      inline INTM n() const { return _n;};
       /// returns the number of rows
-      inline int m() const { return _m;};
+      inline INTM m() const { return _m;};
       /// returns the value of an index
-      inline T operator()(const int index1, const int index2) const;
+      inline T operator()(const INTM index1, const INTM index2) const;
       /// returns the value of an index
-      inline T operator[](const int index) const;
+      inline T operator[](const INTM index) const;
 
    private:
       /// Depending on the mode, DtX is a matrix, or two matrices
@@ -1049,8 +1050,8 @@ template<typename T> class ProdMatrix : public AbstractMatrix<T> {
       const Matrix<T>* _X;
       const Matrix<T>* _D;
       bool _high_memory;
-      int _n;
-      int _m;
+      INTM _n;
+      INTM _m;
       T _addDiag;
 };
 
@@ -1060,12 +1061,12 @@ template<typename T> class ProdMatrix : public AbstractMatrix<T> {
  * ************************************/
 
 /// Constructor with existing data X of an m x n matrix
-template <typename T> Matrix<T>::Matrix(T* X, int m, int n) :
+template <typename T> Matrix<T>::Matrix(T* X, INTM m, INTM n) :
    _externAlloc(true), _X(X), _m(m), _n(n) {  };
 
 
 /// Constructor for a new m x n matrix
-template <typename T> Matrix<T>::Matrix(int m, int n) :
+template <typename T> Matrix<T>::Matrix(INTM m, INTM n) :
    _externAlloc(false), _m(m), _n(n)  {
 #pragma omp critical
       {
@@ -1083,12 +1084,12 @@ template <typename T> Matrix<T>::~Matrix() {
 };
 
 /// Return a modifiable reference to X(i,j)
-template <typename T> inline T& Matrix<T>::operator()(const int i, const int j) {
+template <typename T> inline T& Matrix<T>::operator()(const INTM i, const INTM j) {
    return _X[j*_m+i];
 };
 
 /// Return the value X(i,j)
-template <typename T> inline T Matrix<T>::operator()(const int i, const int j) const {
+template <typename T> inline T Matrix<T>::operator()(const INTM i, const INTM j) const {
    return _X[j*_m+i];
 };
 
@@ -1096,8 +1097,8 @@ template <typename T> inline T Matrix<T>::operator()(const int i, const int j) c
 template <typename T> inline void Matrix<T>::print(const string& name) const {
    std::cerr << name << std::endl;
    std::cerr << _m << " x " << _n << std::endl;
-   for (int i = 0; i<_m; ++i) {
-      for (int j = 0; j<_n; ++j) {
+   for (INTM i = 0; i<_m; ++i) {
+      for (INTM j = 0; j<_n; ++j) {
          printf("%10.5g ",static_cast<double>(_X[j*_m+i]));
          //         std::cerr << _X[j*_m+i] << " ";
       }
@@ -1107,52 +1108,53 @@ template <typename T> inline void Matrix<T>::print(const string& name) const {
    printf("\n ");
 };
 
-/// Copy the column i into x
-template <typename T> inline void Matrix<T>::copyCol(const int i, Vector<T>& x) const {
+/// Copy the column i INTMo x
+template <typename T> inline void Matrix<T>::copyCol(const INTM i, Vector<T>& x) const {
    assert(i >= 0 && i<_n);
    x.resize(_m);
    cblas_copy<T>(_m,_X+i*_m,1,x._X,1);
 };
 
-/// Copy the column i into x
-template <typename T> inline void Matrix<T>::copyRow(const int i, Vector<T>& x) const {
+/// Copy the column i INTMo x
+template <typename T> inline void Matrix<T>::copyRow(const INTM i, Vector<T>& x) const {
    assert(i >= 0 && i<_m);
    x.resize(_n);
    cblas_copy<T>(_n,_X+i,_m,x._X,1);
 };
 
 
-/// Copy the column i into x
-template <typename T> inline void Matrix<T>::extract_rawCol(const int i, T* x) const {
+/// Copy the column i INTMo x
+template <typename T> inline void Matrix<T>::extract_rawCol(const INTM i, T* x) const {
    assert(i >= 0 && i<_n);
    cblas_copy<T>(_m,_X+i*_m,1,x,1);
 };
 
-/// Copy the column i into x
-template <typename T> inline void Matrix<T>::add_rawCol(const int i, T* x, const T a) const {
+/// Copy the column i INTMo x
+template <typename T> inline void Matrix<T>::add_rawCol(const INTM i, T* x, const T a) const {
    assert(i >= 0 && i<_n);
    cblas_axpy<T>(_m,a,_X+i*_m,1,x,1);
 };
 
-/// Copy the column i into x
-template <typename T> inline void Matrix<T>::getData(Vector<T>& x, const int i) const {
+/// Copy the column i INTMo x
+template <typename T> inline void Matrix<T>::getData(Vector<T>& x, const INTM i) const {
    this->copyCol(i,x);
 };
 
 template <typename T> inline void Matrix<T>::getGroup(Matrix<T>& data, 
-      const vector_groups& groups, const int i) const {
+      const vector_groups& groups, const INTM i) const {
    const group& gr = groups[i];
-   const int N = gr.size();
+   const INTM N = gr.size();
    data.resize(_m,N);
-   int count=0;
+   INTM count=0;
    for (group::const_iterator it = gr.begin(); it != gr.end(); ++it) {
       cblas_copy<T>(_m,_X+(*it)*_m,1,data._X+count*_m,1);
       ++count;
    }
 };
 
+
 /// Reference the column i into the vector x
-template <typename T> inline void Matrix<T>::refCol(int i, Vector<T>& x) const {
+template <typename T> inline void Matrix<T>::refCol(INTM i, Vector<T>& x) const {
    assert(i >= 0 && i<_n);
    x.clear();
    x._X=_X+i*_m;
@@ -1160,14 +1162,14 @@ template <typename T> inline void Matrix<T>::refCol(int i, Vector<T>& x) const {
    x._externAlloc=true; 
 };
 
-/// Reference the column i to i+n into the Matrix mat
-template <typename T> inline void Matrix<T>::refSubMat(int i, int n, Matrix<T>& mat) const {
+/// Reference the column i to i+n INTMo the Matrix mat
+template <typename T> inline void Matrix<T>::refSubMat(INTM i, INTM n, Matrix<T>& mat) const {
    mat.setData(_X+i*_m,_m,n);
 }
 
 /// Check wether the columns of the matrix are normalized or not
 template <typename T> inline bool Matrix<T>::isNormalized() const {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       T norm=cblas_nrm2<T>(_m,_X+_m*i,1);
       if (fabs(norm - 1.0) > 1e-6) return false;
    }
@@ -1182,8 +1184,8 @@ inline void Matrix<T>::clean() {
    this->XtX(G);
    T* prG = G._X;
    /// remove the diagonal
-   for (int i = 0; i<_n; ++i) {
-      for (int j = i+1; j<_n; ++j) {
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j = i+1; j<_n; ++j) {
          if (prG[i*_n+j] > 0.99) {
             // remove nasty column j and put random values inside
             Vector<T> col;
@@ -1196,7 +1198,7 @@ inline void Matrix<T>::clean() {
 };
 
 /// return the 1D-index of the value of greatest magnitude
-template <typename T> inline int Matrix<T>::fmax() const {
+template <typename T> inline INTM Matrix<T>::fmax() const {
    return cblas_iamax<T>(_n*_m,_X,1);
 };
 
@@ -1207,25 +1209,25 @@ template <typename T> inline T Matrix<T>::fmaxval() const {
 
 
 /// return the 1D-index of the value of lowest magnitude
-template <typename T> inline int Matrix<T>::fmin() const {
+template <typename T> inline INTM Matrix<T>::fmin() const {
    return cblas_iamin<T>(_n*_m,_X,1);
 };
 
 /// extract a sub-matrix of a symmetric matrix
 template <typename T> inline void Matrix<T>::subMatrixSym(
-      const Vector<int>& indices, Matrix<T>& subMatrix) const {
-   int L = indices.n();
+      const Vector<INTM>& indices, Matrix<T>& subMatrix) const {
+   INTM L = indices.n();
    subMatrix.resize(L,L);
    T* out = subMatrix._X;
-   int* rawInd = indices.rawX();
-   for (int i = 0; i<L; ++i)
-      for (int j = 0; j<=i; ++j)
+   INTM* rawInd = indices.rawX();
+   for (INTM i = 0; i<L; ++i)
+      for (INTM j = 0; j<=i; ++j)
          out[i*L+j]=_X[rawInd[i]*_n+rawInd[j]];
    subMatrix.fillSymmetric();
 };
 
 /// Resize the matrix
-template <typename T> inline void Matrix<T>::resize(int m, int n) {
+template <typename T> inline void Matrix<T>::resize(INTM m, INTM n) {
    if (_n==n && _m==m) return;
    clear();
    _n=n;
@@ -1239,7 +1241,7 @@ template <typename T> inline void Matrix<T>::resize(int m, int n) {
 };
 
 /// Change the data in the matrix
-template <typename T> inline void Matrix<T>::setData(T* X, int m, int n) {
+template <typename T> inline void Matrix<T>::setData(T* X, INTM m, INTM n) {
    clear();
    _X=X;
    _m=m;
@@ -1254,7 +1256,7 @@ template <typename T> inline void Matrix<T>::setZeros() {
 
 /// Set all the values to a scalar
 template <typename T> inline void Matrix<T>::set(const T a) {
-   for (int i = 0; i<_n*_m; ++i) _X[i]=a;
+   for (INTM i = 0; i<_n*_m; ++i) _X[i]=a;
 };
 
 /// Clear the matrix
@@ -1268,25 +1270,25 @@ template <typename T> inline void Matrix<T>::clear() {
 
 /// Put white Gaussian noise in the matrix 
 template <typename T> inline void Matrix<T>::setAleat() {
-   for (int i = 0; i<_n*_m; ++i) _X[i]=normalDistrib<T>();
+   for (INTM i = 0; i<_n*_m; ++i) _X[i]=normalDistrib<T>();
 };
 
 /// set the matrix to the identity
 template <typename T> inline void Matrix<T>::eye() {
    this->setZeros();
-   for (int i = 0; i<MIN(_n,_m); ++i) _X[i*_m+i] = T(1.0);
+   for (INTM i = 0; i<MIN(_n,_m); ++i) _X[i*_m+i] = T(1.0);
 };
 
 /// Normalize all columns to unit l2 norm
 template <typename T> inline void Matrix<T>::normalize() {
    //T constant = 1.0/sqrt(_m);
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       T norm=cblas_nrm2<T>(_m,_X+_m*i,1);
       if (norm > 1e-10) {
          T invNorm=1.0/norm;
          cblas_scal<T>(_m,invNorm,_X+_m*i,1);
       }  else {
-         // for (int j = 0; j<_m; ++j) _X[_m*i+j]=constant;
+         // for (INTM j = 0; j<_m; ++j) _X[_m*i+j]=constant;
          Vector<T> d;
          this->refCol(i,d);
          d.setAleat();
@@ -1297,7 +1299,7 @@ template <typename T> inline void Matrix<T>::normalize() {
 
 /// Normalize all columns which l2 norm is greater than one.
 template <typename T> inline void Matrix<T>::normalize2() {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       T norm=cblas_nrm2<T>(_m,_X+_m*i,1);
       if (norm > 1.0) {
          T invNorm=1.0/norm;
@@ -1308,7 +1310,7 @@ template <typename T> inline void Matrix<T>::normalize2() {
 
 /// center the matrix
 template <typename T> inline void Matrix<T>::center() {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       Vector<T> col;
       this->refCol(i,col);
       T sum = col.sum();
@@ -1320,19 +1322,19 @@ template <typename T> inline void Matrix<T>::center() {
 template <typename T> inline void Matrix<T>::center_rows() {
    Vector<T> mean_rows(_m);
    mean_rows.setZeros();
-   for (int i = 0; i<_n; ++i) 
-      for (int j = 0; j<_m; ++j) 
+   for (INTM i = 0; i<_n; ++i) 
+      for (INTM j = 0; j<_m; ++j) 
          mean_rows[j] += _X[i*_m+j];
    mean_rows.scal(T(1.0)/_n);
-   for (int i = 0; i<_n; ++i) 
-      for (int j = 0; j<_m; ++j) 
+   for (INTM i = 0; i<_n; ++i) 
+      for (INTM j = 0; j<_m; ++j) 
          _X[i*_m+j] -= mean_rows[j];
 };
 
 /// center the matrix and keep the center values
 template <typename T> inline void Matrix<T>::center(Vector<T>& centers) {
    centers.resize(_n);
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       Vector<T> col;
       this->refCol(i,col);
       T sum = col.sum()/static_cast<T>(_m);
@@ -1359,33 +1361,33 @@ template <typename T> inline void Matrix<T>::copyRef(const Matrix<T>& mat) {
 };
 
 /// make the matrix symmetric by copying the upper-right part
-/// into the lower-left part
+/// INTMo the lower-left part
 template <typename T> inline void Matrix<T>::fillSymmetric() {
-   for (int i = 0; i<_n; ++i) {
-      for (int j =0; j<i; ++j) {
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j =0; j<i; ++j) {
          _X[j*_m+i]=_X[i*_m+j];
       }
    }
 };
 template <typename T> inline void Matrix<T>::fillSymmetric2() {
-   for (int i = 0; i<_n; ++i) {
-      for (int j =0; j<i; ++j) {
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j =0; j<i; ++j) {
          _X[i*_m+j]=_X[j*_m+i];
       }
    }
 };
 
 
-template <typename T> inline void Matrix<T>::whiten(const int V) {
-   const int sizePatch=_m/V;
-   for (int i = 0; i<_n; ++i) {
-      for (int j = 0; j<V; ++j) {
+template <typename T> inline void Matrix<T>::whiten(const INTM V) {
+   const INTM sizePatch=_m/V;
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j = 0; j<V; ++j) {
          T mean = 0;
-         for (int k = 0; k<sizePatch; ++k) {
+         for (INTM k = 0; k<sizePatch; ++k) {
             mean+=_X[i*_m+sizePatch*j+k];
          }
          mean /= sizePatch;
-         for (int k = 0; k<sizePatch; ++k) {
+         for (INTM k = 0; k<sizePatch; ++k) {
             _X[i*_m+sizePatch*j+k]-=mean;
          }
       }
@@ -1395,48 +1397,48 @@ template <typename T> inline void Matrix<T>::whiten(const int V) {
 template <typename T> inline void Matrix<T>::whiten(Vector<T>& mean, const bool pattern) {
    mean.setZeros();
    if (pattern) {
-      const int n =static_cast<int>(sqrt(static_cast<T>(_m)));
-      int count[4];
-      for (int i = 0; i<4; ++i) count[i]=0;
-      for (int i = 0; i<_n; ++i) {
-         int offsetx=0;
-         for (int j = 0; j<n; ++j) {
+      const INTM n =static_cast<INTM>(sqrt(static_cast<T>(_m)));
+      INTM count[4];
+      for (INTM i = 0; i<4; ++i) count[i]=0;
+      for (INTM i = 0; i<_n; ++i) {
+         INTM offsetx=0;
+         for (INTM j = 0; j<n; ++j) {
             offsetx= (offsetx+1) % 2;
-            int offsety=0;
-            for (int k = 0; k<n; ++k) {
+            INTM offsety=0;
+            for (INTM k = 0; k<n; ++k) {
                offsety= (offsety+1) % 2;
                mean[2*offsetx+offsety]+=_X[i*_m+j*n+k];
                count[2*offsetx+offsety]++;
             }
          }
       }
-      for (int i = 0; i<4; ++i)
+      for (INTM i = 0; i<4; ++i)
          mean[i] /= count[i];
-      for (int i = 0; i<_n; ++i) {
-         int offsetx=0;
-         for (int j = 0; j<n; ++j) {
+      for (INTM i = 0; i<_n; ++i) {
+         INTM offsetx=0;
+         for (INTM j = 0; j<n; ++j) {
             offsetx= (offsetx+1) % 2;
-            int offsety=0;
-            for (int k = 0; k<n; ++k) {
+            INTM offsety=0;
+            for (INTM k = 0; k<n; ++k) {
                offsety= (offsety+1) % 2;
                _X[i*_m+j*n+k]-=mean[2*offsetx+offsety];
             }
          }
       }
    } else  {
-      const int V = mean.n();
-      const int sizePatch=_m/V;
-      for (int i = 0; i<_n; ++i) {
-         for (int j = 0; j<V; ++j) {
-            for (int k = 0; k<sizePatch; ++k) {
+      const INTM V = mean.n();
+      const INTM sizePatch=_m/V;
+      for (INTM i = 0; i<_n; ++i) {
+         for (INTM j = 0; j<V; ++j) {
+            for (INTM k = 0; k<sizePatch; ++k) {
                mean[j]+=_X[i*_m+sizePatch*j+k];
             }
          }
       }
       mean.scal(T(1.0)/(_n*sizePatch));
-      for (int i = 0; i<_n; ++i) {
-         for (int j = 0; j<V; ++j) {
-            for (int k = 0; k<sizePatch; ++k) {
+      for (INTM i = 0; i<_n; ++i) {
+         for (INTM j = 0; j<V; ++j) {
+            for (INTM k = 0; k<sizePatch; ++k) {
                _X[i*_m+sizePatch*j+k]-=mean[j];
             }
          }
@@ -1446,21 +1448,21 @@ template <typename T> inline void Matrix<T>::whiten(Vector<T>& mean, const bool 
 
 template <typename T> inline void Matrix<T>::whiten(Vector<T>& mean, const
       Vector<T>& mask) {
-   const int V = mean.n();
-   const int sizePatch=_m/V;
+   const INTM V = mean.n();
+   const INTM sizePatch=_m/V;
    mean.setZeros();
-   for (int i = 0; i<_n; ++i) {
-      for (int j = 0; j<V; ++j) {
-         for (int k = 0; k<sizePatch; ++k) {
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j = 0; j<V; ++j) {
+         for (INTM k = 0; k<sizePatch; ++k) {
             mean[j]+=_X[i*_m+sizePatch*j+k];
          }
       }
    }
-   for (int i = 0; i<V; ++i)
+   for (INTM i = 0; i<V; ++i)
       mean[i] /= _n*cblas_asum(sizePatch,mask._X+i*sizePatch,1);
-   for (int i = 0; i<_n; ++i) {
-      for (int j = 0; j<V; ++j) {
-         for (int k = 0; k<sizePatch; ++k) {
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j = 0; j<V; ++j) {
+         for (INTM k = 0; k<sizePatch; ++k) {
             if (mask[sizePatch*j+k])
                _X[i*_m+sizePatch*j+k]-=mean[j];
          }
@@ -1471,24 +1473,24 @@ template <typename T> inline void Matrix<T>::whiten(Vector<T>& mean, const
 
 template <typename T> inline void Matrix<T>::unwhiten(Vector<T>& mean, const bool pattern) {
    if (pattern) {
-      const int n =static_cast<int>(sqrt(static_cast<T>(_m)));
-      for (int i = 0; i<_n; ++i) {
-         int offsetx=0;
-         for (int j = 0; j<n; ++j) {
+      const INTM n =static_cast<INTM>(sqrt(static_cast<T>(_m)));
+      for (INTM i = 0; i<_n; ++i) {
+         INTM offsetx=0;
+         for (INTM j = 0; j<n; ++j) {
             offsetx= (offsetx+1) % 2;
-            int offsety=0;
-            for (int k = 0; k<n; ++k) {
+            INTM offsety=0;
+            for (INTM k = 0; k<n; ++k) {
                offsety= (offsety+1) % 2;
                _X[i*_m+j*n+k]+=mean[2*offsetx+offsety];
             }
          }
       }
    } else {
-      const int V = mean.n();
-      const int sizePatch=_m/V;
-      for (int i = 0; i<_n; ++i) {
-         for (int j = 0; j<V; ++j) {
-            for (int k = 0; k<sizePatch; ++k) {
+      const INTM V = mean.n();
+      const INTM sizePatch=_m/V;
+      for (INTM i = 0; i<_n; ++i) {
+         for (INTM j = 0; j<V; ++j) {
+            for (INTM k = 0; k<sizePatch; ++k) {
                _X[i*_m+sizePatch*j+k]+=mean[j];
             }
          }
@@ -1501,35 +1503,35 @@ template <typename T> inline void Matrix<T>::unwhiten(Vector<T>& mean, const boo
 template <typename T> inline void Matrix<T>::transpose(Matrix<T>& trans) {
    trans.resize(_n,_m);
    T* out = trans._X;
-   for (int i = 0; i<_n; ++i)
-      for (int j = 0; j<_m; ++j)
+   for (INTM i = 0; i<_n; ++i)
+      for (INTM j = 0; j<_m; ++j)
          out[j*_n+i] = _X[i*_m+j];
 };
 
 /// A <- -A
 template <typename T> inline void Matrix<T>::neg() {
-   for (int i = 0; i<_n*_m; ++i) _X[i]=-_X[i];
+   for (INTM i = 0; i<_n*_m; ++i) _X[i]=-_X[i];
 };
 
 template <typename T> inline void Matrix<T>::incrDiag() {
-   for (int i = 0; i<MIN(_n,_m); ++i) ++_X[i*_m+i];
+   for (INTM i = 0; i<MIN(_n,_m); ++i) ++_X[i*_m+i];
 };
 
 template <typename T> inline void Matrix<T>::addDiag(
       const Vector<T>& diag) {
    T* d= diag.rawX();
-   for (int i = 0; i<MIN(_n,_m); ++i) _X[i*_m+i] += d[i];
+   for (INTM i = 0; i<MIN(_n,_m); ++i) _X[i*_m+i] += d[i];
 };
 
 template <typename T> inline void Matrix<T>::addDiag(
       const T diag) {
-   for (int i = 0; i<MIN(_n,_m); ++i) _X[i*_m+i] += diag;
+   for (INTM i = 0; i<MIN(_n,_m); ++i) _X[i*_m+i] += diag;
 };
 
 template <typename T> inline void Matrix<T>::addToCols(
       const Vector<T>& cent) {
    Vector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,col);      
       col.add(cent[i]);
    }
@@ -1538,7 +1540,7 @@ template <typename T> inline void Matrix<T>::addToCols(
 template <typename T> inline void Matrix<T>::addVecToCols(
       const Vector<T>& vec, const T a) {
    Vector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,col);      
       col.add(vec,a);
    }
@@ -1592,7 +1594,7 @@ template <typename T> inline void Matrix<T>::singularValues(Vector<T>& u) const 
 };
 
 template <typename T> inline void Matrix<T>::svd(Matrix<T>& U, Vector<T>& S, Matrix<T>&V) const {
-   const int num_eig=MIN(_m,_n);
+   const INTM num_eig=MIN(_m,_n);
    S.resize(num_eig);
    U.resize(_m,num_eig);
    V.resize(num_eig,_n);
@@ -1606,7 +1608,7 @@ template <typename T> inline void Matrix<T>::svd(Matrix<T>& U, Vector<T>& S, Mat
       Vt.transpose(V);
       Vector<T> inveigs;
       inveigs.copy(S);
-      for (int i = 0; i<num_eig; ++i) 
+      for (INTM i = 0; i<num_eig; ++i) 
          if (S[i] > 1e-10) {
             inveigs[i]=T(1.0)/S[i];
          } else {
@@ -1621,7 +1623,7 @@ template <typename T> inline void Matrix<T>::svd(Matrix<T>& U, Vector<T>& S, Mat
       U.mult(*this,V,true,false);
       Vector<T> inveigs;
       inveigs.copy(S);
-      for (int i = 0; i<num_eig; ++i) 
+      for (INTM i = 0; i<num_eig; ++i) 
          if (S[i] > 1e-10) {
             inveigs[i]=T(1.0)/S[i];
          } else {
@@ -1726,29 +1728,8 @@ template <typename T> inline T Matrix<T>::eigLargestMagnSym() const {
 
 /// inverse the matrix when it is symmetric
 template <typename T> inline void Matrix<T>::invSym() {
- //  int lwork=2*_n;
- //  T* work;
-//#ifdef USE_BLAS_LIB
-//   INTT* ipiv;
-//#else
-//   int* ipiv;
-//#endif
-//#pragma omp critical
-//   {
-//      work= new T[lwork];
-//#ifdef USE_BLAS_LIB
-///      ipiv= new INTT[lwork];
-//#else
-//      ipiv= new int[lwork];
-//#endif
-//   }
-//   sytrf<T>(upper,_n,_X,_n,ipiv,work,lwork);
-//   sytri<T>(upper,_n,_X,_n,ipiv,work);
-//   sytrf<T>(upper,_n,_X,_n);
    sytri<T>(upper,_n,_X,_n);
    this->fillSymmetric();
-//   delete[](work);
-//   delete[](ipiv);
 };
 
 /// perform b = alpha*A'x + beta*b
@@ -1765,13 +1746,13 @@ template <typename T> inline void Matrix<T>::multTrans(const SpVector<T>& x,
    b.resize(_n);
    Vector<T> col;
    if (beta) {
-      for (int i = 0; i<_n; ++i) {
+      for (INTM i = 0; i<_n; ++i) {
          refCol(i,col);
          b._X[i] = alpha*col.dot(x);
       }
    } else {
 
-      for (int i = 0; i<_n; ++i) {
+      for (INTM i = 0; i<_n; ++i) {
          refCol(i,col);
          b._X[i] = beta*b._X[i]+alpha*col.dot(x);
       }
@@ -1783,7 +1764,7 @@ template <typename T> inline void Matrix<T>::multTrans(
    b.setZeros();
    Vector<T> col;
    bool* pr_active=active.rawX();
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (pr_active[i]) {
          this->refCol(i,col);
          b._X[i]=col.dot(x);
@@ -1808,11 +1789,11 @@ template <typename T> inline void Matrix<T>::mult(const SpVector<T>& x,
       b.scal(a2);
    }
    if (a == 1.0) {
-      for (int i = 0; i<x._L; ++i) {
+      for (INTM i = 0; i<x._L; ++i) {
          cblas_axpy<T>(_m,x._v[i],_X+x._r[i]*_m,1,b._X,1);
       }
    } else {
-      for (int i = 0; i<x._L; ++i) {
+      for (INTM i = 0; i<x._L; ++i) {
          cblas_axpy<T>(_m,a*x._v[i],_X+x._r[i]*_m,1,b._X,1);
       }
    }
@@ -1823,7 +1804,7 @@ template <typename T> inline void Matrix<T>::mult(const Matrix<T>& B,
       Matrix<T>& C, const bool transA, const bool transB,
       const T a, const T b) const {
    CBLAS_TRANSPOSE trA,trB;
-   int m,k,n;
+   INTM m,k,n;
    if (transA) {
       trA = CblasTrans;
       m = _n;
@@ -1870,7 +1851,7 @@ inline void Matrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          Vector<T> rowC(B.m());
          Vector<T> colA;
-         for (int i = 0; i<_n; ++i) {
+         for (INTM i = 0; i<_n; ++i) {
             this->refCol(i,colA);
             B.mult(colA,rowC,a);
             C.addRow(i,rowC,a);
@@ -1884,7 +1865,7 @@ inline void Matrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          Vector<T> colC;
          SpVector<T> colB;
-         for (int i = 0; i<B.n(); ++i) {
+         for (INTM i = 0; i<B.n(); ++i) {
             C.refCol(i,colC);
             B.refCol(i,colB);
             this->multTrans(colB,colC,a,T(1.0));
@@ -1900,7 +1881,7 @@ inline void Matrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          Vector<T> colA;
          SpVector<T> colB;
-         for (int i = 0; i<_n; ++i) {
+         for (INTM i = 0; i<_n; ++i) {
             this->refCol(i,colA);
             B.refCol(i,colB);
             C.rank1Update(colA,colB,a);
@@ -1914,7 +1895,7 @@ inline void Matrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          Vector<T> colC;
          SpVector<T> colB;
-         for (int i = 0; i<B.n(); ++i) {
+         for (INTM i = 0; i<B.n(); ++i) {
             C.refCol(i,colC);
             B.refCol(i,colB);
             this->mult(colB,colC,a,T(1.0));
@@ -1930,8 +1911,8 @@ template <typename T>
       if (diag.n() != _m)
          return;
       T* d = diag.rawX();
-      for (int i = 0; i< _n; ++i) {
-         for (int j = 0; j<_m; ++j) {
+      for (INTM i = 0; i< _n; ++i) {
+         for (INTM j = 0; j<_m; ++j) {
             _X[i*_m+j] *= d[j];
          }
       }
@@ -1943,8 +1924,8 @@ template <typename T> inline void Matrix<T>::multDiagRight(
    if (diag.n() != _n)
       return;
    T* d = diag.rawX();
-   for (int i = 0; i< _n; ++i) {
-      for (int j = 0; j<_m; ++j) {
+   for (INTM i = 0; i< _n; ++i) {
+      for (INTM j = 0; j<_m; ++j) {
          _X[i*_m+j] *= d[i];
       }
    }
@@ -1984,9 +1965,9 @@ template <typename T> inline void Matrix<T>::XXt(Matrix<T>& xxt) const {
 };
 
 /// XXt = A*A' where A is an upper triangular matrix
-template <typename T> inline void Matrix<T>::upperTriXXt(Matrix<T>& XXt, const int L) const {
+template <typename T> inline void Matrix<T>::upperTriXXt(Matrix<T>& XXt, const INTM L) const {
    XXt.resize(L,L);
-   for (int i = 0; i<L; ++i) {
+   for (INTM i = 0; i<L; ++i) {
       cblas_syr<T>(CblasColMajor,CblasUpper,i+1,T(1.0),_X+i*_m,1,XXt._X,L);
    }
    XXt.fillSymmetric();
@@ -1995,25 +1976,25 @@ template <typename T> inline void Matrix<T>::upperTriXXt(Matrix<T>& XXt, const i
 
 /// extract the diagonal
 template <typename T> inline void Matrix<T>::diag(Vector<T>& dv) const {
-   int size_diag=MIN(_n,_m);
+   INTM size_diag=MIN(_n,_m);
    dv.resize(size_diag);
    T* const d = dv.rawX();
-   for (int i = 0; i<size_diag; ++i)
+   for (INTM i = 0; i<size_diag; ++i)
       d[i]=_X[i*_m+i];
 };
 
 /// set the diagonal
 template <typename T> inline void Matrix<T>::setDiag(const Vector<T>& dv) {
-   int size_diag=MIN(_n,_m);
+   INTM size_diag=MIN(_n,_m);
    T* const d = dv.rawX();
-   for (int i = 0; i<size_diag; ++i)
+   for (INTM i = 0; i<size_diag; ++i)
       _X[i*_m+i]=d[i];
 };
 
 /// set the diagonal
 template <typename T> inline void Matrix<T>::setDiag(const T val) {
-   int size_diag=MIN(_n,_m);
-   for (int i = 0; i<size_diag; ++i)
+   INTM size_diag=MIN(_n,_m);
+   for (INTM i = 0; i<size_diag; ++i)
       _X[i*_m+i]=val;
 };
 
@@ -2033,23 +2014,23 @@ template <typename T> inline void Matrix<T>::Invsqrt() {
 template <typename T> inline T Matrix<T>::quad(
       const SpVector<T>& vec) const {
    T sum = T();
-   int L = vec._L;
-   int* r = vec._r;
+   INTM L = vec._L;
+   INTM* r = vec._r;
    T* v = vec._v;
-   for (int i = 0; i<L; ++i)
-      for (int j = 0; j<L; ++j)
+   for (INTM i = 0; i<L; ++i)
+      for (INTM j = 0; j<L; ++j)
          sum += _X[r[i]*_m+r[j]]*v[i]*v[j];
    return sum;
 };
 
 template <typename T> inline void Matrix<T>::quad_mult(const Vector<T>& vec1,
       const SpVector<T>& vec2, Vector<T>& y, const T a, const T b) const {
-   const int size_y= y.n();
-   const int nn = _n/size_y;
+   const INTM size_y= y.n();
+   const INTM nn = _n/size_y;
    //y.resize(size_y);
    //y.setZeros();
    Matrix<T> tmp;
-   for (int i = 0; i<size_y; ++i) {
+   for (INTM i = 0; i<size_y; ++i) {
       tmp.setData(_X+(i*nn)*_m,_m,nn);
       y[i]=b*y[i]+a*tmp.quad(vec1,vec2);
    }
@@ -2059,11 +2040,11 @@ template <typename T> inline void Matrix<T>::quad_mult(const Vector<T>& vec1,
 template <typename T> inline T Matrix<T>::quad(
       const Vector<T>& vec1, const SpVector<T>& vec) const {
    T sum = T();
-   int L = vec._L;
-   int* r = vec._r;
+   INTM L = vec._L;
+   INTM* r = vec._r;
    T* v = vec._v;
    Vector<T> col;
-   for (int i = 0; i<L; ++i) {
+   for (INTM i = 0; i<L; ++i) {
       this->refCol(r[i],col);
       sum += v[i]*col.dot(vec1);
    }
@@ -2085,7 +2066,7 @@ template <typename T> inline T Matrix<T>::dot(const Matrix<T>& mat) const {
 
 /// add alpha to the current matrix
 template <typename T> inline void Matrix<T>::add(const T alpha) {
-   for (int i = 0; i<_n*_m; ++i) _X[i]+=alpha;
+   for (INTM i = 0; i<_n*_m; ++i) _X[i]+=alpha;
 };
 
 /// substract the matrix mat to the current matrix
@@ -2101,8 +2082,8 @@ template <typename T> inline T Matrix<T>::asum() const {
 /// returns the trace of the matrix
 template <typename T> inline T Matrix<T>::trace() const {
    T sum=T();
-   int m = MIN(_n,_m);
-   for (int i = 0; i<m; ++i) 
+   INTM m = MIN(_n,_m);
+   for (INTM i = 0; i<m; ++i) 
       sum += _X[i*_m+i];
    return sum;
 };
@@ -2127,7 +2108,7 @@ template <typename T> inline T Matrix<T>::normFsq() const {
 template <typename T> inline T Matrix<T>::norm_inf_2_col() const {
    Vector<T> col;
    T max = -1.0;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       refCol(i,col);
       T norm_col = col.nrm2();
       if (norm_col > max) 
@@ -2140,7 +2121,7 @@ template <typename T> inline T Matrix<T>::norm_inf_2_col() const {
 template <typename T> inline T Matrix<T>::norm_1_2_col() const {
    Vector<T> col;
    T sum = 0.0;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       refCol(i,col);
       sum += col.nrm2();
    }
@@ -2152,10 +2133,10 @@ template <typename T> inline void Matrix<T>::norm_2_rows(
       Vector<T>& norms) const {
    norms.resize(_m);
    norms.setZeros();
-   for (int i = 0; i<_n; ++i) 
-      for (int j = 0; j<_m; ++j) 
+   for (INTM i = 0; i<_n; ++i) 
+      for (INTM j = 0; j<_m; ++j) 
          norms[j] += _X[i*_m+j]*_X[i*_m+j];
-   for (int j = 0; j<_m; ++j) 
+   for (INTM j = 0; j<_m; ++j) 
       norms[j]=sqrt(norms[j]);
 };
 
@@ -2164,8 +2145,8 @@ template <typename T> inline void Matrix<T>::norm_2sq_rows(
       Vector<T>& norms) const {
    norms.resize(_m);
    norms.setZeros();
-   for (int i = 0; i<_n; ++i) 
-      for (int j = 0; j<_m; ++j) 
+   for (INTM i = 0; i<_n; ++i) 
+      for (INTM j = 0; j<_m; ++j) 
          norms[j] += _X[i*_m+j]*_X[i*_m+j];
 };
 
@@ -2175,7 +2156,7 @@ template <typename T> inline void Matrix<T>::norm_2_cols(
       Vector<T>& norms) const {
    norms.resize(_n);
    Vector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       refCol(i,col);
       norms[i] = col.nrm2();
    }
@@ -2186,7 +2167,7 @@ template <typename T> inline void Matrix<T>::norm_2_cols(
 template <typename T> inline void Matrix<T>::norm_inf_cols(Vector<T>& norms) const {
    norms.resize(_n);
    Vector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       refCol(i,col);
       norms[i] = col.fmaxval();
    }
@@ -2196,8 +2177,8 @@ template <typename T> inline void Matrix<T>::norm_inf_cols(Vector<T>& norms) con
 template <typename T> inline void Matrix<T>::norm_inf_rows(Vector<T>& norms) const {
    norms.resize(_m);
    norms.setZeros();
-   for (int i = 0; i<_n; ++i) 
-      for (int j = 0; j<_m; ++j) 
+   for (INTM i = 0; i<_n; ++i) 
+      for (INTM j = 0; j<_m; ++j) 
          norms[j] = MAX(abs<T>(_X[i*_m+j]),norms[j]);
 };
 
@@ -2205,8 +2186,8 @@ template <typename T> inline void Matrix<T>::norm_inf_rows(Vector<T>& norms) con
 template <typename T> inline void Matrix<T>::norm_l1_rows(Vector<T>& norms) const {
    norms.resize(_m);
    norms.setZeros();
-   for (int i = 0; i<_n; ++i) 
-      for (int j = 0; j<_m; ++j) 
+   for (INTM i = 0; i<_n; ++i) 
+      for (INTM j = 0; j<_m; ++j) 
          norms[j] += abs<T>(_X[i*_m+j]);
 };
 
@@ -2217,7 +2198,7 @@ template <typename T> inline void Matrix<T>::norm_2sq_cols(
       Vector<T>& norms) const {
    norms.resize(_n);
    Vector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       refCol(i,col);
       norms[i] = col.nrm2sq();
    }
@@ -2228,7 +2209,7 @@ inline void Matrix<T>::sum_cols(Vector<T>& sum) const {
    sum.resize(_m);
    sum.setZeros();
    Vector<T> tmp;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,tmp);
       sum.add(tmp);
    }
@@ -2251,40 +2232,40 @@ template <typename T> inline void Matrix<T>::meanRow(Vector<T>& mean) const {
 
 /// fill the matrix with the row given
 template <typename T> inline void Matrix<T>::fillRow(const Vector<T>& row) {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       T val = row[i];
-      for (int j = 0; j<_m; ++j) {
+      for (INTM j = 0; j<_m; ++j) {
          _X[i*_m+j]=val;
       }
    }
 };
 
 /// fill the matrix with the row given
-template <typename T> inline void Matrix<T>::extractRow(const int j,
+template <typename T> inline void Matrix<T>::extractRow(const INTM j,
       Vector<T>& row) const {
    row.resize(_n);
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       row[i]=_X[i*_m+j];
    }
 };
 
 /// fill the matrix with the row given
-template <typename T> inline void Matrix<T>::setRow(const int j,
+template <typename T> inline void Matrix<T>::setRow(const INTM j,
       const Vector<T>& row) {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       _X[i*_m+j]=row[i];
    }
 };
 
 /// fill the matrix with the row given
-template <typename T> inline void Matrix<T>::addRow(const int j,
+template <typename T> inline void Matrix<T>::addRow(const INTM j,
       const Vector<T>& row, const T a) {
    if (a==1.0) {
-      for (int i = 0; i<_n; ++i) {
+      for (INTM i = 0; i<_n; ++i) {
          _X[i*_m+j]+=row[i];
       }
    } else {
-      for (int i = 0; i<_n; ++i) {
+      for (INTM i = 0; i<_n; ++i) {
          _X[i*_m+j]+=a*row[i];
       }
    }
@@ -2330,20 +2311,20 @@ template <typename T> inline void Matrix<T>::inv_elem() {
 
 /// perform soft-thresholding of the matrix, with the threshold nu
 template <typename T> inline void Matrix<T>::blockThrshold(const T nu,
-      const int sizeGroup) {
-   for (int i = 0; i<_n; ++i) {
-      int j;
+      const INTM sizeGroup) {
+   for (INTM i = 0; i<_n; ++i) {
+      INTM j;
       for (j = 0; j<_m-sizeGroup+1; j+=sizeGroup) {
          T nrm=0;
-         for (int k = 0; k<sizeGroup; ++k)
+         for (INTM k = 0; k<sizeGroup; ++k)
             nrm += _X[i*_m +j+k]*_X[i*_m +j+k];
          nrm=sqrt(nrm);
          if (nrm < nu) {
-            for (int k = 0; k<sizeGroup; ++k)
+            for (INTM k = 0; k<sizeGroup; ++k)
                _X[i*_m +j+k]=0;
          } else {
             T scal = (nrm-nu)/nrm;
-            for (int k = 0; k<sizeGroup; ++k)
+            for (INTM k = 0; k<sizeGroup; ++k)
                _X[i*_m +j+k]*=scal;
          }
       }
@@ -2401,19 +2382,19 @@ template <typename T> inline void Matrix<T>::rank1Update(
 /// perform A <- A + alpha*vec1*vec2', when vec1 is sparse
 template <typename T> inline void Matrix<T>::rank1Update(
       const SpVector<T>& vec1, const Vector<T>& vec2, const T alpha) {
-   int* r = vec1._r;
+   INTM* r = vec1._r;
    T* v = vec1._v;
    T* X2 = vec2._X;
    assert(vec2._n == _n);
    if (alpha == 1.0) {
-      for (int i = 0; i<_n; ++i) {
-         for (int j = 0; j<vec1._L; ++j) {
+      for (INTM i = 0; i<_n; ++i) {
+         for (INTM j = 0; j<vec1._L; ++j) {
             _X[i*_m+r[j]] += v[j]*X2[i];
          }
       }
    } else {
-      for (int i = 0; i<_n; ++i) {
-         for (int j = 0; j<vec1._L; ++j) {
+      for (INTM i = 0; i<_n; ++i) {
+         for (INTM j = 0; j<vec1._L; ++j) {
             _X[i*_m+r[j]] += alpha*v[j]*X2[i];
          }
       }
@@ -2425,10 +2406,10 @@ inline void Matrix<T>::rank1Update_mult(const Vector<T>& vec1,
       const Vector<T>& vec1b,
       const SpVector<T>& vec2,
       const T alpha) {
-   const int nn = vec1b.n();
-   const int size_A = _n/nn;
+   const INTM nn = vec1b.n();
+   const INTM size_A = _n/nn;
    Matrix<T> tmp;
-   for (int i = 0; i<nn; ++i) {
+   for (INTM i = 0; i<nn; ++i) {
       tmp.setData(_X+i*size_A*_m,_m,size_A);
       tmp.rank1Update(vec1,vec2,alpha*vec1b[i]);
    }
@@ -2437,19 +2418,19 @@ inline void Matrix<T>::rank1Update_mult(const Vector<T>& vec1,
 /// perform A <- A + alpha*vec1*vec2', when vec1 is sparse
 template <typename T> inline void Matrix<T>::rank1Update(
       const SpVector<T>& vec1, const SpVector<T>& vec2, const T alpha) {
-   int* r = vec1._r;
+   INTM* r = vec1._r;
    T* v = vec1._v;
    T* v2 = vec2._v;
-   int* r2 = vec2._r;
+   INTM* r2 = vec2._r;
    if (alpha == 1.0) {
-      for (int i = 0; i<vec2._L; ++i) {
-         for (int j = 0; j<vec1._L; ++j) {
+      for (INTM i = 0; i<vec2._L; ++i) {
+         for (INTM j = 0; j<vec1._L; ++j) {
             _X[r2[i]*_m+r[j]] += v[j]*v2[i];
          }
       }
    } else {
-      for (int i = 0; i<vec2._L; ++i) {
-         for (int j = 0; j<vec1._L; ++j) {
+      for (INTM i = 0; i<vec2._L; ++i) {
+         for (INTM j = 0; j<vec1._L; ++j) {
             _X[r[i]*_m+r[j]] += alpha*v[j]*v2[i];
          }
       }
@@ -2460,10 +2441,10 @@ template <typename T> inline void Matrix<T>::rank1Update(
 /// perform A <- A + alpha*vec1*vec2', when vec2 is sparse
 template <typename T> inline void Matrix<T>::rank1Update(
       const Vector<T>& vec1, const SpVector<T>& vec2, const T alpha) {
-   int* r = vec2._r;
+   INTM* r = vec2._r;
    T* v = vec2._v;
    Vector<T> Xi;
-   for (int i = 0; i<vec2._L; ++i) {
+   for (INTM i = 0; i<vec2._L; ++i) {
       this->refCol(r[i],Xi);
       Xi.add(vec1,v[i]*alpha);
    }
@@ -2472,17 +2453,17 @@ template <typename T> inline void Matrix<T>::rank1Update(
 /// perform A <- A + alpha*vec1*vec1', when vec1 is sparse
 template <typename T> inline void Matrix<T>::rank1Update(
       const SpVector<T>& vec1, const T alpha) {
-   int* r = vec1._r;
+   INTM* r = vec1._r;
    T* v = vec1._v;
    if (alpha == 1.0) {
-      for (int i = 0; i<vec1._L; ++i) {
-         for (int j = 0; j<vec1._L; ++j) {
+      for (INTM i = 0; i<vec1._L; ++i) {
+         for (INTM j = 0; j<vec1._L; ++j) {
             _X[r[i]*_m+r[j]] += v[j]*v[i];
          }
       }
    } else {
-      for (int i = 0; i<vec1._L; ++i) {
-         for (int j = 0; j<vec1._L; ++j) {
+      for (INTM i = 0; i<vec1._L; ++i) {
+         for (INTM j = 0; j<vec1._L; ++j) {
             _X[_m*r[i]+r[j]] += alpha*v[j]*v[i];
          }
       }
@@ -2519,8 +2500,8 @@ template <typename T> inline void Matrix<T>::drop(char* fileName) const {
    f.flags(std::ios_base::scientific);
    f.open(fileName, ofstream::trunc);
    std::cout << "Matrix written in " << fileName << std::endl;
-   for (int i = 0; i<_n; ++i) {
-      for (int j = 0; j<_m; ++j) 
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j = 0; j<_m; ++j) 
          f << _X[i*_m+j] << " ";
       f << std::endl;
    }
@@ -2529,22 +2510,22 @@ template <typename T> inline void Matrix<T>::drop(char* fileName) const {
 
 /// compute a Nadaraya Watson estimator
 template <typename T> inline void Matrix<T>::NadarayaWatson(
-      const Vector<int>& ind, const T sigma) {
+      const Vector<INTM>& ind, const T sigma) {
    if (ind.n() != _n) return;
 
    init_omp(MAX_THREADS);
 
-   const int Ngroups=ind.maxval();
-   int i;
+   const INTM Ngroups=ind.maxval();
+   INTM i;
 #pragma omp parallel for private(i)
    for (i = 1; i<=Ngroups; ++i) {
-      Vector<int> indicesGroup(_n);
-      int count = 0;
-      for (int j = 0; j<_n; ++j)
+      Vector<INTM> indicesGroup(_n);
+      INTM count = 0;
+      for (INTM j = 0; j<_n; ++j)
          if (ind[j] == i) indicesGroup[count++]=j;
       Matrix<T> Xm(_m,count);
       Vector<T> col, col2;
-      for (int j= 0; j<count; ++j) {
+      for (INTM j= 0; j<count; ++j) {
          this->refCol(indicesGroup[j],col);
          Xm.refCol(j,col2);
          col2.copy(col);
@@ -2566,7 +2547,7 @@ template <typename T> inline void Matrix<T>::NadarayaWatson(
       weights.multDiagRight(den);
       Matrix<T> num;
       Xm.mult(weights,num);
-      for (int j= 0; j<count; ++j) {
+      for (INTM j= 0; j<count; ++j) {
          this->refCol(indicesGroup[j],col);
          num.refCol(j,col2);
          col.copy(col2);
@@ -2577,26 +2558,26 @@ template <typename T> inline void Matrix<T>::NadarayaWatson(
 /// make a sparse copy of the current matrix
 template <typename T> inline void Matrix<T>::toSparse(SpMatrix<T>& out) const {
    out.clear();
-   int count=0;
-   int* pB;
+   INTM count=0;
+   INTM* pB;
 #pragma omp critical
    {
-      pB=new int[_n+1];
+      pB=new INTM[_n+1];
    }
-   int* pE=pB+1;
-   for (int i = 0; i<_n*_m; ++i) 
+   INTM* pE=pB+1;
+   for (INTM i = 0; i<_n*_m; ++i) 
       if (_X[i] != 0) ++count;
-   int* r;
+   INTM* r;
    T* v;
 #pragma omp critical
    {
-      r=new int[count];
+      r=new INTM[count];
       v=new T[count];
    }
    count=0;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       pB[i]=count;
-      for (int j = 0; j<_m; ++j) {
+      for (INTM j = 0; j<_m; ++j) {
          if (_X[i*_m+j] != 0) {
             v[count]=_X[i*_m+j];
             r[count++]=j;
@@ -2618,26 +2599,26 @@ template <typename T> inline void Matrix<T>::toSparse(SpMatrix<T>& out) const {
 template <typename T> inline void Matrix<T>::toSparseTrans(
       SpMatrix<T>& out) {
    out.clear();
-   int count=0;
-   int* pB;
+   INTM count=0;
+   INTM* pB;
 #pragma omp critical
    {
-      pB=new int[_m+1];
+      pB=new INTM[_m+1];
    }
-   int* pE=pB+1;
-   for (int i = 0; i<_n*_m; ++i) 
+   INTM* pE=pB+1;
+   for (INTM i = 0; i<_n*_m; ++i) 
       if (_X[i] != 0) ++count;
-   int* r;
+   INTM* r;
    T* v;
 #pragma omp critical
    {
-      r=new int[count];
+      r=new INTM[count];
       v=new T[count];
    }
    count=0;
-   for (int i = 0; i<_m; ++i) {
+   for (INTM i = 0; i<_m; ++i) {
       pB[i]=count;
-      for (int j = 0; j<_n; ++j) {
+      for (INTM j = 0; j<_n; ++j) {
          if (_X[i+j*_m] != 0) {
             v[count]=_X[j*_m+i];
             r[count++]=j;
@@ -2667,11 +2648,11 @@ template <typename T> inline void Matrix<T>::toVect(
 /// merge two dictionaries
 template <typename T> inline void Matrix<T>::merge(const Matrix<T>& B,
       Matrix<T>& C) const {
-   const int K =_n; 
+   const INTM K =_n; 
    Matrix<T> G;
    this->mult(B,G,true,false);
-   std::list<int> list;
-   for (int i = 0; i<G.n(); ++i) {
+   std::list<INTM> list;
+   for (INTM i = 0; i<G.n(); ++i) {
       Vector<T> g;
       G.refCol(i,g);
       T fmax=g.fmaxval();
@@ -2679,14 +2660,14 @@ template <typename T> inline void Matrix<T>::merge(const Matrix<T>& B,
    }
    C.resize(_m,K+list.size());
 
-   for (int i = 0; i<K; ++i) {
+   for (INTM i = 0; i<K; ++i) {
       Vector<T> d, d2;
       C.refCol(i,d);
       this->refCol(i,d2);
       d.copy(d2);
    }
-   int count=0;
-   for (std::list<int>::const_iterator it = list.begin();
+   INTM count=0;
+   for (std::list<INTM>::const_iterator it = list.begin();
          it != list.end(); ++it) {
       Vector<T> d, d2;
       C.refCol(K+count,d);
@@ -2706,7 +2687,7 @@ template <typename T> Vector<T>::Vector() :
    _externAlloc(true), _X(NULL),  _n(0) {  };
 
 /// Constructor. Create a new vector of size n
-template <typename T> Vector<T>::Vector(int n) :
+template <typename T> Vector<T>::Vector(INTM n) :
    _externAlloc(false), _n(n) {
 #pragma omp critical
       {
@@ -2715,7 +2696,7 @@ template <typename T> Vector<T>::Vector(int n) :
    };
 
 /// Constructor with existing data
-template <typename T> Vector<T>::Vector(T* X, int n) :
+template <typename T> Vector<T>::Vector(T* X, INTM n) :
    _externAlloc(true), _X(X),  _n(n) {  };
 
 /// Copy constructor
@@ -2735,8 +2716,8 @@ template <typename T> Vector<T>::~Vector() {
 
 /// Print the vector to std::cout
 template <> inline void Vector<double>::print(const char* name) const {
-   printf("%s, %d\n",name,_n);
-   for (int i = 0; i<_n; ++i) {
+   printf("%s, %d\n",name,(int)_n);
+   for (INTM i = 0; i<_n; ++i) {
       printf("%g ",_X[i]);
    }
    printf("\n");
@@ -2744,8 +2725,8 @@ template <> inline void Vector<double>::print(const char* name) const {
 
 /// Print the vector to std::cout
 template <> inline void Vector<float>::print(const char* name) const {
-   printf("%s, %d\n",name,_n);
-   for (int i = 0; i<_n; ++i) {
+   printf("%s, %d\n",name,(int)_n);
+   for (INTM i = 0; i<_n; ++i) {
       printf("%g ",_X[i]);
    }
    printf("\n");
@@ -2753,8 +2734,8 @@ template <> inline void Vector<float>::print(const char* name) const {
 
 /// Print the vector to std::cout
 template <> inline void Vector<int>::print(const char* name) const {
-   printf("%s, %d\n",name,_n);
-   for (int i = 0; i<_n; ++i) {
+   printf("%s, %d\n",name,(int)_n);
+   for (INTM i = 0; i<_n; ++i) {
       printf("%d ",_X[i]);
    }
    printf("\n");
@@ -2762,18 +2743,18 @@ template <> inline void Vector<int>::print(const char* name) const {
 
 /// Print the vector to std::cout
 template <> inline void Vector<bool>::print(const char* name) const {
-   printf("%s, %d\n",name,_n);
-   for (int i = 0; i<_n; ++i) {
+   printf("%s, %d\n",name,(int)_n);
+   for (INTM i = 0; i<_n; ++i) {
       printf("%d ",_X[i] ? 1 : 0);
    }
    printf("\n");
 };
 
 /// returns the index of the largest value
-template <typename T> inline int Vector<T>::max() const {
-   int imax=0;
+template <typename T> inline INTM Vector<T>::max() const {
+   INTM imax=0;
    T max=_X[0];
-   for (int j = 1; j<_n; ++j) {
+   for (INTM j = 1; j<_n; ++j) {
       T cur = _X[j];
       if (cur > max) {
          imax=j;
@@ -2784,10 +2765,10 @@ template <typename T> inline int Vector<T>::max() const {
 };
 
 /// returns the index of the minimum value
-template <typename T> inline int Vector<T>::min() const {
-   int imin=0;
+template <typename T> inline INTM Vector<T>::min() const {
+   INTM imin=0;
    T min=_X[0];
-   for (int j = 1; j<_n; ++j) {
+   for (INTM j = 1; j<_n; ++j) {
       T cur = _X[j];
       if (cur < min) {
          imin=j;
@@ -2818,57 +2799,57 @@ template <typename T> inline T Vector<T>::fminval() const {
 };
 
 template <typename T>
-inline void Vector<T>::logspace(const int n, const T a, const T b) {
+inline void Vector<T>::logspace(const INTM n, const T a, const T b) {
    T first=log10(a);
    T last=log10(b);
    T step = (last-first)/(n-1);
    this->resize(n);
    _X[0]=first;
-   for (int i = 1; i<_n; ++i)
+   for (INTM i = 1; i<_n; ++i)
       _X[i]=_X[i-1]+step;
-   for (int i = 0; i<_n; ++i)
+   for (INTM i = 0; i<_n; ++i)
       _X[i]=pow(T(10.0),_X[i]);
 }
 
 template <typename T>
-inline int Vector<T>::nnz() const {
-   int sum=0;
-   for (int i = 0; i<_n; ++i) 
+inline INTM Vector<T>::nnz() const {
+   INTM sum=0;
+   for (INTM i = 0; i<_n; ++i) 
       if (_X[i] != T()) ++sum;
    return sum;
 };
 /// generate logarithmically spaced values
 template <>
-inline void Vector<int>::logspace(const int n, const int a, const int b) {
+inline void Vector<INTM>::logspace(const INTM n, const INTM a, const INTM b) {
    Vector<double> tmp(n);
    tmp.logspace(n,double(a),double(b));
    this->resize(n);
    _X[0]=a;
    _X[n-1]=b;
-   for (int i = 1; i<_n-1; ++i) {
-      int candidate=static_cast<int>(floor(static_cast<double>(tmp[i])));
+   for (INTM i = 1; i<_n-1; ++i) {
+      INTM candidate=static_cast<INTM>(floor(static_cast<double>(tmp[i])));
       _X[i]= candidate > _X[i-1] ? candidate : _X[i-1]+1;
    }
 }
 
 /// returns the index of the value with largest magnitude
-template <typename T> inline int Vector<T>::fmax() const {
+template <typename T> inline INTM Vector<T>::fmax() const {
    return cblas_iamax<T>(_n,_X,1);
 };
 
 /// returns the index of the value with smallest magnitude
-template <typename T> inline int Vector<T>::fmin() const {
+template <typename T> inline INTM Vector<T>::fmin() const {
    return cblas_iamin<T>(_n,_X,1);
 };
 
 /// returns a reference to X[index]
-template <typename T> inline T& Vector<T>::operator[] (const int i) {
+template <typename T> inline T& Vector<T>::operator[] (const INTM i) {
    assert(i>=0 && i<_n);
    return _X[i];
 };
 
 /// returns X[index]
-template <typename T> inline T Vector<T>::operator[] (const int i) const {
+template <typename T> inline T Vector<T>::operator[] (const INTM i) const {
    assert(i>=0 && i<_n);
    return _X[i];
 };
@@ -2886,7 +2867,7 @@ template <typename T> inline void Vector<T>::setZeros() {
 };
 
 /// resize the vector
-template <typename T> inline void Vector<T>::resize(const int n) {
+template <typename T> inline void Vector<T>::resize(const INTM n) {
    if (_n == n) return;
    clear();
 #pragma omp critical
@@ -2899,7 +2880,7 @@ template <typename T> inline void Vector<T>::resize(const int n) {
 };
 
 /// change the data of the vector
-template <typename T> inline void Vector<T>::setPointer(T* X, const int n) {
+template <typename T> inline void Vector<T>::setPointer(T* X, const INTM n) {
    clear();
    _externAlloc=true;
    _X=X;
@@ -2923,7 +2904,7 @@ template <> inline void Vector<int>::randperm(int n) {
 
 /// put random values in the vector (white Gaussian Noise)
 template <typename T> inline void Vector<T>::setAleat() {
-   for (int i = 0; i<_n; ++i) _X[i]=normalDistrib<T>();
+   for (INTM i = 0; i<_n; ++i) _X[i]=normalDistrib<T>();
 };
 
 /// clear the vector
@@ -2936,7 +2917,7 @@ template <typename T> inline void Vector<T>::clear() {
 
 /// performs soft-thresholding of the vector
 template <typename T> inline void Vector<T>::softThrshold(const T nu) {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (_X[i] > nu) {
          _X[i] -= nu;
       } else if (_X[i] < -nu) {
@@ -2949,7 +2930,7 @@ template <typename T> inline void Vector<T>::softThrshold(const T nu) {
 
 /// performs soft-thresholding of the vector
 template <typename T> inline void Vector<T>::hardThrshold(const T nu) {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (!(_X[i] > nu || _X[i] < -nu)) {
          _X[i] = 0;
       }
@@ -2959,38 +2940,38 @@ template <typename T> inline void Vector<T>::hardThrshold(const T nu) {
 
 /// performs thresholding of the vector
 template <typename T> inline void Vector<T>::thrsmax(const T nu) {
-   for (int i = 0; i<_n; ++i) 
+   for (INTM i = 0; i<_n; ++i) 
       _X[i]=MAX(_X[i],nu);
 }
 
 /// performs thresholding of the vector
 template <typename T> inline void Vector<T>::thrsmin(const T nu) {
-   for (int i = 0; i<_n; ++i) 
+   for (INTM i = 0; i<_n; ++i) 
       _X[i]=MIN(_X[i],nu);
 }
 
 /// performs thresholding of the vector
 template <typename T> inline void Vector<T>::thrsabsmin(const T nu) {
-   for (int i = 0; i<_n; ++i) 
+   for (INTM i = 0; i<_n; ++i) 
       _X[i]=MAX(MIN(_X[i],nu),-nu);
 }
 
 /// performs thresholding of the vector
 template <typename T> inline void Vector<T>::thrshold(const T nu) {
-   for (int i = 0; i<_n; ++i) 
+   for (INTM i = 0; i<_n; ++i) 
       if (abs<T>(_X[i]) < nu) 
          _X[i]=0;
 }
 /// performs soft-thresholding of the vector
 template <typename T> inline void Vector<T>::thrsPos() {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (_X[i] < 0) _X[i]=0;
    }
 };
 
 template <>
 inline bool Vector<bool>::alltrue() const {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (!_X[i]) return false;
    }
    return true;
@@ -2998,7 +2979,7 @@ inline bool Vector<bool>::alltrue() const {
 
 template <>
 inline bool Vector<bool>::allfalse() const {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (_X[i]) return false;
    }
    return true;
@@ -3007,7 +2988,7 @@ inline bool Vector<bool>::allfalse() const {
 
 /// set each value of the vector to val
 template <typename T> inline void Vector<T>::set(const T val) {
-   for (int i = 0; i<_n; ++i) _X[i]=val;
+   for (INTM i = 0; i<_n; ++i) _X[i]=val;
 };
 
 /// returns ||A||_2
@@ -3030,8 +3011,8 @@ template <typename T> inline T Vector<T>::dot(const Vector<T>& x) const {
 template <typename T> inline T Vector<T>::dot(const SpVector<T>& x) const {
    T sum=0;
    const T* v = x._v;
-   const int* r = x._r;
-   for (int i = 0; i<x._L; ++i) {
+   const INTM* r = x._r;
+   for (INTM i = 0; i<x._L; ++i) {
       sum += _X[r[i]]*v[i];
    }
    return sum;
@@ -3047,17 +3028,17 @@ template <typename T> inline void Vector<T>::add(const Vector<T>& x, const T a) 
 template <typename T> inline void Vector<T>::add(const SpVector<T>& x,
       const T a) {
    if (a == 1.0) {
-      for (int i = 0; i<x._L; ++i)
+      for (INTM i = 0; i<x._L; ++i)
          _X[x._r[i]]+=x._v[i];
    } else {
-      for (int i = 0; i<x._L; ++i)
+      for (INTM i = 0; i<x._L; ++i)
          _X[x._r[i]]+=a*x._v[i];
    }
 };
 
 /// adds a to each value in the vector
 template <typename T> inline void Vector<T>::add(const T a) {
-   for (int i = 0; i<_n; ++i) _X[i]+=a;
+   for (INTM i = 0; i<_n; ++i) _X[i]+=a;
 };
 
 /// A <- A - x
@@ -3068,7 +3049,7 @@ template <typename T> inline void Vector<T>::sub(const Vector<T>& x) {
 
 /// A <- A + a*x
 template <typename T> inline void Vector<T>::sub(const SpVector<T>& x) {
-   for (int i = 0; i<x._L; ++i)
+   for (INTM i = 0; i<x._L; ++i)
       _X[x._r[i]]-=x._v[i];
 };
 
@@ -3151,40 +3132,40 @@ template <typename T> inline void Vector<T>::normalize2() {
 template <typename T> inline void Vector<T>::whiten(
       Vector<T>& meanv, const bool pattern) {
    if (pattern) {
-      const int n =static_cast<int>(sqrt(static_cast<T>(_n)));
-      int count[4];
-      for (int i = 0; i<4; ++i) count[i]=0;
-      int offsetx=0;
-      for (int j = 0; j<n; ++j) {
+      const INTM n =static_cast<INTM>(sqrt(static_cast<T>(_n)));
+      INTM count[4];
+      for (INTM i = 0; i<4; ++i) count[i]=0;
+      INTM offsetx=0;
+      for (INTM j = 0; j<n; ++j) {
          offsetx= (offsetx+1) % 2;
-         int offsety=0;
-         for (int k = 0; k<n; ++k) {
+         INTM offsety=0;
+         for (INTM k = 0; k<n; ++k) {
             offsety= (offsety+1) % 2;
             meanv[2*offsetx+offsety]+=_X[j*n+k];
             count[2*offsetx+offsety]++;
          }
       }
-      for (int i = 0; i<4; ++i)
+      for (INTM i = 0; i<4; ++i)
          meanv[i] /= count[i];
       offsetx=0;
-      for (int j = 0; j<n; ++j) {
+      for (INTM j = 0; j<n; ++j) {
          offsetx= (offsetx+1) % 2;
-         int offsety=0;
-         for (int k = 0; k<n; ++k) {
+         INTM offsety=0;
+         for (INTM k = 0; k<n; ++k) {
             offsety= (offsety+1) % 2;
             _X[j*n+k]-=meanv[2*offsetx+offsety];
          }
       }
    } else {
-      const int V = meanv.n();
-      const int sizePatch=_n/V;
-      for (int j = 0; j<V; ++j) {
+      const INTM V = meanv.n();
+      const INTM sizePatch=_n/V;
+      for (INTM j = 0; j<V; ++j) {
          T mean = 0;
-         for (int k = 0; k<sizePatch; ++k) {
+         for (INTM k = 0; k<sizePatch; ++k) {
             mean+=_X[sizePatch*j+k];
          }
          mean /= sizePatch;
-         for (int k = 0; k<sizePatch; ++k) {
+         for (INTM k = 0; k<sizePatch; ++k) {
             _X[sizePatch*j+k]-=mean;
          }
          meanv[j]=mean;
@@ -3195,15 +3176,15 @@ template <typename T> inline void Vector<T>::whiten(
 /// whiten
 template <typename T> inline void Vector<T>::whiten(
       Vector<T>& meanv, const Vector<T>& mask) {
-   const int V = meanv.n();
-   const int sizePatch=_n/V;
-   for (int j = 0; j<V; ++j) {
+   const INTM V = meanv.n();
+   const INTM sizePatch=_n/V;
+   for (INTM j = 0; j<V; ++j) {
       T mean = 0;
-      for (int k = 0; k<sizePatch; ++k) {
+      for (INTM k = 0; k<sizePatch; ++k) {
          mean+=_X[sizePatch*j+k];
       }
       mean /= cblas_asum(sizePatch,mask._X+j*sizePatch,1);
-      for (int k = 0; k<sizePatch; ++k) {
+      for (INTM k = 0; k<sizePatch; ++k) {
          if (mask[sizePatch*j+k])
             _X[sizePatch*j+k]-=mean;
       }
@@ -3212,15 +3193,15 @@ template <typename T> inline void Vector<T>::whiten(
 };
 
 /// whiten
-template <typename T> inline void Vector<T>::whiten(const int V) {
-   const int sizePatch=_n/V;
-   for (int j = 0; j<V; ++j) {
+template <typename T> inline void Vector<T>::whiten(const INTM V) {
+   const INTM sizePatch=_n/V;
+   for (INTM j = 0; j<V; ++j) {
       T mean = 0;
-      for (int k = 0; k<sizePatch; ++k) {
+      for (INTM k = 0; k<sizePatch; ++k) {
          mean+=_X[sizePatch*j+k];
       }
       mean /= sizePatch;
-      for (int k = 0; k<sizePatch; ++k) {
+      for (INTM k = 0; k<sizePatch; ++k) {
          _X[sizePatch*j+k]-=mean;
       }
    }
@@ -3229,10 +3210,7 @@ template <typename T> inline void Vector<T>::whiten(const int V) {
 template <typename T> inline T Vector<T>::KL(const Vector<T>& Y) {
    T sum = 0;
    T* prY = Y.rawX();
-   // Y.print("Y");
-   // this->print("X");
-   // stop();
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (_X[i] > 1e-20) {
          if (prY[i] < 1e-60) {
             sum += 1e200;
@@ -3250,22 +3228,22 @@ template <typename T> inline T Vector<T>::KL(const Vector<T>& Y) {
 template <typename T> inline void Vector<T>::unwhiten(
       Vector<T>& meanv, const bool pattern) {
    if (pattern) {
-      const int n =static_cast<int>(sqrt(static_cast<T>(_n)));
-      int offsetx=0;
-      for (int j = 0; j<n; ++j) {
+      const INTM n =static_cast<INTM>(sqrt(static_cast<T>(_n)));
+      INTM offsetx=0;
+      for (INTM j = 0; j<n; ++j) {
          offsetx= (offsetx+1) % 2;
-         int offsety=0;
-         for (int k = 0; k<n; ++k) {
+         INTM offsety=0;
+         for (INTM k = 0; k<n; ++k) {
             offsety= (offsety+1) % 2;
             _X[j*n+k]+=meanv[2*offsetx+offsety];
          }
       }
    } else  {
-      const int V = meanv.n();
-      const int sizePatch=_n/V;
-      for (int j = 0; j<V; ++j) {
+      const INTM V = meanv.n();
+      const INTM sizePatch=_n/V;
+      for (INTM j = 0; j<V; ++j) {
          T mean = meanv[j];
-         for (int k = 0; k<sizePatch; ++k) {
+         for (INTM k = 0; k<sizePatch; ++k) {
             _X[sizePatch*j+k]+=mean;
          }
       }
@@ -3282,7 +3260,7 @@ template <typename T> inline T Vector<T>::mean() {
 template <typename T> inline T Vector<T>::std() {
    T E = this->mean();
    T std=0;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       T tmp=_X[i]-E;
       std += tmp*tmp;
    }
@@ -3297,7 +3275,7 @@ template <typename T> inline void Vector<T>::scal(const T a) {
 
 /// A <- -A
 template <typename T> inline void Vector<T>::neg() {
-   for (int i = 0; i<_n; ++i) _X[i]=-_X[i];
+   for (INTM i = 0; i<_n; ++i) _X[i]=-_X[i];
 };
 
 /// replace each value by its exponential
@@ -3312,12 +3290,12 @@ template <typename T> inline void Vector<T>::abs_vec() {
 
 /// replace each value by its logarithm
 template <typename T> inline void Vector<T>::log() {
-   for (int i=0; i<_n; ++i) _X[i]=alt_log<T>(_X[i]);
+   for (INTM i=0; i<_n; ++i) _X[i]=alt_log<T>(_X[i]);
 };
 
 /// replace each value by its exponential
 template <typename T> inline void Vector<T>::logexp() {
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (_X[i] < -30) {
          _X[i]=0;
       } else if (_X[i] < 30) {
@@ -3348,8 +3326,8 @@ template <typename T> inline T Vector<T>::asum() const {
 };
 
 template <typename T> inline T Vector<T>::lzero() const {
-   int count=0;
-   for (int i = 0; i<_n; ++i) 
+   INTM count=0;
+   for (INTM i = 0; i<_n; ++i) 
       if (_X[i] != 0) ++count;
    return count;
 };
@@ -3357,7 +3335,7 @@ template <typename T> inline T Vector<T>::lzero() const {
 
 template <typename T> inline T Vector<T>::afused() const {
    T sum = 0;
-   for (int i = 1; i<_n; ++i) {
+   for (INTM i = 1; i<_n; ++i) {
       sum += abs<T>(_X[i]-_X[i-1]);
    }
    return sum;
@@ -3365,14 +3343,14 @@ template <typename T> inline T Vector<T>::afused() const {
 /// returns the sum of the vector
 template <typename T> inline T Vector<T>::sum() const {
    T sum=T();
-   for (int i = 0; i<_n; ++i) sum +=_X[i]; 
+   for (INTM i = 0; i<_n; ++i) sum +=_X[i]; 
    return sum;
 };
 
-/// puts in signs, the sign of each point in the vector
+/// puts in signs, the sign of each poINTM in the vector
 template <typename T> inline void Vector<T>::sign(Vector<T>& signs) const {
    T* prSign=signs.rawX();
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       if (_X[i] == 0) {
          prSign[i]=0.0; 
       } else {
@@ -3397,19 +3375,19 @@ template <typename T> inline void Vector<T>::l1project(Vector<T>& out,
       return;
    }
    T* prU = out._X;
-   int sizeU = _n;
+   INTM sizeU = _n;
 
    T sum = T();
-   int sum_card = 0;
+   INTM sum_card = 0;
 
    while (sizeU > 0) {
       // put the pivot in prU[0]
       swap(prU[0],prU[sizeU/2]);
       T pivot = prU[0];
-      int sizeG=1;
+      INTM sizeG=1;
       T sumG=pivot;
 
-      for (int i = 1; i<sizeU; ++i) {
+      for (INTM i = 1; i<sizeU; ++i) {
          if (prU[i] >= pivot) {
             sumG += prU[i];
             swap(prU[sizeG++],prU[i]);
@@ -3445,13 +3423,13 @@ template <typename T> inline void Vector<T>::l1project_weighted(Vector<T>& out, 
    }
    vAbs<T>(_n,out._X,out._X);
    out.div(weights);
-   Vector<int> keys(_n);
-   for (int i = 0; i<_n; ++i) keys[i]=i;
+   Vector<INTM> keys(_n);
+   for (INTM i = 0; i<_n; ++i) keys[i]=i;
    out.sort2(keys,false);
    T sum1=0;
    T sum2=0;
    T lambda=0;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       const T lambda_old=lambda;
       const T fact=weights[keys[i]]*weights[keys[i]];
       lambda=out[i];
@@ -3467,11 +3445,11 @@ template <typename T> inline void Vector<T>::l1project_weighted(Vector<T>& out, 
    lambda=MAX(0,(sum1-thrs)/sum2);
 
    if (residual) {
-      for (int i = 0; i<_n; ++i) {
+      for (INTM i = 0; i<_n; ++i) {
          out._X[i]=_X[i] > 0 ? MIN(_X[i],lambda*weights[i]) : MAX(_X[i],-lambda*weights[i]);
       }
    } else {
-      for (int i = 0; i<_n; ++i) {
+      for (INTM i = 0; i<_n; ++i) {
          out._X[i]=_X[i] > 0 ? MAX(0,_X[i]-lambda*weights[i]) : MIN(0,_X[i]+lambda*weights[i]);
       }
    }
@@ -3483,8 +3461,8 @@ inline void Vector<T>::project_sft_binary(const Vector<T>& y) {
    T mean = this->mean();
    T thrs=mean;
    while (abs(mean) > EPSILON) {
-      int n_seuils=0;
-      for (int i = 0; i< _n; ++i) {
+      INTM n_seuils=0;
+      for (INTM i = 0; i< _n; ++i) {
          _X[i] = _X[i]-thrs;
          const T val = y[i]*_X[i];
          if (val > 0) {
@@ -3506,8 +3484,8 @@ inline void Vector<T>::project_sft(const Vector<int>& labels, const int clas) {
    T thrs=mean;
 
    while (abs(mean) > EPSILON) {
-      int n_seuils=0;
-      for (int i = 0; i< _n; ++i) {
+      INTM n_seuils=0;
+      for (INTM i = 0; i< _n; ++i) {
          _X[i] = _X[i]-thrs;
          if (labels[i]==clas) {
             if (_X[i] < -1.0) {
@@ -3629,19 +3607,19 @@ template <typename T>
 
       /// BEGIN
       T* prU = out._X;
-      int sizeU = _n;
+      INTM sizeU = _n;
 
       T sum = 0;
-      int sum_card = 0;
+      INTM sum_card = 0;
 
       while (sizeU > 0) {
          // put the pivot in prU[0]
          swap(prU[0],prU[sizeU/2]);
          T pivot = prU[0];
-         int sizeG=1;
+         INTM sizeG=1;
          T sumG=pivot+0.5*gamma*pivot*pivot;
 
-         for (int i = 1; i<sizeU; ++i) {
+         for (INTM i = 1; i<sizeU; ++i) {
             if (prU[i] >= pivot) {
                sumG += prU[i]+0.5*gamma*prU[i]*prU[i];
                swap(prU[sizeG++],prU[i]);
@@ -3698,7 +3676,7 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
       const T lambda1,const T lambda2,const T lambda3,
       const bool penalty) {
    T* pr_DtR=_X;
-   const int K = _n;
+   const INTM K = _n;
    alpha.setZeros();
    Vector<T> u(K); // regularization path for gamma
    Vector<T> Du(K); // regularization path for alpha
@@ -3713,10 +3691,10 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
    T* pr_DDu = DDu.rawX();
    T* pr_c = c.rawX();
    T* pr_scores = scores.rawX();
-   Vector<int> ind(K+1);
+   Vector<INTM> ind(K+1);
    Vector<bool> signs(K);
    ind.set(K);
-   int* pr_ind = ind.rawX();
+   INTM* pr_ind = ind.rawX();
    bool* pr_signs = signs.rawX();
 
    /// Computation of DtR
@@ -3728,20 +3706,20 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
    alpha.set(pr_gamma[0]);
    /// update DtR
    this->sub(alpha);
-   for (int j = K-2; j>=0; --j) 
+   for (INTM j = K-2; j>=0; --j) 
       pr_DtR[j] += pr_DtR[j+1];
 
    pr_DtR[0]=0;
    pr_ind[0]=0;
    pr_signs[0] = pr_DtR[0] > 0;
    pr_c[0]=T(1.0)/K;
-   int currentInd=this->fmax();
+   INTM currentInd=this->fmax();
    T currentLambda=abs<T>(pr_DtR[currentInd]);
    bool newAtom = true;
 
    /// Solve the Lasso using simplified LARS
-   for (int i = 1; i<K; ++i) {
-      /// exit if constraints are satisfied
+   for (INTM i = 1; i<K; ++i) {
+      /// exit if constraINTMs are satisfied
       /// min_u ||b-u||_2^2  +  lambda1||u||_1 +lambda2 Fused(u) + 0.5lambda3||u||_2^2 
       if (penalty && currentLambda <= lambda2) break;
       if (!penalty) {
@@ -3755,10 +3733,10 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
 
       /// Update pr_ind and pr_c
       if (newAtom) {
-         int j;
+         INTM j;
          for (j = 1; j<i; ++j) 
             if (pr_ind[j] > currentInd) break;
-         for (int k = i; k>j; --k) {
+         for (INTM k = i; k>j; --k) {
             pr_ind[k]=pr_ind[k-1];
             pr_c[k]=pr_c[k-1];
             pr_signs[k]=pr_signs[k-1];
@@ -3776,7 +3754,7 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
       } else {
          pr_u[1]=pr_signs[1] ? pr_c[0]+pr_c[1] : -pr_c[0]-pr_c[1];
          pr_u[1]+=pr_signs[2] ? -pr_c[1] : pr_c[1];
-         for (int j = 2; j<i; ++j) {
+         for (INTM j = 2; j<i; ++j) {
             pr_u[j]=2*fusedHomotopyAux<T>(pr_signs[j-1],
                   pr_signs[j],pr_signs[j+1], pr_c[j-1],pr_c[j]);
          }
@@ -3786,20 +3764,20 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
 
       // Compute Du 
       pr_Du[0]=pr_u[0];
-      for (int k = 1; k<pr_ind[1]; ++k)
+      for (INTM k = 1; k<pr_ind[1]; ++k)
          pr_Du[k]=pr_Du[0];
-      for (int j = 1; j<=i; ++j) {
+      for (INTM j = 1; j<=i; ++j) {
          pr_Du[pr_ind[j]]=pr_Du[pr_ind[j]-1]+pr_u[j];
-         for (int k = pr_ind[j]+1; k<pr_ind[j+1]; ++k)
+         for (INTM k = pr_ind[j]+1; k<pr_ind[j+1]; ++k)
             pr_Du[k]=pr_Du[pr_ind[j]];
       }
 
       /// Compute DDu 
       DDu.copy(Du);
-      for (int j = K-2; j>=0; --j) 
+      for (INTM j = K-2; j>=0; --j) 
          pr_DDu[j] += pr_DDu[j+1];
 
-      /// Check constraints
+      /// Check constraINTMs
       T max_step1 = INFINITY;
       if (penalty) {
          max_step1 = currentLambda-lambda2;
@@ -3807,8 +3785,8 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
 
       /// Check changes of sign
       T max_step2 = INFINITY;
-      int step_out = -1;
-      for (int j = 1; j<=i; ++j) {
+      INTM step_out = -1;
+      for (INTM j = 1; j<=i; ++j) {
          T ratio = -pr_gamma[pr_ind[j]]/pr_u[j];
          if (ratio > 0 && ratio <= max_step2) {
             max_step2=ratio;
@@ -3817,14 +3795,14 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
       }
       T max_step3 = INFINITY;
       /// Check new variables entering the active set
-      for (int j = 1; j<K; ++j) {
+      for (INTM j = 1; j<K; ++j) {
          T sc1 = (currentLambda-pr_DtR[j])/(T(1.0)-pr_DDu[j]);
          T sc2 = (currentLambda+pr_DtR[j])/(T(1.0)+pr_DDu[j]);
          if (sc1 <= 1e-10) sc1=INFINITY;
          if (sc2 <= 1e-10) sc2=INFINITY;
          pr_scores[j]= MIN(sc1,sc2);
       }
-      for (int j = 0; j<=i; ++j) {
+      for (INTM j = 0; j<=i; ++j) {
          pr_scores[pr_ind[j]]=INFINITY;
       }
       currentInd = scores.fmin();
@@ -3833,7 +3811,7 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
       if (step == 0 || step == INFINITY) break; 
 
       /// Update gamma, alpha, DtR, currentLambda
-      for (int j = 0; j<=i; ++j) {
+      for (INTM j = 0; j<=i; ++j) {
          pr_gamma[pr_ind[j]]+=step*pr_u[j];
       }
       alpha.add(Du,step);
@@ -3841,10 +3819,10 @@ inline void Vector<T>::fusedProjectHomotopy(Vector<T>& alpha,
       currentLambda -= step;
       if (step == max_step2) {
          /// Update signs,pr_ind, pr_c
-         for (int k = step_out; k<=i; ++k) 
+         for (INTM k = step_out; k<=i; ++k) 
             pr_ind[k]=pr_ind[k+1];
          pr_ind[i]=K;
-         for (int k = step_out; k<=i; ++k) 
+         for (INTM k = step_out; k<=i; ++k) 
             pr_signs[k]=pr_signs[k+1];
          pr_c[step_out-1]=T(1.0)/(pr_ind[step_out]-pr_ind[step_out-1]);
          pr_c[step_out]=T(1.0)/(pr_ind[step_out+1]-pr_ind[step_out]);
@@ -3869,14 +3847,14 @@ inline void Vector<T>::fusedProject(Vector<T>& alpha, const T lambda1, const T l
       const int itermax) {
    T* pr_alpha= alpha.rawX();
    T* pr_beta=_X;
-   const int K = alpha.n();
+   const INTM K = alpha.n();
 
    T total_alpha =alpha.sum();
    /// Modification of beta
-   for (int i = K-2; i>=0; --i) 
+   for (INTM i = K-2; i>=0; --i) 
       pr_beta[i]+=pr_beta[i+1];
 
-   for (int i = 0; i<itermax; ++i) {
+   for (INTM i = 0; i<itermax; ++i) {
       T sum_alpha=0;
       T sum_diff = 0;
       /// Update first coordinate
@@ -3889,7 +3867,7 @@ inline void Vector<T>::fusedProject(Vector<T>& alpha, const T lambda1, const T l
       total_alpha +=K*diff;
 
       /// Update alpha_j
-      for (int j = 1; j<K; ++j) {
+      for (INTM j = 1; j<K; ++j) {
          pr_alpha[j]+=sum_diff;
          T gamma_old=pr_alpha[j]-pr_alpha[j-1];
          T gamma_new=softThrs((K-j)*gamma_old+pr_beta[j]-
@@ -3924,118 +3902,118 @@ inline void Vector<T>::sort(Vector<T>& out, const bool mode) const {
 };
 
 template <typename T>
-inline void Vector<T>::sort2(Vector<int>& key, const bool mode) {
-   quick_sort(key.rawX(),_X,0,_n-1,mode);
+inline void Vector<T>::sort2(Vector<INTM>& key, const bool mode) {
+   quick_sort(key.rawX(),_X,(INTM)0,_n-1,mode);
 };
 
 
 template <typename T>
-inline void Vector<T>::sort2(Vector<T>& out, Vector<int>& key, const bool mode) const {
+inline void Vector<T>::sort2(Vector<T>& out, Vector<INTM>& key, const bool mode) const {
    out.copy(*this);
    out.sort2(key,mode);
 }
 
 template <typename T>
 inline void Vector<T>::applyBayerPattern(const int offset) {
-   int sizePatch=_n/3;
-   int n = static_cast<int>(sqrt(static_cast<T>(sizePatch)));
+   INTM sizePatch=_n/3;
+   INTM n = static_cast<INTM>(sqrt(static_cast<T>(sizePatch)));
    if (offset == 0) {
       // R
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 1 : 2;
-         const int off = (i % 2) ? 0 : 1;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 1 : 2;
+         const INTM off = (i % 2) ? 0 : 1;
+         for (INTM j = off; j<n; j+=step) {
             _X[i*n+j]=0;
          }
       }
       // G
-      for (int i = 0; i<n; ++i) {
-         const int step = 2;
-         const int off = (i % 2) ? 1 : 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = 2;
+         const INTM off = (i % 2) ? 1 : 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[sizePatch+i*n+j]=0;
          }
       }
       // B
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 2 : 1;
-         const int off = 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 2 : 1;
+         const INTM off = 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[2*sizePatch+i*n+j]=0;
          }
       }
    } else if (offset == 1) {
       // R
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 2 : 1;
-         const int off = (i % 2) ? 1 : 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 2 : 1;
+         const INTM off = (i % 2) ? 1 : 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[i*n+j]=0;
          }
       }
       // G
-      for (int i = 0; i<n; ++i) {
-         const int step = 2;
-         const int off = (i % 2) ? 0 : 1;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = 2;
+         const INTM off = (i % 2) ? 0 : 1;
+         for (INTM j = off; j<n; j+=step) {
             _X[sizePatch+i*n+j]=0;
          }
       }
       // B
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 1 : 2;
-         const int off = 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 1 : 2;
+         const INTM off = 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[2*sizePatch+i*n+j]=0;
          }
       }
    } else if (offset == 2) {
       // R
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 1 : 2;
-         const int off = 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 1 : 2;
+         const INTM off = 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[i*n+j]=0;
          }
       }
       // G
-      for (int i = 0; i<n; ++i) {
-         const int step = 2;
-         const int off = (i % 2) ? 0 : 1;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = 2;
+         const INTM off = (i % 2) ? 0 : 1;
+         for (INTM j = off; j<n; j+=step) {
             _X[sizePatch+i*n+j]=0;
          }
       }
       // B
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 2 : 1;
-         const int off = (i % 2) ? 1 : 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 2 : 1;
+         const INTM off = (i % 2) ? 1 : 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[2*sizePatch+i*n+j]=0;
          }
       }
    } else if (offset == 3) {
       // R
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 2 : 1;
-         const int off = 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 2 : 1;
+         const INTM off = 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[i*n+j]=0;
          }
       }
       // G
-      for (int i = 0; i<n; ++i) {
-         const int step = 2;
-         const int off = (i % 2) ? 1 : 0;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = 2;
+         const INTM off = (i % 2) ? 1 : 0;
+         for (INTM j = off; j<n; j+=step) {
             _X[sizePatch+i*n+j]=0;
          }
       }
       // B
-      for (int i = 0; i<n; ++i) {
-         const int step = (i % 2) ? 1 : 2;
-         const int off = (i % 2) ? 0 : 1;
-         for (int j = off; j<n; j+=step) {
+      for (INTM i = 0; i<n; ++i) {
+         const INTM step = (i % 2) ? 1 : 2;
+         const INTM off = (i % 2) ? 0 : 1;
+         for (INTM j = off; j<n; j+=step) {
             _X[2*sizePatch+i*n+j]=0;
          }
       }
@@ -4046,10 +4024,10 @@ inline void Vector<T>::applyBayerPattern(const int offset) {
 /// make a sparse copy 
 template <typename T> inline void Vector<T>::toSparse(
       SpVector<T>& vec) const {
-   int L=0;
+   INTM L=0;
    T* v = vec._v;
-   int* r = vec._r;
-   for (int i = 0; i<_n; ++i) {
+   INTM* r = vec._r;
+   for (INTM i = 0; i<_n; ++i) {
       if (_X[i] != T()) {
          v[L]=_X[i];
          r[L++]=i;
@@ -4062,8 +4040,8 @@ template <typename T> inline void Vector<T>::toSparse(
 template <typename T>
 inline void Vector<T>::copyMask(Vector<T>& out, Vector<bool>& mask) const {
    out.resize(_n);
-   int pointer=0;
-   for (int i = 0; i<_n; ++i) {
+   INTM pointer=0;
+   for (INTM i = 0; i<_n; ++i) {
       if (mask[i])
          out[pointer++]=_X[i];
    }
@@ -4073,14 +4051,14 @@ inline void Vector<T>::copyMask(Vector<T>& out, Vector<bool>& mask) const {
 template <typename T>
 inline void Matrix<T>::copyMask(Matrix<T>& out, Vector<bool>& mask) const {
    out.resize(_m,_n);
-   int count=0;
-   for (int i = 0; i<mask.n(); ++i)
+   INTM count=0;
+   for (INTM i = 0; i<mask.n(); ++i)
       if (mask[i])
          ++count;
    out.setm(count);
-   for (int i = 0; i<_n; ++i) {
-      int pointer=0;
-      for (int j = 0; j<_m; ++j) {
+   for (INTM i = 0; i<_n; ++i) {
+      INTM pointer=0;
+      for (INTM j = 0; j<_m; ++j) {
          if (mask[j]) {
             out[i*count+pointer]=_X[i*_m+j];
             ++pointer;
@@ -4097,19 +4075,19 @@ inline void Matrix<T>::copyMask(Matrix<T>& out, Vector<bool>& mask) const {
 
 
 /// Constructor, CSC format, existing data
-template <typename T> SpMatrix<T>::SpMatrix(T* v, int* r, int* pB, int* pE,
-      int m, int n, int nzmax) :
+template <typename T> SpMatrix<T>::SpMatrix(T* v, INTM* r, INTM* pB, INTM* pE,
+      INTM m, INTM n, INTM nzmax) :
    _externAlloc(true), _v(v), _r(r), _pB(pB), _pE(pE), _m(m), _n(n), _nzmax(nzmax)
 { };
 
 /// Constructor, new m x n matrix, with at most nzmax non-zeros values
-template <typename T> SpMatrix<T>::SpMatrix(int m, int n, int nzmax) :
+template <typename T> SpMatrix<T>::SpMatrix(INTM m, INTM n, INTM nzmax) :
    _externAlloc(false), _m(m), _n(n), _nzmax(nzmax) {
 #pragma omp critical
       {
          _v=new T[nzmax];
-         _r=new int[nzmax];
-         _pB=new int[_n+1];
+         _r=new INTM[nzmax];
+         _pB=new INTM[_n+1];
       }
       _pE=_pB+1;
    };
@@ -4124,8 +4102,8 @@ template <typename T>
 inline void SpMatrix<T>::copy(const SpMatrix<T>& mat) {
    this->resize(mat._m,mat._n,mat._nzmax);
    memcpy(_v,mat._v,_nzmax*sizeof(T));
-   memcpy(_r,mat._r,_nzmax*sizeof(int));
-   memcpy(_pB,mat._pB,(_n+1)*sizeof(int));
+   memcpy(_r,mat._r,_nzmax*sizeof(INTM));
+   memcpy(_pB,mat._pB,(_n+1)*sizeof(INTM));
 }
 
 
@@ -4134,8 +4112,8 @@ template <typename T> SpMatrix<T>::~SpMatrix() {
    clear();
 };
 
-/// reference the column i into vec
-template <typename T> inline void SpMatrix<T>::refCol(int i, 
+/// reference the column i INTMo vec
+template <typename T> inline void SpMatrix<T>::refCol(INTM i, 
       SpVector<T>& vec) const {
    if (vec._nzmax > 0) vec.clear();
    vec._v=_v+_pB[i];
@@ -4149,19 +4127,19 @@ template <typename T> inline void SpMatrix<T>::refCol(int i,
 template<typename T> inline void SpMatrix<T>::print(const string& name) const {
    cerr << name << endl;
    cerr << _m << " x " << _n << " , " << _nzmax << endl;
-   for (int i = 0; i<_n; ++i) {
-      for (int j = _pB[i]; j<_pE[i]; ++j) {
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j = _pB[i]; j<_pE[i]; ++j) {
          cerr << "(" <<_r[j] << "," << i << ") = " << _v[j] << endl;
       }
    }
 };
 
 template<typename T>
-inline T SpMatrix<T>::operator[](const int index) const {
-   const int num_col=(index/_m);
-   const int num_row=index -num_col*_m;
+inline T SpMatrix<T>::operator[](const INTM index) const {
+   const INTM num_col=(index/_m);
+   const INTM num_row=index -num_col*_m;
    T val = 0;
-   for (int j = _pB[num_col]; j<_pB[num_col+1]; ++j) {
+   for (INTM j = _pB[num_col]; j<_pB[num_col+1]; ++j) {
       if (_r[j]==num_row) {
          val=_v[j];
          break;
@@ -4170,19 +4148,19 @@ inline T SpMatrix<T>::operator[](const int index) const {
    return val;
 };
 template<typename T>
-void SpMatrix<T>::getData(Vector<T>& data, const int index) const {
+void SpMatrix<T>::getData(Vector<T>& data, const INTM index) const {
    data.resize(_m);
    data.setZeros();
-   for (int i = _pB[index]; i< _pB[index+1]; ++i) 
+   for (INTM i = _pB[index]; i< _pB[index+1]; ++i) 
       data[_r[i]]=_v[i];
 };
 
 template<typename T>
-void SpMatrix<T>::getGroup(Matrix<T>& data, const vector_groups& groups,  const int i) const {
+void SpMatrix<T>::getGroup(Matrix<T>& data, const vector_groups& groups,  const INTM i) const {
    const group& gr = groups[i];
-   const int N = gr.size();
+   const INTM N = gr.size();
    data.resize(_m,N);
-   int count=0;
+   INTM count=0;
    Vector<T> col;
    for (group::const_iterator it = gr.begin(); it != gr.end(); ++it) {
       data.refCol(count,col);
@@ -4240,8 +4218,8 @@ template <typename T> inline void SpMatrix<T>::clear() {
 };
 
 /// resize the matrix
-template <typename T> inline void SpMatrix<T>::resize(const int m, 
-      const int n, const int nzmax) {
+template <typename T> inline void SpMatrix<T>::resize(const INTM m, 
+      const INTM n, const INTM nzmax) {
    if (n == _n && m == _m && nzmax == _nzmax) return;
    this->clear();
    _n=n;
@@ -4251,11 +4229,11 @@ template <typename T> inline void SpMatrix<T>::resize(const int m,
 #pragma omp critical
    {
       _v = new T[nzmax];
-      _r = new int[nzmax];
-      _pB = new int[_n+1];
+      _r = new INTM[nzmax];
+      _pB = new INTM[_n+1];
    }
    _pE = _pB+1;
-   for (int i = 0; i<=_n; ++i) _pB[i]=0;
+   for (INTM i = 0; i<=_n; ++i) _pB[i]=0;
 };
 
 /// resize the matrix
@@ -4274,9 +4252,9 @@ inline void SpMatrix<T>::multTrans(const Vector<T>& x, Vector<T>& y,
       y.setZeros();
    }
    const T* prX = x.rawX();
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       T sum=T();
-      for (int j = _pB[i]; j<_pE[i]; ++j) {
+      for (INTM j = _pB[i]; j<_pE[i]; ++j) {
          sum+=_v[j]*prX[_r[j]];
       }
       y[i] += alpha*sum;
@@ -4295,7 +4273,7 @@ inline void SpMatrix<T>::multTrans(const SpVector<T>& x, Vector<T>& y,
    }
    T* prY = y.rawX();
    SpVector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,col);
       prY[i] += alpha*x.dot(col);
    }
@@ -4313,9 +4291,9 @@ inline void SpMatrix<T>::mult(const Vector<T>& x, Vector<T>& y,
       y.setZeros();
    }
    const T* prX = x.rawX();
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       T sca=alpha* prX[i];
-      for (int j = _pB[i]; j<_pE[i]; ++j) {
+      for (INTM j = _pB[i]; j<_pE[i]; ++j) {
          y[_r[j]] += sca*_v[j];
       }
    }
@@ -4333,10 +4311,10 @@ inline void SpMatrix<T>::mult(const SpVector<T>& x, Vector<T>& y,
       y.setZeros();
    }
    T* prY = y.rawX();
-   for (int i = 0; i<x.L(); ++i) {
-      int ind=x.r(i);
+   for (INTM i = 0; i<x.L(); ++i) {
+      INTM ind=x.r(i);
       T val = alpha * x.v(i);
-      for (int j = _pB[ind]; j<_pE[ind]; ++j) {
+      for (INTM j = _pB[ind]; j<_pE[ind]; ++j) {
          prY[_r[j]] += val *_v[j];
       }
    }
@@ -4357,7 +4335,7 @@ inline void SpMatrix<T>::mult(const Matrix<T>& B, Matrix<T>& C,
          }
          SpVector<T> tmp;
          Vector<T> row(B.m());
-         for (int i = 0; i<_n; ++i) {
+         for (INTM i = 0; i<_n; ++i) {
             this->refCol(i,tmp);
             B.mult(tmp,row);
             C.addRow(i,row,a);
@@ -4371,7 +4349,7 @@ inline void SpMatrix<T>::mult(const Matrix<T>& B, Matrix<T>& C,
          }
          SpVector<T> tmp;
          Vector<T> row(B.n());
-         for (int i = 0; i<_n; ++i) {
+         for (INTM i = 0; i<_n; ++i) {
             this->refCol(i,tmp);
             B.multTrans(tmp,row);
             C.addRow(i,row,a);
@@ -4387,7 +4365,7 @@ inline void SpMatrix<T>::mult(const Matrix<T>& B, Matrix<T>& C,
          }
          Vector<T> row(B.n());
          Vector<T> col;
-         for (int i = 0; i<B.m(); ++i) {
+         for (INTM i = 0; i<B.m(); ++i) {
             B.copyRow(i,row);
             C.refCol(i,col);
             this->mult(row,col,a,T(1.0));
@@ -4401,7 +4379,7 @@ inline void SpMatrix<T>::mult(const Matrix<T>& B, Matrix<T>& C,
          }
          Vector<T> colB;
          Vector<T> colC;
-         for (int i = 0; i<B.n(); ++i) {
+         for (INTM i = 0; i<B.n(); ++i) {
             B.refCol(i,colB);
             C.refCol(i,colC);
             this->mult(colB,colC,a,T(1.0));
@@ -4425,7 +4403,7 @@ inline void SpMatrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          SpVector<T> tmp;
          Vector<T> row(B.m());
-         for (int i = 0; i<_n; ++i) {
+         for (INTM i = 0; i<_n; ++i) {
             this->refCol(i,tmp);
             B.mult(tmp,row);
             C.addRow(i,row,a);
@@ -4439,7 +4417,7 @@ inline void SpMatrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          SpVector<T> tmp;
          Vector<T> row(B.n());
-         for (int i = 0; i<_n; ++i) {
+         for (INTM i = 0; i<_n; ++i) {
             this->refCol(i,tmp);
             B.multTrans(tmp,row);
             C.addRow(i,row,a);
@@ -4455,7 +4433,7 @@ inline void SpMatrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          SpVector<T> colB;
          SpVector<T> colA;
-         for (int i = 0; i<_n; ++i) {
+         for (INTM i = 0; i<_n; ++i) {
             this->refCol(i,colA);
             B.refCol(i,colB);
             C.rank1Update(colA,colB,a);
@@ -4469,7 +4447,7 @@ inline void SpMatrix<T>::mult(const SpMatrix<T>& B, Matrix<T>& C,
          }
          SpVector<T> colB;
          Vector<T> colC;
-         for (int i = 0; i<B.n(); ++i) {
+         for (INTM i = 0; i<B.n(); ++i) {
             B.refCol(i,colB);
             C.refCol(i,colC);
             this->mult(colB,colC,a);
@@ -4489,8 +4467,8 @@ inline void SpMatrix<T>::multSwitch(const Matrix<T>& B, Matrix<T>& C,
 template <typename T>
 inline T SpMatrix<T>::dot(const Matrix<T>& x) const {
    T sum=0;
-   for (int i = 0; i<_n; ++i)
-      for (int j = _pB[i]; j<_pE[i]; ++j) {
+   for (INTM i = 0; i<_n; ++i)
+      for (INTM j = _pB[i]; j<_pE[i]; ++j) {
          sum+=_v[j]*x(_r[j],j);
       }
    return sum;
@@ -4498,11 +4476,11 @@ inline T SpMatrix<T>::dot(const Matrix<T>& x) const {
 
 
 template <typename T>
-inline void SpMatrix<T>::copyRow(const int ind, Vector<T>& x) const {
+inline void SpMatrix<T>::copyRow(const INTM ind, Vector<T>& x) const {
    x.resize(_n);
    x.setZeros();
-   for (int i = 0; i<_n; ++i) {
-      for (int j = _pB[i]; j<_pE[i]; ++j) {
+   for (INTM i = 0; i<_n; ++i) {
+      for (INTM j = _pB[i]; j<_pE[i]; ++j) {
          if (_r[j]==ind) {
             x[i]=_v[j];
          } else if (_r[j] > ind) {
@@ -4517,12 +4495,12 @@ inline void SpMatrix<T>::addVecToCols(
       const Vector<T>& vec, const T a) {
    const T* pr_vec = vec.rawX();
    if (isEqual(a,T(1.0))) {
-      for (int i = 0; i<_n; ++i) 
-         for (int j = _pB[i]; j<_pE[i]; ++j) 
+      for (INTM i = 0; i<_n; ++i) 
+         for (INTM j = _pB[i]; j<_pE[i]; ++j) 
             _v[j] += pr_vec[_r[j]];
    } else {
-      for (int i = 0; i<_n; ++i) 
-         for (int j = _pB[i]; j<_pE[i]; ++j) 
+      for (INTM i = 0; i<_n; ++i) 
+         for (INTM j = _pB[i]; j<_pE[i]; ++j) 
             _v[j] += a*pr_vec[_r[j]];
    }
 };
@@ -4532,12 +4510,12 @@ inline void SpMatrix<T>::addVecToColsWeighted(
       const Vector<T>& vec, const T* weights, const T a) {
    const T* pr_vec = vec.rawX();
    if (isEqual(a,T(1.0))) {
-      for (int i = 0; i<_n; ++i) 
-         for (int j = _pB[i]; j<_pE[i]; ++j) 
+      for (INTM i = 0; i<_n; ++i) 
+         for (INTM j = _pB[i]; j<_pE[i]; ++j) 
             _v[j] += pr_vec[_r[j]]*weights[j-_pB[i]];
    } else {
-      for (int i = 0; i<_n; ++i) 
-         for (int j = _pB[i]; j<_pE[i]; ++j) 
+      for (INTM i = 0; i<_n; ++i) 
+         for (INTM j = _pB[i]; j<_pE[i]; ++j) 
             _v[j] += a*pr_vec[_r[j]]*weights[j-_pB[i]];
    }
 };
@@ -4547,7 +4525,7 @@ inline void SpMatrix<T>::sum_cols(Vector<T>& sum) const {
    sum.resize(_m);
    sum.setZeros();
    SpVector<T> tmp;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,tmp);
       sum.add(tmp);
    }
@@ -4555,9 +4533,9 @@ inline void SpMatrix<T>::sum_cols(Vector<T>& sum) const {
 
 /// aat <- A*A'
 template <typename T> inline void SpMatrix<T>::AAt(Matrix<T>& aat) const {
-   int i,j,k;
-   int K=_m;
-   int M=_n;
+   INTM i,j,k;
+   INTM K=_m;
+   INTM M=_n;
 
    /* compute alpha alpha^T */
    aat.resize(K,K);
@@ -4593,7 +4571,7 @@ inline void SpMatrix<T>::XtX(Matrix<T>& XtX) const {
    XtX.setZeros();
    SpVector<T> col;
    Vector<T> col_out;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,col);
       XtX.refCol(i,col_out);
       this->multTrans(col,col_out);
@@ -4603,10 +4581,10 @@ inline void SpMatrix<T>::XtX(Matrix<T>& XtX) const {
 
 /// aat <- A(:,indices)*A(:,indices)'
 template <typename T> inline void SpMatrix<T>::AAt(Matrix<T>& aat,
-      const Vector<int>& indices) const {
-   int i,j,k;
-   int K=_m;
-   int M=indices.n();
+      const Vector<INTM>& indices) const {
+   INTM i,j,k;
+   INTM K=_m;
+   INTM M=indices.n();
 
    /* compute alpha alpha^T */
    aat.resize(K,K);
@@ -4616,7 +4594,7 @@ template <typename T> inline void SpMatrix<T>::AAt(Matrix<T>& aat,
 
 #pragma omp parallel for private(i,j,k)
    for (i = 0; i<M; ++i) {
-      int ii = indices[i];
+      INTM ii = indices[i];
 #ifdef _OPENMP
       int numT=omp_get_thread_num();
 #else
@@ -4640,9 +4618,9 @@ template <typename T> inline void SpMatrix<T>::AAt(Matrix<T>& aat,
 /// aat <- sum_i w_i A(:,i)*A(:,i)'
 template <typename T> inline void SpMatrix<T>::wAAt(const Vector<T>& w,
       Matrix<T>& aat) const {
-   int i,j,k;
-   int K=_m;
-   int M=_n;
+   INTM i,j,k;
+   INTM K=_m;
+   INTM M=_n;
 
    /* compute alpha alpha^T */
    aat.resize(K,K);
@@ -4675,10 +4653,10 @@ template <typename T> inline void SpMatrix<T>::wAAt(const Vector<T>& w,
 /// XAt <- X*A'
 template <typename T> inline void SpMatrix<T>::XAt(const Matrix<T>& X,
       Matrix<T>& XAt) const {
-   int j,i;
-   int n=X._m;
-   int K=_m;
-   int M=_n;
+   INTM j,i;
+   INTM n=X._m;
+   INTM K=_m;
+   INTM M=_n;
 
    XAt.resize(n,K);
    /* compute X alpha^T */
@@ -4707,11 +4685,11 @@ template <typename T> inline void SpMatrix<T>::XAt(const Matrix<T>& X,
 
 /// XAt <- X(:,indices)*A(:,indices)'
 template <typename T> inline void SpMatrix<T>::XAt(const Matrix<T>& X,
-      Matrix<T>& XAt, const Vector<int>& indices) const {
-   int j,i;
-   int n=X._m;
-   int K=_m;
-   int M=indices.n();
+      Matrix<T>& XAt, const Vector<INTM>& indices) const {
+   INTM j,i;
+   INTM n=X._m;
+   INTM K=_m;
+   INTM M=indices.n();
 
    XAt.resize(n,K);
    /* compute X alpha^T */
@@ -4721,7 +4699,7 @@ template <typename T> inline void SpMatrix<T>::XAt(const Matrix<T>& X,
 
 #pragma omp parallel for private(i,j)
    for (i = 0; i<M; ++i) {
-      int ii = indices[i];
+      INTM ii = indices[i];
 #ifdef _OPENMP
       int numT=omp_get_thread_num();
 #else
@@ -4742,12 +4720,12 @@ template <typename T> inline void SpMatrix<T>::XAt(const Matrix<T>& X,
 /// XAt <- sum_i w_i X(:,i)*A(:,i)'
 template <typename T> inline void SpMatrix<T>::wXAt(const Vector<T>& w,
       const Matrix<T>& X, Matrix<T>& XAt, const int numThreads) const {
-   int j,l,i;
-   int n=X._m;
-   int K=_m;
-   int M=_n;
-   int Mx = X._n;
-   int numRepX= M/Mx;
+   INTM j,l,i;
+   INTM n=X._m;
+   INTM K=_m;
+   INTM M=_n;
+   INTM Mx = X._n;
+   INTM numRepX= M/Mx;
    assert(numRepX*Mx == M);
    XAt.resize(n,K);
    /* compute X alpha^T */
@@ -4764,7 +4742,7 @@ template <typename T> inline void SpMatrix<T>::wXAt(const Vector<T>& w,
 #endif
       T * write_area=XatT+numT*n*K;
       for (l = 0; l<numRepX; ++l) {
-         int ind=numRepX*i+l;
+         INTM ind=numRepX*i+l;
          if (w._X[ind] != 0)
             for (j = _pB[ind]; j<_pE[ind]; ++j) {
                cblas_axpy<T>(n,w._X[ind]*_v[j],X._X+i*n,1,write_area+_r[j]*n,1);
@@ -4783,8 +4761,8 @@ template<typename T> inline void SpMatrix<T>::toFull(Matrix<T>& matrix) const {
    matrix.resize(_m,_n);
    matrix.setZeros();
    T* out = matrix._X;
-   for (int i=0; i<_n; ++i) {
-      for (int j = _pB[i]; j<_pE[i]; ++j) {
+   for (INTM i=0; i<_n; ++i) {
+      for (INTM j = _pB[i]; j<_pE[i]; ++j) {
          out[i*_m+_r[j]]=_v[j];
       }
    }
@@ -4796,8 +4774,8 @@ template <typename T> inline void SpMatrix<T>::toFullTrans(
    matrix.resize(_n,_m);
    matrix.setZeros();
    T* out = matrix._X;
-   for (int i=0; i<_n; ++i) {
-      for (int j = _pB[i]; j<_pE[i]; ++j) {
+   for (INTM i=0; i<_n; ++i) {
+      for (INTM j = _pB[i]; j<_pE[i]; ++j) {
          out[i+_r[j]*_n]=_v[j];
       }
    }
@@ -4806,47 +4784,47 @@ template <typename T> inline void SpMatrix<T>::toFullTrans(
 
 /// use the data from v, r for _v, _r
 template <typename T> inline void SpMatrix<T>::convert(const Matrix<T>&vM, 
-      const Matrix<int>& rM, const int K) {
-   const int M = rM.n();
-   const int L = rM.m();
-   const int* r = rM.X();
+      const Matrix<INTM>& rM, const INTM K) {
+   const INTM M = rM.n();
+   const INTM L = rM.m();
+   const INTM* r = rM.X();
    const T* v = vM.X();
-   int count=0;
-   for (int i = 0; i<M*L; ++i) if (r[i] != -1) ++count;
+   INTM count=0;
+   for (INTM i = 0; i<M*L; ++i) if (r[i] != -1) ++count;
    resize(K,M,count);
    count=0;
-   for (int i = 0; i<M; ++i) {
+   for (INTM i = 0; i<M; ++i) {
       _pB[i]=count;
-      for (int j = 0; j<L; ++j) {
+      for (INTM j = 0; j<L; ++j) {
          if (r[i*L+j] == -1) break;
          _v[count]=v[i*L+j];
          _r[count++]=r[i*L+j];
       }
       _pE[i]=count;
    }
-   for (int i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
+   for (INTM i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
 };
 
 /// use the data from v, r for _v, _r
 template <typename T> inline void SpMatrix<T>::convert2(
-      const Matrix<T>&vM, const Vector<int>& rv, const int K) {
-   const int M = vM.n();
-   const int L = vM.m();
-   int* r = rv.rawX();
+      const Matrix<T>&vM, const Vector<INTM>& rv, const INTM K) {
+   const INTM M = vM.n();
+   const INTM L = vM.m();
+   INTM* r = rv.rawX();
    const T* v = vM.X();
-   int LL=0;
-   for (int i = 0; i<L; ++i) if (r[i] != -1) ++LL;
+   INTM LL=0;
+   for (INTM i = 0; i<L; ++i) if (r[i] != -1) ++LL;
    this->resize(K,M,LL*M);
-   int count=0;
-   for (int i = 0; i<M; ++i) {
+   INTM count=0;
+   for (INTM i = 0; i<M; ++i) {
       _pB[i]=count;
-      for (int j = 0; j<LL; ++j) {
+      for (INTM j = 0; j<LL; ++j) {
          _v[count]=v[i*L+j];
          _r[count++]=r[j];
       }
       _pE[i]=count;
    }
-   for (int i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
+   for (INTM i = 0; i<M; ++i) sort(_r,_v,_pB[i],_pE[i]-1);
 };
 
 /// returns the l2 norms ^2 of the columns
@@ -4854,7 +4832,7 @@ template <typename T>
 inline void SpMatrix<T>::norm_2sq_cols(Vector<T>& norms) const {
    norms.resize(_n);
    SpVector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,col);
       norms[i] = col.nrm2sq();
    }
@@ -4864,7 +4842,7 @@ template <typename T>
 inline void SpMatrix<T>::norm_0_cols(Vector<T>& norms) const {
    norms.resize(_n);
    SpVector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,col);
       norms[i] = static_cast<T>(col.length());
    }
@@ -4874,7 +4852,7 @@ template <typename T>
 inline void SpMatrix<T>::norm_1_cols(Vector<T>& norms) const {
    norms.resize(_n);
    SpVector<T> col;
-   for (int i = 0; i<_n; ++i) {
+   for (INTM i = 0; i<_n; ++i) {
       this->refCol(i,col);
       norms[i] =col.asum();
    }
@@ -4887,16 +4865,16 @@ inline void SpMatrix<T>::norm_1_cols(Vector<T>& norms) const {
 
 
 /// Constructor, of the sparse vector of size L.
-template <typename T> SpVector<T>::SpVector(T* v, int* r, int L, int nzmax) :
+template <typename T> SpVector<T>::SpVector(T* v, INTM* r, INTM L, INTM nzmax) :
    _externAlloc(true), _v(v), _r(r), _L(L), _nzmax(nzmax)  { };
 
 /// Constructor, allocates nzmax slots
-template <typename T> SpVector<T>::SpVector(int nzmax) :
+template <typename T> SpVector<T>::SpVector(INTM nzmax) :
    _externAlloc(false), _L(0), _nzmax(nzmax) {
 #pragma omp critical
       {
          _v = new T[nzmax];
-         _r = new int[nzmax];
+         _r = new INTM[nzmax];
       }
    };
 
@@ -4934,13 +4912,13 @@ template <typename T> inline T SpVector<T>::fmaxval() const {
 template <typename T> inline void SpVector<T>::print(const string& name) const {
    std::cerr << name << std::endl;
    std::cerr << _nzmax << std::endl;
-   for (int i = 0; i<_L; ++i)
+   for (INTM i = 0; i<_L; ++i)
       cerr << "(" <<_r[i] << ", " <<  _v[i] << ")" << endl;
 };
 
 /// create a reference on the vector r
 template <typename T> inline void SpVector<T>::refIndices(
-      Vector<int>& indices) const {
+      Vector<INTM>& indices) const {
    indices.setPointer(_r,_L);   
 };
 
@@ -4963,11 +4941,11 @@ inline void SpVector<T>::scal(const T a) {
 template <typename T>
 inline T SpVector<T>::dot(const SpVector<T>& vec) const {
    T sum=T();
-   int countI = 0;
-   int countJ = 0;
+   INTM countI = 0;
+   INTM countJ = 0;
    while (countI < _L && countJ < vec._L) {
-      const int rI = _r[countI];
-      const int rJ = vec._r[countJ];
+      const INTM rI = _r[countI];
+      const INTM rJ = vec._r[countJ];
       if (rI > rJ) {
          ++countJ;
       } else if (rJ > rI) {
@@ -4984,7 +4962,7 @@ inline T SpVector<T>::dot(const SpVector<T>& vec) const {
 template <typename T>
 inline T SpVector<T>::dot(const Vector<T>& vec) const {
    T sum=T();
-   int countI = 0;
+   INTM countI = 0;
    while (countI < _L) 
       sum+=_v[countI++]*vec[_r[countI]];
    return sum;
@@ -5004,7 +4982,7 @@ template <typename T> inline void SpVector<T>::clear() {
 };
 
 /// resizes the vector
-template <typename T> inline void SpVector<T>::resize(const int nzmax) {
+template <typename T> inline void SpVector<T>::resize(const INTM nzmax) {
    if (_nzmax != nzmax) {
       clear();
       _nzmax=nzmax;
@@ -5013,22 +4991,22 @@ template <typename T> inline void SpVector<T>::resize(const int nzmax) {
 #pragma omp critical
       {
          _v=new T[nzmax];
-         _r=new int[nzmax];
+         _r=new INTM[nzmax];
       }
    }
 };
 
 template <typename T> void inline SpVector<T>::toSpMatrix(
-      SpMatrix<T>& out, const int m, const int n) const {
+      SpMatrix<T>& out, const INTM m, const INTM n) const {
    out.resize(m,n,_L);
    cblas_copy<T>(_L,_v,1,out._v,1);
-   int current_col=0;
+   INTM current_col=0;
    T* out_v=out._v;
-   int* out_r=out._r;
-   int* out_pB=out._pB;
+   INTM* out_r=out._r;
+   INTM* out_pB=out._pB;
    out_pB[0]=current_col;
-   for (int i = 0; i<_L; ++i) {
-      int col=_r[i]/m;
+   for (INTM i = 0; i<_L; ++i) {
+      INTM col=_r[i]/m;
       if (col > current_col) {
          out_pB[current_col+1]=i;
          current_col++;
@@ -5045,7 +5023,7 @@ template <typename T> void inline SpVector<T>::toFull(Vector<T>& out)
    const {
       out.setZeros();
       T* X = out.rawX();
-      for (int i = 0; i<_L; ++i)
+      for (INTM i = 0; i<_L; ++i)
          X[_r[i]]=_v[i];
    };
 
@@ -5108,7 +5086,7 @@ template <typename T> inline void ProdMatrix<T>::setMatrices(
 };
 
 /// compute DtX(:,i)
-template <typename T> inline void ProdMatrix<T>::copyCol(const int i, Vector<T>& DtXi) const {
+template <typename T> inline void ProdMatrix<T>::copyCol(const INTM i, Vector<T>& DtXi) const {
    if (_high_memory) {
       _DtX->copyCol(i,DtXi);
    } else {
@@ -5120,7 +5098,7 @@ template <typename T> inline void ProdMatrix<T>::copyCol(const int i, Vector<T>&
 };
 
 /// compute DtX(:,i)
-template <typename T> inline void ProdMatrix<T>::extract_rawCol(const int i,T* DtXi) const {
+template <typename T> inline void ProdMatrix<T>::extract_rawCol(const INTM i,T* DtXi) const {
    if (_high_memory) {
       _DtX->extract_rawCol(i,DtXi);
    } else {
@@ -5132,7 +5110,7 @@ template <typename T> inline void ProdMatrix<T>::extract_rawCol(const int i,T* D
    } 
 };
 
-template <typename T> inline void ProdMatrix<T>::add_rawCol(const int i,T* DtXi,
+template <typename T> inline void ProdMatrix<T>::add_rawCol(const INTM i,T* DtXi,
       const T a) const {
    if (_high_memory) {
       _DtX->add_rawCol(i,DtXi,a);
@@ -5155,12 +5133,12 @@ template <typename T> void inline ProdMatrix<T>::addDiag(const T diag) {
    }
 };
 
-template <typename T> inline T ProdMatrix<T>::operator[](const int index) const {
+template <typename T> inline T ProdMatrix<T>::operator[](const INTM index) const {
    if (_high_memory) {
       return (*_DtX)[index];
    } else {
-      const int index2=index/this->_m;
-      const int index1=index-this->_m*index2;
+      const INTM index2=index/this->_m;
+      const INTM index1=index-this->_m*index2;
       Vector<T> col1, col2;
       _D->refCol(index1,col1);
       _X->refCol(index2,col2);
@@ -5169,8 +5147,8 @@ template <typename T> inline T ProdMatrix<T>::operator[](const int index) const 
 };
 
 
-template <typename T> inline T ProdMatrix<T>::operator()(const int index1,
-      const int index2) const {
+template <typename T> inline T ProdMatrix<T>::operator()(const INTM index1,
+      const INTM index2) const {
    if (_high_memory) {
       return (*_DtX)(index1,index2);
    } else {
@@ -5187,7 +5165,7 @@ template <typename T> void inline ProdMatrix<T>::diag(Vector<T>& diag) const {
          _DtX->diag(diag);
       } else {
          Vector<T> col1, col2;
-         for (int i = 0; i <_m; ++i) {
+         for (INTM i = 0; i <_m; ++i) {
             _D->refCol(i,col1);
             _X->refCol(i,col2);
             diag[i] = col1.dot(col2);
@@ -5199,84 +5177,84 @@ template <typename T> void inline ProdMatrix<T>::diag(Vector<T>& diag) const {
 template <typename T> class SubMatrix : public AbstractMatrix<T> {
 
    public:
-      SubMatrix(AbstractMatrix<T>& G, Vector<int>& indI, Vector<int>& indJ);
+      SubMatrix(AbstractMatrix<T>& G, Vector<INTM>& indI, Vector<INTM>& indJ);
 
-      void inline convertIndicesI(Vector<int>& ind) const;
-      void inline convertIndicesJ(Vector<int>& ind) const;
-      int inline n() const { return _indicesJ.n(); };
-      int inline m() const { return _indicesI.n(); };
-      void inline extract_rawCol(const int i, T* pr) const;
+      void inline convertIndicesI(Vector<INTM>& ind) const;
+      void inline convertIndicesJ(Vector<INTM>& ind) const;
+      INTM inline n() const { return _indicesJ.n(); };
+      INTM inline m() const { return _indicesI.n(); };
+      void inline extract_rawCol(const INTM i, T* pr) const;
       /// compute DtX(:,i)
-      inline void copyCol(const int i, Vector<T>& DtXi) const;
+      inline void copyCol(const INTM i, Vector<T>& DtXi) const;
       /// compute DtX(:,i)
-      inline void add_rawCol(const int i, T* DtXi, const T a) const;
+      inline void add_rawCol(const INTM i, T* DtXi, const T a) const;
       /// compute DtX(:,i)
       inline void diag(Vector<T>& diag) const;
-      inline T operator()(const int index1, const int index2) const;
+      inline T operator()(const INTM index1, const INTM index2) const;
 
    private:
-      Vector<int> _indicesI;
-      Vector<int> _indicesJ;
+      Vector<INTM> _indicesI;
+      Vector<INTM> _indicesJ;
       AbstractMatrix<T>* _matrix;
 };
 
 template <typename T> 
-SubMatrix<T>::SubMatrix(AbstractMatrix<T>& G, Vector<int>& indI, Vector<int>& indJ) {
+SubMatrix<T>::SubMatrix(AbstractMatrix<T>& G, Vector<INTM>& indI, Vector<INTM>& indJ) {
    _matrix = &G;
    _indicesI.copy(indI);
    _indicesJ.copy(indJ);
 };
 
 template <typename T> void inline SubMatrix<T>::convertIndicesI(
-      Vector<int>& ind) const {
-   int* pr_ind = ind.rawX();
-   for (int i = 0; i<ind.n(); ++i) {
+      Vector<INTM>& ind) const {
+   INTM* pr_ind = ind.rawX();
+   for (INTM i = 0; i<ind.n(); ++i) {
       if (pr_ind[i] == -1) break;
       pr_ind[i]=_indicesI[pr_ind[i]];
    }
 };
 
 template <typename T> void inline SubMatrix<T>::convertIndicesJ(
-      Vector<int>& ind) const {
-   int* pr_ind = ind.rawX();
-   for (int i = 0; i<ind.n(); ++i) {
+      Vector<INTM>& ind) const {
+   INTM* pr_ind = ind.rawX();
+   for (INTM i = 0; i<ind.n(); ++i) {
       if (pr_ind[i] == -1) break;
       pr_ind[i]=_indicesJ[pr_ind[i]];
    }
 };
 
-template <typename T> void inline SubMatrix<T>::extract_rawCol(const int i, T* pr) const {
-   int* pr_ind=_indicesI.rawX();
-   int* pr_ind2=_indicesJ.rawX();
-   for (int j = 0; j<_indicesI.n(); ++j) {
+template <typename T> void inline SubMatrix<T>::extract_rawCol(const INTM i, T* pr) const {
+   INTM* pr_ind=_indicesI.rawX();
+   INTM* pr_ind2=_indicesJ.rawX();
+   for (INTM j = 0; j<_indicesI.n(); ++j) {
       pr[j]=(*_matrix)(pr_ind[j],pr_ind2[i]);
    }
 };
 
-template <typename T> inline void SubMatrix<T>::copyCol(const int i, 
+template <typename T> inline void SubMatrix<T>::copyCol(const INTM i, 
       Vector<T>& DtXi) const {
    this->extract_rawCol(i,DtXi.rawX());
 };
 
-template <typename T> void inline SubMatrix<T>::add_rawCol(const int i, T* pr,
+template <typename T> void inline SubMatrix<T>::add_rawCol(const INTM i, T* pr,
       const T a) const {
-   int* pr_ind=_indicesI.rawX();
-   int* pr_ind2=_indicesJ.rawX();
-   for (int j = 0; j<_indicesI.n(); ++j) {
+   INTM* pr_ind=_indicesI.rawX();
+   INTM* pr_ind2=_indicesJ.rawX();
+   for (INTM j = 0; j<_indicesI.n(); ++j) {
       pr[j]+=a*(*_matrix)(pr_ind[j],pr_ind2[i]);
    }
 };
 
 template <typename T> void inline SubMatrix<T>::diag(Vector<T>& diag) const {
    T* pr = diag.rawX();
-   int* pr_ind=_indicesI.rawX();
-   for (int j = 0; j<_indicesI.n(); ++j) {
+   INTM* pr_ind=_indicesI.rawX();
+   for (INTM j = 0; j<_indicesI.n(); ++j) {
       pr[j]=(*_matrix)(pr_ind[j],pr_ind[j]);
    }
 };
 
-template <typename T> inline T SubMatrix<T>::operator()(const int index1, 
-      const int index2) const {
+template <typename T> inline T SubMatrix<T>::operator()(const INTM index1, 
+      const INTM index2) const {
    return (*_matrix)(_indicesI[index1],_indicesJ[index2]);
 }
 
@@ -5288,8 +5266,8 @@ template <typename T> class ShiftMatrix : public AbstractMatrixB<T> {
          _n=_inputmatrix->n()*shifts;
          if (center) this->center();
       };
-      int n() const { return _n; };
-      int m() const { return _m; };
+      INTM n() const { return _n; };
+      INTM m() const { return _m; };
 
       /// b <- alpha A'x + beta b
       void multTrans(const Vector<T>& x, Vector<T>& b,
@@ -5319,7 +5297,7 @@ template <typename T> class ShiftMatrix : public AbstractMatrixB<T> {
       /// XtX = A'*A
       virtual void XtX(Matrix<T>& XtX) const;
 
-      virtual void copyRow(const int i, Vector<T>& x) const;
+      virtual void copyRow(const INTM i, Vector<T>& x) const;
 
       virtual void copyTo(Matrix<T>& copy) const;
       virtual T dot(const Matrix<T>& x) const;
@@ -5335,8 +5313,8 @@ template <typename T> class ShiftMatrix : public AbstractMatrixB<T> {
          this->multTrans(ones,_means);
          _centered=true;  };
 
-      int _m;
-      int _n;
+      INTM _m;
+      INTM _n;
       int _shifts;
       bool _centered;
       Vector<T> _means;
@@ -5350,7 +5328,7 @@ template <typename T> void ShiftMatrix<T>::multTrans(const
    Vector<T> tmp(_inputmatrix->m());
    Vector<T> subvec;
    Vector<T> subvec2;
-   const int nn=_inputmatrix->n();
+   const INTM nn=_inputmatrix->n();
    for (int i = 0; i<_shifts; ++i) {
       tmp.setZeros();
       subvec2.setData(tmp.rawX()+i,_m);
@@ -5373,8 +5351,8 @@ template <typename T> void ShiftMatrix<T>::mult(const
    } else {
       b.scal(beta);
    }
-   const int nn=_inputmatrix->n();
-   const int mm=_inputmatrix->m();
+   const INTM nn=_inputmatrix->n();
+   const INTM mm=_inputmatrix->m();
    Vector<T> fullx(_n);
    x.toFull(fullx);
    SpVector<T> sptmp(nn);
@@ -5396,8 +5374,8 @@ template <typename T> void ShiftMatrix<T>::mult(const
 template <typename T> void ShiftMatrix<T>::mult(const
       Vector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
    b.resize(_m);
-   const int nn=_inputmatrix->n();
-   const int mm=_inputmatrix->m();
+   const INTM nn=_inputmatrix->n();
+   const INTM mm=_inputmatrix->m();
    Vector<T> tmp;
    Vector<T> tmp2(mm);
    if (beta==0) {
@@ -5439,9 +5417,9 @@ template <typename T> void ShiftMatrix<T>::XtX(Matrix<T>& XtX) const {
    cerr << "Shift Matrix is used in inadequate setting" << endl;
 };
 
-template <typename T> void ShiftMatrix<T>::copyRow(const int ind, Vector<T>& x) const {
+template <typename T> void ShiftMatrix<T>::copyRow(const INTM ind, Vector<T>& x) const {
    Vector<T> sub_vec;
-   const int mm=_inputmatrix->m();
+   const INTM mm=_inputmatrix->m();
    for (int i = 0; i<_shifts; ++i) {
       sub_vec.setData(x.rawX()+i*mm,mm);
       _inputmatrix->copyRow(ind+i,sub_vec);
@@ -5472,8 +5450,8 @@ template <typename T> class DoubleRowMatrix : public AbstractMatrixB<T> {
          _n=inputmatrix.n();
          _m=2*inputmatrix.m();
       };
-      int n() const { return _n; };
-      int m() const { return _m; };
+      INTM n() const { return _n; };
+      INTM m() const { return _m; };
 
       /// b <- alpha A'x + beta b
       void multTrans(const Vector<T>& x, Vector<T>& b,
@@ -5503,7 +5481,7 @@ template <typename T> class DoubleRowMatrix : public AbstractMatrixB<T> {
       /// XtX = A'*A
       virtual void XtX(Matrix<T>& XtX) const;
 
-      virtual void copyRow(const int i, Vector<T>& x) const;
+      virtual void copyRow(const INTM i, Vector<T>& x) const;
 
       virtual void copyTo(Matrix<T>& copy) const;
       virtual T dot(const Matrix<T>& x) const;
@@ -5513,17 +5491,17 @@ template <typename T> class DoubleRowMatrix : public AbstractMatrixB<T> {
       virtual ~DoubleRowMatrix() {  };
 
    private:
-      int _m;
-      int _n;
+      INTM _m;
+      INTM _n;
       const AbstractMatrixB<T>* _inputmatrix;
 };
 
 
 template <typename T> void DoubleRowMatrix<T>::multTrans(const
       Vector<T>& x, Vector<T>& b, const T alpha, const T beta) const {
-   const int mm = _inputmatrix->m();
+   const INTM mm = _inputmatrix->m();
    Vector<T> tmp(mm);
-   for (int i = 0; i<mm; ++i) 
+   for (INTM i = 0; i<mm; ++i) 
       tmp[i]=x[2*i]+x[2*i+1];
    _inputmatrix->multTrans(tmp,b,alpha,beta);
 };
@@ -5538,10 +5516,10 @@ template <typename T> void DoubleRowMatrix<T>::mult(const
    } else {
       b.scal(beta);
    }
-   const int mm = _inputmatrix->m();
+   const INTM mm = _inputmatrix->m();
    Vector<T> tmp(mm);
    _inputmatrix->mult(x,tmp,alpha);
-   for (int i = 0; i<mm; ++i) {
+   for (INTM i = 0; i<mm; ++i) {
       b[2*i]+=tmp[i];
       b[2*i+1]+=tmp[i];
    }
@@ -5556,10 +5534,10 @@ template <typename T> void DoubleRowMatrix<T>::mult(const
    } else {
       b.scal(beta);
    }
-   const int mm = _inputmatrix->m();
+   const INTM mm = _inputmatrix->m();
    Vector<T> tmp(mm);
    _inputmatrix->mult(x,tmp,alpha);
-   for (int i = 0; i<mm; ++i) {
+   for (INTM i = 0; i<mm; ++i) {
       b[2*i]+=tmp[i];
       b[2*i+1]+=tmp[i];
    }
@@ -5592,8 +5570,8 @@ template <typename T> void DoubleRowMatrix<T>::XtX(Matrix<T>& XtX) const {
    cerr << "Double Matrix is used in inadequate setting" << endl;
 };
 
-template <typename T> void DoubleRowMatrix<T>::copyRow(const int ind, Vector<T>& x) const {
-   const int indd2= static_cast<int>(floor(static_cast<double>(ind)/2.0));
+template <typename T> void DoubleRowMatrix<T>::copyRow(const INTM ind, Vector<T>& x) const {
+   const INTM indd2= static_cast<INTM>(floor(static_cast<double>(ind)/2.0));
    _inputmatrix->copyRow(indd2,x);
 };
 

@@ -37,10 +37,10 @@ template <typename T> static inline T ran1b();
 template <typename T> static inline T normalDistrib();
 /// reorganize a sparse table between indices beg and end,
 /// using quicksort
-template <typename T>
-static void sort(int* irOut, T* prOut,int beg, int end);
-template <typename T>
-static void quick_sort(int* irOut, T* prOut,const int beg, const int end, const bool incr);
+template <typename T, typename I>
+static void sort(I* irOut, T* prOut,I beg, I end);
+template <typename T, typename I>
+static void quick_sort(I* irOut, T* prOut,const I beg, const I end, const bool incr);
 /// template version of the power function
 template <typename T>
 T power(const T x, const T y);
@@ -134,22 +134,22 @@ static inline T normalDistrib() {
 
 /// reorganize a sparse table between indices beg and end,
 /// using quicksort
-template <typename T>
-static void sort(int* irOut, T* prOut,int beg, int end) {
-   int i;
+template <typename T, typename I>
+static void sort(I* irOut, T* prOut,I beg, I end) {
+   I i;
    if (end <= beg) return;
-   int pivot=beg;
+   I pivot=beg;
    for (i = beg+1; i<=end; ++i) {
       if (irOut[i] < irOut[pivot]) {
          if (i == pivot+1) {
-            int tmp = irOut[i];
+            I tmp = irOut[i];
             T tmpd = prOut[i];
             irOut[i]=irOut[pivot];
             prOut[i]=prOut[pivot];
             irOut[pivot]=tmp;
             prOut[pivot]=tmpd;
          } else {
-            int tmp = irOut[pivot+1];
+            I tmp = irOut[pivot+1];
             T tmpd = prOut[pivot+1];
             irOut[pivot+1]=irOut[pivot];
             prOut[pivot+1]=prOut[pivot];
@@ -164,14 +164,14 @@ static void sort(int* irOut, T* prOut,int beg, int end) {
    sort(irOut,prOut,beg,pivot-1);
    sort(irOut,prOut,pivot+1,end);
 }
-template <typename T>
-static void quick_sort(int* irOut, T* prOut,const int beg, const int end, const bool incr) {
+template <typename T, typename I>
+static void quick_sort(I* irOut, T* prOut,const I beg, const I end, const bool incr) {
    if (end <= beg) return;
-   int pivot=beg;
+   I pivot=beg;
    if (incr) {
       const T val_pivot=prOut[pivot];
-      const int key_pivot=irOut[pivot];
-      for (int i = beg+1; i<=end; ++i) {
+      const I key_pivot=irOut[pivot];
+      for (I i = beg+1; i<=end; ++i) {
          if (prOut[i] < val_pivot) {
             prOut[pivot]=prOut[i];
             irOut[pivot]=irOut[i];
@@ -183,8 +183,8 @@ static void quick_sort(int* irOut, T* prOut,const int beg, const int end, const 
       }
    } else {
       const T val_pivot=prOut[pivot];
-      const int key_pivot=irOut[pivot];
-      for (int i = beg+1; i<=end; ++i) {
+      const I key_pivot=irOut[pivot];
+      for (I i = beg+1; i<=end; ++i) {
          if (prOut[i] > val_pivot) {
             prOut[pivot]=prOut[i];
             irOut[pivot]=irOut[i];
@@ -195,7 +195,7 @@ static void quick_sort(int* irOut, T* prOut,const int beg, const int end, const 
          } 
       }
    }
-   quick_sort(irOut,prOut,beg,pivot-1,incr);
+   quick_sort<T,I>(irOut,prOut,beg,pivot-1,incr);
    quick_sort(irOut,prOut,pivot+1,end,incr);
 }
 

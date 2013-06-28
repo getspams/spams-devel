@@ -1,5 +1,5 @@
-#ifndef MKL_TEMPLATE
-#define MKL_TEMPLATE
+#ifndef CBLAS_ALT_TEMPLATE
+#define CBLAS_ALCBLAS_ALTT_TEMPLATE
 
 //#include <cblas.h>
 #include <stddef.h>
@@ -10,11 +10,24 @@
 //#include <lapack.h>
 #include <cblas_defvar.h>
 
-#ifdef NEW_MATLAB
-   typedef ptrdiff_t INTT;
+#ifdef NEW_MATLAB_BLAS
+#define INTT ptrdiff_t
 #else
-   typedef int INTT;
+#ifdef OLD_MATLAB_BLAS
+#define INTT int
+#else
+#ifdef MKL_INT
+#define INTT MKL_INT
+#else
+#ifdef INT_64BITS
+#define INTT long long int 
+#else
+#define INTT int
 #endif
+#endif
+#endif
+#endif
+
 
 /// a few static variables for lapack
 static char low='l';
@@ -75,16 +88,16 @@ static char allV='V';
 #endif
 
 /// external functions
-#ifdef HAVE_MKL   // obsolete
-extern "C" {
-#endif
-   size_t cblas_idamin( int n,  double* X,  int incX);
-   size_t cblas_isamin( int n,  float* X,  int incX);
-#ifdef HAVE_MKL
-};
-#endif
+//#ifdef HAVE_MKL   // obsolete
+//extern "C" {
+//#endif
+INTT cblas_idamin( INTT n,  double* X,  INTT incX);
+INTT cblas_isamin( INTT n,  float* X,  INTT incX);
+//#ifdef HAVE_MKL
+//};
+//#endif
 
-#ifdef HAVE_MKL
+/*#ifdef HAVE_MKL
 extern "C" {
    void vdSqr( int n,  double* vecIn, double* vecOut);
    void vsSqr( int n,  float* vecIn, float* vecOut);
@@ -107,7 +120,7 @@ extern "C" {
    void vdAbs( int n,  double* vecIn, double* vecOut);
    void vsAbs( int n,  float* vecIn, float* vecOut);
 }
-#endif
+#endif*/
 
 
 // INTTerfaces to a few BLAS function, Level 1
@@ -331,6 +344,13 @@ template <> inline void cblas_copy<int>( INTT n,  int* X,  INTT incX,
       Y[incY*i]=X[incX*i];
 };
 /// Implementation of the INTTerface for cblas_scopy
+template <> inline void cblas_copy<long long int>( INTT n,  long long int* X,  INTT incX, 
+      long long int* Y,  INTT incY) {
+   for (INTT i = 0; i<n; ++i)
+      Y[incY*i]=X[incX*i];
+};
+
+/// Implementation of the INTTerface for cblas_scopy
 template <> inline void cblas_copy<bool>( INTT n,  bool* X,  INTT incX, 
       bool* Y,  INTT incY) {
    for (int i = 0; i<n; ++i)
@@ -353,9 +373,17 @@ template <> inline void cblas_axpy<float>( INTT n,  float a,  float* X,
 /// Implementation of the INTTerface for cblas_saxpy
 template <> inline void cblas_axpy<int>( INTT n,  int a,  int* X,
        INTT incX, int* Y,  INTT incY) {
-   for (int i = 0; i<n; ++i)
+   for (INTT i = 0; i<n; ++i)
       Y[i] += a*X[i];
 };
+
+/// Implementation of the INTTerface for cblas_saxpy
+template <> inline void cblas_axpy<long long int>( INTT n,  long long int a,   long long int* X,
+       INTT incX,  long long int* Y,  INTT incY) {
+   for (INTT i = 0; i<n; ++i)
+      Y[i] += a*X[i];
+};
+
 
 /// Implementation of the INTTerface for cblas_saxpy
 template <> inline void cblas_axpy<bool>( INTT n,  bool a,  bool* X,
@@ -381,6 +409,9 @@ template <> inline void cblas_scal<float>( INTT n,  float a, float* X,
 template <> inline void cblas_scal<int>( INTT n,  int a, int* X, 
        INTT incX) {
    for (int i = 0; i<n; ++i) X[i*incX]*=a;
+};
+template <> inline void cblas_scal<long long int>( INTT n,  long long int a, long long int* X, INTT incX) {
+   for (long long int i = 0; i < n; ++i) X[i*incX]*=a;
 };
 /// Implementation of the INTTerface for cblas_sscal
 template <> inline void cblas_scal<bool>( INTT n,  bool a, bool* X, 
@@ -422,6 +453,19 @@ template <> inline int cblas_dot<int>( INTT n,  int* X,
    }
    return total;
 };
+template <> inline long long int cblas_dot<long long int>( INTT n,  long long int* X,
+       INTT incX,  long long int* Y, INTT incY) {
+   long long int total=0;
+   INTT i,j;
+   j=0;
+   for (i = 0; i<n; ++i) {
+      total+=X[i*incX]*Y[j];
+      //j+=incY;
+      j+=incY;
+   }
+   return total;
+};
+
 /// Implementation of the INTTerface for cblas_sdot
 template <> inline bool cblas_dot<bool>( INTT n,  bool* X,
        INTT incX,  bool* Y, INTT incY) {
@@ -463,6 +507,13 @@ template <> inline void cblas_gemv<bool>( CBLAS_ORDER order,
        bool *X,  INTT incX,  bool beta,
       bool *Y,  INTT incY) {
    /// not implemented
+};
+template <> inline void cblas_gemv<long long int>( CBLAS_ORDER order,
+       CBLAS_TRANSPOSE TransA,  INTT M,  INTT N,
+       long long int alpha,  long long int *A,  INTT lda,
+       long long int *X,  INTT incX,  long long int beta,
+      long long int *Y,  INTT incY) {
+   ///  not implemented
 };
 
 ///  Implementation of the INTTerface for cblas_dger
@@ -553,6 +604,14 @@ template <> inline void cblas_gemm<int>( CBLAS_ORDER order,
        int beta, int *C,  INTT ldc) {
    /// not implemented
 };
+template <> inline void cblas_gemm<long long int>( CBLAS_ORDER order, 
+       CBLAS_TRANSPOSE TransA,  CBLAS_TRANSPOSE TransB, 
+       INTT M,  INTT N,  INTT K,  long long int alpha, 
+       long long int *A,  INTT lda,  long long int *B,  INTT ldb,
+       long long int beta, long long int *C,  INTT ldc) {
+   /// not implemented
+};
+
 ///  Implementation of the INTTerface for cblas_sgemm
 template <> inline void cblas_gemm<bool>( CBLAS_ORDER order, 
        CBLAS_TRANSPOSE TransA,  CBLAS_TRANSPOSE TransB, 
@@ -585,6 +644,13 @@ template <> inline void cblas_syrk<int>( CBLAS_ORDER order,
        int beta, int *C,  INTT ldc) {
    /// not implemented
 };
+template <> inline void cblas_syrk<long long int>( CBLAS_ORDER order, 
+       CBLAS_UPLO Uplo,  CBLAS_TRANSPOSE Trans,  INTT N,  INTT K,
+       long long int alpha,  long long int *A,  INTT lda,
+       long long int beta, long long int *C,  INTT ldc) {
+   /// not implemented
+};
+
 ///  Implementation of the INTTerface for cblas_ssyrk
 template <> inline void cblas_syrk<bool>( CBLAS_ORDER order, 
        CBLAS_UPLO Uplo,  CBLAS_TRANSPOSE Trans,  INTT N,  INTT K,
@@ -750,6 +816,7 @@ template <> void inline syev( char& jobz, char& uplo, INTT n,
 
 
 /// If the MKL is not present, a slow implementation is used instead.
+/*
 #ifdef HAVE_MKL 
 /// Implemenation of the interface for vdSqr
 template <> inline void vSqr<double>( int n,  double* vecIn, 
@@ -866,7 +933,8 @@ template <> inline int cblas_iamin<float>( int n,  float* x,
    return (int) cblas_isamin(n,x,incx);
 };
 /// slow alternative implementation of some MKL function
-#else
+*/
+//#else
 /// Slow implementation of vdSqr and vsSqr
 template <typename T> inline void vSqr( int n,  T* vecIn, T* vecOut) {
    for (int i = 0; i<n; ++i) vecOut[i]=vecIn[i]*vecIn[i];
@@ -925,6 +993,6 @@ template <typename T> int inline cblas_iamin(INTT n, T* X, INTT incX) {
    }
    return imin;
 }
-#endif
+//#endif
 
 #endif 

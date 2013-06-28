@@ -17,16 +17,16 @@
 #include <math.h>
 #include <assert.h>
 
-#ifdef HAVE_MKL   // obsolete
+//#ifdef HAVE_MKL   // obsolete
 //#include <mkl_cblas.h>
 //#else
 //#include "cblas.h"
-#endif
-#ifdef USE_BLAS_LIB
+//#endif
+//#ifdef USE_BLAS_LIB
 //#include "blas.h"
-#else
-#include "cblas.h"  // dependency upon cblas libraries has been removed in a recent version
-#endif
+//#else
+//#include "cblas.h"  // dependency upon cblas libraries has been removed in a recent version
+//#endif
 
 #include <limits>
 

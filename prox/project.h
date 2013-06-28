@@ -786,8 +786,8 @@ void inline MaxFlow<T>::init_split_variables(SpMatrix<T>& splitted_w, const int 
    }
    /// assumes memory is not an issue
    splitted_w.resize(Nv,Ng,nzmax);
-   int* pB = splitted_w.pB();
-   int* r = splitted_w.r();
+   INTM* pB = splitted_w.pB();
+   INTM* r = splitted_w.r();
    T* v = splitted_w.v();
    pB[0]=0;
    int counter=0;

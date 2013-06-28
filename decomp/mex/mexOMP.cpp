@@ -50,13 +50,13 @@ template <typename T>
       
       T* prX = reinterpret_cast<T*>(mxGetPr(prhs[0]));
       const mwSize* dimsX=mxGetDimensions(prhs[0]);
-      int n=static_cast<int>(dimsX[0]);
-      int M=static_cast<int>(dimsX[1]);
+      INTM n=static_cast<INTM>(dimsX[0]);
+      INTM M=static_cast<INTM>(dimsX[1]);
 
       T* prD = reinterpret_cast<T*>(mxGetPr(prhs[1]));
       const mwSize* dimsD=mxGetDimensions(prhs[1]);
-      int nD=static_cast<int>(dimsD[0]);
-      int K=static_cast<int>(dimsD[1]);
+      INTM nD=static_cast<INTM>(dimsD[0]);
+      INTM K=static_cast<INTM>(dimsD[1]);
       if (n != nD) mexErrMsgTxt("argument sizes are not consistent");
 
       Matrix<T> X(prX,n,M);
@@ -69,12 +69,12 @@ template <typename T>
       mxArray* pr_lambda=mxGetField(prhs[2],0,"lambda");
       if (!pr_L && !pr_eps && !pr_lambda) mexErrMsgTxt("You should either provide L, eps or lambda");
       
-      int sizeL = 1;
+      INTM sizeL = 1;
       int L=MIN(n,K);
       int *pL = &L;
       if (pr_L) {
          const mwSize* dimsL= mxGetDimensions(pr_L);
-         sizeL=static_cast<int>(dimsL[0])*static_cast<int>(dimsL[1]);
+         sizeL=static_cast<INTM>(dimsL[0])*static_cast<INTM>(dimsL[1]);
          if (sizeL > 1) {
             if (!mexCheckType<int>(pr_L)) 
                mexErrMsgTxt("Type of param.L should be int32");
@@ -88,18 +88,18 @@ template <typename T>
       T* pE=&eps;
       if (pr_eps) {
          const mwSize* dimsE=mxGetDimensions(pr_eps);
-         sizeE=static_cast<int>(dimsE[0])*static_cast<int>(dimsE[1]);
+         sizeE=static_cast<INTM>(dimsE[0])*static_cast<INTM>(dimsE[1]);
          eps=static_cast<T>(mxGetScalar(pr_eps));
          if (sizeE > 1) 
             pE = reinterpret_cast<T*>(mxGetPr(pr_eps));
       }
 
       T lambda=0;
-      int sizeLambda=1;
+      INTM sizeLambda=1;
       T* pLambda=&lambda;
       if (pr_lambda) {
          const mwSize* dimsLambda=mxGetDimensions(pr_lambda);
-         sizeLambda=static_cast<int>(dimsLambda[0])*static_cast<int>(dimsLambda[1]);
+         sizeLambda=static_cast<INTM>(dimsLambda[0])*static_cast<INTM>(dimsLambda[1]);
          lambda=static_cast<T>(mxGetScalar(pr_lambda));
          if (sizeLambda > 1) 
             pLambda = reinterpret_cast<T*>(mxGetPr(pr_lambda));

@@ -11,12 +11,22 @@ static int info=0;
 static char incr='I';
 static char decr='D';
 
+#ifdef MKL_INT
+#define BLAS_INT MKL_INT
+#else
+#ifdef INTEGERS_64
+#define BLAS_INT long long int 
+#else 
+#define BLAS_INT int
+#endif
+#endif
+
 /// external functions
 #ifdef HAVE_MKL
 extern "C" {
 #endif
-   size_t cblas_idamin(const int n, const double* X, const int incX);
-   size_t cblas_isamin(const int n, const float* X, const int incX);
+   BLAS_BLAS_INT cblas_idamin(const BLAS_INT n, const double* X, const BLAS_INT incX);
+   BLAS_BLAS_INT cblas_isamin(const BLAS_INT n, const float* X, const BLAS_INT incX);
 #ifdef HAVE_MKL
 };
 #endif

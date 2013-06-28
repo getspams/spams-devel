@@ -2039,9 +2039,9 @@ namespace FISTA {
           for (ListIterator<Path<long long>*> it=paths.begin(); it != paths.end(); ++it)
              nzmax+=it->nodes.size();
           paths_mat.resize(n,paths.size(),nzmax);
-          int* pB =paths_mat.pB();
-          int* pE =paths_mat.pE();
-          int* r =paths_mat.r();
+          INTM* pB =paths_mat.pB();
+          INTM* pE =paths_mat.pE();
+          INTM* r =paths_mat.r();
           T* v =paths_mat.v();
           int count_col=0;
           int count=0;
