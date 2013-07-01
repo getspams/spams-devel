@@ -1,3 +1,6 @@
+#ifndef CBLAS_ALT_TEMPLATE_H
+#define CBLAS_ALT_TEMPLATE_H
+
 #ifndef CBLAS_ALT_TEMPLATE
 #define CBLAS_ALCBLAS_ALTT_TEMPLATE
 
@@ -996,3 +999,5 @@ template <typename T> int inline cblas_iamin(INTT n, T* X, INTT incX) {
 //#endif
 
 #endif 
+
+#endif // CBLAS_ALT_TEMPLATE_H
