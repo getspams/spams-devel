@@ -43,7 +43,7 @@
  **/
 template <typename T>
 void cppOmp(const Matrix<T>& X, const Matrix<T>& D, SpMatrix<T>& spalpha, 
-	 const int *L, const T* eps, const T* lambda= 0., const bool vecL = false,
+	 const int *L, const T* eps, const T* lambda, const bool vecL = false,
 	 const bool vecEps = false, const bool vecLambda=false, const int numThreads=-1,
 	 Matrix<T>* path = NULL)
 {
