@@ -299,6 +299,8 @@ The following piece of code contains usage examples:
 \lstinputlisting{../test_release/test_OMPMask.m}
 
 
+\subsection{Function mexRidgeRegression}
+This is a ridge regression solver using a conjugate gradient solver. Given a 
 
 \subsection{Function mexLasso}
 This is a fast implementation of the LARS algorithm~\cite{efron} (variant for solving the Lasso) for solving the Lasso or Elastic-Net. Given a matrix of signals $\X=[\x^1,\ldots,\x^n]$  in $\Real^{m \times n}$ and a dictionary $\D$ in $\Real^{m \times p}$, depending on the input parameters, the algorithm returns a matrix of coefficients $\A=[\alphab^1,\ldots,\alphab^n]$ in $\Real^{p \times n}$ such that for every column $\x$ of $\X$, the corresponding column $\alphab$ of $\A$ is the solution of

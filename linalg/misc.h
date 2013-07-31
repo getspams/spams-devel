@@ -271,5 +271,12 @@ static inline int init_omp(const int numThreads) {
    return NUM_THREADS;
 }
 
+template <typename T1, typename T2, typename T3> 
+struct Triplet {
+   T1 x;
+   T2 z;
+   T3 s;
+};
+
 
 #endif

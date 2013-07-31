@@ -14,7 +14,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='mex';
+compiler='gcc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -29,11 +29,11 @@ blas='builtin';
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
 % need an appropriate compiler for that (intel compiler, most recent gcc, or visual studio pro)
-use_multithread=true;   % (might not compatible with compiler=mex)
+use_multithread=true; % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
-use_64bits_integers=false;
+use_64bits_integers=true;
 % only use this option if you have VERY large arrays/matrices causing some segfaults
 
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
@@ -45,7 +45,7 @@ use_64bits_integers=false;
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries='/usr/lib/x86_64-linux-gnu/gcc/x86_64-linux-gnu/4.5/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -62,6 +62,9 @@ elseif strcmp(compiler,'icc')
        % example when compiler='icc' for Linux/Mac
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
+       path_to_compiler_libraries='/scratch2/clear/mairal/intel/composerxe/lib/intel64/';
+       path_to_compiler='/scratch2/clear/mairal/intel/composerxe/bin/';
+
     else
        % example when compiler='icc' for Windows
        path_to_compiler_libraries='C:\Program Files (x86)\Intel\Composer XE\compiler\lib\intel64\';
@@ -84,6 +87,7 @@ end
 if strcmp(blas,'mkl')
    if linux || mac
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -114,6 +118,8 @@ end
 out_dir='./build/';
 
 COMPILE = { 
+            '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
+            '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
             % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
@@ -142,6 +148,7 @@ COMPILE = {
             '-I./linalg/ linalg/mex/mexSort.cpp', 
             '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             % compile decomp toolbox
+            '-I./linalg/ -I./decomp/ decomp/mex/mexRidgeRegression.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexCD.cpp'
@@ -332,7 +339,7 @@ else
 end
 
 if ~windows
-   fprintf(fid,'matlab $* -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n'); 
+   fprintf(fid,'/softs/bin/matlab $* -singleCompThread -nodisplay -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n'); 
    fclose(fid);
    !chmod +x run_matlab.sh
 end

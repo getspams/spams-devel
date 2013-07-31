@@ -184,6 +184,46 @@ inline void getStringStruct(const mxArray* pr_struct,
    mxGetString(pr_field,field,length);
 };
 
+template <typename T> inline void getVector(const mxArray* array, Vector<T>& y) {
+   if (!mexCheckType<T>(array)) 
+      mexErrMsgTxt("type of argument is not consistent");
+   if (mxIsSparse(array))
+      mexErrMsgTxt("argument should not be sparse");
+   const mwSize* dims=mxGetDimensions(array);
+   INTM n=static_cast<INTM>(dims[0])*static_cast<INTM>(dims[1]);
+   T* prY = reinterpret_cast<T*>(mxGetPr(array));
+   y.setData(prY,n);
+};
+
+template <typename T> inline void getMatrix(const mxArray* array, Matrix<T>& X) {
+   if (!mexCheckType<T>(array)) 
+      mexErrMsgTxt("type of argument is not consistent");
+   if (mxIsSparse(array))
+      mexErrMsgTxt("argument should not be sparse");
+   const mwSize* dims=mxGetDimensions(array);
+   INTM m=static_cast<INTM>(dims[0]);
+   INTM n=static_cast<INTM>(dims[1]);
+   T* prX = reinterpret_cast<T*>(mxGetPr(array));
+   X.setData(prX,m,n);
+};
+
+
+
+/// get a scalar from a struct
+/*template <typename T> inline void getVectorStruct(const mxArray* pr_struct,
+      const char* name, Vector<T>& out) {
+   mxArray *pr_field = mxGetField(pr_struct,0,name);
+   if (!mexCheckType<T>(prhs[0])) 
+
+   if (!pr_field) {
+      mexPrintf("Missing field: ");
+      mexErrMsgTxt(name);
+   }
+   const int size=
+   return static_cast<T>(mxGetScalar(pr_field));
+};*/
+
+
 /// get a scalar from a struct
 inline bool checkField(const mxArray* pr_struct,
       const char* name) {

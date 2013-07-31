@@ -7,6 +7,7 @@ test_Lasso
 test_LassoMask
 test_LassoWeighted
 test_CD
+test_RidgeRegression
 test_SparseProject
 test_SOMP
 test_L1L2BCD

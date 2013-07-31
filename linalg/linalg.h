@@ -44,6 +44,9 @@
 #include <vector>
 
 #include <utils.h>
+#include "list.h"
+typedef List<int> list_int;
+typedef ListIterator<int> const_iterator_int;
 
 #ifdef INT_64BITS
 #define INTM long long int 
@@ -179,6 +182,11 @@ template <typename T> class AbstractMatrixB {
 
       virtual void print(const string& name) const = 0;
 
+      void ridgeCG(const Vector<T>& b, Vector<T>& x, const T lambda, const T tol, const int itermax) const;
+      void ridgeCG(const Vector<T>& b, const Vector<T>& delta, Vector<T>& x, const T lambda, const T tol, const int itermax) const;
+      void ridgeCG(const Matrix<T>& b, Matrix<T>& x, const T lambda, const T tol, const int itermax, const int numThreads = -1) const; 
+      void ridgeCG(const Matrix<T>& b, const Matrix<T>& delta, Matrix<T>& x, const T lambda, const T tol, const int itermax, const int numThreads = -1) const; 
+
       virtual ~AbstractMatrixB() { };
 };
 
@@ -268,7 +276,7 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    /// clean a dictionary matrix
    inline void clean();
    /// Resize the matrix
-   inline void resize(INTM m, INTM n);
+   inline void resize(INTM m, INTM n, const bool set_zeros = true);
    /// Change the data in the matrix
    inline void setData(T* X, INTM m, INTM n);
    /// modify _m
@@ -527,6 +535,7 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    inline void copyMask(Matrix<T>& out, Vector<bool>& mask) const;
 
    typedef Vector<T> col;
+   static const bool is_sparse = false;
 
    protected:
    /// Forbid lazy copies
@@ -542,6 +551,7 @@ template<typename T> class Matrix : public Data<T>, public AbstractMatrix<T>, pu
    INTM _m;
    /// number of columns
    INTM _n;
+
 };
 
 /// Class for dense vector
@@ -898,6 +908,7 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    inline void addVecToColsWeighted(const Vector<T>& diag, const T* weights, const T a = 1.0);
 
    typedef SpVector<T> col;
+   static const bool is_sparse = true;
 
    private:
    /// forbid copy constructor
@@ -962,6 +973,8 @@ template <typename T> class SpVector {
    /// access table r
    inline T v(const INTM i) const { return _v[i]; };
    inline T* rawX() const { return _v; };
+   inline INTM* rawR() const { return _r; };
+
    /// 
    inline INTM L() const { return _L; };
    /// 
@@ -1227,7 +1240,7 @@ template <typename T> inline void Matrix<T>::subMatrixSym(
 };
 
 /// Resize the matrix
-template <typename T> inline void Matrix<T>::resize(INTM m, INTM n) {
+template <typename T> inline void Matrix<T>::resize(INTM m, INTM n, const bool set_zeros) {
    if (_n==n && _m==m) return;
    clear();
    _n=n;
@@ -1237,7 +1250,8 @@ template <typename T> inline void Matrix<T>::resize(INTM m, INTM n) {
    {
       _X=new T[_n*_m];
    }
-   setZeros();
+   if (set_zeros)
+      setZeros();
 };
 
 /// Change the data in the matrix
@@ -3303,6 +3317,12 @@ template <typename T> inline void Vector<T>::logexp() {
       }
    }
 };
+
+template <typename T>
+static inline T logexp2(const T x) {
+   return (x > 0) ? x + log_alt<T>(T(1.0)+ exp_alt<T>(-x)) :
+      log( T(1.0) + exp_alt<T>( x ) );
+}
 
 /// replace each value by its exponential
 template <typename T> inline T Vector<T>::softmax(const int y) {
@@ -5592,5 +5612,166 @@ template <typename T> void DoubleRowMatrix<T>::print(const string& name) const {
    cerr << "Double Row Matrix" << endl;
    _inputmatrix->print(name);
 };
+
+// solve (A'A+lambda I)x = A'b+delta
+template <typename T> void AbstractMatrixB<T>::ridgeCG(const Vector<T>& b, const Vector<T>& delta,
+      Vector<T>& x, const T lambda, const T tol, const int itermax) const {
+   const int m = this->m();
+   const int n = this->n();
+   Vector<T> copyb;
+   copyb.copy(b);
+   List<int> missingvalues;
+   for (int i = 0; i<b.n(); ++i) {
+      if (isnan(b[i])) {
+         copyb[i]=0;
+         missingvalues.push_back(i);
+      }
+   }
+   // (A'A+lambda I)x=A'b;
+   Vector<T> R,P,AP,tmp;
+   this->multTrans(copyb,R);
+   R.add(delta);
+   this->mult(x,tmp);
+   for (ListIterator<int> it = missingvalues.begin();
+         it != missingvalues.end(); ++it)
+      tmp[*it]=0;
+   this->multTrans(tmp,R,-T(1.0),T(1.0));
+   R.add(x,-lambda);
+   P.copy(R);
+   int k = 0;
+   T normR = R.nrm2sq();
+   T alpha;
+   while (normR > tol && k < itermax) {
+      this->mult(P,tmp);
+      for (ListIterator<int> it = missingvalues.begin();
+            it != missingvalues.end(); ++it)
+         tmp[*it]=0;
+      this->multTrans(tmp,AP);
+      AP.add(P,lambda);
+      alpha = normR/P.dot(AP);
+      x.add(P,alpha);
+      R.add(AP,-alpha);
+      T tmp = R.nrm2sq();
+      P.scal(tmp/normR);
+      normR = tmp;
+      P.add(R,T(1.0));
+      ++k;
+   };
+};
+
+
+
+// solve (A'A+lambda I)x = A'b
+template <typename T> void AbstractMatrixB<T>::ridgeCG(const Vector<T>& b,
+      Vector<T>& x, const T lambda, const T tol, const int itermax) const {
+   const int m = this->m();
+   const int n = this->n();
+   Vector<T> copyb;
+   copyb.copy(b);
+   List<int> missingvalues;
+   for (int i = 0; i<b.n(); ++i) {
+      if (isnan(b[i])) {
+         copyb[i]=0;
+         missingvalues.push_back(i);
+      }
+   }
+   if (m > n) {
+      // (A'A+lambda I)x=A'b;
+      Vector<T> R,P,AP,tmp;
+      this->multTrans(copyb,R);
+      this->mult(x,tmp);
+      for (ListIterator<int> it = missingvalues.begin();
+            it != missingvalues.end(); ++it)
+         tmp[*it]=0;
+      this->multTrans(tmp,R,-T(1.0),T(1.0));
+      R.add(x,-lambda);
+      P.copy(R);
+      int k = 0;
+      T normR = R.nrm2sq();
+      T alpha;
+      while (normR > tol && k < itermax) {
+         this->mult(P,tmp);
+         for (ListIterator<int> it = missingvalues.begin();
+               it != missingvalues.end(); ++it)
+            tmp[*it]=0;
+         this->multTrans(tmp,AP);
+         AP.add(P,lambda);
+         alpha = normR/P.dot(AP);
+         x.add(P,alpha);
+         R.add(AP,-alpha);
+         T tmp = R.nrm2sq();
+         P.scal(tmp/normR);
+         normR = tmp;
+         P.add(R,T(1.0));
+         ++k;
+      };
+   } else {
+      // (AA'+lambda I)delta=b;
+      // x=A' delta;
+      Vector<T> R,P,AP,tmp,delta;
+      delta.resize(m);
+      delta.setZeros();
+      R.copy(copyb);
+      this->multTrans(delta,tmp);
+      this->mult(tmp,R,T(-1.0),T(1.0));
+      R.add(delta,-lambda);
+      P.copy(R);
+      int k = 0;
+      T normR = R.nrm2sq();
+      T alpha;
+      while (normR > tol && k < itermax) {
+         this->multTrans(P,tmp);
+         this->mult(tmp,AP);
+         for (ListIterator<int> it = missingvalues.begin();
+               it != missingvalues.end(); ++it)
+            AP[*it]=0;
+         AP.add(P,lambda);
+         alpha = normR/P.dot(AP);
+         delta.add(P,alpha);
+         R.add(AP,-alpha);
+         T tmp = R.nrm2sq();
+         P.scal(tmp/normR);
+         normR = tmp;
+         P.add(R,T(1.0));
+         ++k;
+      }
+      this->multTrans(delta,x);
+   }
+};
+
+template <typename T> void AbstractMatrixB<T>::ridgeCG(const Matrix<T>& mb,
+      Matrix<T>& mx, const T lambda, const T tol, const int itermax,const int numThreads) const {
+   const int NUM_THREADS = init_omp(numThreads);
+   const int num_probs=mb.n();
+   int i = 0;
+#pragma omp parallel for private(i) 
+   for (i =0; i<num_probs; ++i) {
+      Vector<T> b;
+      mb.refCol(i,b);
+      Vector<T> x;
+      mx.refCol(i,x);
+      this->ridgeCG(b,x,lambda,tol,itermax);
+   }
+}
+
+
+template <typename T> void AbstractMatrixB<T>::ridgeCG(const Matrix<T>& mb, const Matrix<T>& mdelta,
+      Matrix<T>& mx, const T lambda, const T tol, const int itermax,const int numThreads) const {
+   const int NUM_THREADS = init_omp(numThreads);
+   const int num_probs=mb.n();
+   int i = 0;
+#pragma omp parallel for private(i) 
+   for (i =0; i<num_probs; ++i) {
+      Vector<T> b;
+      mb.refCol(i,b);
+      Vector<T> delta;
+      mdelta.refCol(i,delta);
+      Vector<T> x;
+      mx.refCol(i,x);
+      this->ridgeCG(b,delta,x,lambda,tol,itermax);
+   }
+}
+
+
 
 #endif
