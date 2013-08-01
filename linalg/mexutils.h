@@ -60,13 +60,13 @@ bool checkSize(const mxArray* array, const int m, const int n) {
 template <typename T, typename I>
 void createCopySparse(T*& alpha_v2, I*& alpha_r2, I*& alpha_pB2, I*& alpha_pE2,
       double* alpha_v, mwSize* alpha_r, mwSize* alpha_pB, mwSize* alpha_pE, I M) {
-   if (sizeof(alpha_v) == sizeof(alpha_v2)) {
+   if (sizeof(double) == sizeof(T)) {
       alpha_v2=reinterpret_cast<T*>(alpha_v);
    } else {
       alpha_v2 = new T[alpha_pB[M]];
       for (mwSize i = 0; i<alpha_pB[M]; ++i) alpha_v2[i] = static_cast<T>(alpha_v[i]);
    }
-   if (sizeof(alpha_r2) == sizeof(alpha_r)) {
+   if (sizeof(I) == sizeof(mwSize)) {
       alpha_r2=reinterpret_cast<I*>(alpha_r);
       alpha_pB2=reinterpret_cast<I*>(alpha_pB);
       alpha_pE2=reinterpret_cast<I*>(alpha_pE);
@@ -83,10 +83,10 @@ void createCopySparse(T*& alpha_v2, I*& alpha_r2, I*& alpha_pB2, I*& alpha_pE2,
 template <typename T,typename I>
 inline void deleteCopySparse(T*& alpha_v2, I*& alpha_r2, I*& alpha_pB2, I*& alpha_pE2,
       double* alpha_v, mwSize* alpha_r) {
-   if (sizeof(alpha_v) != sizeof(alpha_v2)) {
+   if (sizeof(T) != sizeof(double)) {
       delete[](alpha_v2);
    }
-   if (sizeof(alpha_r2) != sizeof(alpha_r)) {
+   if (sizeof(I) != sizeof(mwSize)) {
       delete[](alpha_r2);
       delete[](alpha_pB2);
    }

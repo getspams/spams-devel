@@ -24,7 +24,7 @@ compiler='gcc';
 %   - acml: (AMD Core math library), optimized for opteron cpus
 %   - blas: (netlib at atlas version of blas/lapack), free
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='builtin';
+blas='mkl';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -33,8 +33,9 @@ use_multithread=true; % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
-use_64bits_integers=true;
-% only use this option if you have VERY large arrays/matrices causing some segfaults
+use_64bits_integers=false;
+% use this option if you have VERY large arrays/matrices 
+% this option allows such matrices, but may slightly reduce the speed of the computations.
 
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
@@ -60,6 +61,7 @@ elseif strcmp(compiler,'open64')
 elseif strcmp(compiler,'icc')
     if linux || mac
        % example when compiler='icc' for Linux/Mac
+       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
        path_to_compiler_libraries='/scratch2/clear/mairal/intel/composerxe/lib/intel64/';
@@ -128,7 +130,6 @@ COMPILE = {
             '-I./dags/ -I./linalg/ dags/mex/mexCountPathsDAG.cpp',
             '-I./dags/ -I./linalg/ dags/mex/mexCountConnexComponents.cpp',
             % compile proximal toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexEvalPathCoding.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexFistaTree.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexFistaGraph.cpp',  
@@ -137,6 +138,7 @@ COMPILE = {
             '-I./linalg/ -I./prox/ prox/mex/mexProximalTree.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexProximalGraph.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexProximalPathCoding.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexEvalPathCoding.cpp',  
             % compile linalg toolbox
             '-I./linalg/ linalg/mex/mexCalcAAt.cpp',
             '-I./linalg/ linalg/mex/mexCalcXAt.cpp',  
@@ -149,10 +151,10 @@ COMPILE = {
             '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             % compile decomp toolbox
             '-I./linalg/ -I./decomp/ decomp/mex/mexRidgeRegression.cpp',
-            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexCD.cpp'
             '-I./linalg/ -I./decomp/ decomp/mex/mexL1L2BCD.cpp', 
+            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoMask.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoWeighted.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMPMask.cpp',
@@ -261,9 +263,10 @@ if strcmp(compiler,'icc')
       fprintf(fid,sprintf('export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:%s:%s\n',path_to_compiler_libraries,path_to_blas));
       fprintf(fid,'export DYLD_INSERT_LIBRARIES=$LIB_INTEL/libimf.dylib:$LIB_INTEL/libintlc.dylib:$LIB_INTEL/libiomp5.dylib:$LIB_INTEL/libsvml.dylib\n');
    elseif linux
+      fprintf(fid,'export LIB_GCC=%s\n',path_to_gcccompiler_libraries);
       fprintf(fid,'export LIB_INTEL=%s\n',path_to_compiler_libraries);
       fprintf(fid,sprintf('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s:%s\n',path_to_compiler_libraries,path_to_blas));
-      fprintf(fid,'export LD_PRELOAD=$LIB_INTEL/libimf.so:$LIB_INTEL/libintlc.so.5:$LIB_INTEL/libiomp5.so:$LIB_INTEL/libsvml.so\n');
+      fprintf(fid,'export LD_PRELOAD=$LIB_INTEL/libimf.so:$LIB_INTEL/libintlc.so.5:$LIB_INTEL/libiomp5.so:$LIB_INTEL/libsvml.so:$LIB_GCC/libstdc++.so\n');
    end
    if use_multithread
       if windows
