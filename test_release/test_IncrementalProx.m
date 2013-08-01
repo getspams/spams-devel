@@ -1,5 +1,5 @@
-n=200000;
-p=2000;
+n=400000;
+p=20000;
 density=0.01;
 
 % generate random data
@@ -35,6 +35,7 @@ param.lambda=max_lambda*(2^(1/8)).^(0:-1:-25);    % best to order from large to 
 tabepochs=[1 2 3 5];
 %% The problem which will be solved is
 %%   min_beta  1/(2n) ||y-X' beta||_2^2 + lambda ||beta||_1
+% the problems for different lambdas are solve INDEPENDENTLY in parallel
 fprintf('EXPERIMENT: ALL LAMBDAS IN PARALLEL\n');
 for ii=1:length(tabepochs)
    param.epochs=tabepochs(ii);   % one pass over the data
@@ -51,8 +52,10 @@ for ii=1:length(tabepochs)
    sum(Beta ~= 0)
 end
 
+% the problems are here solved sequentially with warm restart
+% this seems to be the prefered choice.
 fprintf('EXPERIMENT: SEQUENTIAL LAMBDAS WITH WARM RESTART\n');
-fprintf('A SINGLE CORE IS USED');
+fprintf('A SINGLE CORE IS USED\n');
 param.warm_restart=true;
 param.num_threads=1;
 for ii=1:length(tabepochs)

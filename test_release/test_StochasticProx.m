@@ -1,5 +1,5 @@
 n=200000;
-p=2000;
+p=20000;
 density=0.01;
 
 % generate random data
@@ -36,6 +36,8 @@ tabepochs=[1 5 20 50];
 %% The problem which will be solved is
 %%   min_beta  1/(2n) ||y-X' beta||_2^2 + lambda ||beta||_1
 fprintf('EXPERIMENT: ALL LAMBDAS IN PARALLEL\n');
+% we try different experiments when varying the number of epochs.
+% the problems for different lambdas are solve INDEPENDENTLY in parallel
 for ii=1:length(tabepochs)
    param.iters=tabepochs(ii)*n;   % one pass over the data
    fprintf('EXP WITH %d PASS\n',tabepochs(ii));
