@@ -45,6 +45,43 @@ static char no='N';
 static char reduced='S';
 static char allV='V';
 
+#ifdef ADD_ATL 
+#define dnrm2_ ATL_dnrm2
+#define snrm2_ ATL_snrm2
+#define dcopy_ ATL_dcopy
+#define scopy_ ATL_scopy
+#define daxpy_ ATL_daxpy
+#define saxpy_ ATL_saxpy
+#define daxpby_ ATL_daxpby
+#define saxpby_ ATL_saxpby
+#define dscal_ ATL_dscal
+#define sscal_ ATL_sscal
+#define dasum_ ATL_dasum
+#define sasum_ ATL_sasum
+#define ddot_ ATL_ddot
+#define sdot_ ATL_sdot
+#define dgemv_ ATL_dgemv
+#define sgemv_ ATL_sgemv
+#define dger_ ATL_dger
+#define sger_ ATL_sger
+#define dtrmv_ ATL_dtrmv
+#define strmv_ ATL_strmv
+#define dsyr_ ATL_dsyr
+#define ssyr_ ATL_ssyr
+#define dsymv_ ATL_dsymv
+#define ssymv_ ATL_ssymv
+#define dgemm_ ATL_dgemm
+#define sgemm_ ATL_sgemm
+#define dsyrk_ ATL_dsyrk
+#define ssyrk_ ATL_ssyrk
+#define dtrmm_ ATL_dtrmm
+#define strmm_ ATL_strmm
+#define dtrtri_ ATL_dtrtri
+#define strtri_ ATL_strtri
+#define idamax_ ATL_idamax
+#define isamax_ ATL_isamax
+#endif
+
 #ifdef REMOVE_
 #define dnrm2_ dnrm2
 #define snrm2_ snrm2
@@ -52,6 +89,8 @@ static char allV='V';
 #define scopy_ scopy
 #define daxpy_ daxpy
 #define saxpy_ saxpy
+#define daxpby_ daxpby
+#define saxpby_ saxpby
 #define dscal_ dscal
 #define sscal_ sscal
 #define dasum_ dasum
@@ -100,7 +139,11 @@ INTT cblas_isamin( INTT n,  float* X,  INTT incX);
 //};
 //#endif
 
-/*#ifdef HAVE_MKL
+//#define HAVE_MKL
+/*#ifdef HAVE_MKL   // obsolete, do not use
+
+#define idamin_ idamin
+#define isamin_ isamin
 extern "C" {
    void vdSqr( int n,  double* vecIn, double* vecOut);
    void vsSqr( int n,  float* vecIn, float* vecOut);
@@ -135,6 +178,8 @@ template <typename T> void cblas_copy( INTT n,  T* X,  INTT incX,
 /// INTTerface to cblas_*axpy
 template <typename T> void cblas_axpy( INTT n,  T a,  T* X, 
        INTT incX, T* Y,  INTT incY);
+template <typename T> void cblas_axpby( INTT n,  T a,  T* X, 
+       INTT incX, T b,  T* Y,  INTT incY);
 /// INTTerface to cblas_*scal
 template <typename T> void cblas_scal( INTT n,  T a, T* X, 
        INTT incX);
@@ -144,9 +189,9 @@ template <typename T> T cblas_asum( INTT n,  T* X,  INTT incX);
 template <typename T> T cblas_dot( INTT n,  T* X,  INTT incX, 
        T* Y, INTT incY);
 /// interface to cblas_i*amin
-template <typename T> int cblas_iamin( INTT n,  T* X,  INTT incX);
+template <typename T> INTT cblas_iamin( INTT n,  T* X,  INTT incX);
 /// interface to cblas_i*amax
-template <typename T> int cblas_iamax( INTT n,  T* X,  INTT incX);
+template <typename T> INTT cblas_iamax( INTT n,  T* X,  INTT incX);
 
 // INTTerfaces to a few BLAS function, Level 2
 
@@ -245,6 +290,8 @@ extern "C" {
    void scopy_(INTT *n,float *x,INTT *incX, float *y,INTT *incY);
    void daxpy_(INTT *n,double* a, double *x,INTT *incX, double *y,INTT *incY);
    void saxpy_(INTT *n,float* a, float *x,INTT *incX, float *y,INTT *incY);
+   void daxpby_(INTT *n,double* a, double *x,INTT *incX,double* b,  double *y,INTT *incY);
+   void saxpby_(INTT *n,float* a, float *x,INTT *incX, float* b, float *y,INTT *incY);
    void dscal_(INTT *n,double* a, double *x,INTT *incX);
    void sscal_(INTT *n,float* a, float *x,INTT *incX);
    double dasum_(INTT *n,double *x,INTT *incX);
@@ -372,6 +419,30 @@ template <> inline void cblas_axpy<float>( INTT n,  float a,  float* X,
    //cblas_saxpy(n,a,X,incX,Y,incY);
    saxpy_(&n,&a,X,&incX,Y,&incY);
 };
+
+#ifndef AXPBY
+template <> inline void cblas_axpby<double>( INTT n,  double a,  double* X, 
+       INTT incX, double b, double* Y,  INTT incY) {
+   dscal_(&n,&b,Y,&incY);
+   daxpy_(&n,&a,X,&incX,Y,&incY);
+};
+/// Implementation of the INTTerface for cblas_saxpy
+template <> inline void cblas_axpby<float>( INTT n,  float a,  float* X,
+       INTT incX, float b, float* Y,  INTT incY) {
+   sscal_(&n,&b,Y,&incY);
+   saxpy_(&n,&a,X,&incX,Y,&incY);
+};
+#else
+template <> inline void cblas_axpby<double>( INTT n,  double a,  double* X, 
+       INTT incX, double b, double* Y,  INTT incY) {
+   daxpby_(&n,&a,X,&incX,&b,Y,&incY);
+};
+/// Implementation of the INTTerface for cblas_saxpy
+template <> inline void cblas_axpby<float>( INTT n,  float a,  float* X,
+       INTT incX, float b, float* Y,  INTT incY) {
+   saxpby_(&n,&a,X,&incX,&b,Y,&incY);
+};
+#endif
 
 /// Implementation of the INTTerface for cblas_saxpy
 template <> inline void cblas_axpy<int>( INTT n,  int a,  int* X,
@@ -681,16 +752,16 @@ template <> inline void cblas_trmm<float>( CBLAS_ORDER order,
    strmm_(cblas_side(Side),cblas_uplo(Uplo),cblas_transpose(TransA),cblas_diag(Diag),&M,&N,&alpha,A,&lda,B,&ldb);
 };
 ///  Implementation of the interface for cblas_idamax
-template <> inline int cblas_iamax<double>( INTT n,  double* X,
+template <> inline INTT cblas_iamax<double>( INTT n,  double* X,
        INTT incX) {
    //return cblas_idamax(n,X,incX);
-   return static_cast<int>(idamax_(&n,X,&incX)-1);
+   return static_cast<INTT >(idamax_(&n,X,&incX)-1);
 };
 ///  Implementation of the interface for cblas_isamax
-template <> inline int cblas_iamax<float>( INTT n,  float* X, 
+template <> inline INTT cblas_iamax<float>( INTT n,  float* X, 
        INTT incX) {
    //return cblas_isamax(n,X,incX);
-   return static_cast<int>(isamax_(&n,X,&incX)-1);
+   return static_cast<INTT>(isamax_(&n,X,&incX)-1);
 };
 
 // Implementations of the interfaces, LAPACK
@@ -819,8 +890,12 @@ template <> void inline syev( char& jobz, char& uplo, INTT n,
 
 
 /// If the MKL is not present, a slow implementation is used instead.
-/*
-#ifdef HAVE_MKL 
+/*#ifdef HAVE_MKL 
+
+extern "C" {
+   INTT idamin_(INTT *n, double *dx, INTT *incx);
+   INTT isamin_(INTT *n, float *dx, INTT *incx);
+};
 /// Implemenation of the interface for vdSqr
 template <> inline void vSqr<double>( int n,  double* vecIn, 
       double* vecOut) {
@@ -925,19 +1000,19 @@ template <> inline void vAbs( int n,  float* vecIn,
 
 /// implemenation of the interface of the non-offical blas, level 1 function 
 /// cblas_idamin
-template <> inline int cblas_iamin<double>( int n,  double* x,
-       int incx) {
-   return (int) cblas_idamin(n,x,incx);
+template <> inline INTT cblas_iamin<double>(  INTT n,  double* X,
+       INTT incX) {
+   return static_cast<INTT>(idamin_(&n,X,&incX)-1);
 };
 /// implemenation of the interface of the non-offical blas, level 1 function 
 /// cblas_isamin
-template <> inline int cblas_iamin<float>( int n,  float* x, 
-       int incx) {
-   return (int) cblas_isamin(n,x,incx);
+template <> inline INTT cblas_iamin<float>( INTT n,  float* X, 
+       INTT incX) {
+   return static_cast<INTT >(isamin_(&n,X,&incX)-1);
 };
 /// slow alternative implementation of some MKL function
-*/
-//#else
+
+#else*/
 /// Slow implementation of vdSqr and vsSqr
 template <typename T> inline void vSqr( int n,  T* vecIn, T* vecOut) {
    for (int i = 0; i<n; ++i) vecOut[i]=vecIn[i]*vecIn[i];
@@ -984,8 +1059,8 @@ template <typename T> inline void vAbs( int n,  T* vecIn,
 };
 
 /// Slow implementation of cblas_idamin and cblas_isamin
-template <typename T> int inline cblas_iamin(INTT n, T* X, INTT incX) {
-   int imin=0;
+template <typename T> INTT inline cblas_iamin(INTT n, T* X, INTT incX) {
+   INTT imin=0;
    double min=fabs(X[0]);
    for (int j = 1; j<n; j+=incX) {
       double cur = fabs(X[j]);

@@ -623,6 +623,7 @@ template<typename T> class Vector {
    inline void clear();
    /// performs soft-thresholding of the vector
    inline void softThrshold(const T nu);
+   inline void softThrsholdScal(Vector<T>& out, const T nu, const T s);
    inline void hardThrshold(const T nu);
    /// performs soft-thresholding of the vector
    inline void thrsmax(const T nu);
@@ -653,6 +654,8 @@ template<typename T> class Vector {
    inline void add(const SpVector<T>& x, const T a = 1.0);
    /// adds a to each value in the vector
    inline void add(const T a);
+   /// A <- b*A + a*x
+   inline void add_scal(const Vector<T>& x, const T a = 1.0, const T b = 0);
    /// A <- A - x
    inline void sub(const Vector<T>& x);
    /// A <- A + a*x
@@ -2937,7 +2940,21 @@ template <typename T> inline void Vector<T>::softThrshold(const T nu) {
       } else if (_X[i] < -nu) {
          _X[i] += nu;
       } else {
-         _X[i] = T();
+         _X[i] = 0;
+      }
+   }
+};
+
+/// performs soft-thresholding of the vector
+template <typename T> inline void Vector<T>::softThrsholdScal(Vector<T>& out, const T nu, const T s) {
+   T* Y = out.rawX();
+   for (INTM i = 0; i<_n; ++i) {
+      if (_X[i] > nu) {
+         Y[i] = s*(_X[i]-nu);
+      } else if (_X[i] < -nu) {
+         Y[i] = s*(_X[i]+nu);
+      } else {
+         Y[i] = 0;
       }
    }
 };
@@ -3036,6 +3053,11 @@ template <typename T> inline T Vector<T>::dot(const SpVector<T>& x) const {
 template <typename T> inline void Vector<T>::add(const Vector<T>& x, const T a) {
    assert(_n == x._n);
    cblas_axpy<T>(_n,a,x._X,1,_X,1);
+};
+
+template <typename T> inline void Vector<T>::add_scal(const Vector<T>& x, const T a, const T b) {
+   assert(_n == x._n);
+   cblas_axpby<T>(_n,a,x._X,1,b,_X,1);
 };
 
 /// A <- A + a*x

@@ -22,18 +22,19 @@ compiler='gcc';
 %           same as mex: good choice if matlab is correctly configured.
 %   - mkl: (intel math kernel library), usually the fastest, but not free.
 %   - acml: (AMD Core math library), optimized for opteron cpus
-%   - blas: (netlib at atlas version of blas/lapack), free
+%   - blas: (netlib version of blas/lapack), free
+%   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='mkl';
+blas='builtin';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
 % need an appropriate compiler for that (intel compiler, most recent gcc, or visual studio pro)
-use_multithread=true; % (might not compatible with compiler=mex)
+use_multithread=false; % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
-use_64bits_integers=false;
+use_64bits_integers=true;
 % use this option if you have VERY large arrays/matrices 
 % this option allows such matrices, but may slightly reduce the speed of the computations.
 
@@ -95,7 +96,13 @@ if strcmp(blas,'mkl')
    end
 elseif strcmp(blas,'blas')
    if linux || mac
-       path_to_blas='/usr/lib/';
+       path_to_blas='/usr/lib64/';
+   else
+       path_to_blas='?';
+   end
+elseif strcmp(blas,'atlas')
+   if linux || mac
+       path_to_blas='/usr/lib64/atlas/';
    else
        path_to_blas='?';
    end
@@ -185,7 +192,7 @@ end
 
 DEFBLAS='';
 if strcmp(blas,'mkl') 
-   DEFBLAS='-DUSE_BLAS_LIB';
+   DEFBLAS='-DUSE_BLAS_LIB -DAXPBY';
    if strcmp(arch,'GLNXA64')
       if use_64bits_integers
          blas_link = sprintf('-Wl,--start-group %slibmkl_intel_ilp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
@@ -216,7 +223,10 @@ if strcmp(blas,'mkl')
    end
 elseif strcmp(blas,'blas')
    DEFBLAS='-DUSE_BLAS_LIB';
-   blas_link='-lblas -llapack';
+   blas_link='-lblas -l:liblapack.so.3';
+elseif strcmp(blas,'atlas')
+   DEFBLAS='-DUSE_BLAS_LIB -DADD_ATL -DAXPBY';
+   blas_link='-l:libatlas.so.3 -l:liblapack.so.3';
 elseif strcmp(blas,'builtin')
    blas_link='-lmwblas -lmwlapack';
    DEFBLAS='-DUSE_BLAS_LIB';
