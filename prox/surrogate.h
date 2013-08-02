@@ -567,19 +567,33 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
          _prox->prox(this->_z,output,_lambda/this->_rho);
       };
       virtual void minimize_incremental_surrogate(Vector<T>& output) {
+         const int n = this->_function->n();
          if (this->_strategy <= 2) {
-            Vector<T>& tmp = this->_z3;
-            tmp.copy(this->_z);
-            tmp.scal(T(1.0)/(this->_scalL*this->_rho));
-            const int n = this->_function->n();
-            _prox->prox(tmp,output,n*_lambda/(this->_scalL*this->_rho));
+            if (_prox->id() == RIDGE) {
+               output.add_scal(this->_z,T(1.0)/(this->_scalL*this->_rho+n*_lambda),0);
+            } else if (_prox->id() == L1) {
+               this->_z.softThrsholdScal(output,n*_lambda,T(1.0)/(this->_scalL*this->_rho));
+            } else {
+               Vector<T>& tmp = this->_z3;
+               tmp.copy(this->_z);
+               tmp.scal(T(1.0)/(this->_scalL*this->_rho));
+               _prox->prox(tmp,output,n*_lambda/(this->_scalL*this->_rho));
+            }
          } else {
-            Vector<T>& tmp = this->_z3;
-            tmp.copy(this->_z);
-            tmp.add(this->_z2,T(1.0)/this->_scalL);
-            tmp.scal(T(1.0)/(this->_rho));
-            const int n = this->_function->n();
-            _prox->prox(tmp,output,n*_lambda/(this->_scalL*this->_rho));
+            if (_prox->id() == RIDGE) {
+               output.copy(this->_z);
+               const T s = T(1.0)/(this->_rho+n*_lambda/this->_scalL);
+               output.add_scal(this->_z2,s/this->_scalL,s);
+            } else if (_prox->id() == L1) {
+               output.copy(this->_z);
+               output.add(this->_z2,T(1.0)/this->_scalL);
+               output.softThrsholdScal(output,n*_lambda/(this->_scalL),T(1.0)/(this->_rho));
+            } else {
+               Vector<T>& tmp = this->_z3;
+               tmp.copy(this->_z);
+               tmp.add_scal(this->_z2,T(1.0)/(this->_rho*this->_scalL),T(1.0)/(this->_rho));
+               _prox->prox(tmp,output,n*_lambda/(this->_scalL*this->_rho));
+            }
          }
       };
       void inline changeLambda(const T lambda) { _lambda=lambda;};
@@ -616,7 +630,7 @@ class StochasticSolver {
       StochasticSolver<T,U>& operator=(const StochasticSolver<T,U>& dict);
 
    protected:
-      void auto_parameters(const Vector<T>& w0, Vector<T>& w);
+      void auto_parameters(const Vector<T>& w0, Vector<T>& w, Vector<T>& wav, const int averaging_mode = 0);
       void t0_to_eta() {
          switch (_weighting_mode) {
             case 0 : _eta=_t0+1; break;
@@ -645,17 +659,18 @@ class StochasticSolver {
 };
 
 template <typename T, typename U>
-void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w) {
+void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, Vector<T>& wav, const int averaging_mode) {
    const int newn= this->n()/20;
    const int iters = ceil(this->n()/(20*_minibatches));
    /// inspired from bottou's determineta0 function
    T factor = 0.5;
    T lo_t0 = _t0;
    t0_to_eta();
+   const int ind_res=averaging_mode ? 1 : 0;
    this->subsample(newn);
-   this->solve(w0,w,w,iters,false,0,false);
+   this->solve(w0,w,w,iters,false,averaging_mode,false);
 
-   T loCost = _logs[0];
+   T loCost = _logs[ind_res];
 //   cerr << _logs[0] << " ";
    // try to reduce
    for (int t = 0; t<15; ++t) 
@@ -664,8 +679,8 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w) {
       if (hi_t0 < 1 || hi_t0 > 10000000) break;
       _t0 = hi_t0;
       t0_to_eta();
-      this->solve(w0,w,w,iters,false,0,false);
-      T hiCost = _logs[0];
+      this->solve(w0,w,w,iters,false,averaging_mode,false);
+      T hiCost = _logs[ind_res];
      // cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
@@ -696,7 +711,7 @@ void StochasticSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, Vector<T>& 
    _logs[2]=0;
    w.copy(w0);
    if (averaging_mode) wav.copy(w0);
-   if (auto_params && iters > 0) this->auto_parameters(w0,w);
+   if (auto_params && iters > 0) this->auto_parameters(w0,w,wav,averaging_mode);
    _surrogate->initialize(w0);
    T tmpweight=0;
    for (int i = 1; i<= iters; ++i) {
@@ -769,7 +784,7 @@ void StochasticSmoothRidgeSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, 
    this->_logs[2]=0;
    w.copy(w0);
    if (averaging_mode) wav.copy(w0);
-   if (auto_params && iters > 0) this->auto_parameters(w0,w);
+   if (auto_params && iters > 0) this->auto_parameters(w0,w,wav,averaging_mode);
 
    T rho=_function->genericL();
    T alpha = T(1.0);
@@ -815,9 +830,7 @@ void StochasticSmoothRidgeSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, 
    if (averaging_mode) {
       wav.scal(beta);
       wav.add(w,-gamma);
-   } else {
-      wav.copy(wav);
-   }
+   } 
    time.stop();
    if (evaluate) {
       this->_logs[0]=_function->eval(w)+0.5*_lambda*w.nrm2sq();
@@ -873,7 +886,7 @@ void StochasticSmoothL1Solver<T>::solve(const Vector<T>& w0, Vector<T>& w, Vecto
    if (verbose && iters > 0) 
       cout << "Dedicated L1-Sparse Solver" << endl;
 
-   if (auto_params && iters > 0) this->auto_parameters(w0,w);
+   if (auto_params && iters > 0) this->auto_parameters(w0,w,wav,averaging_mode);
    const int n = _function->n();
    const int p = _function->p();
    const T rho=_function->genericL();

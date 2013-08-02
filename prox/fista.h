@@ -26,7 +26,7 @@
 namespace FISTA {
 
    enum loss_t { SQUARE, SQUARE_MISSING, LOG, LOGWEIGHT, MULTILOG, CUR, HINGE, INCORRECT_LOSS};
-   enum regul_t { L0, L1, RIDGE, L2, LINF, L1CONSTRAINT, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG, GRAPH_PATH_L0, GRAPH_PATH_CONV};
+   enum regul_t { L0, L1, RIDGE, L2, LINF, L1CONSTRAINT, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG, GRAPH_PATH_L0, GRAPH_PATH_CONV, NA};
 
    regul_t regul_from_string(char* regul) {
       if (strcmp(regul,"l0")==0) return L0;
@@ -1037,7 +1037,7 @@ namespace FISTA {
       class Regularizer {
          public:
             Regularizer() { };
-            Regularizer(const ParamReg<T>& param) { 
+            Regularizer(const ParamReg<T>& param) : _id(NA) { 
                _intercept=param.intercept;
                _pos=param.pos;
             }
@@ -1057,21 +1057,23 @@ namespace FISTA {
             virtual T eval_dual_norm(const D& x) const { return 0; };
             // TODO complete for all norms
             virtual T eval_dual_norm_paths(const D& x, SpMatrix<T>& path) const { return this->eval_dual_norm(x); };
+            regul_t inline id() const { return _id; };
+            
 
          protected:
             bool _pos;
             bool _intercept;
+            regul_t _id;
 
          private:
             explicit Regularizer<T,D>(const Regularizer<T,D>& reg);
             Regularizer<T,D>& operator=(const Regularizer<T,D>& reg);
-
       };
 
    template <typename T> 
       class Lasso : public Regularizer<T> {
          public:
-            Lasso(const ParamReg<T>& param) : Regularizer<T>(param) { };
+            Lasso(const ParamReg<T>& param) : Regularizer<T>(param) { this->_id = L1; };
             virtual ~Lasso() { };
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
@@ -1111,7 +1113,10 @@ namespace FISTA {
    template <typename T> 
       class LassoConstraint : public Regularizer<T> {
          public:
-            LassoConstraint(const ParamReg<T>& param) : Regularizer<T>(param) { _thrs=param.lambda; };
+            LassoConstraint(const ParamReg<T>& param) : Regularizer<T>(param) { 
+               _thrs=param.lambda;
+               this->_id = L1CONSTRAINT; 
+            };
             virtual ~LassoConstraint() { };
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
@@ -1188,7 +1193,7 @@ namespace FISTA {
    template <typename T> 
       class Ridge: public Regularizer<T> {
          public:
-            Ridge(const ParamReg<T>& param) : Regularizer<T>(param) { };
+            Ridge(const ParamReg<T>& param) : Regularizer<T>(param) { this->_id = RIDGE; };
             virtual ~Ridge() { };
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
