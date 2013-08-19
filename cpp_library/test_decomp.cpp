@@ -25,7 +25,7 @@ void test_omp() {
    double lambda = 0.;
    SpMatrix<double> spa;
    clock_gettime(CLOCK_REALTIME,&tstart);
-   cppOmp(X,D,spa,&L,&eps,&lambda);
+   cppOMP(X,D,spa,&L,&eps,&lambda);
    clock_gettime(CLOCK_REALTIME,&tend);
    float nbs = X.n() / delta_t(tstart,tend);
    std::cout << nbs << " signals processed per second." << std::endl;
