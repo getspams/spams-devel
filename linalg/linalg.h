@@ -811,6 +811,8 @@ template<typename T> class SpMatrix : public Data<T>, public AbstractMatrixB<T> 
    /// returns X[index]
    inline T operator[](const INTM index) const;
    void getData(Vector<T>& data, const INTM index) const;
+   void setData(T* v, INTM* r, INTM* pB, INTM* pE, INTM m, INTM n, INTM nzmax);
+
    void getGroup(Matrix<T>& data, const vector_groups& groups,
          const INTM i) const ;
    /// print the sparse matrix
@@ -4196,6 +4198,19 @@ void SpMatrix<T>::getData(Vector<T>& data, const INTM index) const {
    for (INTM i = _pB[index]; i< _pB[index+1]; ++i) 
       data[_r[i]]=_v[i];
 };
+
+template <typename T>
+void SpMatrix<T>::setData(T* v, INTM* r, INTM* pB, INTM* pE, INTM m, INTM n, INTM nzmax) {
+   this->clear();
+   _externAlloc =true;
+    _v = v;
+    _r=r;
+    _pB=pB;
+    _pE=pE;
+    _m=m;
+    _n=n;
+    _nzmax=nzmax;
+}
 
 template<typename T>
 void SpMatrix<T>::getGroup(Matrix<T>& data, const vector_groups& groups,  const INTM i) const {

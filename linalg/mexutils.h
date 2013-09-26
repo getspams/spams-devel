@@ -207,22 +207,24 @@ template <typename T> inline void getMatrix(const mxArray* array, Matrix<T>& X) 
    X.setData(prX,m,n);
 };
 
-
-
-/// get a scalar from a struct
-/*template <typename T> inline void getVectorStruct(const mxArray* pr_struct,
-      const char* name, Vector<T>& out) {
-   mxArray *pr_field = mxGetField(pr_struct,0,name);
-   if (!mexCheckType<T>(prhs[0])) 
-
-   if (!pr_field) {
-      mexPrintf("Missing field: ");
-      mexErrMsgTxt(name);
-   }
-   const int size=
-   return static_cast<T>(mxGetScalar(pr_field));
-};*/
-
+template <typename T> inline void getSpMatrix(const mxArray* array, SpMatrix<T>& X) {
+   if (!mxIsSparse(array))
+      mexErrMsgTxt("argument should be sparse");
+   if (sizeof(T) != sizeof(double)) 
+      mexErrMsgTxt("only works in double precision");
+   if (sizeof(INTM) != sizeof(mwSize)) 
+      mexErrMsgTxt("need 64 bits integers");
+   const mwSize* dims=mxGetDimensions(array);
+   INTM m=static_cast<INTM>(dims[0]);
+   INTM n=static_cast<INTM>(dims[1]);
+   double* D_v;
+   INTM* D_r, *D_pB, *D_pE;
+   D_v = reinterpret_cast<double*>(mxGetPr(array));
+   D_r=reinterpret_cast<INTM*>(mxGetIr(array));
+   D_pB=reinterpret_cast<INTM*>(mxGetJc(array)); // TODO: to fix for 32bits machines
+   D_pE=D_pB+1;
+   X.setData(D_v,D_r,D_pB,D_pE,m,n,D_pB[n]);
+};
 
 /// get a scalar from a struct
 inline bool checkField(const mxArray* pr_struct,

@@ -164,6 +164,12 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       T* pr_path = NULL, int length_path = -1);
 
 template <typename T>
+void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
+      Vector<T>& coeffs, T normX,
+      const constraint_type mode,
+      const T constraint, const bool pos = false);
+
+template <typename T>
 void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
       Matrix<T>& Gs,
       Matrix<T>& Ga,
@@ -1544,7 +1550,34 @@ void lasso2(const Data<T>& X, const AbstractMatrix<T>& G, const AbstractMatrix<T
    spalpha.convert(vM,rM,K);
 };
 
-
+template <typename T>
+void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
+      Vector<T>& coeffs, T normX,
+      const constraint_type mode,
+      const T constraint, const bool pos) {
+   const INTM p = G.m(); 
+   const INTM L = p;
+   Vector<T> v;
+   v.resize(L);
+   Vector<INTM> r;
+   r.resize(L);
+   Vector<T> u;
+   u.resize(p);
+   Matrix<T> Gs;
+   Gs.resize(L,L);
+   Matrix<T> invGs;
+   invGs.resize(L,L);
+   Matrix<T> Ga;
+   Ga.resize(p,L);
+   Matrix<T> work;
+   work.resize(p,3);
+   coreLARS2(DtR,G,Gs,Ga,invGs,u,v,r,work,normX,mode,constraint,pos);
+   coeffs.setZeros();
+   for (int i = 0; i< L; ++i) {
+      if (r[i] < 0) break;
+      coeffs[r[i]]=v[i];
+   };
+};
 
 /// Auxiliary function for lasso 
 template <typename T>
@@ -2146,6 +2179,63 @@ inline void coreIST(const AbstractMatrix<T>& G, Vector<T>& DtRv, Vector<T>& coef
             }
          }
          vAdd(K,DtR,coeffs,DtR);         
+         const T kappa = -DtRa+norm1*maxDtR;
+         if (abs(lambda - maxDtR) < tol && kappa <= tol)
+            break;
+      }
+   }
+}
+
+template <typename T>
+inline void coreIST_unnormalized(const AbstractMatrix<T>& G, Vector<T>& DtRv, Vector<T>& coeffsv,
+      const T thrs, const int itermax, 
+      const T tol) {
+
+   const int K = G.n();
+   T* const coeffs = coeffsv.rawX();
+   T* const DtR = DtRv.rawX();
+   //  T* const prG = G.rawX();
+
+   const T lambda_init=thrs;
+   T maxDtR = DtRv.fmaxval();
+   T norm1=coeffsv.asum();
+   T lambda=lambda_init;
+   DtRv.add(coeffsv);
+//   vAdd(K,DtR,coeffs,DtR);
+
+   for (int iter=0; iter < itermax; ++iter) {
+      for (int j = 0; j <K; ++j) {
+         if (DtR[j] > lambda) {
+            T diff=coeffs[j];
+            coeffs[j]=DtR[j]-lambda;
+            diff-=coeffs[j];
+            DtR[j]-=diff;
+            G.add_rawCol(j,DtR,diff);
+         } else if (DtR[j] < -lambda) {
+            T diff=coeffs[j];
+            coeffs[j]=DtR[j]+lambda;
+            diff-=coeffs[j];
+            DtR[j]-=diff;
+            G.add_rawCol(j,DtR,diff);
+         } else if (coeffs[j]) {
+            T diff=coeffs[j];
+            coeffs[j]=T();
+            DtR[j]-=diff;
+            G.add_rawCol(j,DtR,diff);
+         }
+      }
+      if (iter % 5 == 1) {
+         vSub(K,DtR,coeffs,DtR);         
+         maxDtR = DtRv.fmaxval();
+         norm1 =T();
+         T DtRa = T();
+         for (int j = 0; j<K; ++j) {
+            if (coeffs[j]) {
+               norm1 += abs(coeffs[j]);
+               DtRa += DtR[j]*coeffs[j];
+            }
+         }
+         DtRv.add(coeffs);
          const T kappa = -DtRa+norm1*maxDtR;
          if (abs(lambda - maxDtR) < tol && kappa <= tol)
             break;

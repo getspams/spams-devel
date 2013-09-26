@@ -195,8 +195,35 @@ static void quick_sort(I* irOut, T* prOut,const I beg, const I end, const bool i
          } 
       }
    }
-   quick_sort<T,I>(irOut,prOut,beg,pivot-1,incr);
+   quick_sort(irOut,prOut,beg,pivot-1,incr);
    quick_sort(irOut,prOut,pivot+1,end,incr);
+}
+
+template <typename T, typename I>
+static void quick_sort(T* prOut,const I beg, const I end, const bool incr) {
+   if (end <= beg) return;
+   I pivot=beg;
+   if (incr) {
+      const T val_pivot=prOut[pivot];
+      for (I i = beg+1; i<=end; ++i) {
+         if (prOut[i] < val_pivot) {
+            prOut[pivot]=prOut[i];
+            prOut[i]=prOut[++pivot];
+            prOut[pivot]=val_pivot;
+         } 
+      }
+   } else {
+      const T val_pivot=prOut[pivot];
+      for (I i = beg+1; i<=end; ++i) {
+         if (prOut[i] > val_pivot) {
+            prOut[pivot]=prOut[i];
+            prOut[i]=prOut[++pivot];
+            prOut[pivot]=val_pivot;
+         } 
+      }
+   }
+   quick_sort(prOut,beg,pivot-1,incr);
+   quick_sort(prOut,pivot+1,end,incr);
 }
 
 

@@ -56,6 +56,9 @@ template <typename T> class List {
       inline T front() const { 
          return _first->element;
       };
+      inline T last() const { 
+         return _last->element;
+      };
       void inline pop_front() { 
          Element<T>* fr=_first;
          _first=fr->next;
