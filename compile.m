@@ -119,7 +119,7 @@ elseif strcmp(blas,'builtin')
     path_to_blas='/';
 end
    
-debug=true;
+debug=false;
 if debug 
    use_multithread=false;
 end
