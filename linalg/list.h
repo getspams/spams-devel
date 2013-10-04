@@ -127,6 +127,12 @@ template <typename T> class List {
             list.push_front(*it);
          }
       }
+      inline void copy(List<T>& list) {
+         list.clear();
+         for (ListIterator<T> it = this->begin(); it != this->end(); ++it) {
+            list.push_back(*it);
+         }
+      }
       void inline print() const {
          cerr << " print list " << endl;
          for (ListIterator<T> it = this->begin(); it != this->end(); ++it) {

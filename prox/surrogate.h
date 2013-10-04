@@ -491,7 +491,8 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
             _z.add(z_old,rho_old);
             _function->add_sample_gradient3(input,_z2,_stats3,_stats4[num_batch]);
             if (!this->_first_pass) {
-               _diff += (old_value-_stats4[num_batch]   > 0 ? T(1.0) : -T(1.0));
+               _diff += (old_value-_stats4[num_batch]);
+               //_diff += (old_value-_stats4[num_batch]   > 0 ? T(1.0) : -T(1.0));
             }
          }
       };
@@ -1194,6 +1195,8 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
       _surrogate->initialize_incremental(w0,strategy);
    const int n = _surrogate->n();
    const int num_batches = _surrogate->num_batches();
+   if (strategy >= 3) _surrogate->reset_diff();
+
    if (epochs > 0) {
       /// first epoch
       _surrogate->setRandom(warm_restart);
@@ -1213,8 +1216,12 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
             _surrogate->minimize_incremental_surrogate(w);
          }
          if (strategy >= 3) {
-            if ((_surrogate->get_diff()) <= 0) 
+            if ((_surrogate->get_diff()) <= 0) {
                _surrogate->set_param(2*_surrogate->get_param());
+              // FLAG(0)
+            }
+               //PRINT_F(_surrogate->get_param())
+              // PRINT_F(_surrogate->get_diff())
             _surrogate->reset_diff();
          }
       }
@@ -1260,7 +1267,7 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
       }
    }
 //   cerr << endl;
-   _surrogate->set_param(strategy >= 2 ? lo_param/20 : lo_param);
+   _surrogate->set_param(strategy >= 2 ? lo_param/10 : lo_param);
 //   cerr << "param: " << lo_param << endl;
    _surrogate->un_subsample();
 };
@@ -1330,7 +1337,8 @@ void incrementalProximalSeq(const Vector<T>& y, const U& X, const Matrix<T>& w0M
       wM.refCol(i,w);
       logsM.refCol(i,logs);
       surrogate.changeLambda(lambdaV[i]);
-      solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,i > 0);
+      solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,false);
+      //solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,i > 0);
       solver.getLogs(logs);
    }
    delete(regul);

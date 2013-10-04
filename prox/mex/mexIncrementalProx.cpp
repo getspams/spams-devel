@@ -65,7 +65,6 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    param.strategy=getScalarStructDef<int>(prhs[3],"strategy",0);
    srandom(seed);
    param.epochs = getScalarStruct<long>(prhs[3],"epochs");
-   const T lambda = getScalarStruct<T>(prhs[3],"lambda");
    const bool seq = getScalarStructDef<bool>(prhs[3],"warm_restart",false);
    param.minibatches = getScalarStructDef<int>(prhs[3],"minibatches",1);
    param.normalized = getScalarStructDef<bool>(prhs[3],"normalized",false);

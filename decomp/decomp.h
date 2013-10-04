@@ -170,7 +170,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       const T constraint, const bool pos = false);
 
 template <typename T>
-void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
+void coreLARS2W(Vector<T>& DtR, const AbstractMatrix<T>& G,
       Matrix<T>& Gs,
       Matrix<T>& Ga,
       Matrix<T>& invGs,
@@ -180,6 +180,12 @@ void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
       Vector<INTM>& ind,
       Matrix<T>& work,
       T& normX,
+      const constraint_type mode,
+      const T constraint, const bool pos = false);
+
+template <typename T>
+void coreLARS2W(Vector<T>& DtR, const AbstractMatrix<T>& G,
+      Vector<T>& coeffs, const Vector<T>& weights, T normX,
       const constraint_type mode,
       const T constraint, const bool pos = false);
 
@@ -218,6 +224,12 @@ template <typename T>
 void coreIST(const AbstractMatrix<T>& G, Vector<T>& DtR, Vector<T>& coeffs,
       const T thrs, const int itermax = 500, 
       const T tol = 0.5);
+
+template <typename T>
+void coreISTW(const AbstractMatrix<T>& G, Vector<T>& DtR, Vector<T>& coeffs, const Vector<T>& weights,
+      const T thrs, const int itermax = 500, 
+      const T tol = 0.5);
+
 
 /// coreIST constrained
 template <typename T>
@@ -1551,6 +1563,35 @@ void lasso2(const Data<T>& X, const AbstractMatrix<T>& G, const AbstractMatrix<T
 };
 
 template <typename T>
+void coreLARS2W(Vector<T>& DtR, const AbstractMatrix<T>& G,
+      Vector<T>& coeffs, const Vector<T>& weights, T normX,
+      const constraint_type mode,
+      const T constraint, const bool pos) {
+   const INTM p = G.m(); 
+   const INTM L = p;
+   Vector<T> v;
+   v.resize(L);
+   Vector<INTM> r;
+   r.resize(L);
+   Vector<T> u;
+   u.resize(p);
+   Matrix<T> Gs;
+   Gs.resize(L,L);
+   Matrix<T> invGs;
+   invGs.resize(L,L);
+   Matrix<T> Ga;
+   Ga.resize(p,L);
+   Matrix<T> work;
+   work.resize(p,3);
+   coreLARS2W(DtR,G,Gs,Ga,invGs,u,v,weights,r,work,normX,mode,constraint,pos);
+   coeffs.setZeros();
+   for (int i = 0; i< L; ++i) {
+      if (r[i] < 0) break;
+      coeffs[r[i]]=v[i];
+   };
+};
+
+template <typename T>
 void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
       Vector<T>& coeffs, T normX,
       const constraint_type mode,
@@ -1792,7 +1833,7 @@ void coreLARS2(Vector<T>& DtR, const AbstractMatrix<T>& G,
 
 /// Auxiliary function for lasso 
 template <typename T>
-void coreLARS2W(Vector<T>& DtR, AbstractMatrix<T>& G,
+void coreLARS2W(Vector<T>& DtR, const AbstractMatrix<T>& G,
       Matrix<T>& Gs,
       Matrix<T>& Ga,
       Matrix<T>& invGs,
@@ -2187,6 +2228,57 @@ inline void coreIST(const AbstractMatrix<T>& G, Vector<T>& DtRv, Vector<T>& coef
 }
 
 template <typename T>
+inline void coreISTW(const Matrix<T>& G, Vector<T>& DtRv, Vector<T>& coeffsv,const Vector<T>& weightsv,
+      const T lambda, const int itermax, 
+      const T tol) {
+
+   T opt=0;
+   const int K = G.n();
+   T* const coeffs = coeffsv.rawX();
+   T* const weights = weightsv.rawX();
+   T* const DtR = DtRv.rawX();
+   //  T* const prG = G.rawX();
+
+   for (int iter=0; iter < itermax; ++iter) {
+      for (int j = 0; j <K; ++j) {
+         const T nrm = G(j,j);
+         const T u = DtR[j]/nrm+coeffs[j];
+         const T thrs = lambda*weights[j]/nrm;
+         if (u > thrs) {
+            T diff=coeffs[j];
+            coeffs[j]=u-thrs;
+            diff-=coeffs[j];
+            G.add_rawCol(j,DtR,diff);
+            //cblas_axpy(K,diff,prG+j*K,1,DtR,1);
+         } else if (u < -thrs) {
+            T diff=coeffs[j];
+            coeffs[j]=u+thrs;
+            diff-=coeffs[j];
+            G.add_rawCol(j,DtR,diff);
+            //cblas_axpy(K,diff,prG+j*K,1,DtR,1);
+         } else if (coeffs[j]) {
+            G.add_rawCol(j,DtR,coeffs[j]);
+            coeffs[j]=0;
+            //cblas_axpy(K,diff,prG+j*K,1,DtR,1);
+         }
+      }
+      if (iter % 10 == 0) {
+         opt=0;
+         for (int j = 0; j <K; ++j) {
+            if (coeffs[j] > 0) {
+               opt=MAX(opt,abs<T>(T(1.0)-DtR[j]/(weights[j]*lambda)));
+            } else if (coeffs[j] < 0) {
+               opt=MAX(opt,abs<T>(T(1.0)+DtR[j]/(lambda*weights[j])));
+            } else {
+               opt=MAX(opt,abs<T>(DtR[j]/(lambda*weights[j]))-T(1.0));
+            }
+         }
+         if (opt < tol) break;
+      }
+   }
+}
+
+/*template <typename T>
 inline void coreIST_unnormalized(const AbstractMatrix<T>& G, Vector<T>& DtRv, Vector<T>& coeffsv,
       const T thrs, const int itermax, 
       const T tol) {
@@ -2209,6 +2301,7 @@ inline void coreIST_unnormalized(const AbstractMatrix<T>& G, Vector<T>& DtRv, Ve
             T diff=coeffs[j];
             coeffs[j]=DtR[j]-lambda;
             diff-=coeffs[j];
+            
             DtR[j]-=diff;
             G.add_rawCol(j,DtR,diff);
          } else if (DtR[j] < -lambda) {
@@ -2241,7 +2334,7 @@ inline void coreIST_unnormalized(const AbstractMatrix<T>& G, Vector<T>& DtRv, Ve
             break;
       }
    }
-}
+}*/
 
 
 /// coreIST constrained
