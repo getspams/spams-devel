@@ -97,6 +97,8 @@ static char allV='V';
 #define sasum_ sasum
 #define ddot_ ddot
 #define sdot_ sdot
+#define ddoti_ ddoti
+#define sdoti_ sdoti
 #define dgemv_ dgemv
 #define sgemv_ sgemv
 #define dger_ dger
@@ -171,27 +173,27 @@ extern "C" {
 
 // INTTerfaces to a few BLAS function, Level 1
 /// INTTerface to cblas_*nrm2
-template <typename T> T cblas_nrm2( INTT n,  T* X,  INTT incX);
+template <typename T> T inline cblas_nrm2( INTT n,  T* X,  INTT incX);
 /// INTTerface to cblas_*copy
-template <typename T> void cblas_copy( INTT n,  T* X,  INTT incX, 
+template <typename T> void inline cblas_copy( INTT n,  T* X,  INTT incX, 
       T* Y,  INTT incY);
 /// INTTerface to cblas_*axpy
-template <typename T> void cblas_axpy( INTT n,  T a,  T* X, 
+template <typename T> void inline cblas_axpy( INTT n,  T a,  T* X, 
        INTT incX, T* Y,  INTT incY);
-template <typename T> void cblas_axpby( INTT n,  T a,  T* X, 
+template <typename T> void inline cblas_axpby( INTT n,  T a,  T* X, 
        INTT incX, T b,  T* Y,  INTT incY);
 /// INTTerface to cblas_*scal
-template <typename T> void cblas_scal( INTT n,  T a, T* X, 
+template <typename T> void inline cblas_scal( INTT n,  T a, T* X, 
        INTT incX);
 /// INTTerface to cblas_*asum
-template <typename T> T cblas_asum( INTT n,  T* X,  INTT incX);
+template <typename T> T inline cblas_asum( INTT n,  T* X,  INTT incX);
 /// INTTerface to cblas_*adot
-template <typename T> T cblas_dot( INTT n,  T* X,  INTT incX, 
+template <typename T> T inline cblas_dot( INTT n,  T* X,  INTT incX, 
        T* Y, INTT incY);
 /// interface to cblas_i*amin
-template <typename T> INTT cblas_iamin( INTT n,  T* X,  INTT incX);
+template <typename T> INTT inline cblas_iamin( INTT n,  T* X,  INTT incX);
 /// interface to cblas_i*amax
-template <typename T> INTT cblas_iamax( INTT n,  T* X,  INTT incX);
+template <typename T> INTT inline cblas_iamax( INTT n,  T* X,  INTT incX);
 
 // INTTerfaces to a few BLAS function, Level 2
 
@@ -546,6 +548,34 @@ template <> inline bool cblas_dot<bool>( INTT n,  bool* X,
    /// not implemented
    return true;
 };
+
+#ifdef SPARSE_BLAS
+/*extern "C" {
+   double ddoti_(INTT *n,double *x,INTT *incX, double *y);
+   float sdoti_(INTT *n,float *x,INTT *incX, float *y);
+}
+
+template <typename T> inline T cblas_doti( INTT n,T* X,  INTT* r, T* Y);
+template <> inline double cblas_doti<double>( INTT n, double* X, INTT* r, 
+      double* Y) {
+   return ddoti_(&n,X,r,Y+1);
+};
+template <> inline float cblas_doti<float>( INTT n, float* X,  INTT* r, 
+      float* Y) {
+   return sdoti_(&n,X,r,Y+1);
+};*/
+// bug with the fortran-like indices
+#else
+template <typename T> inline T cblas_doti( INTT n, T* X,  INTT* r, 
+      T* Y) {
+   T sum=0;
+   for (INTT i = 0; i<n; ++i) {
+      sum += Y[r[i]]*X[i];
+   }
+   return sum;
+};
+#endif
+
 
 // Implementations of the INTTerfaces, BLAS Level 2
 ///  Implementation of the INTTerface for cblas_dgemv

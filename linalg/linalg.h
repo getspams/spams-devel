@@ -49,7 +49,7 @@ typedef List<int> list_int;
 typedef ListIterator<int> const_iterator_int;
 
 #ifdef INT_64BITS
-#define INTM long long int 
+#define INTM INTT
 #else
 #define INTM int
 #endif
@@ -3043,12 +3043,13 @@ template <typename T> inline T Vector<T>::dot(const Vector<T>& x) const {
 /// returns A'x, when x is sparse
 template <typename T> inline T Vector<T>::dot(const SpVector<T>& x) const {
    T sum=0;
-   const T* v = x._v;
-   const INTM* r = x._r;
-   for (INTM i = 0; i<x._L; ++i) {
+   const INTM* r = x.rawR();
+   const T* v = x.rawX();
+   for (INTT i = 0; i<x._L; ++i) {
       sum += _X[r[i]]*v[i];
    }
    return sum;
+   //return cblas_doti<T>(x._L,x._v,x._r,_X);
 };
 
 /// A <- A + a*x
@@ -5018,6 +5019,7 @@ inline T SpVector<T>::dot(const SpVector<T>& vec) const {
 
 template <typename T>
 inline T SpVector<T>::dot(const Vector<T>& vec) const {
+//   return cblas_doti<T>(_L,_v,_r,vec._X);
    T sum=T();
    INTM countI = 0;
    while (countI < _L) 

@@ -1,5 +1,5 @@
 clear all;
-n=4000;
+n=40000;
 p=40000;
 density=0.01;
 
@@ -26,14 +26,14 @@ param.loss='square';     % only square and log are available
 param.num_threads=1;    % uses all possible cores
 param.normalized=false;  % if the columns of X have unit norm, set to true.
 param.strategy=3;
-param.verbose=false;
+param.verbose=true;
 param.minibatches=ceil(1/density);  
 
 % set grid of lambda
 max_lambda=max(abs(X*y))/n;
 param.lambda=max_lambda*(2^(1/8)).^(0:-1:-50);    % best to order from large to small
 
-tabepochs=[1 2 3 5];
+tabepochs=[1 2 3 5 10 50];
 %% The problem which will be solved is
 %%   min_beta  1/(2n) ||y-X' beta||_2^2 + lambda ||beta||_1
 % the problems for different lambdas are solve INDEPENDENTLY in parallel
@@ -74,7 +74,6 @@ for ii=1:length(tabepochs)
    0.5*sum((yR-X'*Beta).^2)/n+param.lambda.*sum(abs(Beta))
    fprintf('Sparsity: \n');
    sum(Beta ~= 0)
-   pause
 end
 
 

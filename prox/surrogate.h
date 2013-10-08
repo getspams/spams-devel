@@ -492,7 +492,7 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
             _function->add_sample_gradient3(input,_z2,_stats3,_stats4[num_batch]);
             if (!this->_first_pass) {
                _diff += (old_value-_stats4[num_batch]);
-               //_diff += (old_value-_stats4[num_batch]   > 0 ? T(1.0) : -T(1.0));
+//               _diff += (old_value-_stats4[num_batch]   > 0 ? T(1.0) : -T(1.0));
             }
          }
       };
@@ -1196,7 +1196,6 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
    const int n = _surrogate->n();
    const int num_batches = _surrogate->num_batches();
    if (strategy >= 3) _surrogate->reset_diff();
-
    if (epochs > 0) {
       /// first epoch
       _surrogate->setRandom(warm_restart);
@@ -1205,23 +1204,28 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
          _surrogate->update_incremental_surrogate(w);
          _surrogate->minimize_incremental_surrogate(w);
       }
+      if (strategy >= 3 && warm_restart) {
+         if ((_surrogate->get_diff()) <= 0.0*num_batches)  {
+            _surrogate->set_param(sqrt(2)*_surrogate->get_param());
+         } 
+         _surrogate->reset_diff();
+      }
+      if (strategy >= 3) _surrogate->reset_diff();
 
       /// classical epochs
       _surrogate->setRandom(true);
       _surrogate->setFirstPass(false);
-      if (strategy >= 3) _surrogate->reset_diff();
       for (int i = 1; i<epochs; ++i) {
          for (int j = 0; j< num_batches; ++j) {
             _surrogate->update_incremental_surrogate(w);  
             _surrogate->minimize_incremental_surrogate(w);
          }
          if (strategy >= 3) {
-            if ((_surrogate->get_diff()) <= 0) {
-               _surrogate->set_param(2*_surrogate->get_param());
-              // FLAG(0)
+         //   PRINT_F(_surrogate->get_diff())
+            if ((_surrogate->get_diff()) <= 0.0*num_batches) {
+               _surrogate->set_param(sqrt(2)*_surrogate->get_param());
+          //     PRINT_F(_surrogate->get_param())
             }
-               //PRINT_F(_surrogate->get_param())
-              // PRINT_F(_surrogate->get_diff())
             _surrogate->reset_diff();
          }
       }
@@ -1248,7 +1252,7 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
    this->solve(w0,w,1,false,true,0);
 
    T loCost = _logs[0];
- //  cerr << _logs[0] << " ";
+   //  cerr << _logs[0] << " ";
    // try to reduce
    for (int t = 0; t<15; ++t) 
    {
@@ -1257,7 +1261,7 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
       _surrogate->set_param(hi_param);
       this->solve(w0,w,1,false,true,0);
       T hiCost = _logs[0];
-//      cerr << _logs[0] << " ";
+      //      cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
       } else {
@@ -1266,12 +1270,11 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
          loCost=hiCost;
       }
    }
-//   cerr << endl;
-   _surrogate->set_param(strategy >= 2 ? lo_param/10 : lo_param);
-//   cerr << "param: " << lo_param << endl;
+   //   cerr << endl;
+   _surrogate->set_param(strategy >= 2 ? lo_param/20 : lo_param);
+   //   cerr << "param: " << lo_param << endl;
    _surrogate->un_subsample();
 };
-
 
 template <typename T, typename U>
 void incrementalProximal(const Vector<T>& y, const U& X, const Vector<T>& w0,
@@ -1337,8 +1340,8 @@ void incrementalProximalSeq(const Vector<T>& y, const U& X, const Matrix<T>& w0M
       wM.refCol(i,w);
       logsM.refCol(i,logs);
       surrogate.changeLambda(lambdaV[i]);
-      solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,false);
-      //solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,i > 0);
+      //solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,false);
+      solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,i > 0);
       solver.getLogs(logs);
    }
    delete(regul);

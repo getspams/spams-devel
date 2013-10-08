@@ -25,7 +25,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='builtin';
+blas='mkl';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -41,14 +41,16 @@ use_64bits_integers=true;
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
+path_matlab='';
+
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
 % set up the path to the compiler libraries that you intend to use below
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries=' /usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -90,8 +92,8 @@ end
 % set up the path to the blas/lapack libraries. 
 if strcmp(blas,'mkl')
    if linux || mac
-      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -128,7 +130,6 @@ end
 out_dir='./build/';
 
 COMPILE = { 
-            '-I./linalg/ -I./decomp/ -I./dags/ dags/mex/mexMotifsDna.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
             % compile dictLearn toolbox
@@ -354,7 +355,7 @@ else
 end
 
 if ~windows
-   fprintf(fid,'matlab $* -singleCompThread -nodisplay -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n'); 
+   fprintf(fid,[path_matlab 'matlab $* -singleCompThread -nodisplay -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n']); 
    fclose(fid);
    !chmod +x run_matlab.sh
 end
