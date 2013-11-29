@@ -12,8 +12,8 @@ test_SparseProject
 test_SOMP
 test_L1L2BCD
 test_TrainDL
-test_StructTrainDL
 test_TrainDL_Memory
+test_StructTrainDL
 test_nmf
 test_ProximalFlat
 test_ProximalTree

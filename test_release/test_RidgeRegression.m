@@ -15,6 +15,6 @@ W0=zeros(size(X,2),size(Y,2));
 fprintf('\nVarious regression experiments\n');
 fprintf('\nRidge Regression with conjugate gradient solver\n');
 tic
-[W optim_info]=mexRidgeRegression(Y,X,W0,param);
+[W]=mexRidgeRegression(Y,X,W0,param);
 t=toc
 

@@ -30,18 +30,22 @@ blas='mkl';
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
 % need an appropriate compiler for that (intel compiler, most recent gcc, or visual studio pro)
-use_multithread=false; % (might not compatible with compiler=mex)
+use_multithread=true; % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
-use_64bits_integers=true;
+use_64bits_integers=false;
 % use this option if you have VERY large arrays/matrices 
 % this option allows such matrices, but may slightly reduce the speed of the computations.
 
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
-path_matlab='';
+add_flag='';
+% WARNING: on Mac OS  mountain lion, you may have to uncomment the line
+%add_flag=' -mmacosx-version-min=10.7'
+
+path_matlab='';  % optional  
 
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
@@ -49,8 +53,9 @@ path_matlab='';
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -65,10 +70,7 @@ elseif strcmp(compiler,'open64')
 elseif strcmp(compiler,'icc')
     if linux || mac
        % example when compiler='icc' for Linux/Mac
-       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
-       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7/';
-       path_to_compiler_libraries='/scratch2/clear/mairal/intel/composerxe/lib/intel64/';
-       path_to_compiler='/scratch2/clear/mairal/intel/composerxe/bin/';
+       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
     else
@@ -94,6 +96,7 @@ if strcmp(blas,'mkl')
    if linux || mac
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -132,6 +135,9 @@ out_dir='./build/';
 COMPILE = { 
             '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
+            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
+            '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
+            '-I./linalg/ -I./decomp/ decomp/mex/mexLassoWeighted.cpp',
             % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
@@ -161,12 +167,9 @@ COMPILE = {
             '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             % compile decomp toolbox
             '-I./linalg/ -I./decomp/ decomp/mex/mexRidgeRegression.cpp',
-            '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexCD.cpp'
             '-I./linalg/ -I./decomp/ decomp/mex/mexL1L2BCD.cpp', 
-            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoMask.cpp',
-            '-I./linalg/ -I./decomp/ decomp/mex/mexLassoWeighted.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMPMask.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexSOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp'};
@@ -361,6 +364,10 @@ if ~windows
 end
 
 DEFS=[DEFBLAS ' ' DEFCOMMON ' ' DEFCOMP];
+
+if mac
+   compile_flags=[compile_flags add_flag];
+end
 
 for k = 1:length(COMPILE),
     str = COMPILE{k};

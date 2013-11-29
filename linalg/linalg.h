@@ -5022,8 +5022,10 @@ inline T SpVector<T>::dot(const Vector<T>& vec) const {
 //   return cblas_doti<T>(_L,_v,_r,vec._X);
    T sum=T();
    INTM countI = 0;
-   while (countI < _L) 
-      sum+=_v[countI++]*vec[_r[countI]];
+   while (countI < _L) {
+      sum+=_v[countI]*vec[_r[countI]];
+      ++countI;
+   }
    return sum;
 };
 

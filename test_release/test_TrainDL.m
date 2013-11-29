@@ -6,9 +6,9 @@ X=im2col(I,[8 8],'sliding');
 X=X-repmat(mean(X),[size(X,1) 1]);
 X=X ./ repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
 
-param.K=100;  % learns a dictionary with 100 elements
+param.K=256;  % learns a dictionary with 100 elements
 param.lambda=0.15;
-param.numThreads=4; % number of threads
+param.numThreads=-1; % number of threads
 param.batchsize=400;
 param.verbose=false;
 
