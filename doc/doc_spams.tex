@@ -67,26 +67,27 @@
 \tableofcontents
 
 \section{Introduction}
-SPAMS (SPArse Modeling Software) is an open-source optimization toolbox under
-licence GPLv3.  It implements algorithms for solving various machine learning
-and signal processing problems involving sparse regularizations.
+SPAMS (SPArse Modeling Software) is an open-source optimization toolbox for
+sparse estimation with licence GPLv3.  It implements algorithms for solving
+machine learning and signal processing problems involving sparse
+regularizations.
 
 The library is coded in C++, is compatible with Linux, Mac, and Windows 32bits
 and 64bits Operating Systems. It is interfaced with Matlab, but can be called
-from any C++ application. A R and Python interface has been developed by
+from any C++ application. R and Python interfaces have been developed by
 Jean-Paul Chieze.
 
-It requires an implementation of BLAS and LAPACK for performing efficient
-linear algebra operations such as the one provided by matlab/R, atlas, netlib,
-or the one provided by Intel (Math Kernel Library).  It also exploits
-multi-core CPUs when this feature is supported by the compiler, through
-OpenMP.
+It requires an implementation of BLAS and LAPACK for performing
+linear algebra operations. The ones shipped with matlab and R can be used,
+but also external libraries such as atlas, the netlib implementation, or the
+Intel Math Kernel Library.  It also exploits multi-core CPUs when this feature
+is supported by the compiler, through OpenMP.
 
-The current licence is GPLv3 available at
-\url{http://www.gnu.org/licenses/gpl.html}, which limits its usage.  For other
-usages (such as the use in proprietary softwares), please contact the author.
+The current licence is GPLv3, which is available at
+\url{http://www.gnu.org/licenses/gpl.html}.  For other usages (such as the use
+in proprietary softwares), please contact the author.
 
-Version 2.3 of SPAMS is divided into three ``toolboxes'' and has a few
+Version 2.4 of SPAMS is divided into four ``toolboxes'' and has a few
 additional miscellaneous functions:
 \begin{itemize}
 \item The \textbf{Dictionary learning and matrix factorization toolbox}
@@ -96,7 +97,8 @@ variants for solving various matrix factorization problems:
 \item dictionary Learning for sparse coding;
 \item sparse principal component analysis (seen as a sparse matrix factorization problem);
 \item non-negative matrix factorization;
-\item non-negative sparse coding.
+\item non-negative sparse coding;
+\item dictionary learning with structured sparsity.
 \end{itemize}
 \item The \textbf{Sparse decomposition toolbox} contains efficient implementations of
 \begin{itemize}
@@ -150,17 +152,18 @@ All of these regularization functions can be used with the following losses
 This toolbox can also enforce non-negativity constraints, handle intercepts and
 sparse matrices.  There are also a few additional undocumented functionalities,
 which are available in the source code.
+For some combinations of loss and regularizers, stochastic and incremental proximal
+gradient solvers are also implemented~\cite{mairal15,mairal16}.
 \item A few tools for performing linear algebra operations such as a
 conjugate gradient algorithm, manipulating sparse matrices and graphs.
 \end{itemize}
 
-The toolbox was written by Julien Mairal when he was at INRIA, with the
-collaboration of Francis Bach (INRIA), Jean Ponce (Ecole Normale Sup\'erieure),
-Guillermo Sapiro (University of Minnesota), Guillaume Obozinski (INRIA) and
-Rodolphe Jenatton (INRIA).
+The toolbox was written by Julien Mairal at INRIA, with the collaboration of
+Francis Bach (INRIA), Jean Ponce (Ecole Normale Sup\'erieure), Guillermo Sapiro
+(University of Minnesota), Guillaume Obozinski (INRIA) and Rodolphe Jenatton
+(INRIA).
 
-R and Python interfaces have been written by Jean-Paul Chieze (INRIA), and a
-few contributors have helped us making compilation scripts for various platforms.
+R and Python interfaces have been written by Jean-Paul Chieze (INRIA).
 
 \section{Installation}
 The toolbox used to come with pre-compiled binaries for various plateforms. 
@@ -197,9 +200,6 @@ in \cite{mairal9}. {\bf Note that for problems of a reasonable size, and when $\
    the function mexTrainDL\_Memory can be faster but uses more memory.} 
 
 \lstinputlisting{../src_release/mexTrainDL.m}
-% {\footnotesize
-   % \verbatiminput{../src_release/mexTrainDL.m}
-   % }
 
 The following piece of code contains usage examples:
 \lstinputlisting{../test_release/test_TrainDL.m}
@@ -211,12 +211,14 @@ It requires storing all the coefficients $\alphab$ and is therefore impractical
 for very large datasets. However, in many situations, one can afford this memory cost and it is better to use this method, which 
 is faster than mexTrainDL.
 Note that unlike mexTrainDL this function does not allow warm-restart.
-% {\footnotesize
-%    \verbatiminput{../src_release/mexTrainDL\_Memory.m}
-% }
+
 \lstinputlisting{../src_release/mexTrainDL_Memory.m}
 The following piece of code contains usage examples:
 \lstinputlisting{../test_release/test_TrainDL_Memory.m}
+
+\subsection{Function mexStructTrainDL}
+This function 
+
 
 \subsection{Function nmf}
 This function is an example on how to use the function mexTrainDL for the

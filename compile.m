@@ -14,7 +14,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='icc';
+compiler='gcc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -25,7 +25,7 @@ compiler='icc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='mkl';
+blas='builtin';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -133,6 +133,12 @@ end
 out_dir='./build/';
 
 COMPILE = { 
+            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
+            '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexGroupStructOfString.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexSimpleGroupTree.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexTreeOfGroupStruct.cpp',  
             % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
@@ -153,11 +159,6 @@ COMPILE = {
             '-I./linalg/ -I./prox/ prox/mex/mexProximalGraph.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexProximalPathCoding.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexEvalPathCoding.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexGroupStructOfString.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexSimpleGroupTree.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexTreeOfGroupStruct.cpp',  
             % compile linalg toolbox
             '-I./linalg/ linalg/mex/mexCalcAAt.cpp',
             '-I./linalg/ linalg/mex/mexCalcXAt.cpp',  
@@ -169,7 +170,6 @@ COMPILE = {
             '-I./linalg/ linalg/mex/mexSort.cpp', 
             '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             % compile decomp toolbox
-            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoWeighted.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexRidgeRegression.cpp',

@@ -35,7 +35,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nlhs) {
   Vector<double> *eta_g;
   int *permutations;
   int nb_perm;
-  int nb_vars = treeOfGroupStruct(gstruct,&permutations,&nb_perm,&eta_g,&groups,&own_variables,&N_own_variables);
+  int nb_vars = _treeOfGroupStruct<double>(gstruct,&permutations,&nb_perm,&eta_g,&groups,&own_variables,&N_own_variables);
   del_gstruct(gstruct);
   mxArray* mxeta_g = makeVector<double>(eta_g);
   mxArray* mxown_variables = makeVector<int>(own_variables);

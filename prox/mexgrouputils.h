@@ -20,6 +20,9 @@
 #endif
 #include <groups-graph.h>
 
+
+typedef StructNodeElem<double> NodeElem;
+
 void mexCgroupsToMatlab(std::vector<NodeElem *> *gstruct,mxArray* mxgstruct) {
   int i = 0;
   mwSize cdims[1];

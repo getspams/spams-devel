@@ -48,13 +48,6 @@
 typedef List<int> list_int;
 typedef ListIterator<int> const_iterator_int;
 
-#ifdef INT_64BITS
-#define INTM INTT
-#else
-#define INTM int
-#endif
-
-
 #undef max
 #undef min
 

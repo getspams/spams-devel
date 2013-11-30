@@ -30,7 +30,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nlhs) {
   std::vector<NodeElem *> *gstruct;
   if(mxGetString(prhs[0],fname,2048)) 
     mexErrMsgTxt("Pb with filename\n");
-  MEX_TRY(gstruct = readGroupStruct(fname);)
+  MEX_TRY(gstruct = _readGroupStruct<double>(fname);)
   mwSize cdims[1];
   cdims[0] = gstruct->size();
   mxArray* mxgstruct = mxCreateCellArray((mwSize)1,cdims);

@@ -31,7 +31,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    const mwSize* dims = mxGetDimensions(prhs[0]);
    int n = dims[1];
    mwSize cdims[] = {n};
-   std::vector<NodeElem *> *gstruct = simpleGroupTree(degrees,n);
+   std::vector<NodeElem *> *gstruct = _simpleGroupTree<double>(degrees,n);
    cdims[0] = gstruct->size();
    mxArray* mxgstruct = mxCreateCellArray((mwSize)1,cdims);
    mexCgroupsToMatlab(gstruct,mxgstruct);

@@ -51,14 +51,14 @@ template <typename T>
 
       Data<T> *X;
       const mwSize* dimsX=mxGetDimensions(prhs[0]);
-      int n=static_cast<int>(dimsX[0]);
-      int M=static_cast<int>(dimsX[1]);
+      INTM n=static_cast<int>(dimsX[0]);
+      INTM M=static_cast<int>(dimsX[1]);
       if (mxIsSparse(prhs[0])) {
          double * X_v=static_cast<double*>(mxGetPr(prhs[0]));
          mwSize* X_r=mxGetIr(prhs[0]);
          mwSize* X_pB=mxGetJc(prhs[0]);
          mwSize* X_pE=X_pB+1;
-         int* X_r2, *X_pB2, *X_pE2;
+         INTM* X_r2, *X_pB2, *X_pE2;
          T* X_v2;
          createCopySparse<T>(X_v2,X_r2,X_pB2,X_pE2,
                X_v,X_r,X_pB,X_pE,M);

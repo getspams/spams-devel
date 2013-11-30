@@ -31,7 +31,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nlhs) {
   plhs[0]=mxCreateStructArray(1,dims,3,names);
   SpMatrix<bool> *groups;
   SpMatrix<bool> *groups_var;
-  Vector<double> *eta_g = graphOfGroupStruct(gstruct,&groups,&groups_var);
+  Vector<double> *eta_g = _graphOfGroupStruct<double>(gstruct,&groups,&groups_var);
   del_gstruct(gstruct);
   mxArray* mxeta_g = makeVector<double>(eta_g);
   delete eta_g;

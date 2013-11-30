@@ -30,7 +30,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nlhs) {
   std::vector<NodeElem *> *gstruct;
   if(data == static_cast<char *>(0))
     mexErrMsgTxt("Pb with data string\n");
-  MEX_TRY(gstruct = groupStructOfString(data);)
+  MEX_TRY(gstruct = _groupStructOfString<double>(data);)
   mxFree(data);
   mwSize cdims[1];
   cdims[0] = gstruct->size();
