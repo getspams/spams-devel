@@ -55,7 +55,7 @@ if strcmp(compiler,'gcc')
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -70,7 +70,7 @@ elseif strcmp(compiler,'open64')
 elseif strcmp(compiler,'icc')
     if linux || mac
        % example when compiler='icc' for Linux/Mac
-       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
+       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7/';
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
     else
@@ -133,12 +133,6 @@ end
 out_dir='./build/';
 
 COMPILE = { 
-            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
-            '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexGroupStructOfString.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexSimpleGroupTree.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexTreeOfGroupStruct.cpp',  
             % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
@@ -159,6 +153,11 @@ COMPILE = {
             '-I./linalg/ -I./prox/ prox/mex/mexProximalGraph.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexProximalPathCoding.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexEvalPathCoding.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexGroupStructOfString.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexSimpleGroupTree.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexTreeOfGroupStruct.cpp',  
             % compile linalg toolbox
             '-I./linalg/ linalg/mex/mexCalcAAt.cpp',
             '-I./linalg/ linalg/mex/mexCalcXAt.cpp',  
@@ -171,6 +170,7 @@ COMPILE = {
             '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             % compile decomp toolbox
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
+            '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoWeighted.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexRidgeRegression.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexCD.cpp'

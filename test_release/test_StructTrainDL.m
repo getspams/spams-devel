@@ -12,23 +12,15 @@ param.numThreads=4; % number of threads
 param.batchsize=400;
 param.tol = 1e-3
 
-param.iter=20;  %
+param.iter=200;  %
 
+if false
 param.regul = 'l1';
 fprintf('with Fista Regression %s\n',param.regul);
 tic
 D = mexStructTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,1);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
 %
 param.regul = 'l2';
 fprintf('with Fista Regression %s\n',param.regul);
@@ -36,17 +28,6 @@ tic
 D = mexStructTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
-
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,2);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
-
 %
 param.regul = 'elastic-net';
 fprintf('with Fista %s\n',param.regul);
@@ -56,17 +37,6 @@ D = mexStructTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
 
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,3);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
-%%%%%%
-%?pause
 %%% GRAPH
 param.lambda=0.1; % regularization parameter
 param.tol=1e-5;
@@ -97,38 +67,13 @@ D = mexStructTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
 
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,1);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
-%
-param.regul = 'graph-ridge';
-fprintf('with Fista %s\n',param.regul);
-tic
-D = mexStructTrainDL(X,param);
-t=toc;
-fprintf('time of computation for Dictionary Learning: %f\n',t);
-
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,2);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
-%
-
 %%
 %%% TREE
 %?pause;
 param = rmfield(param,'graph');
+
+end
+
 
 param.lambda=0.1; % regularization parameter
 param.tol=1e-5;
@@ -146,7 +91,7 @@ tree.groups=sparse([0 0 0 0 0 0 0 0; ...
                     0 0 0 0 1 0 0 0; ...
                     0 0 0 0 0 0 1 0]);  % first group should always be the root of the tree
 
-param.tree = tree
+param.tree = tree;
 
 param.regul = 'tree-l0';
 fprintf('with Fista %s\n',param.regul);
@@ -156,33 +101,13 @@ D = mexStructTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
 
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,1);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
 %
 param.regul = 'tree-l2';
 fprintf('with Fista %s\n',param.regul);
-
 tic
 D = mexStructTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
-
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,3);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
 
 %
 param.regul = 'tree-linf';
@@ -192,14 +117,4 @@ tic
 D = mexStructTrainDL(X,param);
 t=toc;
 fprintf('time of computation for Dictionary Learning: %f\n',t);
-
-param.approx=0;
-fprintf('Evaluating cost function...\n');
-alpha=mexLasso(X,D,param);
-R=mean(0.5*sum((X-D*alpha).^2)+param.lambda*sum(abs(alpha)));
-ImD=displayPatches(D);
-subplot(1,3,3);
-imagesc(ImD); colormap('gray');
-fprintf('objective function: %f\n',R);
-drawnow;
 

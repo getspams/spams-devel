@@ -217,9 +217,55 @@ template <typename T>
       TreeStruct<T> tree;
       TreeStruct<T> *ptree = (TreeStruct<T> *) 0;
       tree.Nv=0;
+      if (param.regul==FISTA::TREE_L0 || param.regul==FISTA::TREE_L2 || param.regul==FISTA::TREE_LINF) {
+         mxArray* ppr_own_variables = mxGetField(mxtree,0,"own_variables");
+         if (!mexCheckType<int>(ppr_own_variables)) 
+            mexErrMsgTxt("own_variables field should be int32");
+         if (!ppr_own_variables) mexErrMsgTxt("field own_variables is not provided");
+         int* pr_own_variables = reinterpret_cast<int*>(mxGetPr(ppr_own_variables));
+         const mwSize* dims_groups =mxGetDimensions(ppr_own_variables);
+         int num_groups=static_cast<int>(dims_groups[0])*static_cast<int>(dims_groups[1]);
+         mxArray* ppr_N_own_variables = mxGetField(mxtree,0,"N_own_variables");
+         if (!ppr_N_own_variables) mexErrMsgTxt("field N_own_variables is not provided");
+         if (!mexCheckType<int>(ppr_N_own_variables)) 
+            mexErrMsgTxt("N_own_variables field should be int32");
+         const mwSize* dims_var =mxGetDimensions(ppr_N_own_variables);
+         int num_groups2=static_cast<int>(dims_var[0])*static_cast<int>(dims_var[1]);
+         if (num_groups != num_groups2)
+            mexErrMsgTxt("Error in tree definition");
+         int* pr_N_own_variables = reinterpret_cast<int*>(mxGetPr(ppr_N_own_variables));
+         int num_var=0;
+         for (int i = 0; i<num_groups; ++i)
+            num_var+=pr_N_own_variables[i];
+         mxArray* ppr_lambda_g = mxGetField(mxtree,0,"eta_g");
+         if (!ppr_lambda_g) mexErrMsgTxt("field eta_g is not provided");
+         const mwSize* dims_weights =mxGetDimensions(ppr_lambda_g);
+         int num_groups3=static_cast<int>(dims_weights[0])*static_cast<int>(dims_weights[1]);
+         if (num_groups != num_groups3)
+            mexErrMsgTxt("Error in tree definition");
+         T* pr_lambda_g = reinterpret_cast<T*>(mxGetPr(ppr_lambda_g));
+         mxArray* ppr_groups = mxGetField(mxtree,0,"groups");
+         const mwSize* dims_gg =mxGetDimensions(ppr_groups);
+         if ((num_groups != static_cast<int>(dims_gg[0])) || 
+               (num_groups != static_cast<int>(dims_gg[1])))
+            mexErrMsgTxt("Error in tree definition");
+         if (!ppr_groups) mexErrMsgTxt("field groups is not provided");
+         mwSize* pr_groups_ir = reinterpret_cast<mwSize*>(mxGetIr(ppr_groups));
+         mwSize* pr_groups_jc = reinterpret_cast<mwSize*>(mxGetJc(ppr_groups));
+
+         for (int i = 0; i<num_groups; ++i) tree.Nv+=pr_N_own_variables[i];
+         tree.Ng=num_groups;
+         tree.weights=pr_lambda_g;
+         tree.own_variables=pr_own_variables;
+         tree.N_own_variables=pr_N_own_variables;
+         tree.groups_ir=pr_groups_ir;
+         tree.groups_jc=pr_groups_jc;
+         ptree=&tree;
+      }
+
 
       /* */
-      trainer->train(*X,param,pgraph,ptree);
+      trainer->train_fista(*X,param,pgraph,ptree);
       if (param.log)
          mxFree(param.logName);
 

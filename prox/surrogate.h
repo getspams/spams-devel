@@ -1182,10 +1182,9 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
       evaluate, const int strategy, const bool warm_restart) {
    if (verbose && epochs > 0 && !warm_restart) {
       cout << "Standard Incremental Solver" << endl;
-      //timer2.reset();
-      //timer3.reset();
-      //timer.reset();
    }
+   /// strategy 0: do not change L
+   /// strategy 1: try to adjust L 
    Timer time;
    time.start();
    _logs.set(0);
