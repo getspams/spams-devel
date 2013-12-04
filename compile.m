@@ -25,7 +25,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='builtin';
+blas='mkl';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -53,9 +53,9 @@ path_matlab='';  % optional
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -71,6 +71,7 @@ elseif strcmp(compiler,'icc')
     if linux || mac
        % example when compiler='icc' for Linux/Mac
        path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7/';
+       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
     else
@@ -134,6 +135,8 @@ out_dir='./build/';
 
 COMPILE = { 
             % compile dictLearn toolbox
+            '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
+            '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
@@ -142,8 +145,6 @@ COMPILE = {
             '-I./dags/ -I./linalg/ dags/mex/mexCountPathsDAG.cpp',
             '-I./dags/ -I./linalg/ dags/mex/mexCountConnexComponents.cpp',
             % compile proximal toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
-            '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexFistaTree.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexFistaGraph.cpp',  
@@ -364,7 +365,7 @@ else
 end
 
 if ~windows
-   fprintf(fid,[path_matlab 'matlab $* -singleCompThread -nodisplay -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n']); 
+   fprintf(fid,[path_matlab 'matlab $* -singleCompThread -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n']); 
    fclose(fid);
    !chmod +x run_matlab.sh
 end

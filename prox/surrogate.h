@@ -87,7 +87,7 @@ class SmoothFunction {
          _genericL(genericL),
          _constantL(is_normalized) { 
             _current_batch.resize(nbatches); 
-            _num_batches = _n /_nbatches;
+            _num_batches = MAX(_n /_nbatches,1);
             if (!is_normalized) {
                _L.resize(_n);
                typename U::col spw;
@@ -149,7 +149,8 @@ class SmoothFunction {
                rho_sample += _L[_current_batch[i]];
             }
             rho_sample /= _sizebatch;
-            const T new_rho=(1-w)*rho + w*rho_sample;
+            //const T new_rho=(1-w)*rho + w*rho_sample;
+            const T new_rho=rho;
             typename U::col spw;
             z.scal(rho*(T(1.0)-w)/new_rho);
             z.add(input,rho_sample*w/new_rho);
@@ -236,6 +237,7 @@ class SmoothFunction {
             _Xt->refCol(ind,spw);
             val-= stats[ind]*spw.dot(input); 
          }
+         return val;
       };
 
       virtual T eval_simple(const T y, const T s) const = 0;
@@ -253,13 +255,13 @@ class SmoothFunction {
          _save_n=_n;
          _counter=0;
          _n = MIN(n,_n);
-         _num_batches = _n /_nbatches;
+         _num_batches = MAX(_n /_nbatches,1);
       };
       /// restore the full dataset
       virtual void un_subsample() {
          _n = _save_n;
          _counter=0;
-         _num_batches = _n /_nbatches;
+         _num_batches = MAX(_n /_nbatches,1);
       };
       inline int n() const { return _n; };
       inline int p() const { return _p; };
@@ -269,7 +271,7 @@ class SmoothFunction {
          _nbatches=nbatches;
          _sizebatch=_nbatches;
          _current_batch.resize(nbatches);
-         _num_batches = _n /_nbatches;
+         _num_batches = MAX(_n /_nbatches,1);
       };
       int inline nbatches() const { return _nbatches; };
       int inline num_batches() const { return _num_batches; };
@@ -425,8 +427,10 @@ class IncrementalSurrogate : public OnlineSurrogate<T,U> {
       virtual void minimize_incremental_surrogate(Vector<T>& output) = 0;
       virtual T get_param() const = 0;
       virtual T set_param(const T param) = 0;
+      virtual T set_param_strong_convexity() { };
       inline void setFirstPass(const bool pass) { _first_pass = pass; };
       virtual T get_diff() const = 0;
+      virtual T get_scal_diff() const = 0; //{ return 0; };
       virtual T reset_diff() =0 ;
 
    protected:
@@ -474,24 +478,28 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
          Vector<T> z_old;
          _stats2.refCol(num_batch,z_old);
          const T rho_old=_stats[num_batch];
-         if (this->_strategy <= 2) {
+         if (this->_strategy <= 2 || this->_strategy == 4) {
             if (!this->_first_pass)
                _z.sub(z_old);
             _function->add_sample_gradient2(input,z_old,rho_old*_scalL);
             _z.add(z_old);
          } else {
             T old_value=0;
+            T old_valueb=0;
             if (!this->_first_pass) {
                _z.add(z_old,-rho_old);
                _z3.copy(input);
                _z3.sub(z_old);
-               old_value = _stats4[num_batch] + _function->dotprod_gradient3(_z3,_stats3)+0.5*rho_old*_scalL*_z3.nrm2sq();
+               //old_value = _stats4[num_batch] + _function->dotprod_gradient3(_z3,_stats3)+0.5*rho_old*_scalL*_z3.nrm2sq();
+               old_value = _stats4[num_batch] + _function->dotprod_gradient3(_z3,_stats3); // f_old+ nabla f(old)'( new-old)
+               old_valueb=0.5*rho_old*_z3.nrm2sq();
             }
             z_old.copy(input);
             _z.add(z_old,rho_old);
             _function->add_sample_gradient3(input,_z2,_stats3,_stats4[num_batch]);
             if (!this->_first_pass) {
-               _diff += (old_value-_stats4[num_batch]);
+               _diff += (old_value-_stats4[num_batch]); // should be non-positive (convexity inequality)
+               _diffb+=old_valueb;
 //               _diff += (old_value-_stats4[num_batch]   > 0 ? T(1.0) : -T(1.0));
             }
          }
@@ -507,7 +515,7 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
          this->_stats.resize(num_batches);
          _function->getL(this->_stats);
          this->_stats2.resize(p,num_batches,false);
-         if (strategy >= 3) {
+         if (strategy == 3) {
             this->_stats3.resize(n);
             this->_stats3.setZeros();
             this->_stats4.resize(num_batches);
@@ -517,7 +525,7 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
          }
       };
       virtual void minimize_incremental_surrogate(Vector<T>& output) {
-         if (this->_strategy <= 2) {
+         if (this->_strategy <= 2 || this->_strategy==4) {
             output.copy(_z);
             output.scal(T(1.0)/(_scalL*_rho));
          } else {
@@ -529,8 +537,13 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
 
       inline T get_param() const { return _scalL; };
       inline T set_param(const T param)  { _scalL = param; };
-      virtual T get_diff() const { return _diff; };
-      virtual T reset_diff()  { _diff=0; };
+      virtual T get_scal_diff() const { 
+         return -(_diff/_diffb)/_scalL;
+      };
+      virtual T get_diff() const { 
+         return _diff+_scalL*_diffb; 
+      };
+      virtual T reset_diff()  { _diff=0; _diffb=0; };
 
    private:
       explicit QuadraticSurrogate<T,U>(const QuadraticSurrogate<T,U>& dict);
@@ -549,6 +562,7 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
       Vector<T> _stats3;  // -nabla f_i   not used if strategy <= 2
       Vector<T> _stats4;          // last surrogate constant  not used if strategy <= 2
       T _diff;
+      T _diffb;
 
 };
 
@@ -569,7 +583,7 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
       };
       virtual void minimize_incremental_surrogate(Vector<T>& output) {
          const int n = this->_function->n();
-         if (this->_strategy <= 2) {
+         if (this->_strategy <= 2 || this->_strategy==4) {
             if (_prox->id() == RIDGE) {
                output.add_scal(this->_z,T(1.0)/(this->_scalL*this->_rho+n*_lambda),0);
             } else if (_prox->id() == L1) {
@@ -598,6 +612,7 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
          }
       };
       void inline changeLambda(const T lambda) { _lambda=lambda;};
+      inline T set_param_strong_convexity()  { this->_scalL = _prox->id() == RIDGE ? this->_lambda/this->_rho: 0; };
 
    private:
       explicit ProximalSurrogate<T,U>(const ProximalSurrogate<T,U>& dict);
@@ -667,12 +682,13 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, V
    T factor = 0.5;
    T lo_t0 = _t0;
    t0_to_eta();
-   const int ind_res=averaging_mode ? 1 : 0;
+   //const int ind_res=averaging_mode ? 1 : 0;
+   const int ind_res=0;
    this->subsample(newn);
-   this->solve(w0,w,w,iters,false,averaging_mode,false);
+   this->solve(w0,w,w,iters,false,0,false);
 
    T loCost = _logs[ind_res];
-//   cerr << _logs[0] << " ";
+   //cerr << _logs[0] << " ";
    // try to reduce
    for (int t = 0; t<15; ++t) 
    {
@@ -680,9 +696,9 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, V
       if (hi_t0 < 1 || hi_t0 > 10000000) break;
       _t0 = hi_t0;
       t0_to_eta();
-      this->solve(w0,w,w,iters,false,averaging_mode,false);
+      this->solve(w0,w,w,iters,false,0,false);
       T hiCost = _logs[ind_res];
-     // cerr << _logs[0] << " ";
+    //  cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
       } else {
@@ -691,7 +707,7 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, V
          loCost=hiCost;
       }
    }
-   //cerr << endl;
+  // cerr << endl;
    _t0 = lo_t0;
    t0_to_eta();
    //cerr << "t0: " << _t0 << " eta: " << _eta << endl;
@@ -1188,13 +1204,14 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
    Timer time;
    time.start();
    _logs.set(0);
-   if (strategy >= 1 && !warm_restart) auto_parameters(w0,w,strategy);
+   if (strategy == 4) _surrogate->set_param_strong_convexity();
+   if (strategy >= 1 && strategy < 4 && !warm_restart) auto_parameters(w0,w,strategy);
    w.copy(w0);
    if (!warm_restart)
       _surrogate->initialize_incremental(w0,strategy);
    const int n = _surrogate->n();
    const int num_batches = _surrogate->num_batches();
-   if (strategy >= 3) _surrogate->reset_diff();
+   if (strategy == 3) _surrogate->reset_diff();
    if (epochs > 0) {
       /// first epoch
       _surrogate->setRandom(warm_restart);
@@ -1203,13 +1220,14 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
          _surrogate->update_incremental_surrogate(w);
          _surrogate->minimize_incremental_surrogate(w);
       }
-      if (strategy >= 3 && warm_restart) {
-         if ((_surrogate->get_diff()) <= 0.0*num_batches)  {
-            _surrogate->set_param(sqrt(2)*_surrogate->get_param());
+      if (strategy == 3 && warm_restart) {
+         if ((_surrogate->get_diff()) < 0)  {
+            T fact = (_surrogate->get_scal_diff());
+            _surrogate->set_param(fact*_surrogate->get_param());
          } 
          _surrogate->reset_diff();
       }
-      if (strategy >= 3) _surrogate->reset_diff();
+      if (strategy == 3) _surrogate->reset_diff();
 
       /// classical epochs
       _surrogate->setRandom(true);
@@ -1219,11 +1237,10 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
             _surrogate->update_incremental_surrogate(w);  
             _surrogate->minimize_incremental_surrogate(w);
          }
-         if (strategy >= 3) {
-         //   PRINT_F(_surrogate->get_diff())
-            if ((_surrogate->get_diff()) <= 0.0*num_batches) {
-               _surrogate->set_param(sqrt(2)*_surrogate->get_param());
-          //     PRINT_F(_surrogate->get_param())
+         if (strategy == 3) {
+            if ((_surrogate->get_diff()) < 0) {
+               T fact = (_surrogate->get_scal_diff());
+               _surrogate->set_param(fact*_surrogate->get_param());
             }
             _surrogate->reset_diff();
          }
@@ -1251,7 +1268,7 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
    this->solve(w0,w,1,false,true,0);
 
    T loCost = _logs[0];
-   //  cerr << _logs[0] << " ";
+   //cerr << _logs[0] << " ";
    // try to reduce
    for (int t = 0; t<15; ++t) 
    {
@@ -1260,7 +1277,7 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
       _surrogate->set_param(hi_param);
       this->solve(w0,w,1,false,true,0);
       T hiCost = _logs[0];
-      //      cerr << _logs[0] << " ";
+  //          cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
       } else {
@@ -1269,9 +1286,9 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
          loCost=hiCost;
       }
    }
-   //   cerr << endl;
+//    cerr << endl;
    _surrogate->set_param(strategy >= 2 ? lo_param/20 : lo_param);
-   //   cerr << "param: " << lo_param << endl;
+   // cerr << "param: " << lo_param << endl;
    _surrogate->un_subsample();
 };
 
@@ -1298,6 +1315,11 @@ template <typename T, typename U>
 void incrementalProximal(const Vector<T>& y, const U& X, const Matrix<T>& w0M,
       Matrix<T>& wM, const ParamFISTA<T>& paramprox, const ParamSurrogate<T>& param, 
       const Vector<T>& lambdaV, Matrix<T>& logsM) {
+
+   cout << "Incremental proximal algorithm" << endl;
+   cout << "heuristic mode " << param.strategy << endl;
+   if (param.strategy==2)
+      cout << " WARNING, strategy 2 is unsafe " << endl;
    const int num_lambdas=lambdaV.n();
    int i;
 #pragma omp parallel for private(i) 
@@ -1326,6 +1348,11 @@ void incrementalProximalSeq(const Vector<T>& y, const U& X, const Matrix<T>& w0M
    Regularizer<T,Vector<T> >* regul = setRegularizerVectors<T>(paramprox);
    ProximalSurrogate<T, U> surrogate(function,regul,lambdaV[0]);
    IncrementalSolver<T, U> solver(surrogate,param);
+
+   cout << "path-following incremental algorithm" << endl;
+   cout << "heuristic mode " << param.strategy << endl;
+   if (param.strategy==2)
+      cout << " WARNING, strategy 2 is unsafe " << endl;
 
    for (int i = 0; i<num_lambdas; ++i) {
       Vector<T> w0;

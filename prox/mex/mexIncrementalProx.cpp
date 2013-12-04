@@ -62,7 +62,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    ParamSurrogate<T> param;
    param.num_threads = getScalarStructDef<int>(prhs[3],"numThreads",-1);
    const int seed=getScalarStructDef<int>(prhs[3],"seed",0);
-   param.strategy=getScalarStructDef<int>(prhs[3],"strategy",0);
+   param.strategy=getScalarStructDef<int>(prhs[3],"strategy",3);
    srandom(seed);
    param.epochs = getScalarStruct<long>(prhs[3],"epochs");
    const bool seq = getScalarStructDef<bool>(prhs[3],"warm_restart",false);
@@ -85,7 +85,9 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
       init_omp(MIN(MAX_THREADS,omp_get_num_procs()));
 #endif
    } else {
+#ifdef _OPENMP
       init_omp(param.num_threads);
+#endif
    }
 
    Matrix<T> optim;

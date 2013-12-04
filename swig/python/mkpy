@@ -10,7 +10,7 @@ if [ -x /cygdrive/c/MinGW/msys/1.0/bin/bash ]; then
     exec /cygdrive/c/MinGW/msys/1.0/bin/bash $0 $optx $*
 fi
 
-INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn"
+INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn -I/usr/include/python2.7/"
 INC_PYTHON=-I/usr/include/python2.6
 XCCFLAGS=""
 XLINKFLAGS=""

@@ -7,7 +7,7 @@ import numpy
 # includes numpy : package numpy.distutils , numpy.get_include()
 # python setup.py build --inplace
 # python setup.py install --prefix=dist, 
-incs = ['.'] + map(lambda x: os.path.join('spams',x),[ 'linalg', 'prox', 'decomp', 'dictLearn']) + [numpy.get_include()]
+incs = ['.'] + map(lambda x: os.path.join('spams',x),[ 'linalg', 'prox', 'decomp', 'dictLearn']) + [numpy.get_include()] + ['/usr/include/python2.7/']
 
 osname = distutils.util.get_platform()
 cc_flags = ['-fPIC', '-fopenmp']

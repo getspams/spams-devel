@@ -1242,7 +1242,8 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
     throw("structTrainDL error: with multi-task-tree, lambda2 should be > 0");
 
   /* graph */
-  GraphStruct<T> *pgraph = (GraphStruct<T> *) 0;
+  GraphStruct<T> *pgraph =NULL;
+  //GraphStruct<T> *pgraph = (GraphStruct<T> *) 0;
   GraphStruct<T> graph;
   if (param.regul==FISTA::GRAPH || param.regul==FISTA::GRAPH_RIDGE || 
       param.regul==FISTA::GRAPH_L2) {
@@ -1269,7 +1270,7 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   }
   /* tree */
   TreeStruct<T> tree;
-  TreeStruct<T> *ptree = (TreeStruct<T> *) 0;
+  TreeStruct<T> *ptree = NULL; //(TreeStruct<T> *) 0;
   tree.Nv=0;
   int num_groups = own_variables->n();
   if (param.regul==FISTA::TREE_L0 || param.regul==FISTA::TREE_L2 || param.regul==FISTA::TREE_LINF) {
@@ -1300,8 +1301,11 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   /* */
   if (in_memory)
     trainer->trainOffline(*X,param);
-  else
-    trainer->train(*X,param,pgraph,ptree);
+  else if (ptree || pgraph) {
+    trainer->train_fista(*X,param,pgraph,ptree);
+  } else {
+    trainer->train(*X,param);
+  }
   if (param.log) delete[](param.logName);
   Matrix<T> *D = new Matrix<T>();
   trainer->getD((Matrix<T> &)(*D));
