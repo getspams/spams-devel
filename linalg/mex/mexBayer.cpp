@@ -40,8 +40,8 @@ template <typename T>
 
       T* prV = reinterpret_cast<T*>(mxGetPr(prhs[0]));
       const mwSize* dimsX=mxGetDimensions(prhs[0]);
-      mzSize n=(dimsX[0]);
-      mzSize M=(dimsX[1]);
+      mwSize n=(dimsX[0]);
+      mwSize M=(dimsX[1]);
       Vector<T> X(prV,n*M);
       const int offset = static_cast<int>(mxGetScalar(prhs[1]));
 

@@ -176,7 +176,7 @@ COMPILE = {
             '-I./linalg/ -I./decomp/ decomp/mex/mexSOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp',
             % misc
-            '-I./linalg/ decomp/mex/mexBayer.cpp',
+            '-I./linalg/ linalg/mex/mexBayer.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexGroupStructOfString.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
