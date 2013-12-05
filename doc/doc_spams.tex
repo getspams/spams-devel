@@ -51,7 +51,7 @@
 \lstset{language=Matlab, style=colors, backgroundcolor=\color{lightblue}}
 \else
 \lstdefinestyle{colors}{keywordstyle={\bf\color{blue}}, commentstyle={\color{dkgreen}}, stringstyle=\color{mauve}}
-\lstset{language=Matlab, style=colors,basicstyle=\footnotesize, backgroundcolor=\color{lightblue}, showspaces=false, showstringspaces=false, showtabs=false, frame=single, breaklines=true, basewidth=5.5pt }
+\lstset{language=Matlab, style=colors,basicstyle=\ttfamily, backgroundcolor=\color{lightblue}, showspaces=false, showstringspaces=false, showtabs=false, frame=single, breaklines=true, basewidth=5.5pt,fontadjust=true }
 \fi
 
 \title{SPAMS: a SPArse Modeling Software, v2.4}
@@ -201,7 +201,7 @@ in \cite{mairal9}. {\bf Note that for problems of a reasonable size, and when $\
 
 \lstinputlisting{../src_release/mexTrainDL.m}
 
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_TrainDL.m}
 
 
@@ -213,12 +213,15 @@ is faster than mexTrainDL.
 Note that unlike mexTrainDL this function does not allow warm-restart.
 
 \lstinputlisting{../src_release/mexTrainDL_Memory.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_TrainDL_Memory.m}
 
 \subsection{Function mexStructTrainDL}
-This function 
-
+This function allows to use mexTrainDL with structured regularization functions
+for the coefficients~$\alphab$. It internally uses the FISTA algorithm.
+\lstinputlisting{../src_release/mexStructTrainDL.m}
+The following piece of code illustrates how to use this function.
+\lstinputlisting{../test_release/test_StructTrainDL.m}
 
 \subsection{Function nmf}
 This function is an example on how to use the function mexTrainDL for the
@@ -230,7 +233,7 @@ small or medium datasets.
 %    \verbatiminput{../src_release/nmf.m}
 % }
 \lstinputlisting{../src_release/nmf.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_nmf.m}
 
 \subsection{Function nnsc}
@@ -243,7 +246,7 @@ medium datasets.
 %    \verbatiminput{../src_release/nnsc.m}
 % }
 \lstinputlisting{../src_release/nnsc.m}
-% The following piece of code contains usage examples:
+% The following piece of code illustrates how to use this function.
 % \lstinputlisting{../test_release/test_nnsc.m}
 
 
@@ -273,7 +276,7 @@ This is a fast implementation of the Orthogonal Matching Pursuit algorithm (or f
 %    \verbatiminput{../src_release/mexOMP.m}
 % }
 \lstinputlisting{../src_release/mexOMP.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_OMP.m}
 
 
@@ -297,12 +300,15 @@ Given a binary mask $\B=[\betab^1,\ldots,\betab^n]$ in $\{0,1\}^{m \times n}$, i
 %    \verbatiminput{../src_release/mexOMPMask.m}
 % }
 \lstinputlisting{../src_release/mexOMPMask.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_OMPMask.m}
 
 
 \subsection{Function mexRidgeRegression}
-This is a ridge regression solver using a conjugate gradient solver. Given a 
+This is a ridge regression solver using a conjugate gradient solver.  
+\lstinputlisting{../src_release/mexRidgeRegression.m}
+The following piece of code illustrates how to use this function.
+\lstinputlisting{../test_release/test_RidgeRegression.m}
 
 \subsection{Function mexLasso}
 This is a fast implementation of the LARS algorithm~\cite{efron} (variant for solving the Lasso) for solving the Lasso or Elastic-Net. Given a matrix of signals $\X=[\x^1,\ldots,\x^n]$  in $\Real^{m \times n}$ and a dictionary $\D$ in $\Real^{m \times p}$, depending on the input parameters, the algorithm returns a matrix of coefficients $\A=[\alphab^1,\ldots,\alphab^n]$ in $\Real^{p \times n}$ such that for every column $\x$ of $\X$, the corresponding column $\alphab$ of $\A$ is the solution of
@@ -335,7 +341,7 @@ This is a fast implementation of the LARS algorithm~\cite{efron} (variant for so
 %    \verbatiminput{../src_release/mexLasso.m}
 % }
 \lstinputlisting{../src_release/mexLasso.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_Lasso.m}
 
 
@@ -361,7 +367,7 @@ This is a fast implementation of a weighted version of LARS~\cite{efron}. Given 
 %    \verbatiminput{../src_release/mexLassoWeighted.m}
 % }
 \lstinputlisting{../src_release/mexLassoWeighted.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_LassoWeighted.m}
 
 
@@ -384,7 +390,7 @@ For every column $\x$ of $\X$, $\betab$ of $\B$, it computes a column $\alphab$ 
 %    \verbatiminput{../src_release/mexLassoMask.m}
 % }
 \lstinputlisting{../src_release/mexLassoMask.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_LassoMask.m}
 
 \subsection{Function mexCD}
@@ -399,7 +405,7 @@ better when the correlation between the dictionary elements is small.
 %    \verbatiminput{../src_release/mexCD.m}
 % }
 \lstinputlisting{../src_release/mexCD.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CD.m}
 
 \subsection{Function mexSOMP}
@@ -417,7 +423,7 @@ To be efficient, the method first compute the covariance matrix $\D^T\D$, then f
 %    \verbatiminput{../src_release/mexSOMP.m}
 % }
 \lstinputlisting{../src_release/mexSOMP.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_SOMP.m}
 
 \subsection{Function mexL1L2BCD}
@@ -435,7 +441,7 @@ To be efficient, the method first compute the covariance matrix $\D^T\D$, then f
 %    \verbatiminput{../src_release/mexL1L2BCD.m}
 % }
 \lstinputlisting{../src_release/mexL1L2BCD.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_L1L2BCD.m}
 
 
@@ -473,7 +479,7 @@ $\V=[\v_1,\ldots,\v_n]$ in $\Real^{m \times n}$ so that for all column $\u$ of $
 %    \verbatiminput{../src_release/mexSparseProject.m}
 % }
 \lstinputlisting{../src_release/mexSparseProject.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_SparseProject.m}
 
 \section{Proximal Toolbox}
@@ -486,7 +492,7 @@ possibly large-scale learning problems, with several combinations of losses and
 regularization terms. The method implements the proximal methods
 of~\cite{beck}, and includes the proximal solvers for the tree-structured
 regularization of \cite{jenatton3}, and the solver of~\cite{mairal10} for
-general structured sparse regularization.
+general structured sparse regularization. 
 The solver for structured sparse regularization norms includes a C++ max-flow
 implementation of the push-relabel algorithm of~\cite{goldberg}, with
 heuristics proposed by~\cite{cherkassky}.
@@ -618,7 +624,7 @@ where $\V^j$ is the $j$-th column of $\V$.
 %    \verbatiminput{../src_release/mexProximalFlat.m}
 % }
 \lstinputlisting{../src_release/mexProximalFlat.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalFlat.m}
 
 \subsection{Function mexProximalTree}
@@ -644,7 +650,7 @@ This function computes the proximal operators associated to tree-structured regu
 
    This function can also be used for computing the proximal operators addressed by mexProximalFlat (it will just not take into account the tree structure). The way the tree is incoded is presented below, (and examples are given in the file test\_ProximalTree.m, with more usage details:
 \lstinputlisting{../src_release/mexProximalTree.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalTree.m}
 
 %          {\footnotesize
@@ -663,18 +669,18 @@ or with a regularization function on matrices, it computes $\V$ solving
 \end{equation} 
 This function can also be used for computing the proximal operators addressed by mexProximalFlat. The way the graph is incoded is presented below (and also in the example file test\_ProximalGraph.m, with more usage details:
 \lstinputlisting{../src_release/mexProximalGraph.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalGraph.m}
 
 \subsection{Function mexProximalPathCoding}
 This function computes the proximal operators associated to the path coding penalties of~\cite{mairal14}. 
 \lstinputlisting{../src_release/mexProximalPathCoding.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalPathCoding.m}
 This function is associated to a function to evaluate the penalties:
 \subsection{Function mexEvalPathCoding}
 \lstinputlisting{../src_release/mexEvalPathCoding.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_EvalPathCoding.m}
 
 
@@ -747,7 +753,7 @@ encountered in the previous toolbox, but with different notations:
 Given a matrix $\X=[\x^1,\ldots,\x^p]^T$ in $\Real^{m \times p}$, and a matrix $\Y=[\y^1,\ldots,\y^n]$, it solves the optimization problems presented in the previous section, with the same regularization functions as mexProximalFlat.
 see usage details below:
 \lstinputlisting{../src_release/mexFistaFlat.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_FistaFlat.m}
 
 % {\footnotesize
@@ -762,7 +768,7 @@ see usage details below:
 %    \verbatiminput{../src_release/mexFistaTree.m}
 % }
 \lstinputlisting{../src_release/mexFistaTree.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_FistaTree.m}
 
 
@@ -774,15 +780,26 @@ see usage details below:
 %    \verbatiminput{../src_release/mexFistaGraph.m}
 % }
 \lstinputlisting{../src_release/mexFistaGraph.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_FistaGraph.m}
 
 \subsection{Function mexFistaPathCoding}
 Similarly, the toolbox handles the penalties of~\cite{mairal14} with the following function
 \lstinputlisting{../src_release/mexFistaPathCoding.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_FistaPathCoding.m}
 
+\subsection{Function mexIncrementalProx}
+This implements the incremental solver MISO~\cite{mairal16}.
+\lstinputlisting{../src_release/mexIncrementalProx.m}
+The following piece of code illustrates how to use this function.
+\lstinputlisting{../test_release/test_IncrementalProx.m}
+
+\subsection{Function mexStochasticProx}
+This implements the stochastic proximal gradient solver~\cite{mairal15}.
+\lstinputlisting{../src_release/mexStochasticProx.m}
+The following piece of code illustrates how to use this function.
+\lstinputlisting{../test_release/test_StochasticProx.m}
 
 \section{Miscellaneous Functions}
 
@@ -795,7 +812,7 @@ function \verb|pcg|, especially when the library uses the Intel Math Kernel Libr
 %    \verbatiminput{../src_release/mexConjGrad.m}
 % }
 \lstinputlisting{../src_release/mexConjGrad.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ConjGrad.m}
 
 \subsection{Function mexBayer}
@@ -805,7 +822,7 @@ Apply a Bayer pattern to an input image
 %    \verbatiminput{../src_release/mexBayer.m}
 % }
 \lstinputlisting{../src_release/mexConjGrad.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ConjGrad.m}
 
 
@@ -816,7 +833,7 @@ For an input sparse matrix $\A$, this function returns $\A\A^T$. For some reason
 %    \verbatiminput{../src_release/mexCalcAAt.m}
 % }
 \lstinputlisting{../src_release/mexCalcAAt.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CalcAAt.m}
 
 
@@ -826,7 +843,7 @@ For an input sparse matrix $\A$ and a matrix $\X$, this function returns $\X\A^T
 %    \verbatiminput{../src_release/mexCalcXAt.m}
 % }
 \lstinputlisting{../src_release/mexCalcXAt.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CalcXAt.m}
 
 
@@ -837,7 +854,7 @@ For two input matrices $\X$ and $\Y$, this function returns $\X\Y$.
 %    \verbatiminput{../src_release/mexCalcXY.m}
 % }
 \lstinputlisting{../src_release/mexCalcXY.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CalcXY.m}
 
 
@@ -848,7 +865,7 @@ For two input matrices $\X$ and $\Y$, this function returns $\X\Y^T$.
 %    \verbatiminput{../src_release/mexCalcXYt.m}
 % }
 \lstinputlisting{../src_release/mexCalcXYt.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CalcXYt.m}
 
 
@@ -859,7 +876,7 @@ For two input matrices $\X$ and $\Y$, this function returns $\X^T\Y$.
 %    \verbatiminput{../src_release/mexCalcXtY.m}
 % }
 \lstinputlisting{../src_release/mexCalcXtY.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CalcXtY.m}
 
 
@@ -870,7 +887,7 @@ For an input symmetric matrices $\A$ in $\Real^{n \times n}$, this function retu
 %    \verbatiminput{../src_release/mexInvSym.m}
 % }
 \lstinputlisting{../src_release/mexInvSym.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_InvSym.m}
 
 
@@ -879,7 +896,7 @@ The following piece of code contains usage examples:
 %    \verbatiminput{../src_release/mexNormalize.m}
 % }
 \lstinputlisting{../src_release/mexNormalize.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_Normalize.m}
 
 \subsection{Function mexSort}
@@ -887,7 +904,7 @@ The following piece of code contains usage examples:
 %    \verbatiminput{../src_release/mexSort.m}
 % }
 \lstinputlisting{../src_release/mexSort.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_Sort.m}
 
 \subsection{Function mexDisplayPatches}
@@ -896,20 +913,31 @@ Print to the screen a matrix containing as columns image patches.
 \subsection{Function mexCountPathsDAG}
 This function counts the number of paths in a DAG using dynamic programming.
 \lstinputlisting{../src_release/mexCountPathsDAG.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CountPathsDAG.m}
 
 \subsection{Function mexRemoveCyclesGraph}
 One heuristic to remove cycles from a graph.
 \lstinputlisting{../src_release/mexRemoveCyclesGraph.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_RemoveCyclesGraph.m}
 
 \subsection{Function mexCountConnexComponents}
 Count the number of connected components of a subgraph from a graph.
 \lstinputlisting{../src_release/mexCountConnexComponents.m}
-The following piece of code contains usage examples:
+The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CountConnexComponents.m}
+
+\subsection{Function mexGraphOfGroupStruct}
+\lstinputlisting{../src_release/mexGraphOfGroupStruct.m}
+\subsection{Function mexGroupStructOfString}
+\lstinputlisting{../src_release/mexGroupStructOfString.m}
+\subsection{Function mexReadGroupStruct}
+\lstinputlisting{../src_release/mexReadGroupStruct.m}
+\subsection{Function mexTreeOfGroupStruct}
+\lstinputlisting{../src_release/mexTreeOfGroupStruct.m}
+\subsection{Function mexSimpleGroupTree}
+\lstinputlisting{../src_release/mexSimpleGroupTree.m}
 
 \appendix
 

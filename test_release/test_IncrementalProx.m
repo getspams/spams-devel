@@ -1,5 +1,5 @@
 clear all;
-n=40000;
+n=400000;
 p=1000;
 density=0.01;
 
@@ -28,7 +28,7 @@ y=y*(sqrt(n)/nrm);
 clear param;
 param.regul='l1';        % many other regularization functions are available
 param.loss='square';     % only square and log are available
-param.num_threads=-1;    % uses all possible cores
+param.numThreads=-1;    % uses all possible cores
 param.normalized=false;  % if the columns of X have unit norm, set to true.
 param.strategy=3;        % MISO with all heuristics
                          % 0: no heuristics, slow  (only for comparison purposes)

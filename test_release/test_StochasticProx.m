@@ -1,6 +1,6 @@
 clear all;
-n=10000;
-p=10000;
+n=400000;
+p=1000;
 density=0.01;
 
 % generate random data
@@ -27,10 +27,10 @@ y=y*(sqrt(n)/nrm);
 clear param;
 param.regul='l1';        % many other regularization functions are available
 param.loss='square';     % only square and log are available
-param.num_threads=-1;    % uses all possible cores
+param.numThreads=1;    % uses all possible cores
 param.normalized=false;  % if the columns of X have unit norm, set to true.
 param.averaging_mode=0;  % no averaging, averaging was not really useful in experiments
-param.weighting_mode=1;  % weights are in O(1/sqrt(n)) 
+param.weighting_mode=2;  % weights are in O(1/sqrt(n)) 
 param.optimized_solver=true;
 param.verbose=false;
 

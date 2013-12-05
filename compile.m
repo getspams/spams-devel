@@ -25,7 +25,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='mkl';
+blas='builtin';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -135,8 +135,6 @@ out_dir='./build/';
 
 COMPILE = { 
             % compile dictLearn toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
-            '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
@@ -145,6 +143,8 @@ COMPILE = {
             '-I./dags/ -I./linalg/ dags/mex/mexCountPathsDAG.cpp',
             '-I./dags/ -I./linalg/ dags/mex/mexCountConnexComponents.cpp',
             % compile proximal toolbox
+            '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
+            '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexFistaTree.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexFistaGraph.cpp',  
@@ -154,11 +154,6 @@ COMPILE = {
             '-I./linalg/ -I./prox/ prox/mex/mexProximalGraph.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexProximalPathCoding.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexEvalPathCoding.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexGroupStructOfString.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexSimpleGroupTree.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexTreeOfGroupStruct.cpp',  
             % compile linalg toolbox
             '-I./linalg/ linalg/mex/mexCalcAAt.cpp',
             '-I./linalg/ linalg/mex/mexCalcXAt.cpp',  
@@ -179,8 +174,14 @@ COMPILE = {
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoMask.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMPMask.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexSOMP.cpp',
-            '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp'};
-
+            '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp',
+            % misc
+            '-I./linalg/ decomp/mex/mexBayer.cpp',
+            '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexGroupStructOfString.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexSimpleGroupTree.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexTreeOfGroupStruct.cpp'};
 if linux || mac
    fid=fopen('run_matlab.sh','w+');
    fprintf(fid,'#!/bin/sh\n');
