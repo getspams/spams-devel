@@ -43,7 +43,7 @@ dictionary Learning for sparse coding;
 </li><li class="li-itemize">The <span class="c010">Sparse decomposition toolbox</span> contains efficient implementations of
 <ul class="itemize"><li class="li-itemize">
 Orthogonal Matching Pursuit, (or Forward Selection) [<a href="doc_spams009.html#weisberg">34</a>, <a href="doc_spams009.html#mallat4">26</a>];
-</li><li class="li-itemize">the LARS/homotopy algorithm [<a >29</a>, <a href="doc_spams009.html#efron">8</a>] (variants for solving Lasso and Elastic-Net problems);
+</li><li class="li-itemize">the LARS/homotopy algorithm [<a href="doc_spams009.html#osborne">29</a>, <a href="doc_spams009.html#efron">8</a>] (variants for solving Lasso and Elastic-Net problems);
 </li><li class="li-itemize">a weighted version of LARS; 
 </li><li class="li-itemize">OMP and LARS when data come with a binary mask;
 </li><li class="li-itemize">a coordinate-descent algorithm for ℓ<sub>1</sub>-decomposition problems [<a href="doc_spams009.html#fu">11</a>, <a href="doc_spams009.html#friedman">9</a>, <a href="doc_spams009.html#wu">35</a>]; 
@@ -68,19 +68,19 @@ Tikhonov regularization (squared ℓ<sub>2</sub>-norm);
 </li><li class="li-itemize">Fused Lasso [<a href="doc_spams009.html#tibshirani2">31</a>];
 </li><li class="li-itemize">tree-structured sum of ℓ<sub>2</sub>-norms (see [<a href="doc_spams009.html#jenatton3">14</a>, <a href="doc_spams009.html#jenatton4">15</a>]);
 </li><li class="li-itemize">tree-structured sum of ℓ<sub>∞</sub>-norms (see [<a href="doc_spams009.html#jenatton3">14</a>, <a href="doc_spams009.html#jenatton4">15</a>]);
-</li><li class="li-itemize">general sum of ℓ<sub>∞</sub>-norms (see [<a href="doc_spams009.html#mairal10">21</a>, <a >22</a>]);
+</li><li class="li-itemize">general sum of ℓ<sub>∞</sub>-norms (see [<a href="doc_spams009.html#mairal10">21</a>, <a href="doc_spams009.html#mairal13">22</a>]);
 </li><li class="li-itemize">mixed ℓ<sub>1</sub>/ℓ<sub>2</sub>-norms on matrices [<a href="doc_spams009.html#yuan">36</a>, <a href="doc_spams009.html#obozinski">28</a>];
 </li><li class="li-itemize">mixed ℓ<sub>1</sub>/ℓ<sub>∞</sub>-norms on matrices [<a href="doc_spams009.html#yuan">36</a>, <a href="doc_spams009.html#obozinski">28</a>];
-</li><li class="li-itemize">mixed ℓ<sub>1</sub>/ℓ<sub>2</sub>-norms on matrices plus ℓ<sub>1</sub> [<a href="doc_spams009.html#sprechmann">30</a>, <a >10</a>];
+</li><li class="li-itemize">mixed ℓ<sub>1</sub>/ℓ<sub>2</sub>-norms on matrices plus ℓ<sub>1</sub> [<a href="doc_spams009.html#sprechmann">30</a>, <a href="doc_spams009.html#Friedman2010">10</a>];
 </li><li class="li-itemize">mixed ℓ<sub>1</sub>/ℓ<sub>∞</sub>-norms on matrices plus ℓ<sub>1</sub>;
 </li><li class="li-itemize">group-lasso with ℓ<sub>2</sub> or ℓ<sub>∞</sub>-norms;
 </li><li class="li-itemize">group-lasso+ℓ<sub>1</sub>;
-</li><li class="li-itemize">multi-task tree-structured sum of ℓ<sub>∞</sub>-norms (see [<a href="doc_spams009.html#mairal10">21</a>, <a >22</a>]);
+</li><li class="li-itemize">multi-task tree-structured sum of ℓ<sub>∞</sub>-norms (see [<a href="doc_spams009.html#mairal10">21</a>, <a href="doc_spams009.html#mairal13">22</a>]);
 </li><li class="li-itemize">trace norm;
 </li><li class="li-itemize">ℓ<sub>0</sub> pseudo-norm (only with ISTA);
 </li><li class="li-itemize">tree-structured ℓ<sub>0</sub> (only with ISTA);
 </li><li class="li-itemize">rank regularization for matrices (only with ISTA);
-</li><li class="li-itemize">the path-coding penalties of [<a >23</a>].
+</li><li class="li-itemize">the path-coding penalties of [<a href="doc_spams009.html#mairal14">23</a>].
 </li></ul>
 All of these regularization functions can be used with the following losses
 <ul class="itemize"><li class="li-itemize">
@@ -93,7 +93,7 @@ This toolbox can also enforce non-negativity constraints, handle intercepts and
 sparse matrices. There are also a few additional undocumented functionalities,
 which are available in the source code.
 For some combinations of loss and regularizers, stochastic and incremental proximal
-gradient solvers are also implemented [<a >25</a>, <a >24</a>].
+gradient solvers are also implemented [<a href="doc_spams009.html#mairal15">25</a>, <a href="doc_spams009.html#mairal16">24</a>].
 </li><li class="li-itemize">A few tools for performing linear algebra operations such as a
 conjugate gradient algorithm, manipulating sparse matrices and graphs.
 </li></ul><p>The toolbox was written by Julien Mairal at INRIA, with the collaboration of

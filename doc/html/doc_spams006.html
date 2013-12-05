@@ -958,7 +958,7 @@ alpha=mexProximalGraph(U,graph,param);</td></tr>
 </table>
 <h3 class="subsection" id="sec26">5.5  Function mexProximalPathCoding</h3>
 <p>
-This function computes the proximal operators associated to the path coding penalties of [<a >23</a>]. 
+This function computes the proximal operators associated to the path coding penalties of [<a href="doc_spams009.html#mairal14">23</a>]. 
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   [V [val_regularizer]]=mexProximalPathCoding(U,DAG,param);<br>
 %<br>
@@ -2122,7 +2122,7 @@ t=<span class="c011">toc</span>;<br>
 </table>
 <h3 class="subsection" id="sec38">5.11  Function mexFistaPathCoding</h3>
 <p>
-Similarly, the toolbox handles the penalties of [<a >23</a>] with the following function
+Similarly, the toolbox handles the penalties of [<a href="doc_spams009.html#mairal14">23</a>] with the following function
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage: [W [optim]]=mexFistaPathCoding(Y,X,W0,DAG,param);<br>
 %<br>
@@ -2265,7 +2265,7 @@ param.ista=false;<br>
 </table>
 <h3 class="subsection" id="sec39">5.12  Function mexIncrementalProx</h3>
 <p>
-This implements the incremental solver MISO [<a >24</a>].
+This implements the incremental solver MISO [<a href="doc_spams009.html#mairal16">24</a>].
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:  [W [optim]]=mexIncrementalProx(y,X,W0,param);<br>
 %<br>
@@ -2324,7 +2324,7 @@ This implements the incremental solver MISO [<a >24</a>].
 </table><p>
 The following piece of code illustrates how to use this function.
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c011">clear</span> <span class="c011">all</span>;<br>
-n=40000;<br>
+n=400000;<br>
 p=1000;<br>
 density=0.01;<br>
 <br>
@@ -2540,7 +2540,7 @@ spar=[];<br>
 </table>
 <h3 class="subsection" id="sec40">5.13  Function mexStochasticProx</h3>
 <p>
-This implements the stochastic proximal gradient solver [<a >25</a>].
+This implements the stochastic proximal gradient solver [<a href="doc_spams009.html#mairal15">25</a>].
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:  [W [W2]]=mexStochasticProx(y,X,W0,param);<br>
 %<br>
@@ -2601,8 +2601,8 @@ This implements the stochastic proximal gradient solver [<a >25</a>].
 </table><p>
 The following piece of code illustrates how to use this function.
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c011">clear</span> <span class="c011">all</span>;<br>
-n=10000;<br>
-p=10000;<br>
+n=400000;<br>
+p=1000;<br>
 density=0.01;<br>
 <br>
 <span class="c001">% generate random data</span><br>
@@ -2632,7 +2632,7 @@ param.loss='</span>square<span class="c003">';     % only square and lo
 param.numThreads=1;    % uses all possible cores<br>
 param.normalized=false;  % if the columns of X have unit norm, set to true.<br>
 param.averaging_mode=0;  % no averaging, averaging was not really useful in experiments<br>
-param.weighting_mode=1;  % weights are in O(1/sqrt(n))<br>
+param.weighting_mode=2;  % weights are in O(1/sqrt(n))<br>
 param.optimized_solver=true;<br>
 param.verbose=false;<br>
 <br>

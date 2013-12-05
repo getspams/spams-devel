@@ -53,69 +53,86 @@ td p{margin:0px;}
 <body>
 <!--HEVEA command line is: /usr/bin/hevea -O article.hva macrocss.hva doc_spams.tex -->
 <!--CUT STYLE article--><!--CUT DEF section 1 --><table class="title"><tr><td style="padding:1ex"><h1 class="titlemain">SPAMS: a SPArse Modeling Software, v2.4</h1><h3 class="titlerest">Julien Mairal <br>
- <span class="c004">julien.mairal@m4x.org</span>
+ <span class="c004">julien.mairal@m4x.org</span> <br>
+  <br>
+ Python and R interfaces by Jean-Paul Chieze
 </h3></td></tr>
 </table><!--TOC section id="sec1" Contents-->
 <h2 class="section" id="sec1">Contents</h2><!--SEC END --><ul class="toc"><li class="li-toc">
-<a href="#htoc1">1  Introduction</a>
-</li><li class="li-toc"><a href="#htoc2">2  Installation</a>
-</li><li class="li-toc"><a href="#htoc3">3  Dictionary Learning and Matrix Factorization Toolbox</a>
+<a href="#sec2">1  Introduction</a>
+</li><li class="li-toc"><a href="#sec3">2  Installation</a>
+</li><li class="li-toc"><a href="#sec4">3  Dictionary Learning and Matrix Factorization Toolbox</a>
 <ul class="toc"><li class="li-toc">
-<a href="#htoc4">3.1  Function mexTrainDL</a>
-</li><li class="li-toc"><a href="#htoc5">3.2  Function mexTrainDL_Memory</a>
-</li><li class="li-toc"><a href="#htoc6">3.3  Function nmf</a>
-</li><li class="li-toc"><a href="#htoc7">3.4  Function nnsc</a>
+<a href="#sec5">3.1  Function mexTrainDL</a>
+</li><li class="li-toc"><a href="#sec6">3.2  Function mexTrainDL_Memory</a>
+</li><li class="li-toc"><a href="#sec7">3.3  Function mexStructTrainDL</a>
+</li><li class="li-toc"><a href="#sec8">3.4  Function nmf</a>
+</li><li class="li-toc"><a href="#sec9">3.5  Function nnsc</a>
 </li></ul>
-</li><li class="li-toc"><a href="#htoc8">4  Sparse Decomposition Toolbox</a>
+</li><li class="li-toc"><a href="#sec10">4  Sparse Decomposition Toolbox</a>
 <ul class="toc"><li class="li-toc">
-<a href="#htoc9">4.1  Function mexOMP</a>
-</li><li class="li-toc"><a href="#htoc10">4.2  Function mexOMPMask</a>
-</li><li class="li-toc"><a href="#htoc11">4.3  Function mexLasso</a>
-</li><li class="li-toc"><a href="#htoc12">4.4  Function mexLassoWeighted</a>
-</li><li class="li-toc"><a href="#htoc13">4.5  Function mexLassoMask</a>
-</li><li class="li-toc"><a href="#htoc14">4.6  Function mexCD</a>
-</li><li class="li-toc"><a href="#htoc15">4.7  Function mexSOMP</a>
-</li><li class="li-toc"><a href="#htoc16">4.8  Function mexL1L2BCD</a>
-</li><li class="li-toc"><a href="#htoc17">4.9  Function mexSparseProject</a>
+<a href="#sec11">4.1  Function mexOMP</a>
+</li><li class="li-toc"><a href="#sec12">4.2  Function mexOMPMask</a>
+</li><li class="li-toc"><a href="#sec13">4.3  Function mexRidgeRegression</a>
+</li><li class="li-toc"><a href="#sec14">4.4  Function mexLasso</a>
+</li><li class="li-toc"><a href="#sec15">4.5  Function mexLassoWeighted</a>
+</li><li class="li-toc"><a href="#sec16">4.6  Function mexLassoMask</a>
+</li><li class="li-toc"><a href="#sec17">4.7  Function mexCD</a>
+</li><li class="li-toc"><a href="#sec18">4.8  Function mexSOMP</a>
+</li><li class="li-toc"><a href="#sec19">4.9  Function mexL1L2BCD</a>
+</li><li class="li-toc"><a href="#sec20">4.10  Function mexSparseProject</a>
 </li></ul>
-</li><li class="li-toc"><a href="#htoc18">5  Proximal Toolbox</a>
+</li><li class="li-toc"><a href="#sec21">5  Proximal Toolbox</a>
 <ul class="toc"><li class="li-toc">
-<a href="#htoc19">5.1  Regularization Functions</a>
-</li><li class="li-toc"><a href="#htoc20">5.2  Function mexProximalFlat</a>
-</li><li class="li-toc"><a href="#htoc21">5.3  Function mexProximalTree</a>
-</li><li class="li-toc"><a href="#htoc22">5.4  Function mexProximalGraph</a>
-</li><li class="li-toc"><a href="#htoc23">5.5  Problems Addressed</a>
+<a href="#sec22">5.1  Regularization Functions</a>
+</li><li class="li-toc"><a href="#sec23">5.2  Function mexProximalFlat</a>
+</li><li class="li-toc"><a href="#sec24">5.3  Function mexProximalTree</a>
+</li><li class="li-toc"><a href="#sec25">5.4  Function mexProximalGraph</a>
+</li><li class="li-toc"><a href="#sec26">5.5  Function mexProximalPathCoding</a>
+</li><li class="li-toc"><a href="#sec27">5.6  Function mexEvalPathCoding</a>
+</li><li class="li-toc"><a href="#sec28">5.7  Problems Addressed</a>
 <ul class="toc"><li class="li-toc">
-<a href="#htoc24">5.5.1  Regression Problems with the Square Loss</a>
-</li><li class="li-toc"><a href="#htoc25">5.5.2  Classification Problems with the Logistic Loss</a>
-</li><li class="li-toc"><a href="#htoc26">5.5.3  Multi-class Classification Problems with the Softmax Loss</a>
-</li><li class="li-toc"><a href="#htoc27">5.5.4  Multi-task Regression Problems with the Square Loss</a>
-</li><li class="li-toc"><a href="#htoc28">5.5.5  Multi-task Classification Problems with the Logistic Loss</a>
-</li><li class="li-toc"><a href="#htoc29">5.5.6  Multi-task and Multi-class Classification Problems with the Softmax Loss</a>
+<a href="#sec29">5.7.1  Regression Problems with the Square Loss</a>
+</li><li class="li-toc"><a href="#sec30">5.7.2  Classification Problems with the Logistic Loss</a>
+</li><li class="li-toc"><a href="#sec31">5.7.3  Multi-class Classification Problems with the Softmax Loss</a>
+</li><li class="li-toc"><a href="#sec32">5.7.4  Multi-task Regression Problems with the Square Loss</a>
+</li><li class="li-toc"><a href="#sec33">5.7.5  Multi-task Classification Problems with the Logistic Loss</a>
+</li><li class="li-toc"><a href="#sec34">5.7.6  Multi-task and Multi-class Classification Problems with the Softmax Loss</a>
 </li></ul>
-</li><li class="li-toc"><a href="#htoc30">5.6  Function mexFistaFlat</a>
-</li><li class="li-toc"><a href="#htoc31">5.7  Function mexFistaTree</a>
-</li><li class="li-toc"><a href="#htoc32">5.8  Function mexFistaGraph</a>
+</li><li class="li-toc"><a href="#sec35">5.8  Function mexFistaFlat</a>
+</li><li class="li-toc"><a href="#sec36">5.9  Function mexFistaTree</a>
+</li><li class="li-toc"><a href="#sec37">5.10  Function mexFistaGraph</a>
+</li><li class="li-toc"><a href="#sec38">5.11  Function mexFistaPathCoding</a>
+</li><li class="li-toc"><a href="#sec39">5.12  Function mexIncrementalProx</a>
+</li><li class="li-toc"><a href="#sec40">5.13  Function mexStochasticProx</a>
 </li></ul>
-</li><li class="li-toc"><a href="#htoc33">6  Miscellaneous Functions</a>
+</li><li class="li-toc"><a href="#sec41">6  Miscellaneous Functions</a>
 <ul class="toc"><li class="li-toc">
-<a href="#htoc34">6.1  Function mexConjGrad</a>
-</li><li class="li-toc"><a href="#htoc35">6.2  Function mexBayer</a>
-</li><li class="li-toc"><a href="#htoc36">6.3  Function mexCalcAAt</a>
-</li><li class="li-toc"><a href="#htoc37">6.4  Function mexCalcXAt</a>
-</li><li class="li-toc"><a href="#htoc38">6.5  Function mexCalcXY</a>
-</li><li class="li-toc"><a href="#htoc39">6.6  Function mexCalcXYt</a>
-</li><li class="li-toc"><a href="#htoc40">6.7  Function mexCalcXtY</a>
-</li><li class="li-toc"><a href="#htoc41">6.8  Function mexInvSym</a>
-</li><li class="li-toc"><a href="#htoc42">6.9  Function mexNormalize</a>
-</li><li class="li-toc"><a href="#htoc43">6.10  Function mexSort</a>
-</li><li class="li-toc"><a href="#htoc44">6.11  Function mexDisplayPatches</a>
+<a href="#sec42">6.1  Function mexConjGrad</a>
+</li><li class="li-toc"><a href="#sec43">6.2  Function mexBayer</a>
+</li><li class="li-toc"><a href="#sec44">6.3  Function mexCalcAAt</a>
+</li><li class="li-toc"><a href="#sec45">6.4  Function mexCalcXAt</a>
+</li><li class="li-toc"><a href="#sec46">6.5  Function mexCalcXY</a>
+</li><li class="li-toc"><a href="#sec47">6.6  Function mexCalcXYt</a>
+</li><li class="li-toc"><a href="#sec48">6.7  Function mexCalcXtY</a>
+</li><li class="li-toc"><a href="#sec49">6.8  Function mexInvSym</a>
+</li><li class="li-toc"><a href="#sec50">6.9  Function mexNormalize</a>
+</li><li class="li-toc"><a href="#sec51">6.10  Function mexSort</a>
+</li><li class="li-toc"><a href="#sec52">6.11  Function mexDisplayPatches</a>
+</li><li class="li-toc"><a href="#sec53">6.12  Function mexCountPathsDAG</a>
+</li><li class="li-toc"><a href="#sec54">6.13  Function mexRemoveCyclesGraph</a>
+</li><li class="li-toc"><a href="#sec55">6.14  Function mexCountConnexComponents</a>
+</li><li class="li-toc"><a href="#sec56">6.15  Function mexGraphOfGroupStruct</a>
+</li><li class="li-toc"><a href="#sec57">6.16  Function mexGroupStructOfString</a>
+</li><li class="li-toc"><a href="#sec58">6.17  Function mexReadGroupStruct</a>
+</li><li class="li-toc"><a href="#sec59">6.18  Function mexTreeOfGroupStruct</a>
+</li><li class="li-toc"><a href="#sec60">6.19  Function mexSimpleGroupTree</a>
 </li></ul>
-</li><li class="li-toc"><a href="#htoc45">A  Duality Gaps with Fenchel Duality</a>
+</li><li class="li-toc"><a href="#sec61">A  Duality Gaps with Fenchel Duality</a>
 <ul class="toc">
 <ul class="toc"><li class="li-toc">
-<a href="#htoc46">A.0.1  Duality Gaps without Intercepts</a>
-</li><li class="li-toc"><a href="#htoc47">A.0.2  Duality Gaps with Intercepts</a>
+<a href="#sec62">A.0.1  Duality Gaps without Intercepts</a>
+</li><li class="li-toc"><a href="#sec63">A.0.2  Duality Gaps with Intercepts</a>
 </li></ul>
 </ul>
 </li></ul>
@@ -256,7 +273,7 @@ Given a training set <span class="c009">x</span><sup>1</sup>,…, . It aims at s
 and in the help file below, various combinations can be used for ψ and <span class="c008">C</span> for solving different matrix factorization problems.
 What is more, positivity constraints can be added to α as well. The function admits several modes for choosing the optimization parameters, using the parameter-free strategy proposed in [<a href="#mairal7">19</a>], or using the parameters <span class="c007">t</span><sub>0</sub> and ρ presented
 in [<a href="#mairal9">20</a>]. <span class="c010">Note that for problems of a reasonable size, and when </span>ψ<span class="c010"> is the </span>ℓ<sub>1</sub><span class="c010">-norm, 
-the function mexTrainDL_Memory can be faster but uses more memory.</span> </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c001">% <br>
+the function mexTrainDL_Memory can be faster but uses more memory.</span> </p><table class="c012"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   [D [model]]=mexTrainDL(X,param[,model]);<br>
 %          model is optional<br>
 %<br>
@@ -4414,7 +4431,7 @@ This implements the incremental solver MISO [<a href="#mairal16">24</a>].
 </table><p>
 The following piece of code illustrates how to use this function.
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c011">clear</span> <span class="c011">all</span>;<br>
-n=40000;<br>
+n=400000;<br>
 p=1000;<br>
 density=0.01;<br>
 <br>
@@ -4691,8 +4708,8 @@ This implements the stochastic proximal gradient solver [<a href="#mairal15">25
 </table><p>
 The following piece of code illustrates how to use this function.
 </p><table class="lstframe c012"><tr><td class="mouselstlisting"><span class="c011">clear</span> <span class="c011">all</span>;<br>
-n=10000;<br>
-p=10000;<br>
+n=400000;<br>
+p=1000;<br>
 density=0.01;<br>
 <br>
 <span class="c001">% generate random data</span><br>
@@ -4722,7 +4739,7 @@ param.loss='</span>square<span class="c003">';     % only square and lo
 param.numThreads=1;    % uses all possible cores<br>
 param.normalized=false;  % if the columns of X have unit norm, set to true.<br>
 param.averaging_mode=0;  % no averaging, averaging was not really useful in experiments<br>
-param.weighting_mode=1;  % weights are in O(1/sqrt(n))<br>
+param.weighting_mode=2;  % weights are in O(1/sqrt(n))<br>
 param.optimized_solver=true;<br>
 param.verbose=false;<br>
 <br>
@@ -5810,7 +5827,10 @@ Least angle regression.
 <em>Annals of statistics</em>, 32(2):407–499, 2004.</dd><dt class="dt-thebibliography"><a id="friedman">[9]</a></dt><dd class="dd-thebibliography">
 J. Friedman, T. Hastie, H. Hölfling, and R. Tibshirani.
 Pathwise coordinate optimization.
-<em>Annals of statistics</em>, 1(2):302–332, 2007.</dd><dt class="dt-thebibliography"><a id="fu">[11]</a></dt><dd class="dd-thebibliography">
+<em>Annals of statistics</em>, 1(2):302–332, 2007.</dd><dt class="dt-thebibliography"><a id="Friedman2010">[10]</a></dt><dd class="dd-thebibliography">
+J. Friedman, T. Hastie, and R. Tibshirani.
+A note on the group lasso and a sparse group lasso.
+Technical report, Preprint arXiv:1001.0736, 2010.</dd><dt class="dt-thebibliography"><a id="fu">[11]</a></dt><dd class="dd-thebibliography">
 W. J. Fu.
 Penalized regressions: The bridge versus the Lasso.
 <em>Journal of computational and graphical statistics</em>, 7:397–416,
@@ -5850,7 +5870,21 @@ Online learning for matrix factorization and sparse coding.
 <em>Journal of Machine Learning Research</em>, 11:19–60, 2010.</dd><dt class="dt-thebibliography"><a id="mairal10">[21]</a></dt><dd class="dd-thebibliography">
 J. Mairal, R. Jenatton, G. Obozinski, and F. Bach.
 Network flow algorithms for structured sparsity.
-In <em>Advances in Neural Information Processing Systems</em>, 2010.</dd><dt class="dt-thebibliography"><a id="mallat4">[26]</a></dt><dd class="dd-thebibliography">
+In <em>Advances in Neural Information Processing Systems</em>, 2010.</dd><dt class="dt-thebibliography"><a id="mairal13">[22]</a></dt><dd class="dd-thebibliography">
+J. Mairal, R. Jenatton, G. Obozinski, and F. Bach.
+Convex and network flow optimization for structured sparsity.
+<em>Journal of Machine Learning Research</em>, 12:2649–2689, 2011.</dd><dt class="dt-thebibliography"><a id="mairal14">[23]</a></dt><dd class="dd-thebibliography">
+J. Mairal and B. Yu.
+Supervised feature selection in graphs with path coding penalties and
+network flows.
+<em>Journal of Machine Learning Research</em>, 2013.</dd><dt class="dt-thebibliography"><a id="mairal16">[24]</a></dt><dd class="dd-thebibliography">
+Julien Mairal.
+Optimization with first-order surrogate functions.
+2013.</dd><dt class="dt-thebibliography"><a id="mairal15">[25]</a></dt><dd class="dd-thebibliography">
+Julien Mairal.
+Stochastic majorization-minimization algorithms for large-scale
+optimization.
+2013.</dd><dt class="dt-thebibliography"><a id="mallat4">[26]</a></dt><dd class="dd-thebibliography">
 S. Mallat and Z. Zhang.
 Matching pursuit in a time-frequency dictionary.
 <em>IEEE Transactions on Signal Processing</em>, 41(12):3397–3415,
@@ -5862,7 +5896,11 @@ ArXiv:0809.2932.</dd><dt class="dt-thebibliography"><a id="obozinski">[28]</a></
 G. Obozinski, B. Taskar, and M.I. Jordan.
 Joint covariate selection and joint subspace selection for multiple
 classification problems.
-<em>Statistics and Computing</em>, pages 1–22.</dd><dt class="dt-thebibliography"><a id="sprechmann">[30]</a></dt><dd class="dd-thebibliography">
+<em>Statistics and Computing</em>, pages 1–22.</dd><dt class="dt-thebibliography"><a id="osborne">[29]</a></dt><dd class="dd-thebibliography">
+M. R. Osborne, B. Presnell, and B. A. Turlach.
+On the Lasso and its dual.
+<em>Journal of Computational and Graphical Statistics</em>,
+9(2):319–37, 2000.</dd><dt class="dt-thebibliography"><a id="sprechmann">[30]</a></dt><dd class="dd-thebibliography">
 P. Sprechmann, I. Ramirez, G. Sapiro, and Y. C. Eldar.
 Collaborative hierarchical sparse modeling.
 Technical report, 2010.
