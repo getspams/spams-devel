@@ -30,7 +30,7 @@ param.regul='l1';        % many other regularization functions are available
 param.loss='square';     % only square and log are available
 param.numThreads=-1;    % uses all possible cores
 param.normalized=false;  % if the columns of X have unit norm, set to true.
-param.strategy=3;        % MISO with all heuristics
+param.strategy=4;        % MISO with all heuristics
                          % 0: no heuristics, slow  (only for comparison purposes)
                          % 1: adjust the constant L on 5% of the data 
                          % 2: adjust the constant L on 5% of the data + unstable heuristics (this strategy does not work)
@@ -48,6 +48,7 @@ tabepochs=[1 2 3 5 10];  % in this script, we compare the results obtained when 
 % value of lambda;
 fprintf('EXPERIMENT: SINGLE LAMBDA\n');
 param.lambda=tablambda(20); 
+
 for ii=1:length(tabepochs)
    fprintf('EXP WITH %d PASS\n',tabepochs(ii));
    param.epochs=tabepochs(ii);   % one pass over the data

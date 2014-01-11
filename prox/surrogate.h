@@ -149,8 +149,8 @@ class SmoothFunction {
                rho_sample += _L[_current_batch[i]];
             }
             rho_sample /= _sizebatch;
-            //const T new_rho=(1-w)*rho + w*rho_sample;
-            const T new_rho=rho;
+            const T new_rho=(1-w)*rho + w*rho_sample;
+            //const T new_rho=rho;
             typename U::col spw;
             z.scal(rho*(T(1.0)-w)/new_rho);
             z.add(input,rho_sample*w/new_rho);
@@ -296,7 +296,7 @@ class SmoothFunction {
             _current_batch[i]=_num_batch*_nbatches+i; 
          return _num_batch;
       };
-      T inline getL(Vector<T>& stats) {
+      void inline getL(Vector<T>& stats) {
          if (_constantL) {
             for (int i = 0; i<_num_batches-1; ++i) 
                stats[i]=_genericL*_nbatches;
@@ -410,7 +410,7 @@ class OnlineSurrogate {
       virtual void initialize(const Vector<T>& input) = 0;
       virtual int n() const = 0; 
       virtual int num_batches() const  = 0;
-      virtual int setRandom(const bool random) = 0;
+      virtual void setRandom(const bool random) = 0;
 
    private:
       explicit OnlineSurrogate<T,U>(const OnlineSurrogate<T,U>& dict);
@@ -426,12 +426,13 @@ class IncrementalSurrogate : public OnlineSurrogate<T,U> {
       virtual void initialize_incremental(const Vector<T>& input, const int strategy = 0) = 0;
       virtual void minimize_incremental_surrogate(Vector<T>& output) = 0;
       virtual T get_param() const = 0;
-      virtual T set_param(const T param) = 0;
-      virtual T set_param_strong_convexity() { };
+      virtual T rho() const = 0; 
+      virtual void set_param(const T param) = 0;
+      virtual void set_param_strong_convexity() { };
       inline void setFirstPass(const bool pass) { _first_pass = pass; };
       virtual T get_diff() const = 0;
       virtual T get_scal_diff() const = 0; //{ return 0; };
-      virtual T reset_diff() =0 ;
+      virtual void reset_diff() =0 ;
 
    protected:
       int _strategy;
@@ -469,8 +470,9 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
       virtual void subsample(const int n) { _function->subsample(n); };
       virtual void un_subsample() { _function->un_subsample(); };
       virtual int n() const { return _function->n(); };
+      virtual T rho() const { return _rho; };
       virtual int num_batches() const  { return _function->num_batches(); };
-      virtual int setRandom(const bool random) { _function->setRandom(random); };
+      virtual void setRandom(const bool random) { _function->setRandom(random); };
 
       /// incremental part
       virtual void update_incremental_surrogate(const Vector<T>& input) { 
@@ -536,14 +538,14 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
       };
 
       inline T get_param() const { return _scalL; };
-      inline T set_param(const T param)  { _scalL = param; };
+      inline void set_param(const T param)  { _scalL = param; };
       virtual T get_scal_diff() const { 
          return -(_diff/_diffb)/_scalL;
       };
       virtual T get_diff() const { 
          return _diff+_scalL*_diffb; 
       };
-      virtual T reset_diff()  { _diff=0; _diffb=0; };
+      virtual void reset_diff()  { _diff=0; _diffb=0; };
 
    private:
       explicit QuadraticSurrogate<T,U>(const QuadraticSurrogate<T,U>& dict);
@@ -612,7 +614,7 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
          }
       };
       void inline changeLambda(const T lambda) { _lambda=lambda;};
-      inline T set_param_strong_convexity()  { this->_scalL = _prox->id() == RIDGE ? this->_lambda/this->_rho: 0; };
+      inline void set_param_strong_convexity()  { this->_scalL = _prox->id() == RIDGE ? this->_function->n()*this->_lambda/this->_rho: 0; };
 
    private:
       explicit ProximalSurrogate<T,U>(const ProximalSurrogate<T,U>& dict);
@@ -698,7 +700,7 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, V
       t0_to_eta();
       this->solve(w0,w,w,iters,false,0,false);
       T hiCost = _logs[ind_res];
-    //  cerr << _logs[0] << " ";
+      //cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
       } else {
@@ -1204,11 +1206,13 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
    Timer time;
    time.start();
    _logs.set(0);
-   if (strategy == 4) _surrogate->set_param_strong_convexity();
    if (strategy >= 1 && strategy < 4 && !warm_restart) auto_parameters(w0,w,strategy);
+ 
    w.copy(w0);
    if (!warm_restart)
       _surrogate->initialize_incremental(w0,strategy);
+   if (strategy == 4) _surrogate->set_param_strong_convexity();
+ 
    const int n = _surrogate->n();
    const int num_batches = _surrogate->num_batches();
    if (strategy == 3) _surrogate->reset_diff();
@@ -1277,7 +1281,7 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
       _surrogate->set_param(hi_param);
       this->solve(w0,w,1,false,true,0);
       T hiCost = _logs[0];
-  //          cerr << _logs[0] << " ";
+      //cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
       } else {
@@ -1286,9 +1290,9 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
          loCost=hiCost;
       }
    }
-//    cerr << endl;
+    //cerr << endl;
    _surrogate->set_param(strategy >= 2 ? lo_param/20 : lo_param);
-   // cerr << "param: " << lo_param << endl;
+    //cerr << "param: " << lo_param << endl;
    _surrogate->un_subsample();
 };
 
