@@ -25,7 +25,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='builtin';
+blas='mkl';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -41,11 +41,10 @@ use_64bits_integers=true;
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
+path_matlab='/softs/bin/';
 add_flag='';
 % WARNING: on Mac OS  mountain lion, you may have to uncomment the line
 %add_flag=' -mmacosx-version-min=10.7'
-
-path_matlab='';  % optional  
 
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
@@ -53,9 +52,9 @@ path_matlab='';  % optional
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -96,8 +95,8 @@ end
 if strcmp(blas,'mkl')
    if linux || mac
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
-      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -209,6 +208,8 @@ if strcmp(blas,'mkl')
    DEFBLAS='-DUSE_BLAS_LIB -DAXPBY';
    if strcmp(arch,'GLNXA64')
       if use_64bits_integers
+         %blas_link = sprintf('-ldl -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core',path_to_blas,path_to_blas,path_to_blas);
+         %blas_link = sprintf('-ldl -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lmkl_avx2',path_to_blas,path_to_blas,path_to_blas);
          blas_link = sprintf('-Wl,--start-group %slibmkl_intel_ilp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
       else
          blas_link = sprintf('-Wl,--start-group %slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);

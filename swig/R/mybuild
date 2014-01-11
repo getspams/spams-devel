@@ -45,7 +45,7 @@ fi
 export PKG_LIBS="-lblas -llapack"
 rm -rf $pkdir
 if [ $nswg -eq 0 ]; then
-    swig -c++ -r $OPT_DBG -o ${nom}.cpp $nom.i
+    /home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -r $OPT_DBG -o ${nom}.cpp $nom.i
     [ $? -ne 0 ] && exit 1
 fi
 [ -d $pkdir ] || mkdir -p $pkdir/R

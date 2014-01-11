@@ -688,7 +688,7 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, V
    this->solve(w0,w,w,iters,false,0,false);
 
    T loCost = _logs[ind_res];
-   cerr << _logs[0] << " ";
+   //cerr << _logs[0] << " ";
    // try to reduce
    for (int t = 0; t<15; ++t) 
    {
@@ -698,7 +698,7 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, V
       t0_to_eta();
       this->solve(w0,w,w,iters,false,0,false);
       T hiCost = _logs[ind_res];
-      cerr << _logs[0] << " ";
+    //  cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
       } else {
@@ -707,7 +707,7 @@ void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, V
          loCost=hiCost;
       }
    }
-   cerr << endl;
+   //cerr << endl;
    _t0 = lo_t0;
    t0_to_eta();
    //cerr << "t0: " << _t0 << " eta: " << _eta << endl;
@@ -1316,10 +1316,12 @@ void incrementalProximal(const Vector<T>& y, const U& X, const Matrix<T>& w0M,
       Matrix<T>& wM, const ParamFISTA<T>& paramprox, const ParamSurrogate<T>& param, 
       const Vector<T>& lambdaV, Matrix<T>& logsM) {
 
-   cout << "Incremental proximal algorithm" << endl;
-   cout << "heuristic mode " << param.strategy << endl;
-   if (param.strategy==2)
-      cout << " WARNING, strategy 2 is unsafe " << endl;
+   if (param.verbose) {
+      cout << "Incremental proximal algorithm" << endl;
+      cout << "heuristic mode " << param.strategy << endl;
+      if (param.strategy==2)
+         cout << " WARNING, strategy 2 is unsafe " << endl;
+   }
    const int num_lambdas=lambdaV.n();
    int i;
 #pragma omp parallel for private(i) 

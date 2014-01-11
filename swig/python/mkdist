@@ -27,8 +27,8 @@ fullvers=`../mkRelease -f`
 
 nom=spams
 /bin/rm -rf dist
-swig -c++ -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
-swig -c++ -python -o ${nom}_wrap.cpp $nom.i
+/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
+/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -python -o ${nom}_wrap.cpp $nom.i
 python setup.py sdist
 [ $? -eq 0 ] || die "setup error; cannot continue"
 cdir=`/bin/pwd`
