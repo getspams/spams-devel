@@ -149,6 +149,7 @@ class SmoothFunction {
                rho_sample += _L[_current_batch[i]];
             }
             rho_sample /= _sizebatch;
+            rho_sample=MAX(rho_sample,0.1*rho);
             const T new_rho=(1-w)*rho + w*rho_sample;
             //const T new_rho=rho;
             typename U::col spw;
@@ -250,6 +251,10 @@ class SmoothFunction {
          const int ind = _current_batch[0];
          _Xt->refCol(ind,output);
       }
+      virtual T getY() const {
+         const int ind = _current_batch[0];
+         return (*_y)[ind];
+      }
       /// subsample the dataset
       virtual void subsample(const int n) {
          _save_n=_n;
@@ -287,6 +292,7 @@ class SmoothFunction {
                _current_batch[i]= _counter++ % _n; 
          }
       };
+      virtual int get_batch() const { return _current_batch[0]; };
       int inline choose_random_fixedbatch() {
          const int size_lastbatch =_nbatches+(_n-_nbatches*_num_batches);
          _num_batch= (_random ? random() : _counter++) % _num_batches;
@@ -411,6 +417,7 @@ class OnlineSurrogate {
       virtual int n() const = 0; 
       virtual int num_batches() const  = 0;
       virtual void setRandom(const bool random) = 0;
+      virtual void print_aux() { };
 
    private:
       explicit OnlineSurrogate<T,U>(const OnlineSurrogate<T,U>& dict);
@@ -583,6 +590,11 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
       virtual void minimize_surrogate(Vector<T>& output) {
          _prox->prox(this->_z,output,_lambda/this->_rho);
       };
+      virtual void print_aux() {
+         this->_z.print("z");
+         //PRINT_F(this->_rho)
+      };
+
       virtual void minimize_incremental_surrogate(Vector<T>& output) {
          const int n = this->_function->n();
          if (this->_strategy <= 2 || this->_strategy==4) {
@@ -737,6 +749,8 @@ void StochasticSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, Vector<T>& 
       const T weight = t_to_weight(i);
       _surrogate->update_surrogate(w,weight);
       _surrogate->minimize_surrogate(w);
+      //if (i < 5)
+      //   _surrogate->print_aux();
       switch (averaging_mode) {
          case 1: wav.scal(T(1.0)-weight); wav.add(w,weight); break;
          case 2: tmpweight+=weight; wav.scal(T(1.0)-weight/tmpweight); wav.add(w,weight/tmpweight); break;
@@ -1281,7 +1295,7 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
       _surrogate->set_param(hi_param);
       this->solve(w0,w,1,false,true,0);
       T hiCost = _logs[0];
-      //cerr << _logs[0] << " ";
+    //  cerr << _logs[0] << " ";
       if (hiCost > loCost && t==0) {
          factor=2.0;
       } else {
@@ -1290,12 +1304,45 @@ void IncrementalSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, 
          loCost=hiCost;
       }
    }
-    //cerr << endl;
+   // cerr << endl;
    _surrogate->set_param(strategy >= 2 ? lo_param/20 : lo_param);
-    //cerr << "param: " << lo_param << endl;
+   // cerr << "param: " << lo_param << endl;
    _surrogate->un_subsample();
 };
 
+template <typename T, typename U>
+void incrementalSmoothRidge(SmoothFunction<T,U>& function, const Vector<T>& w0,
+      Vector<T>& w, Vector<T>& alphas, const int epochs, const T lambda,
+      Vector<T>& logs, const bool init = true, const bool evaluate = true) {
+   const int p = function.p();
+   const int n = function.n();
+   Timer time;
+   time.start();
+   logs.set(0);
+   if (init) {
+      alphas.resize(n);
+      alphas.setZeros();
+   }
+   const T scal = T(1.0)/(n*lambda);
+   for (int i = 0; i<epochs; ++i) {
+      typename U::col col;
+      for (int j = 0; j<n; ++j) {
+         function.choose_random_batch();
+         const int ind = function.get_batch();
+         function.refData(col);
+         const T alphaold=alphas[ind];
+         const T s = w.dot(col);
+         const T y = function.getY();
+         alphas[ind]=function.gradient_simple(y,s);
+         w.add(col,(alphaold-alphas[ind])*scal);
+      }
+   }
+   time.stop();
+   logs[2]=time.getElapsed();
+   if (evaluate)
+      logs[0]=function.eval(w)+0.5*w.nrm2sq();
+};
+   
 template <typename T, typename U>
 void incrementalProximal(const Vector<T>& y, const U& X, const Vector<T>& w0,
       Vector<T>& w, const ParamFISTA<T>& paramprox, const ParamSurrogate<T>& param, 
@@ -1307,10 +1354,15 @@ void incrementalProximal(const Vector<T>& y, const U& X, const Vector<T>& w0,
       default: function=NULL; cerr << "Unknown loss function" << endl; return;
    }
    Regularizer<T,Vector<T> >* regul = setRegularizerVectors<T>(paramprox);
-   ProximalSurrogate<T, U> surrogate(function,regul,lambda);
-   IncrementalSolver<T, U> solver(surrogate,param);
-   solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy);
-   solver.getLogs(logs);
+   if (regul->id()==RIDGE && param.strategy==4) {
+      Vector<T> alphas;
+      incrementalSmoothRidge(*function,w0,w,alphas,param.epochs,lambda,logs,true,true);
+   } else {
+      ProximalSurrogate<T, U> surrogate(function,regul,lambda);
+      IncrementalSolver<T, U> solver(surrogate,param);
+      solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy);
+      solver.getLogs(logs);
+   }
    delete(regul);
    delete(function);
 };
@@ -1359,6 +1411,7 @@ void incrementalProximalSeq(const Vector<T>& y, const U& X, const Matrix<T>& w0M
    cout << "heuristic mode " << param.strategy << endl;
    if (param.strategy==2)
       cout << " WARNING, strategy 2 is unsafe " << endl;
+   Vector<T> alphas;
 
    for (int i = 0; i<num_lambdas; ++i) {
       Vector<T> w0;
@@ -1371,10 +1424,14 @@ void incrementalProximalSeq(const Vector<T>& y, const U& X, const Matrix<T>& w0M
       }
       wM.refCol(i,w);
       logsM.refCol(i,logs);
-      surrogate.changeLambda(lambdaV[i]);
-      //solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,false);
-      solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,i > 0);
-      solver.getLogs(logs);
+      if (regul->id()==RIDGE && param.strategy==4) {
+         incrementalSmoothRidge(*function,w0,w,alphas,param.epochs,lambdaV[i],logs,i==0,true);
+      } else {
+         surrogate.changeLambda(lambdaV[i]);
+         //solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,false);
+         solver.solve(w0,w,param.epochs,param.verbose,true,param.strategy,i > 0);
+         solver.getLogs(logs);
+      }
    }
    delete(regul);
    delete(function);
