@@ -1323,9 +1323,11 @@ void incrementalSmoothRidge(SmoothFunction<T,U>& function, const Vector<T>& w0,
       alphas.resize(n);
       alphas.setZeros();
    }
+   w.copy(w0);
    const T scal = T(1.0)/(n*lambda);
    for (int i = 0; i<epochs; ++i) {
       typename U::col col;
+      function.setRandom(i >= 1 || !init);
       for (int j = 0; j<n; ++j) {
          function.choose_random_batch();
          const int ind = function.get_batch();
@@ -1340,7 +1342,7 @@ void incrementalSmoothRidge(SmoothFunction<T,U>& function, const Vector<T>& w0,
    time.stop();
    logs[2]=time.getElapsed();
    if (evaluate)
-      logs[0]=function.eval(w)+0.5*w.nrm2sq();
+      logs[0]=function.eval(w)+0.5*lambda*w.nrm2sq();
 };
    
 template <typename T, typename U>
