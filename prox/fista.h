@@ -26,7 +26,7 @@
 namespace FISTA {
 
    enum loss_t { SQUARE, SQUARE_MISSING, LOG, LOGWEIGHT, MULTILOG, CUR, HINGE, INCORRECT_LOSS};
-   enum regul_t { L0, L1, RIDGE, L2, LINF, L1CONSTRAINT, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG, GRAPH_PATH_L0, GRAPH_PATH_CONV, NA};
+   enum regul_t { L0, L1, RIDGE, L2, LINF, L1CONSTRAINT, ELASTICNET, FUSEDLASSO, GROUPLASSO_L2, GROUPLASSO_LINF, GROUPLASSO_L2_L1, GROUPLASSO_LINF_L1, L1L2, L1LINF, L1L2_L1, L1LINF_L1, TREE_L0, TREE_L2, TREE_LINF, GRAPH, GRAPH_RIDGE, GRAPH_L2, TREEMULT, GRAPHMULT, L1LINFCR, NONE, TRACE_NORM, TRACE_NORM_VEC, RANK, RANK_VEC, INCORRECT_REG, GRAPH_PATH_L0, GRAPH_PATH_CONV, LOG_DC, NA};
 
    regul_t regul_from_string(char* regul) {
       if (strcmp(regul,"l0")==0) return L0;
@@ -34,6 +34,7 @@ namespace FISTA {
       if (strcmp(regul,"l2")==0) return RIDGE;
       if (strcmp(regul,"linf")==0) return LINF;
       if (strcmp(regul,"l2-not-squared")==0) return L2;
+      if (strcmp(regul,"log-dc")==0) return LOG_DC;
       if (strcmp(regul,"l1-constraint")==0) return L1CONSTRAINT;
       if (strcmp(regul,"elastic-net")==0) return ELASTICNET;
       if (strcmp(regul,"fused-lasso")==0) return FUSEDLASSO;
@@ -98,6 +99,7 @@ namespace FISTA {
          case L1: cout << "L1 regularization" << endl; break;
          case RIDGE: cout << "L2-squared regularization" << endl; break;
          case L2: cout << "L2-not-squared regularization" << endl; break;
+         case LOG_DC: cout << "reweighted-l1 regularization" << endl; break;
          case L1CONSTRAINT: cout << "L1 constraint regularization" << endl; break;
          case LINF: cout << "Linf regularization" << endl; break;
          case ELASTICNET: cout << "Elastic-net regularization" << endl; break;
@@ -1163,6 +1165,28 @@ namespace FISTA {
             };
             void inline fenchel(const Vector<T>& input, T& val, T& scal) const { };
       };
+
+   template <typename T> 
+      class LogDC : public Regularizer<T> {
+         public:
+            LogDC(const ParamReg<T>& param) : _eps(param.lambda2d1), Regularizer<T>(param) { };
+            virtual ~LogDC() { };
+
+            virtual bool is_fenchel() const { return false; };
+            void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
+               y.resize(x.n());
+               for (int i = 0; i<x.n(); ++i) y[i]=softThrs<T>(x[i],lambda/(abs<T>(x[i])+_eps));
+            };
+            T inline eval(const Vector<T>& x) const { 
+               T tmp=0;
+               for (int i = 0; i<x.n(); ++i) tmp+= log_alt<T>(abs<T>(x[i])+_eps);
+               return tmp;
+            };
+            void inline fenchel(const Vector<T>& input, T& val, T& scal) const { };
+         private:
+            const T _eps;
+      };
+
 
    template <typename T> 
       class None: public Regularizer<T>, public SplittingFunction<T, SpMatrix<T> > {
@@ -3198,6 +3222,7 @@ namespace FISTA {
          Regularizer<T>* reg;
          switch (param.regul) {
             case L0: reg=new Lzero<T>(param_reg); break;
+            case LOG_DC: param_reg.lambda2d1=param.a; reg=new LogDC<T>(param_reg); break;
             case L1: reg=new Lasso<T>(param_reg); break;
             case L1CONSTRAINT: reg=new LassoConstraint<T>(param_reg); break;
             case L2: reg=new normL2<T>(param_reg); break;

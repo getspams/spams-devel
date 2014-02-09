@@ -590,10 +590,6 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
       virtual void minimize_surrogate(Vector<T>& output) {
          _prox->prox(this->_z,output,_lambda/this->_rho);
       };
-      virtual void print_aux() {
-         this->_z.print("z");
-         //PRINT_F(this->_rho)
-      };
 
       virtual void minimize_incremental_surrogate(Vector<T>& output) {
          const int n = this->_function->n();
@@ -635,6 +631,50 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
       Regularizer<T>* _prox;
       T _lambda;
 };
+
+/*template <typename T, typename U> 
+class LogRegulSurrogate : public QuadraticSurrogate<T,U> {
+
+   public:
+      LogRegulSurrogate(SmoothFunction<T,U>* function,
+            const T eps, const T lambda) :
+         QuadraticSurrogate<T,U>(function),
+         _eps(eps),
+         _lambda(lambda) { };
+
+      virtual T eval_function(const Vector<T>& input) {
+         T tmp=0;
+         for (int i=0; i<input.n(); ++i) tmp+= log_alt<T>(abs<T>(input[i])+_eps);
+         return this->_function->eval(input)+_lambda*tmp;
+      };
+      virtual void minimize_surrogate(Vector<T>& output) {
+         //_prox->prox(this->_z,output,_lambda/this->_rho);
+      };
+
+      virtual void minimize_incremental_surrogate(Vector<T>& output) {
+         const int n = this->_function->n();
+         if (this->_strategy <= 2 || this->_strategy==4) {
+         //      Vector<T>& tmp = this->_z3;
+         //      tmp.copy(this->_z);
+         //      tmp.scal(T(1.0)/(this->_scalL*this->_rho));
+         //      _prox->prox(tmp,output,n*_lambda/(this->_scalL*this->_rho));
+         } else {
+         //      Vector<T>& tmp = this->_z3;
+         //      tmp.copy(this->_z);
+         //      tmp.add_scal(this->_z2,T(1.0)/(this->_rho*this->_scalL),T(1.0)/(this->_rho));
+         //      _prox->prox(tmp,output,n*_lambda/(this->_scalL*this->_rho));
+         }
+      };
+      void inline changeLambda(const T lambda) { _lambda=lambda;};
+
+   private:
+      explicit LogRegulSurrogate<T,U>(const LogRegulSurrogate<T,U>& dict);
+      LogRegulSurrogate<T,U>& operator=(const LogRegulSurrogate<T,U>& dict);
+
+      T _eps;
+      T _lambda;
+};*/
+
 
 template <typename T, typename U> 
 class StochasticSolver {

@@ -73,6 +73,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    ParamFISTA<T> paramprox;
    getStringStruct(prhs[3],"regul",paramprox.name_regul,paramprox.length_names);
    paramprox.regul = regul_from_string(paramprox.name_regul);
+   paramprox.a=getScalarStructDef<T>(prhs[3],"eps",0);
    if (paramprox.regul==INCORRECT_REG)
       mexErrMsgTxt("Unknown regularization");
    getStringStruct(prhs[3],"loss",paramprox.name_loss,paramprox.length_names);

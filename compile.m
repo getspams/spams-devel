@@ -134,6 +134,7 @@ out_dir='./build/';
 
 COMPILE = { 
             % compile dictLearn toolbox
+            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexIncrementalProx.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexStochasticProx.cpp',
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
@@ -144,7 +145,6 @@ COMPILE = {
             '-I./dags/ -I./linalg/ dags/mex/mexCountPathsDAG.cpp',
             '-I./dags/ -I./linalg/ dags/mex/mexCountConnexComponents.cpp',
             % compile proximal toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexFistaTree.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexFistaGraph.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexFistaPathCoding.cpp',  
