@@ -400,8 +400,8 @@ namespace FISTA {
                tmp.copy(y);
                tmp.sub(prox);
                SpVector<T> sptmp(tmp.n());
-               tmp.toSparse(sptmp);
                if (_compute_gram) {
+                  tmp.toSparse(sptmp);
                   return (_G->quad(sptmp) <= L*sptmp.nrm2sq());
                } else {
                   Vector<T> tmp2(_D->m());
@@ -1060,6 +1060,8 @@ namespace FISTA {
             // TODO complete for all norms
             virtual T eval_dual_norm_paths(const D& x, SpMatrix<T>& path) const { return this->eval_dual_norm(x); };
             regul_t inline id() const { return _id; };
+            virtual void linearize(const D& input) { };
+            virtual bool is_concave() const { return false; };
             
 
          protected:
@@ -1175,8 +1177,13 @@ namespace FISTA {
             virtual bool is_fenchel() const { return false; };
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
                y.resize(x.n());
-               for (int i = 0; i<x.n(); ++i) y[i]=softThrs<T>(x[i],lambda/(abs<T>(x[i])+_eps));
+               for (int i = 0; i<x.n(); ++i) y[i]=softThrs<T>(x[i],lambda*_weights[i]);
             };
+            void inline linearize(const Vector<T> &x) {
+               _weights.resize(x.n());
+               for (int i = 0; i<x.n(); ++i) _weights[i] = T(1.0)/(abs<T>(x[i])+_eps);
+            };
+            bool inline is_concave() const { return true; };
             T inline eval(const Vector<T>& x) const { 
                T tmp=0;
                for (int i = 0; i<x.n(); ++i) tmp+= log_alt<T>(abs<T>(x[i])+_eps);
@@ -1185,6 +1192,7 @@ namespace FISTA {
             void inline fenchel(const Vector<T>& input, T& val, T& scal) const { };
          private:
             const T _eps;
+            Vector<T> _weights;
       };
 
 
@@ -2691,6 +2699,7 @@ namespace FISTA {
          D grad, tmp, prox, old;
 
          const bool duality = loss.is_fenchel() && regularizer.is_fenchel();
+         const bool dc = regularizer.is_concave();
          optim_info.set(-1);
          Timer time;
          time.start();
@@ -2714,10 +2723,13 @@ namespace FISTA {
 
             /// compute gradient
             loss.grad(x,grad);
+            if (dc) regularizer.linearize(x);
+
             int iter=1;
             while (iter < param.max_iter_backtracking) {
                prox.copy(x);
                prox.add(grad,-T(1.0)/L);
+
                regularizer.prox(prox,tmp,lambda/L);
 
                Lold=L;

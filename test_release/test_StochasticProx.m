@@ -8,8 +8,10 @@ format compact;
 randn('seed',0);
 rand('seed',0);
 X=sprandn(p,n,density);
-mean_nrm=mean(sqrt(sum(X.^2)));
-X=X/mean_nrm;
+nrm=sqrt(sum(X.^2));
+X=X/mean(nrm);
+%mean_nrm=mean();
+%X=X/mean_nrm;
 
 % generate some true model
 z=double(sign(full(sprandn(p,1,0.05))));  
@@ -27,28 +29,28 @@ y=y*(sqrt(n)/nrm);
 clear param;
 param.regul='l1';        % many other regularization functions are available
 param.loss='square';     % only square and log are available
-param.numThreads=1;    % uses all possible cores
+param.numThreads=-1;    % uses all possible cores
 param.normalized=false;  % if the columns of X have unit norm, set to true.
 param.averaging_mode=0;  % no averaging, averaging was not really useful in experiments
-param.weighting_mode=2;  % weights are in O(1/sqrt(n)) 
-param.optimized_solver=true;
+param.weighting_mode=0;  % weights are in O(1/sqrt(n))  (see help mexStochasticProx)
+param.optimized_solver=true;  % best is not to touch this option
 param.verbose=false;
 
 % set grid of lambda
 max_lambda=max(abs(X*y))/n;
-tablambda=max_lambda*(2^(1/8)).^(0:-1:-50);  % order from large to small
+tablambda=max_lambda*(2^(1/4)).^(0:-1:-20);  % order from large to small
 param.lambda=tablambda;    % best to order from large to small
 tabepochs=[1 2 3 5 10];  % in this script, we compare the results obtained when varying the number of passes over the data.
 
 %% The problem which will be solved is
 %%   min_beta  1/(2n) ||y-X' beta||_2^2 + lambda ||beta||_1
-fprintf('EXPERIMENT: ALL LAMBDAS IN PARALLEL, no warm restart\n');
+fprintf('EXPERIMENT: ALL LAMBDAS IN PARALLEL\n');
 % we try different experiments when varying the number of epochs.
 % the problems for different lambdas are solve INDEPENDENTLY in parallel
 obj=[];
 objav=[];
 for ii=1:length(tabepochs)
-   param.iters=tabepochs(ii)*n;   % one pass over the data
+   param.iters=tabepochs(ii)*n;   
    fprintf('EXP WITH %d PASS\n',tabepochs(ii));
    nlambdas=length(param.lambda);
    Beta0=zeros(p,nlambdas);
@@ -72,8 +74,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fprintf('EXPERIMENT FOR LOGISTIC REGRESSION + l2\n');
 y=sign(y);
-param.regul='l2';        % many other regularization functions are available
-param.loss='logistic';     % only square and log are available
+param.regul='l2';        
+param.loss='logistic';  
 obj=[];
 objav=[];
 for ii=1:length(tabepochs)

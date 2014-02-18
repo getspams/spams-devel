@@ -30,42 +30,19 @@ param.regul='l1';        % many other regularization functions are available
 param.loss='square';     % only square and log are available
 param.numThreads=-1;    % uses all possible cores
 param.normalized=false;  % if the columns of X have unit norm, set to true.
-param.strategy=3;        % MISO with all heuristics
+param.strategy=1;        % MISO with all heuristics
                          % 0: no heuristics, slow  (only for comparison purposes)
-                         % 1: adjust the constant L on 5% of the data 
+                         % 1: adjust the constant L on 5% of the data  (good for non-strongly convex problems)
                          % 2: adjust the constant L on 5% of the data + unstable heuristics (this strategy does not work)
-                         % 3: adjust the constant L on 5% of the data + stable heuristic (this is by far the best choice)
+                         % 3: adjust the constant L on 5% of the data + stable heuristic good for strongly-convex problems
+                         % 4: best for l2 regularization
 param.verbose=true;
 param.minibatches=min(n,ceil(1/density));  % size of the minibatches, requires to store twice the size of X 
 
 % set grid of lambda
 max_lambda=max(abs(X*y))/n;
-tablambda=max_lambda*(2^(1/8)).^(0:-1:-50);  % order from large to small
+tablambda=max_lambda*(2^(1/4)).^(0:-1:-20);  % order from large to small
 tabepochs=[1 2 3 5 10];  % in this script, we compare the results obtained when changing the number of passes on the data.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Compare the solutions obtained with different epochs for one 
-% value of lambda;
-fprintf('EXPERIMENT: SINGLE LAMBDA\n');
-param.lambda=tablambda(20); 
-
-for ii=1:length(tabepochs)
-   fprintf('EXP WITH %d PASS\n',tabepochs(ii));
-   param.epochs=tabepochs(ii);   % one pass over the data
-   Beta0=zeros(p,1);
-   tic
-   [Beta tmp]=mexIncrementalProx(y,X,Beta0,param);
-   toc
-   obj=tmp(1);
-   fprintf('Objective functions: %f\n',obj);
-   spar=sum(Beta ~= 0);
-   fprintf('Sparsity: %d\n',spar);
-end
-   
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Now we do the same experiments, but we provide the array of lambda to 
-% the function, and we compare two strategies, the second one implementing
-% a warm restart with 
 param.lambda=tablambda;
 %% The problem which will be solved is
 %%   min_beta  1/(2n) ||y-X' beta||_2^2 + lambda ||beta||_1

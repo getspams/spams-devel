@@ -488,8 +488,8 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
          _stats2.refCol(num_batch,z_old);
          const T rho_old=_stats[num_batch];
          if (this->_strategy <= 2 || this->_strategy == 4) {
-            if (!this->_first_pass)
-               _z.sub(z_old);
+            //if (!this->_first_pass)
+            _z.sub(z_old);
             _function->add_sample_gradient2(input,z_old,rho_old*_scalL);
             _z.add(z_old);
          } else {
@@ -516,14 +516,22 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
       virtual void initialize_incremental(const Vector<T>& input, const int strategy) {
          const int p = input.n();
          this->_strategy = strategy;
-         _z.resize(p);
-         _z.setZeros();
+        // _z.resize(p);
+       //  _z.setZeros();
          this->_rho = _function->n()*_function->genericL();
+         _z.copy(input);
+         _z.scal(_rho*_scalL);
          const int num_batches = _function->num_batches();
          const int n = _function->n();
          this->_stats.resize(num_batches);
          _function->getL(this->_stats);
          this->_stats2.resize(p,num_batches,false);
+         Vector<T> col;
+         for (int i = 0; i<num_batches; ++i) {
+            this->_stats2.refCol(i,col);
+            col.copy(_z);
+            col.scal(T(1.0)/num_batches);
+         }
          if (strategy == 3) {
             this->_stats3.resize(n);
             this->_stats3.setZeros();
@@ -593,6 +601,7 @@ class ProximalSurrogate : public QuadraticSurrogate<T,U> {
 
       virtual void minimize_incremental_surrogate(Vector<T>& output) {
          const int n = this->_function->n();
+         _prox->linearize(output);
          if (this->_strategy <= 2 || this->_strategy==4) {
             if (_prox->id() == RIDGE) {
                output.add_scal(this->_z,T(1.0)/(this->_scalL*this->_rho+n*_lambda),0);
