@@ -25,7 +25,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='mkl';
+blas='builtin';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -131,6 +131,7 @@ end
 %%%%%%%%%%%% END OF THE CONFIGURATION %%%%%%%%%%%%%%
 % Do not touch what is below this line, unless you know what you are doing
 out_dir='./build/';
+mkdir(out_dir);
 
 COMPILE = { 
             % compile dictLearn toolbox
