@@ -9,6 +9,7 @@ param.L0=0.1;
 param.tol=1e-3;
 param.intercept=false;
 param.pos=false;
+param.ista=false;
 
 X=randn(100,200);
 X=X-repmat(mean(X),[size(X,1) 1]);
@@ -38,6 +39,17 @@ tic
 [W optim_info]=mexFistaFlat(Y,X,W0,param);
 t=toc;
 fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
+
+param.regul='l1';
+fprintf('\nISTA + Regression l1 + Barzilai Borwein (SPARSA)\n');
+param.ista=true;
+param.barzilaiborwein=true;
+tic
+[W optim_info]=mexFistaFlat(Y,X,W0,param);
+t=toc;
+fprintf('mean loss: %f, mean relative duality_gap: %f, time: %f, number of iterations: %f\n',mean(optim_info(1,:)),mean(optim_info(3,:)),t,mean(optim_info(4,:)));
+param.barzilaiborwein=false;
+
 
 fprintf('\nSubgradient Descent + Regression l1\n');
 param.ista=false;

@@ -42,7 +42,7 @@ use_64bits_integers=true;
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
 path_matlab='';
-path_matlab='/softs/bin/';
+%path_matlab='/softs/bin/';
 add_flag='';
 % WARNING: on Mac OS  mountain lion, you may have to uncomment the line
 %add_flag=' -mmacosx-version-min=10.7'
@@ -54,8 +54,8 @@ if strcmp(compiler,'gcc')
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7';
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -135,6 +135,7 @@ mkdir(out_dir);
 
 COMPILE = { 
             % compile dictLearn toolbox
+            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',

@@ -155,6 +155,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    param.verbose = getScalarStructDef<bool>(prhs[3],"verbose",false);
    param.clever = getScalarStructDef<bool>(prhs[3],"clever",false);
    param.ista= getScalarStructDef<bool>(prhs[3],"ista",false);
+   param.linesearch_mode= getScalarStructDef<int>(prhs[3],"linesearch_mode",0);
    param.subgrad= getScalarStructDef<bool>(prhs[3],"subgrad",false);
    param.log= getScalarStructDef<bool>(prhs[3],"log",false);
    param.a= getScalarStructDef<T>(prhs[3],"a",T(1.0));
