@@ -28,8 +28,13 @@ fullvers=`../mkRelease -f`
 
 nom=spams
 /bin/rm -rf dist
-/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
-/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -python -o ${nom}_wrap.cpp $nom.i
+if [ -x /home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig ]; then
+    SWIG=/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig
+else
+    SWIG=swig
+fi
+$SWIG -c++ -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
+$SWIG -c++ -python -o ${nom}_wrap.cpp $nom.i
 python setup.py sdist
 [ $? -eq 0 ] || die "setup error; cannot continue"
 cdir=`/bin/pwd`
@@ -42,7 +47,8 @@ cd $cdir
 cp -p spams.h $tmpd
 ./docmatlab2python $tmpd/spams
 mv $tmpd/spams.new.py $tmpd/spams.py
-cp -p ../extdata/* $tmpd
+rm -f $tmpd/boat.png $tmpd/lena.png
+cp -p ../extdata/boat.png ../extdata/lena.png $tmpd
 cp -p spams_wrap-windows.cpp $tmpd
 ../setRelease INSTALL-package.in >$tmpd/INSTALL-package
 ../setRelease INSTALL-windows.in >$tmpd/INSTALL-windows
