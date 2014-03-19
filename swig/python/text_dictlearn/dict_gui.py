@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dict_gui.ui'
 #
-# Created: Mon Jun 24 10:26:14 2013
+# Created: Thu Jul 11 11:11:27 2013
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -44,6 +44,27 @@ class Ui_DictLearn(object):
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.horizontalLayout.addWidget(self.comboBox)
+        self.Word_box = QtGui.QGroupBox(self.frame)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.Word_box.sizePolicy().hasHeightForWidth())
+        self.Word_box.setSizePolicy(sizePolicy)
+        self.Word_box.setTitle("")
+        self.Word_box.setObjectName("Word_box")
+        self.wcount = QtGui.QLabel(self.Word_box)
+        self.wcount.setGeometry(QtCore.QRect(30, 30, 120, 16))
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(100)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.wcount.sizePolicy().hasHeightForWidth())
+        self.wcount.setSizePolicy(sizePolicy)
+        self.wcount.setMinimumSize(QtCore.QSize(120, 0))
+        self.wcount.setObjectName("wcount")
+        self.word_count = QtGui.QSpinBox(self.Word_box)
+        self.word_count.setGeometry(QtCore.QRect(180, 20, 55, 27))
+        self.word_count.setObjectName("word_count")
+        self.horizontalLayout.addWidget(self.Word_box)
         self.info = QtGui.QLabel(self.frame)
         self.info.setText("")
         self.info.setObjectName("info")
@@ -94,7 +115,7 @@ class Ui_DictLearn(object):
         self.gridLayout.addWidget(self.buttonFrame, 2, 0, 1, 1)
         DictLearn.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(DictLearn)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 607, 18))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 607, 25))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -194,6 +215,7 @@ class Ui_DictLearn(object):
         self.comboBox.setItemText(2, QtGui.QApplication.translate("DictLearn", "graph struct", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox.setItemText(3, QtGui.QApplication.translate("DictLearn", "tree struct", None, QtGui.QApplication.UnicodeUTF8))
         self.comboBox.setItemText(4, QtGui.QApplication.translate("DictLearn", "symetric tree", None, QtGui.QApplication.UnicodeUTF8))
+        self.wcount.setText(QtGui.QApplication.translate("DictLearn", "nb words to show:", None, QtGui.QApplication.UnicodeUTF8))
         self.Vocabulary.setToolTip(QtGui.QApplication.translate("DictLearn", "select file containing the vocabulary", None, QtGui.QApplication.UnicodeUTF8))
         self.Vocabulary.setText(QtGui.QApplication.translate("DictLearn", "Vocabulary", None, QtGui.QApplication.UnicodeUTF8))
         self.Texts.setToolTip(QtGui.QApplication.translate("DictLearn", "data files for dictionary learning", None, QtGui.QApplication.UnicodeUTF8))

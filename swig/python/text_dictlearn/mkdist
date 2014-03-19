@@ -9,7 +9,7 @@ die () {
 [ -x ./mkdist -o ! -r qtext-dict.py ] || die "You must be in the source directory"
 cdir=`/bin/pwd`
 ddir=$cdir/dist/text_dictlearn
-[ -d $ddir ] && rm -rf $ddir
+[ -d dist ] && rm -rf dist
 mkdir -p $ddir/doc/user $ddir/doc/devel
 ui_files="dict_gui  dparams_gui  viewdecomp_gui  viewdict_gui"
 files="README"

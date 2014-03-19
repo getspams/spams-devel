@@ -213,8 +213,9 @@ For unstructured dictionaries, nodes are independant and variable $i$ is associa
 Cubes can have 3 sizes depending on the number of associated variables : small for
 no variables, medium for 1 variable, and large for more than 1 variable.
 \item by variables (menu items {\bf Show~variables} and {\bf Dict~columns}) : each variable is represented by a red cube with the variable index.\\
-If menu item {\bf Dict~columns} is selected, the vocabulary is listed on the left,
+If menu item {\bf Dict~columns} is selected, at most 100 words of the vocabulary is listed on the left,
 and the values of components of each column are represented by green rectangles.
+The words displayed are sorted in decreasing order of coefficients of the selected column, or, if no column is selected, of the vector sum of all columns.
 \end{itemize}
 In the {\bf Show~nodes} or {\bf Show~variables} mode, you can display the 10 most significant words of variables : 
 \begin{enumerate}
@@ -239,8 +240,7 @@ of their variables is displayed.
 a size proportional to $\alpha^i_j$.
 As above, most significant words are displayed beside variables with maximum coefficient.
 \item menu item {\bf Dict columns} : as above, variables are represented by cubes of size
-proportional to $\alpha^i_j$, but no words are displayed.
-Instead, the variables vectors (i.e dictionary columns) are drawn as barcharts, as in
-the dictionary window.
+proportional to $\alpha^i_j$, but without a list of words.
+As in the dictionary window, the variables vectors (i.e dictionary columns) are drawn as barcharts.
 \end{itemize}
 \end{document}
