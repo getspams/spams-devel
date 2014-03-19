@@ -8,7 +8,7 @@ import time
 from test_utils import *
 
 def test_fistaFlat():
-    param = {'numThreads' : 1,'verbose' : True,
+    param = {'numThreads' : -1,'verbose' : True,
              'lambda1' : 0.05, 'it0' : 10, 'max_it' : 200,
              'L0' : 0.1, 'tol' : 1e-3, 'intercept' : False,
              'pos' : False}

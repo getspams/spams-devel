@@ -1,5 +1,6 @@
 #!/bin/sh
 case $1 in -x) set -x;shift;;esac
+# The main version number is in ../Version
 
 die () {
     echo $*

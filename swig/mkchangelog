@@ -6,7 +6,7 @@ sub usage {
     print "Usage: $0 [-svn][-t dates-file]\n",
     " makes changelo\n",
     "\t-svn : get last raw log from svn and appends it to Changelog.log\n",
-    "\t   if Changelog.log is emmpty, get log since $main::first_rev\n",
+    "\t   if Changelog.log is empty, get log since $main::first_rev\n",
     "\t-t : Converts Changelog.log to Changelog.txt, with dates as revisions flags\n";
     exit 1;
 }

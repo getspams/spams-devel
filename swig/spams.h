@@ -507,6 +507,7 @@ using namespace FISTA;
  int pAlpha = alpha0->m();
  int nAlpha = alpha0->n();
   FISTA::ParamFISTA<T> param;
+  param.num_threads = (num_threads < 0) ? -1 : num_threads;
   param.max_it = max_it;
   param.L0 = L0;
   param.fixed_step = fixed_step;
@@ -593,7 +594,6 @@ using namespace FISTA;
       param.num_threads =  MIN(MAX_THREADS,omp_get_num_procs());
 #endif
    }
-
    if (param.regul==GRAPH || param.regul==GRAPHMULT) 
     throw("Error: fistaGraph should be used instead");
   if (param.regul==TREE_L0 || param.regul==TREEMULT || param.regul==TREE_L2 || param.regul==TREE_LINF) 
@@ -656,6 +656,7 @@ using namespace FISTA;
  int pAlpha = alpha0->m();
  int nAlpha = alpha0->n();
   FISTA::ParamFISTA<T> param;
+  param.num_threads = (num_threads < 0) ? -1 : num_threads;
   param.max_it = max_it;
   param.L0 = L0;
   param.fixed_step = fixed_step;
@@ -821,6 +822,7 @@ throw(const char *)
   int pAlpha = alpha0->m();
   int nAlpha = alpha0->n();
   FISTA::ParamFISTA<T> param;
+  param.num_threads = (num_threads < 0) ? -1 : num_threads;
   param.max_it = max_it;
   param.L0 = L0;
   param.fixed_step = fixed_step;
@@ -955,7 +957,7 @@ using namespace FISTA;
   strncpy(param.name_regul,name_regul,param.length_names);
   if (param.regul==GRAPH || param.regul==GRAPHMULT) 
     throw("proximalFlat : proximalGraph should be used instead");
-  param.num_threads = (num_threads < 0) ? 1 : num_threads;
+  param.num_threads = (num_threads < 0) ? -1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
   param.lambda3 = lambda3;
@@ -1010,7 +1012,7 @@ throw(const char *)
 using namespace FISTA;
   FISTA::ParamFISTA<T> param;
   param.regul = regul_from_string(name_regul);
-  param.num_threads = (num_threads < 0) ? 1 : num_threads;
+  param.num_threads = (num_threads < 0) ? -1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
   param.lambda3 = lambda3;
@@ -1097,7 +1099,7 @@ using namespace FISTA;
   if (param.regul==TREEMULT && abs<T>(param.lambda2 - 0) < 1e-20) {
       throw("proximalGraph error: with multi-task-graph, lambda2 should be > 0");
   }
-  param.num_threads = (num_threads < 0) ? 1 : num_threads;
+  param.num_threads = (num_threads < 0) ? -1 : num_threads;
   param.lambda = lambda1;
   param.lambda2 = lambda2;
   param.lambda3 = lambda3;
