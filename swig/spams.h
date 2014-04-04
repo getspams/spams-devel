@@ -495,7 +495,8 @@ Matrix<T> *_fistaFlat(Matrix<T> *X,AbstractMatrixB<T> *D,Matrix<T> *alpha0,
 	     Vector<T> *inner_weights,
 	     int size_group,
 	     bool sqrt_step,
-	     bool transpose
+	     bool transpose,
+             int linesearch_mode
 )
 throw(const char *) 
 {
@@ -557,6 +558,7 @@ using namespace FISTA;
     strcpy(param.logName,logName);
   }
   param.ista = ista;
+  param.linesearch_mode=linesearch_mode;
   param.subgrad = subgrad;
   param.is_inner_weights = is_inner_weights;
 
@@ -644,7 +646,8 @@ Matrix<T> *_fistaTree(
 	     Vector<T> *inner_weights,
 	     int size_group,
 	     bool sqrt_step,
-	     bool transpose
+	     bool transpose,
+             int linesearch_mode
 )
 throw(const char *) 
 {
@@ -698,6 +701,7 @@ using namespace FISTA;
     strcpy(param.logName,logName);
   }
   param.ista = ista;
+  param.linesearch_mode=linesearch_mode;
   param.subgrad = subgrad;
   param.is_inner_weights = is_inner_weights;
 
@@ -809,7 +813,8 @@ Matrix<T> *_fistaGraph(
 	     Vector<T> *inner_weights,
 	     int size_group,
 	     bool sqrt_step,
-	     bool transpose
+	     bool transpose,
+             int linesearch_mode
 )
 throw(const char *) 
 {
@@ -864,6 +869,7 @@ throw(const char *)
     strcpy(param.logName,logName);
   }
   param.ista = ista;
+  param.linesearch_mode=linesearch_mode;
   param.subgrad = subgrad;
   param.is_inner_weights = is_inner_weights;
 

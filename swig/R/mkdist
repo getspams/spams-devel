@@ -42,7 +42,8 @@ pkdir=$dir/$nom
 [ $mkdoc -ne 0 ] && /bin/rm -rf tmp-doc
 ../mkdoc
 doc=tmp-doc
-/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -r -o ${nom}.cpp $nom.i
+swig -c++ -r -o ${nom}.cpp $nom.i
+#/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -r -o ${nom}.cpp $nom.i
 [ $? -ne 0 ] && exit 1
 mkdir -p $pkdir/R $pkdir/src
 cp -p NAMESPACE  $pkdir

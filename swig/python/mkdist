@@ -28,11 +28,7 @@ fullvers=`../mkRelease -f`
 
 nom=spams
 /bin/rm -rf dist
-if [ -x /home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig ]; then
-    SWIG=/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig
-else
-    SWIG=swig
-fi
+SWIG=swig
 $SWIG -c++ -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
 $SWIG -c++ -python -o ${nom}_wrap.cpp $nom.i
 python setup.py sdist

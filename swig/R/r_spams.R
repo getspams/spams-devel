@@ -328,7 +328,7 @@ spams.fistaFlat <- function(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_
               compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
               resetflow=FALSE,regul="",loss="",verbose=FALSE,pos=FALSE,clever=FALSE,
               log=FALSE,ista=FALSE,subgrad=FALSE,logName="",is_inner_weights=FALSE,
-              inner_weights=c(0.),size_group=1,groups = NULL,sqrt_step=TRUE,transpose=FALSE) {
+              inner_weights=c(0.),size_group=1,groups = NULL,sqrt_step=TRUE,transpose=FALSE,linesearch_mode=0) {
 
   m = nrow(W0)
   n = ncol(W0)
@@ -339,7 +339,7 @@ spams.fistaFlat <- function(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_
   if (is.null(groups)) {
     groups = vector(mode = 'integer')
   }
-  optim_info = fistaFlat(Y,X,W0,W,groups,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
+  optim_info = fistaFlat(Y,X,W0,W,groups,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose,linesearch_mode)
   if(return_optim_info == TRUE)
     return(list(W,optim_info))
   else
@@ -352,7 +352,7 @@ spams.fistaTree <- function(Y,X,W0,tree,return_optim_info = FALSE,numThreads =-1
               compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
               resetflow=FALSE,regul="",loss="",verbose=FALSE,pos=FALSE,clever=FALSE,
               log=FALSE,ista=FALSE,subgrad=FALSE,logName="",is_inner_weights=FALSE,
-              inner_weights=c(0.),size_group=1,sqrt_step=TRUE,transpose=FALSE) {
+              inner_weights=c(0.),size_group=1,sqrt_step=TRUE,transpose=FALSE,linesearch_mode=0) {
   if (length(tree) != 4) {
     stop("fistaTree : tree should be a list of 4 elements")
   }
@@ -364,7 +364,7 @@ spams.fistaTree <- function(Y,X,W0,tree,return_optim_info = FALSE,numThreads =-1
   n = ncol(W0)
 #  W = matrix(rep(0,m * n),nrow = m,ncol = n)
   W = matrix(c(0),nrow = m,ncol = n)
-  optim_info = fistaTree(Y,X,W0,W,eta_g,groups,own_variables,N_own_variables,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
+  optim_info = fistaTree(Y,X,W0,W,eta_g,groups,own_variables,N_own_variables,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose,linesearch_mode)
   if(return_optim_info == TRUE)
     return(list(W,optim_info))
   else
@@ -377,7 +377,7 @@ spams.fistaGraph <- function(Y,X,W0,graph,return_optim_info = FALSE,numThreads =
               compute_gram=FALSE,lin_admm=FALSE,admm=FALSE,intercept=FALSE,
               resetflow=FALSE,regul="",loss="",verbose=FALSE,pos=FALSE,clever=FALSE,
               log=FALSE,ista=FALSE,subgrad=FALSE,logName="",is_inner_weights=FALSE,
-              inner_weights=c(0.),size_group=1,sqrt_step=TRUE,transpose=FALSE) {
+              inner_weights=c(0.),size_group=1,sqrt_step=TRUE,transpose=FALSE,linesearch_mode=0) {
   if (length(graph) != 3) {
     stop("fistaGraph : graph should be a list of 3 elements")
   }
@@ -388,7 +388,7 @@ spams.fistaGraph <- function(Y,X,W0,graph,return_optim_info = FALSE,numThreads =
   n = ncol(W0)
 #  W = matrix(rep(0,m * n),nrow = m,ncol = n)
   W = matrix(c(0),nrow = m,ncol = n)
-  optim_info = fistaGraph(Y,X,W0,W,eta_g,groups,groups_var,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose)
+  optim_info = fistaGraph(Y,X,W0,W,eta_g,groups,groups_var,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose,linesearch_mode)
   if(return_optim_info == TRUE)
     return(list(W,optim_info))
   else

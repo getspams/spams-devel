@@ -2783,7 +2783,7 @@ namespace FISTA {
          ///    3: back_tracking in both directions
          D sbb, xbb;
          const T alphamax=1/L;
-         const T alphamin=10e-9*alphamin;
+         const T alphamin=10e-12*alphamin;
 
          const bool duality = loss.is_fenchel() && regularizer.is_fenchel();
          const bool dc = regularizer.is_concave();

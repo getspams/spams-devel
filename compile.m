@@ -135,7 +135,6 @@ mkdir(out_dir);
 
 COMPILE = { 
             % compile dictLearn toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
