@@ -249,6 +249,19 @@ def l1L2BCD(X,D,alpha0,list_groups,lambda1 = None, mode= spams_wrap.PENALTY, ite
     spams_wrap.l1L2BCD(X,D,alpha,list_groups,lambda1,mode,itermax,tol,numThreads)
     return alpha
 
+### from lsqsplx ###
+def gpFISTAFor(A, b, L0 = 1.0, eta = 1.0/0.7, I = 50):
+  return my_spams_wrap.gpFISTAFor(A,b, L0, eta, I)
+
+def gpFISTA(A, b, L0 = 1.0, eta = 1.0/0.7, epsilon=1e-5):
+  return my_spams_wrap.gpFISTA(A,b, L0, eta, epsilon)
+
+def activeSet(A, b, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.activeSet(A,b, lambda2, epsilon)
+
+def activeSetS(A, b, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.activeSetS(A,b, lambda2, epsilon)
+
 ###########  END decomp ##############
 ##################################################
 
@@ -558,6 +571,48 @@ def nnsc(X,return_lasso= False,model= None,lambda1= None,
     V = lasso(X,D = U,return_reg_path = False, numThreads = numThreads,
                   lambda1 = lambda1,mode = spams_wrap.PENALTY)
     return(U,V)
+
+### from arch ###
+def archContinueForAS(X, Z, I = 20, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.archContinueForAS(X, Z ,I, warm, lambda2, epsilon)
+
+def archForAS(X, p, I = 20, randominit = False, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.archForAS(X, p ,I, randominit, warm, lambda2, epsilon)
+
+def archContinueForASMemo(X, Z, I = 20, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.archContinueForASMemo(X, Z ,I, warm, lambda2, epsilon)
+
+def archForASMemo(X, p, I = 20, randominit = False, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.archForASMemo(X, p ,I, randominit, warm, lambda2, epsilon)
+
+def archRobustContinueForAS(X, Z, I = 20, warm = False, lambda2 = 1e-5, epsilon = 1e-5, epsilon2 = 1e-3):
+  return my_spams_wrap.archRobustContinueForAS(X, Z, I, warm, lambda2, epsilon, epsilon2)
+
+def archRobustForAS(X, p, I = 20, randominit = False, warm = False, lambda2 = 1e-5, epsilon = 1e-5, epsilon2 = 1e-3):
+  return my_spams_wrap.archRobustForAS(X, p ,I, randominit, warm, lambda2, epsilon, epsilon2)
+
+def archContinueForFISTA(X, Z, I = 20, IF = 20, eta = 1.0/0.7):
+  return my_spams_wrap.archContinueForFISTA(X, Z ,I, IF, eta)
+
+def archForFISTA(X, p, I = 20, randominit = False, IF = 20, eta = 1.0/0.7):
+  return my_spams_wrap.archForFISTA(X, p ,I, randominit, IF, eta)
+
+def archContinueForCombined(X, Z, I1 = 3, I2 = 20, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.archContinueForCombined(X, Z ,I1, I2, warm, lambda2, epsilon)
+
+def archForCombined(X, Z, I1 = 3, I2 = 20, randominit = False, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
+  return my_spams_wrap.archForCombined(X, Z ,I1, I2, randominit, warm, lambda2, epsilon)
+
+def archRobustContinueForCombined(X, Z, I1 = 3, I2 = 20, warm = False, lambda2 = 1e-5, epsilon = 1e-5, epsilon2 = 1e-3):
+  return my_spams_wrap.archRobustContinueForCombined(X, Z ,I1, I2, warm, lambda2, epsilon, epsilon2)
+
+def archRobustForCombined(X, Z, I1 = 3, I2 = 20, randominit = False, warm = False, lambda2 = 1e-5, epsilon = 1e-5, epsilon2 = 1e-3):
+  return my_spams_wrap.archRobustForCombined(X, Z ,I1, I2, randominit, warm, lambda2, epsilon, epsilon2)
+
+def alphaArchAS(X, Z):
+  (indptr,indices,data,shape) = my_spams_wrap.alphaArchAS(X, Z)
+  alpha = ssp.csc_matrix((data,indices,indptr),shape)
+  return alpha
 
 ###########  END dictLearn ##############
 def im2col_sliding(A,m,n,RGB = False):
