@@ -67,10 +67,10 @@ void archRobustForAS(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I 
 /// Each sub-quadratic programming is solved by FISTA Method
  
 template <typename T>
-void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const int IF = 20, const T eta = T(2.0));
+void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const int IF = 20, const T eta = T(1.0/0.7));
 
 template <typename T>
-void archForFISTA(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const int IF = 20, const T eta = T(2.0), const bool randominit = false);
+void archForFISTA(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const int IF = 20, const T eta = T(1.0/0.7));
 
 /// A Combined version with first few steps FISTA then AS
 
@@ -135,7 +135,7 @@ void archContinueForAS(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, co
       // matRSS = X- Z*AlphaT
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(1e-8)) {
+      if(sumAsq < T(10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
@@ -228,7 +228,7 @@ void archContinueForASMemo(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z
       // matRSS = X- Z*AlphaT
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(1e-8)) {
+      if(sumAsq < T(10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
@@ -327,7 +327,7 @@ void archRobustContinueForAS(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>&
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
 
-      if(sumAsq < (1e-8)) {
+      if(sumAsq < (10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
@@ -411,7 +411,7 @@ void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,
       // matRSS = X- Z*AlphaT
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(1e-8)) {
+      if(sumAsq < T(10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
@@ -435,7 +435,7 @@ void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,
 }
 
 template <typename T>
-void archForFISTA(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const int IF = 20, const T eta = T(1.0/0.7), const bool randominit = false) {
+void archForFISTA(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const int IF = 20, const T eta = T(1.0/0.7)) {
   const int m = X.m();
   const int n = X.n();
   Matrix<T> Z0(m,p);
@@ -492,7 +492,7 @@ void archContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>&
       // matRSS = X- Z*AlphaT
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(1e-8)) {
+      if(sumAsq < T(10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
@@ -529,7 +529,7 @@ void archContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>&
       // matRSS = X- Z*AlphaT
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(1e-8)) {
+      if(sumAsq < T(10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
@@ -620,7 +620,7 @@ void archRobustContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matr
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
 
-      if(sumAsq < T(1e-8)) {
+      if(sumAsq < T(10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
@@ -669,7 +669,7 @@ void archRobustContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matr
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
 
-      if(sumAsq < T(1e-8)) {
+      if(sumAsq < T(10e-8)) {
         // singular
         matRSS.norm_2_cols(norms);
         int k = norms.max();
