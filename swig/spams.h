@@ -476,12 +476,6 @@ Vector<T> *_activeSet(Matrix<T>* A, Vector<T>* b, T lambda2, T epsilon) throw (c
   return xCurr;
 }
 
-template <typename T>
-Vector<T> *_activeSetS(Matrix<T>* A, Vector<T>* b, Matrix<T>* G, T lambda2, T epsilon) throw(const char *){
-  Vector<T>* xCurr = new Vector<T>();
-  activeSetS<T>((Matrix<T>&)(*A), (Vector<T>&)(*b), (Vector<T>&)(*xCurr), (Matrix<T>&) (*G),  lambda2, epsilon);
-  return xCurr;
-}
 /* end decomp/lsqsplx */
 /* end decomp */
 

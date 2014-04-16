@@ -259,9 +259,6 @@ def gpFISTA(A, b, L0 = 1.0, eta = 1.0/0.7, epsilon=1e-5):
 def activeSet(A, b, lambda2 = 1e-5, epsilon = 1e-5):
   return spams_wrap.activeSet(A,b, lambda2, epsilon)
 
-def activeSetS(A, b, lambda2 = 1e-5, epsilon = 1e-5):
-  return spams_wrap.activeSetS(A,b, lambda2, epsilon)
-
 ###########  END decomp ##############
 ##################################################
 
