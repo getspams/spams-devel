@@ -69,7 +69,9 @@ Use of spams functions should only be done through module spams."
      Matrix<ctype> *AAt,
      Matrix<ctype> *alpha0,
      Matrix<ctype> *alpha,
-     Matrix<ctype> *W
+     Matrix<ctype> *W,
+     Matrix<ctype> *Z0,
+     Matrix<ctype> *Z
 %enddef
 %define argout_matrices(ctype)
      Matrix<ctype> **path,
@@ -80,6 +82,7 @@ Use of spams functions should only be done through module spams."
     Vector<ctype> *v,
     Vector<ctype> *b,
     Vector<ctype> *x,
+    Vector<ctype> *xCurr,
     Vector<ctype> *inner_weights,
     Vector<ctype> *L,
     Vector<ctype> *eps,
@@ -168,9 +171,28 @@ INSTANTIATE_DATA(ompMask)
 INSTANTIATE_DATA(somp)
 INSTANTIATE_DATA(cd)
 INSTANTIATE_DATA(l1L2BCD)
+INSTANTIATE_DATA(gpFISTAFor)
+INSTANTIATE_DATA(gpFISTA)
+INSTANTIATE_DATA(activeSet)
+INSTANTIATE_DATA(activeSetS)
+
 /**** dictLearn ****/
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};
 INSTANTIATE_DATA(alltrainDL)
+/* from arch */
+INSTANTIATE_DATA(archContinueForAS)
+INSTANTIATE_DATA(archForAS)
+INSTANTIATE_DATA(archContinueForASMemo)
+INSTANTIATE_DATA(archForASMemo)
+INSTANTIATE_DATA(archRobustContinueForAS)
+INSTANTIATE_DATA(archRobustForAS)
+INSTANTIATE_DATA(archContinueForFISTA)
+INSTANTIATE_DATA(archForFISTA)
+INSTANTIATE_DATA(archContinueForCombined)
+INSTANTIATE_DATA(archForCombined)
+INSTANTIATE_DATA(archRobustContinueForCombined)
+INSTANTIATE_DATA(archRobustForCombined)
+INSTANTIATE_DATA(alphaArchAS)
 
 /**** prox ****/
 INSTANTIATE_DATA(fistaFlat)
