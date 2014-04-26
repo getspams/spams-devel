@@ -594,17 +594,17 @@ def archContinueForFISTA(X, Z, I = 20, IF = 20, eta = 1.0/0.7):
 def archForFISTA(X, p, I = 20, randominit = False, IF = 20, eta = 1.0/0.7):
   return spams_wrap.archForFISTA(X, p ,I, randominit, IF, eta)
 
-def archContinueForCombined(X, Z, I1 = 3, I2 = 20, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
-  return spams_wrap.archContinueForCombined(X, Z ,I1, I2, warm, lambda2, epsilon)
+def archContinueForCombined(X, Z, I1 = 3, I2 = 20):
+  return spams_wrap.archContinueForCombined(X, Z ,I1, I2)
 
-def archForCombined(X, Z, I1 = 3, I2 = 20, randominit = False, warm = False, lambda2 = 1e-5, epsilon = 1e-5):
-  return spams_wrap.archForCombined(X, Z ,I1, I2, randominit, warm, lambda2, epsilon)
+def archForCombined(X, Z, I1 = 3, I2 = 20, randominit = False):
+  return spams_wrap.archForCombined(X, Z ,I1, I2, randominit)
 
-def archRobustContinueForCombined(X, Z, I1 = 3, I2 = 20, warm = False, lambda2 = 1e-5, epsilon = 1e-5, epsilon2 = 1e-3):
-  return spams_wrap.archRobustContinueForCombined(X, Z ,I1, I2, warm, lambda2, epsilon, epsilon2)
+def archRobustContinueForCombined(X, Z, I1 = 3, I2 = 20):
+  return spams_wrap.archRobustContinueForCombined(X, Z ,I1, I2)
 
-def archRobustForCombined(X, Z, I1 = 3, I2 = 20, randominit = False, warm = False, lambda2 = 1e-5, epsilon = 1e-5, epsilon2 = 1e-3):
-  return spams_wrap.archRobustForCombined(X, Z ,I1, I2, randominit, warm, lambda2, epsilon, epsilon2)
+def archRobustForCombined(X, Z, I1 = 3, I2 = 20, randominit = False):
+  return spams_wrap.archRobustForCombined(X, Z ,I1, I2, randominit)
 
 def alphaArchAS(X, Z):
   (indptr,indices,data,shape) = spams_wrap.alphaArchAS(X, Z)
