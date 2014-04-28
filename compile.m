@@ -54,8 +54,8 @@ if strcmp(compiler,'gcc')
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7';
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -95,8 +95,8 @@ end
 % set up the path to the blas/lapack libraries. 
 if strcmp(blas,'mkl')
    if linux || mac
-      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -331,7 +331,7 @@ elseif strcmp(compiler,'gcc')
    if debug
       compile_flags='-O2 -g'; 
    else
-      compile_flags='-O3 -mtune=core2 -fomit-frame-pointer -funsafe-loop-optimizations'; 
+      compile_flags='-O3 -mtune=native -fomit-frame-pointer -funsafe-loop-optimizations'; 
    end
    links_lib=[links_lib ' -L"' path_to_compiler_libraries '" -L' path_to_blas];
    if mac
@@ -389,7 +389,12 @@ for k = 1:length(COMPILE),
     if windows
        str = [str ' -outdir ' out_dir, ' ' DEFS ' ' links_lib ' OPTIMFLAGS="' compile_flags '" ']; 
     else
-       str = [str ' -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' links_lib];
+       if verLessThan('matlab','8.3.0')
+          str = [str ' -v -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' links_lib];
+       else
+          str = [str ' -v -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' ' LINKLIBS="$LINKLIBS ' links_lib '" '];
+       end
+       %str = [str ' -v -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' '" LINKLIBS ' links_lib '" '];
     end
     args = regexp(str, '\s+', 'split');
     args = args(find(~cellfun(@isempty, args)));
