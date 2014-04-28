@@ -82,6 +82,11 @@
 %            param.gamma (optional, multiplier for increasing the parameter L in fista, 1.5 by default)
 %            param.L0 (optional, initial parameter L in fista, 0.1 by default, should be small enough)
 %            param.fixed_step (deactive the line search for L in fista and use param.L0 instead)
+%            param.linesearch_mode (line-search scheme when ista=true:
+%                      0: default, monotonic backtracking scheme
+%                      1: monotonic backtracking scheme, with restart at each iteration
+%                      2: Barzilai-Borwein step sizes (similar to SparSA by Wright et al.)
+%                      3: non-monotonic backtracking
 %            param.compute_gram (optional, pre-compute X^TX, false by default).
 %            param.intercept (optional, do not regularize last row of W, false by default).
 %            param.ista (optional, use ista instead of fista, false by default).

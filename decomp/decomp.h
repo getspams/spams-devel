@@ -74,11 +74,11 @@ void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<INTM>& ind,
 
 
 /// Auxiliary function of omp
-template <typename T>
+/*template <typename T>
 void coreORMPWeighted(Vector<T>& scores, Vector<T>& weights, Vector<T>& norm,
       Vector<T>& tmp, Matrix<T>& Un, Matrix<T>& Undn, Matrix<T>& Unds,
       Matrix<T>& Gs, Vector<T>& Rdn, const AbstractMatrix<T>& G, Vector<INTM>&
-      ind, Vector<T>& RUn, T& normX,  const T eps, const int L, const T lambda);
+      ind, Vector<T>& RUn, T& normX,  const T eps, const int L, const T lambda);*/
 
 /* **************
  * LARS - Lasso 
@@ -636,7 +636,7 @@ void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
 };
 
 /// Auxiliary function of omp
-template <typename T>
+/*template <typename T>
 void coreORMPWeighted(Vector<T>& scores, Vector<T>& weights, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
       Matrix<T>& Undn, Matrix<T>& Unds, Matrix<T>& Gs, Vector<T>& Rdn,
       const AbstractMatrix<T>& G,
@@ -705,7 +705,7 @@ void coreORMPWeighted(Vector<T>& scores, Vector<T>& weights, Vector<T>& norm, Ve
    // compute the final coefficients 
    cblas_trmv<T>(CblasColMajor,CblasUpper,CblasNoTrans,CblasNonUnit,
          j,prUn,L,prRUn,1); 
-};
+};*/
 
 
 
