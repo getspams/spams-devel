@@ -14,7 +14,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='gcc';
+compiler='icc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -25,7 +25,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='builtin';
+blas='mkl';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -95,8 +95,8 @@ end
 % set up the path to the blas/lapack libraries. 
 if strcmp(blas,'mkl')
    if linux || mac
-      path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -134,6 +134,10 @@ out_dir='./build/';
 mkdir(out_dir);
 
 COMPILE = { 
+            % compile image toolbox
+            '-I./image/ -I./linalg/ -I./prox/ image/mex/mexConvFista.cpp', 
+            '-I./image/ -I./linalg/ image/mex/mexExtractPatches.cpp', 
+            '-I./image/ -I./linalg/ image/mex/mexCombinePatches.cpp', 
             % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
@@ -278,7 +282,7 @@ if strcmp(compiler,'icc')
        compile_flags='/Qvc10  /Qopenmp /MD /QaxSSE2,SSE3,SSE4.1,SSE4.2,AVX,CORE-AVX2,CORE-AVX-I /O2';
    else
        DEFCOMP=sprintf('CXX=%s/icpc LDCXX=%s/icpc',path_to_compiler,path_to_compiler);
-       compile_flags='-fPIC -axSSE3,SSE4.1,SSE4.2,AVX,CORE-AVX2,CORE-AVX-I -pipe -w -w0 -O3 -fomit-frame-pointer -no-prec-div -fno-alias -align -falign-functions -fp-model fast -funroll-loops ';
+       compile_flags='-fPIC -march=native -pipe -w -w0 -O3 -fomit-frame-pointer -fno-alias -align -falign-functions';
        %link_flags=[link_flags sprintf(' -cxxlib=%s',path_to_gcc_libraries)];
        %link_flags=[link_flags ' -gcc-version=430'];
    end

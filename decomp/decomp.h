@@ -72,6 +72,14 @@ template <typename T>
 void coreORMPB(Vector<T>& RtD, const AbstractMatrix<T>& G, Vector<INTM>& ind, 
       Vector<T>& coeffs, T& normX, const int L, const T eps, const T lambda = 0);
 
+
+/// Auxiliary function of omp
+template <typename T>
+void coreORMPWeighted(Vector<T>& scores, Vector<T>& weights, Vector<T>& norm,
+      Vector<T>& tmp, Matrix<T>& Un, Matrix<T>& Undn, Matrix<T>& Unds,
+      Matrix<T>& Gs, Vector<T>& Rdn, const AbstractMatrix<T>& G, Vector<INTM>&
+      ind, Vector<T>& RUn, T& normX,  const T eps, const int L, const T lambda);
+
 /* **************
  * LARS - Lasso 
  * **************/
@@ -625,6 +633,78 @@ void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
          path[(j-1)*K+ind[k]]=prRUn[k];
       }
    }
+};
+
+/// Auxiliary function of omp
+template <typename T>
+void coreORMPWeighted(Vector<T>& scores, Vector<T>& weights, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
+      Matrix<T>& Undn, Matrix<T>& Unds, Matrix<T>& Gs, Vector<T>& Rdn,
+      const AbstractMatrix<T>& G,
+      Vector<INTM>& ind, Vector<T>& RUn, 
+       T& normX, const T peps, const int pL, const T plambda) {
+   const T eps = abs<T>(*peps);
+   const int L = MIN(*pL,Gs.n());
+   const T lambda=*plambda;
+   if ((normX <= eps) || L == 0) return;
+   const int K = scores.n();
+   scores.copy(Rdn);
+   scores.div(weights);
+   norm.set(T(1.0));
+   Un.setZeros();
+
+   // permit unsafe low level access
+   T* const prUn = Un.rawX();
+   T* const prUnds = Unds.rawX();
+   T* const prUndn = Undn.rawX();
+   T* const prGs = Gs.rawX();
+   T* const prRUn= RUn.rawX();
+
+   int j;
+   for (j = 0; j<L; ++j) {
+      const int currentInd=scores.fmax();
+      if (norm[currentInd] < 1e-8) {
+         ind[j]=-1;
+         break;
+      }
+      const T invNorm=T(1.0)/sqrt(norm[currentInd]);
+      const T RU=Rdn[currentInd]*invNorm;
+      const T delta = RU*RU;
+      if (delta < 2*lambda) {
+         break;
+      }
+
+      RUn[j]=RU;
+      normX -= delta;
+      ind[j]=currentInd;
+      prUn[j*L+j]=-T(1.0);
+      cblas_copy<T>(j,prUndn+currentInd,K,prUn+j*L,1);
+      cblas_trmv<T>(CblasColMajor,CblasUpper,CblasNoTrans,CblasNonUnit,j,prUn,L,prUn+j*L,1);
+      cblas_scal<T>(j+1,-invNorm,prUn+j*L,1);
+ 
+      if (j == L-1 || (normX <= eps)) {
+         ++j;
+         break;
+      }
+
+      // update the variables Gs, Undn, Unds, Rdn, norm, scores
+      Vector<T> Gsj;
+      Gs.refCol(j,Gsj);
+      G.copyCol(currentInd,Gsj);
+      cblas_gemv<T>(CblasColMajor,CblasNoTrans,K,j+1,T(1.0),prGs,K,prUn+j*L,1,
+            T(0.0),prUndn+j*K,1);
+      Vector<T> Undnj;
+      Undn.refCol(j,Undnj);
+      Rdn.add(Undnj,-RUn[j]);
+      tmp.sqr(Undnj);
+      norm.sub(tmp);
+      scores.sqr(Rdn);
+      scores.div(norm);
+      scores.div(weights);
+      for (int k = 0; k<=j; ++k) scores[ind[k]]=T();
+   }
+   // compute the final coefficients 
+   cblas_trmv<T>(CblasColMajor,CblasUpper,CblasNoTrans,CblasNonUnit,
+         j,prUn,L,prRUn,1); 
 };
 
 
