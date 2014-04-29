@@ -40,10 +40,13 @@
 /// "For" version
 
 template <typename T>
-void gpFISTAFor(const Matrix<T>& A, const Vector<T>& b, Vector<T>& xCurr, const T L0 = 1.0, const T eta = 1.0/0.7, const int I = 50) {
+void gpFISTAFor(const Matrix<T>& A, const Vector<T>& b, Vector<T>& xCurr, const T L0 = 1.0, const T eta = 1.0/0.7, const int I = 50, const bool warm = false) {
   const int p = A.n();
   Vector<T> xPrev(p);
-  xPrev.set(1.0/p);
+  if(warm)
+    xPrev.copy(xCurr);
+  else
+    xPrev.set(1.0/p);
   Vector<T> yPrev(p);
   yPrev.set(1.0/p);
   Vector<T> yCurr(p);
@@ -99,10 +102,13 @@ void gpFISTAFor(const Matrix<T>& A, const Vector<T>& b, Vector<T>& xCurr, const 
 
 /// "While" verison, stop condition on objective
 template <typename T>
-void gpFISTA(const Matrix<T>& A, const Vector<T>& b, Vector<T>& xCurr, const T L0 = 1.0, const T eta = T(1.0/0.7), const T epsilon = T(1e-6)) {
+void gpFISTA(const Matrix<T>& A, const Vector<T>& b, Vector<T>& xCurr, const T L0 = 1.0, const T eta = T(1.0/0.7), const T epsilon = T(1e-6), const bool warm = false) {
   const int p = A.n();
   Vector<T> xPrev(p);
-  xPrev.set(1.0/p);
+  if(warm) 
+    xPrev.copy(xCurr);
+  else
+    xPrev.set(1.0/p);
   Vector<T> yPrev(p);
   yPrev.set(1.0/p);
   Vector<T> yCurr(p);

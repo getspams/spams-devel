@@ -402,7 +402,7 @@ void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,
     for(int i=0; i<n; ++i) {
       X.refCol(i,refColX);
       AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), eta, IF);
+      gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), eta, IF, true);
     }
     // step 2: fix Alpha, fix all but one to compute Zi
     for(int l=0; l<p; ++l) {
@@ -423,7 +423,7 @@ void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,
         matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
         // least square to get Beta
         BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), eta, IF);
+        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), eta, IF, true);
         X.mult(refColBetaT, refColZ);
       }
     }
@@ -483,7 +483,7 @@ void archContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>&
     for(int i=0; i<n; ++i) {
       X.refCol(i,refColX);
       AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), T(1.0/0.7), 50);
+      gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), T(1.0/0.7), 50, true);
     }
     // step 2: fix Alpha, fix all but one to compute Zi
     for(int l=0; l<p; ++l) {
@@ -504,7 +504,7 @@ void archContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>&
         matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
         // least square to get Beta
         BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 50);
+        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 50, true);
         X.mult(refColBetaT, refColZ);
       }
     }
@@ -602,7 +602,7 @@ void archRobustContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matr
     for(int i=0; i<n; ++i) {
       X.refCol(i,refColX);
       AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z, refColX, refColAlphaT, T(1.0), T(1.0/0.7), 10);
+      gpFISTAFor(Z, refColX, refColAlphaT, T(1.0), T(1.0/0.7), 10, true);
     }
     // update scale factors
     matRSS.copy(X);
@@ -634,7 +634,7 @@ void archRobustContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matr
         vBarre.add(refColZ);
         // least square to get Beta
         BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 10); 
+        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 10, true); 
         X.mult(refColBetaT, refColZ);
       }
     }
