@@ -44,7 +44,6 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    ConvolveDictionary<T> convD(D,w,h,nim);
 
    int sizeEdge=static_cast<int>(sqrt(m/nim));
-   int sizeMap=(w-sizeEdge+1)*(h-sizeEdge+1);
 
    T* pr_alpha0 = reinterpret_cast<T*>(mxGetPr(prhs[2]));
    const mwSize* dimsAlpha=mxGetDimensions(prhs[2]);

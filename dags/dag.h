@@ -1,5 +1,5 @@
 /*!
-/* Software SPAMS v2.3 - Copyright 2009-2011 Julien Mairal 
+ * Software SPAMS v2.3 - Copyright 2009-2011 Julien Mairal 
  *
  * This file is part of SPAMS.
  *
@@ -43,7 +43,6 @@ int count_cc_graph(const SpMatrix<T>& G, Vector<T>& active) {
    }
    const INTM* pB = G.pB();
    const INTM* r = G.r();
-   const T* v = G.v();
 
    while (!list.empty()) {
       int node=list.front();
@@ -79,7 +78,6 @@ void remove_cycles(const SpMatrix<T>& G1, SpMatrix<T>& G2) {
    int n = G1.n();
    int* color = new int[n];
    memset(color,0,n*sizeof(int));
-   int next=0;
    list_int list;
    INTM* pB = G2.pB();
    INTM* r = G2.r();

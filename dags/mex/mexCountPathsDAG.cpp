@@ -1,5 +1,5 @@
 /*!
-/* Software SPAMS v2.3 - Copyright 2009-2011 Julien Mairal 
+ * Software SPAMS v2.3 - Copyright 2009-2011 Julien Mairal 
  *
  * This file is part of SPAMS.
  *
@@ -33,7 +33,6 @@ template <typename T>
       const mwSize* dimsD=mxGetDimensions(prhs[0]);
       INTM mD=static_cast<INTM>(dimsD[0]);
       INTM p=static_cast<INTM>(dimsD[1]);
-      const INTM n = p;
       double* D_v;
       mwSize* D_r, *D_pB, *D_pE;
       INTM* D_r2, *D_pB2, *D_pE2;

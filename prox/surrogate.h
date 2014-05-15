@@ -334,25 +334,25 @@ class SmoothFunction {
       SmoothFunction<T,U>& operator=(const SmoothFunction<T,U>& dict);
 
    protected:
-      Vector<int> _current_batch;
-      int _n;
-      int _nbatches;
-      int _sizebatch;
-      int _num_batches;
-      int _num_batch;
-      bool _random;
-      int _counter;
-      int _save_n;
-      int _p;
-      bool _constantL;
-
       const U* _Xt;
       const Vector<T>* _y;
 
-      T _genericL;
-      Vector<T> _L;
       T _is_normalized;
+      int _n;
+      int _p;
+      int _nbatches;
+      int _sizebatch;
+      bool _random;
+      int _counter;
+      int _save_n;
+      T _genericL;
+      bool _constantL;
+      int _num_batches;
+      int _num_batch;
+
+      Vector<T> _L;
       Vector<T> _tmp;
+      Vector<int> _current_batch;
 };
 
 template <typename T, typename U>
@@ -879,7 +879,6 @@ void StochasticSmoothRidgeSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, 
       T weight=this->t_to_weight(t);
       _function->choose_random_batch();
       if (!_function->constantL()) rho = (T(1.0)-weight)*rho + weight*_function->sampleL();
-      const T kappa=rho/(rho+_lambda);
       const T one_minus_kappa=_lambda/(rho+_lambda);
       T newalpha = alpha*(T(1.0)-weight*one_minus_kappa);
       const T scal=-weight/((rho+_lambda)*newalpha);
@@ -995,7 +994,7 @@ void StochasticSmoothL1Solver<T>::solve(const Vector<T>& w0, Vector<T>& w, Vecto
       if (sumw[next_counter] > T(1e50)) {
          sumw.add(-sumw[next_counter]);
       }
-      const int prev_counter = (n + counter - 1) % n;
+      //const int prev_counter = (n + counter - 1) % n;
       prod[next_counter] = (t==1) ? T(1.0) : prod[counter]*onemw;
       if (prod[next_counter] < T(1e-8) || forgetting_offset == next_counter) {
          T scal=T(1.0)/prod[next_counter];
@@ -1230,8 +1229,8 @@ template <typename T, typename U>
 class IncrementalSolver {
    public:
       IncrementalSolver(IncrementalSurrogate<T,U>& surrogate, const
-            ParamSurrogate<T>& param) : _minibatches(param.minibatches), 
-      _surrogate(&surrogate)  { 
+            ParamSurrogate<T>& param) :  
+      _surrogate(&surrogate), _minibatches(param.minibatches) { 
          _logs.resize(3); 
       };
       ~IncrementalSolver() { };
@@ -1276,7 +1275,6 @@ void IncrementalSolver<T,U>::solve(const Vector<T>& w0, Vector<T>& w, const int 
       _surrogate->initialize_incremental(w0,strategy);
    if (strategy == 4) _surrogate->set_param_strong_convexity();
  
-   const int n = _surrogate->n();
    const int num_batches = _surrogate->num_batches();
    if (strategy == 3) _surrogate->reset_diff();
    if (epochs > 0) {
@@ -1363,7 +1361,6 @@ template <typename T, typename U>
 void incrementalSmoothRidge(SmoothFunction<T,U>& function, const Vector<T>& w0,
       Vector<T>& w, Vector<T>& alphas, const int epochs, const T lambda,
       Vector<T>& logs, const bool init = true, const bool evaluate = true) {
-   const int p = function.p();
    const int n = function.n();
    Timer time;
    time.start();

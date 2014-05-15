@@ -1,5 +1,5 @@
 /*!
-/* Software SPAMS v2.2 - Copyright 2009-2011 Julien Mairal 
+ * Software SPAMS v2.2 - Copyright 2009-2011 Julien Mairal 
  *
  * This file is part of SPAMS.
  *
@@ -31,6 +31,10 @@
 #define DECOMP_H
 
 #include <utils.h>
+      
+static char low='l';
+static char nonUnit='n';
+
 /* **************************
  * Greedy Forward Selection 
  * **************************/
@@ -549,7 +553,7 @@ void coreORMP(Vector<T>& scores, Vector<T>& norm, Vector<T>& tmp, Matrix<T>& Un,
 
    // permit unsafe low level access
    T* const prUn = Un.rawX();
-   T* const prUnds = Unds.rawX();
+   //T* const prUnds = Unds.rawX();
    T* const prUndn = Undn.rawX();
    T* const prGs = Gs.rawX();
    T* const prRUn= RUn.rawX();
@@ -858,7 +862,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
    T* const A = Av.rawX();
    T* const u = uv.rawX();
    T* const sig = sigv.rawX();
-   T* const av = avv.rawX();
+   //T* const av = avv.rawX();
    T* const RUn = RUnv.rawX();
    T* const Un = Unm.rawX();
    T* const Unds = Undsm.rawX();
@@ -866,7 +870,7 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
    T* const Gsa = Gsam.rawX();
    T* const work = workm.rawX();
    //T* const G = Gm.rawX();
-   T* const R = Rm.rawX();
+   //T* const R = Rm.rawX();
    INTM* ind = indv.rawX();
    T* coeffs = coeffsv.rawX();
 
@@ -876,12 +880,12 @@ void coreLARS(Vector<T>& Rdnv, Vector<T>& Xdnv, Vector<T>& Av,
    if (ols) Xdnv.copy(Rdnv);
    int currentInd= pos ? Rdnv.max() : Rdnv.fmax();
    bool newAtom=true;
-   T Cmax;
+   T Cmax = 0;
    int iter=1;
    T thrs = 0.0;
 
-   INTM* const ind_orig = ind;
-   T* const coeffs_orig = coeffs;
+//   INTM* const ind_orig = ind;
+//   T* const coeffs_orig = coeffs;
 
    int j;
    for (j = 0; j<L; ++j) {
@@ -1096,7 +1100,6 @@ inline void downDateLasso(int& j,int& minBasis,T& normX,const bool ols,
       T* coeffs, Vector<T>& sigv, Vector<T>& avv,
       Vector<T>& Xdnv, Vector<T>& RUnv,Matrix<T>& Unm, Matrix<T>& Gsm,
       Matrix<T>& Gsam, Matrix<T>& Undsm, Matrix<T>& Rm) {
-   int k,l;
    const int L = Gsm.n();
    const int K = Gsm.m();
    T* const Rdn = Rdnv.rawX();
@@ -1132,7 +1135,7 @@ inline void downDateLasso(int& j,int& minBasis,T& normX,const bool ols,
       cblas_copy<T>(num,Un+k*L+minBasis+1,1,Un+(k-1)*L+minBasis,1);
    }
    T alpha=1.0;
-   T alphab,gamma,lambda;
+   T alphab,gamma;
    for (int k = 0; k<num; ++k) {
       alphab=alpha+av[k]*av[k];
       R[k*num+k]=sqrt(alphab/alpha);
@@ -2548,7 +2551,7 @@ void ist_groupLasso(const Matrix<T>* XT, const Matrix<T>& D,
 
       Vector<T> col, col2;
       T norm1 = alphat.asum();
-      T normX2;
+      T normX2 = 0;
 
       if (!norm1) {
          Vector<T> DtR_mean(K);
@@ -2846,7 +2849,7 @@ void somp(const Matrix<T>* XT, const Matrix<T>& D, SpMatrix<T>* spalphaT,
    Matrix<T> G;
    D.XtX(G);
 
-   int NUM_THREADS=init_omp(numThreads);
+   init_omp(numThreads);
 
    int i;
 #pragma omp parallel for private(i) 

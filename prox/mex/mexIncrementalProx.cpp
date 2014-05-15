@@ -55,7 +55,6 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    if (nlambdas != w0.n()) mexErrMsgTxt("third argument should be p x nlambda");
 
    plhs[0]=createMatrix<T>(p,nlambdas);
-   T* pr_w=reinterpret_cast<T*>(mxGetPr(plhs[0]));
    Matrix<T> w;
    getMatrix(plhs[0],w);
 

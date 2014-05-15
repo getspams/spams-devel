@@ -105,7 +105,7 @@ template<typename T> class Image : public Data<T> {
 
 /// Empty constructor
 template <typename T> Image<T>::Image() :
-   _w(0), _V(1), _h(0), _externAlloc(false), _X(NULL),_n(0),
+ _externAlloc(false), _X(NULL), _h(0), _w(0), _V(1), _n(0),
 _m(0),_sizePatch(0) { };
 
 /// Destructor
@@ -115,13 +115,13 @@ template <typename T> Image<T>::~Image() {
 
 /// Constructor with existing data X of an image
 template <typename T> Image<T>::Image(INTM w, INTM h, INTM numChannels) :
-   _w(w), _h(h), _externAlloc(false), _V(numChannels),_n(0),_m(0),_sizePatch(0) { 
+   _externAlloc(false), _h(h) ,_w(w), _V(numChannels),_n(0),_m(0),_sizePatch(0) { 
       _X=new T[_w*_h*_V];
    };
 
 /// Constructor with existing data X of an image
 template <typename T> Image<T>::Image(T* X, INTM w, INTM h, INTM numChannels) :
-   _X(X), _w(w), _h(h), _externAlloc(true), _V(numChannels),_n(0),_m(0),_sizePatch(0) {  };
+   _externAlloc(true), _X(X), _h(h), _w(w), _V(numChannels),_n(0),_m(0),_sizePatch(0) {  };
 
 /// Clear the image
 template <typename T> inline void Image<T>::clear() {

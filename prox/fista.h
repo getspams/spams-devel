@@ -1172,7 +1172,7 @@ namespace FISTA {
                T mm = output.fmaxval();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
-               if (this->_intercept & abs<T>(output[output.n()-1]) > EPSILON) val=INFINITY; 
+               if (this->_intercept & (abs<T>(output[output.n()-1]) > EPSILON)) val=INFINITY; 
             };
             virtual bool is_subgrad() const { return true; };
             virtual void sub_grad(const Vector<T>& input, Vector<T>& output) const {  
@@ -1247,7 +1247,7 @@ namespace FISTA {
    template <typename T> 
       class LogDC : public Regularizer<T> {
          public:
-            LogDC(const ParamReg<T>& param) : _eps(param.lambda2d1), Regularizer<T>(param) { };
+            LogDC(const ParamReg<T>& param) : Regularizer<T>(param), _eps(param.lambda2d1) { };
             virtual ~LogDC() { };
 
             virtual bool is_fenchel() const { return false; };
@@ -1320,7 +1320,7 @@ namespace FISTA {
                if (this->_pos) tmp.thrsPos();
                val=this->eval(tmp);
                scal=T(1.0);
-               if (this->_intercept & abs<T>(tmp[tmp.n()-1]) > EPSILON) val=INFINITY; 
+               if (this->_intercept & (abs<T>(tmp[tmp.n()-1]) > EPSILON)) val=INFINITY; 
             };
             virtual bool is_subgrad() const { return true; };
             virtual void sub_grad(const Vector<T>& input, Vector<T>& output) const {  
@@ -1367,7 +1367,7 @@ namespace FISTA {
                T mm = output.nrm2();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
-               if (this->_intercept & abs<T>(output[output.n()-1]) > EPSILON) val=INFINITY; 
+               if (this->_intercept & (abs<T>(output[output.n()-1]) > EPSILON)) val=INFINITY; 
             };
       };
 
@@ -1399,7 +1399,7 @@ namespace FISTA {
                T mm = output.asum();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
-               if (this->_intercept & abs<T>(output[output.n()-1]) > EPSILON) val=INFINITY; 
+               if (this->_intercept & (abs<T>(output[output.n()-1]) > EPSILON)) val=INFINITY; 
             };
       };
 
@@ -1562,7 +1562,7 @@ namespace FISTA {
                   gr->restore_flow();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                val=0;
-               if (this->_intercept & abs<T>(input[input.n()-1]) > EPSILON) val=INFINITY; 
+               if (this->_intercept & (abs<T>(input[input.n()-1]) > EPSILON)) val=INFINITY; 
             };
 
             virtual void init(const Vector<T>& y) { };
@@ -1679,7 +1679,7 @@ namespace FISTA {
                   T mm = const_cast<Tree_Seq<T>* >(&_tree)->dual_norm_inf(yp2);
                   scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                   val=0;
-                  if (this->_intercept & abs<T>(y[y.n()-1]) > EPSILON) val=INFINITY; 
+                  if (this->_intercept & (abs<T>(y[y.n()-1]) > EPSILON)) val=INFINITY; 
                } 
             };
             virtual bool is_fenchel() const {
@@ -1950,7 +1950,7 @@ namespace FISTA {
                T mm = norm.fmaxval();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0; 
                val=0;
-               if (this->_intercept & abs<T>(norm[norm.n()-1]) > EPSILON) val=INFINITY; 
+               if (this->_intercept & (abs<T>(norm[norm.n()-1]) > EPSILON)) val=INFINITY; 
             };
       };
 
@@ -1995,7 +1995,7 @@ namespace FISTA {
                T mm = norm.fmaxval();
                scal= mm > 1.0 ? T(1.0)/mm : 1.0; 
                val=0;
-               if (this->_intercept & abs<T>(norm[norm.n()-1]) > EPSILON) val=INFINITY; 
+               if (this->_intercept & (abs<T>(norm[norm.n()-1]) > EPSILON)) val=INFINITY; 
             };
             virtual bool is_subgrad() const { return true; };
             virtual void sub_grad(const Matrix<T>& input, Matrix<T>& output) const { 
@@ -2258,7 +2258,7 @@ namespace FISTA {
                 }
                 scal= mm > 1.0 ? T(1.0)/mm : 1.0;
                 val=0;
-                if (this->_intercept & abs<T>(input[input.n()-1]) > EPSILON) val=INFINITY; 
+                if (this->_intercept & (abs<T>(input[input.n()-1]) > EPSILON)) val=INFINITY; 
              };
           private:
              GraphPath<T> _graph;
@@ -2773,7 +2773,6 @@ namespace FISTA {
          const int it0 = MAX(1,param.it0);
          const T lambda=param.lambda;
          T L=param.L0;
-         T Lold=L;
          x.copy(x0);
          D grad, tmp, prox, old;
          /// linesearch_mode =
@@ -2783,7 +2782,7 @@ namespace FISTA {
          ///    3: back_tracking in both directions
          D sbb, xbb;
          const T alphamax=1/L;
-         const T alphamin=10e-12*alphamin;
+         const T alphamin=10e-12*alphamax;
 
          const bool duality = loss.is_fenchel() && regularizer.is_fenchel();
          const bool dc = regularizer.is_concave();
@@ -2825,7 +2824,6 @@ namespace FISTA {
                prox.copy(x);
                prox.add(grad,-T(1.0)/L);
                regularizer.prox(prox,tmp,lambda/L);
-               Lold=L;
                if ((param.linesearch_mode==2 && it > 1) || param.fixed_step || loss.test_backtracking(x,grad,tmp,L)) {
                   break;
                }
@@ -2840,13 +2838,11 @@ namespace FISTA {
                   prox.copy(x);
                   prox.add(grad,-T(1.0)/L);
                   regularizer.prox(prox,tmp,lambda/L);
-                  Lold=L;
                   if (!loss.test_backtracking(x,grad,tmp,L)) {
                      L *= param.gamma;
                      prox.copy(x);
                      prox.add(grad,-T(1.0)/L);
                      regularizer.prox(prox,tmp,lambda/L);
-                     Lold=L;
                      break;
                   }
                   if (param.verbose && ((it % it0) == 0)) 
@@ -2898,7 +2894,6 @@ namespace FISTA {
          const T lambda=param.lambda;
          T L=param.L0;
          T t = 1.0;
-         T Lold=L;
          T old_t;
          D y, grad, prox, tmp;
          y.copy(x0);
@@ -2936,7 +2931,6 @@ namespace FISTA {
                prox.copy(y);
                prox.add(grad,-T(1.0)/L);
                regularizer.prox(prox,tmp,lambda/L);
-               Lold=L;
                if (param.fixed_step || loss.test_backtracking(y,grad,tmp,L)) break;
                L *= param.gamma;
                if (param.verbose && ((it % it0) == 0)) 
@@ -3107,7 +3101,7 @@ namespace FISTA {
          Timer time;
          time.start();
          int it=0;
-         T los;
+         T los = INFINITY;
          T old_los=INFINITY;
 
          for (it = 0; it<param.max_it; ++it) {
@@ -3250,7 +3244,7 @@ namespace FISTA {
          Timer time;
          time.start();
          int it=0;
-         T los;
+         T los = INFINITY;
          T old_los=INFINITY;
 
          for (it = 0; it<param.max_it; ++it) {

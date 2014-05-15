@@ -54,7 +54,7 @@ void mexCgroupsToMatlab(std::vector<NodeElem *> *gstruct,mxArray* mxgstruct) {
 std::vector<NodeElem *> *mexMatlabToCgroups(const mxArray *mxgstruct) {
   std::vector<NodeElem *> *gstruct = new std::vector<NodeElem *>;
   const mwSize* dims=mxGetDimensions(mxgstruct);
-  for(int i = 0;i < *dims; i++) {
+  for(uint i = 0;i < *dims; i++) {
     mxArray *m_node = mxGetCell(mxgstruct,(mwIndex) i);
     int num_node = mxGetScalar(mxGetCell(m_node,0));
     float weight = mxGetScalar(mxGetCell(m_node,1));
@@ -64,10 +64,10 @@ std::vector<NodeElem *> *mexMatlabToCgroups(const mxArray *mxgstruct) {
     int *pchildren = reinterpret_cast<int *>(mxGetPr(mxchildren));
     const mwSize* tmpdims=mxGetDimensions(mxvars);
     std::vector<int> *vars = new std::vector<int>;
-    for(int j= 0;j < *tmpdims;j++) vars->push_back(*(pvars+j));
+    for(uint j= 0;j < *tmpdims;j++) vars->push_back(*(pvars+j));
     tmpdims = mxGetDimensions(mxchildren);
     std::vector<int> *children = new std::vector<int>;
-    for(int j= 0;j < *tmpdims;j++) children->push_back(*(pchildren+j));
+    for(uint j= 0;j < *tmpdims;j++) children->push_back(*(pchildren+j));
     NodeElem *node = new NodeElem(num_node,weight,vars,children);
     gstruct->push_back(node);
   }

@@ -39,14 +39,11 @@
 
 
 /// a few static variables for lapack
-static char low='l';
 static char lower='L';
-static char nonUnit='n';
 static char upper='u';
 static INTT info=0;
 static char incr='I';
 static char decr='D';
-static char all='A';
 static char no='N';
 static char reduced='S';
 static char allV='V';

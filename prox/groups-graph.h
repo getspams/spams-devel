@@ -203,7 +203,6 @@ std::vector<StructNodeElem<T> *> *_groupStructOfString(const char *data) throw(c
   std::istringstream is(data);
   std::vector<StructNodeElem<T> *> *gstruct = new std::vector<StructNodeElem<T> *>;
 
-  int ret;
   char buffer[1024];
   while(! is.eof()) {
     is.getline(buffer,1024);
@@ -319,7 +318,6 @@ bool checkGroupTree(std::vector<StructNodeElem<T> *> *gstruct, bool tree_mode, i
   int *used_children = newzeros<int>(nbgr); // to check unicity of children
   std::vector<int> all_vars;
   int inode = 0;
-  bool ordered = true;
   for(typename std::vector<StructNodeElem<T> *>::iterator it = gstruct->begin();it != gstruct->end();it++) {
     StructNodeElem<T> *node = *it;
     T weight = node->weight;
@@ -330,7 +328,6 @@ bool checkGroupTree(std::vector<StructNodeElem<T> *> *gstruct, bool tree_mode, i
       continue;
     }
     if (i != inode)
-      ordered = false;  // gstruct is not sorted by inode
     if (i < 0 || i > nbgr) {
       std::cout << "Bad group num " << i << " (should be in [0 - " << nbgr << "\n";
       is_ok = false;

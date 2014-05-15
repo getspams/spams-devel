@@ -27,7 +27,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nlhs) {
   if (mxGetClassID((prhs[0])) !=  mxCHAR_CLASS)
     mexErrMsgTxt("mexSimpleGroupTree : type of argument 1 must be string");
   char fname[2048];
-  std::vector<NodeElem *> *gstruct;
+  std::vector<NodeElem *> *gstruct = NULL;
   if(mxGetString(prhs[0],fname,2048)) 
     mexErrMsgTxt("Pb with filename\n");
   MEX_TRY(gstruct = _readGroupStruct<double>(fname);)

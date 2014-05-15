@@ -60,7 +60,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    double* D_v;
    mwSize* D_r, *D_pB, *D_pE;
    INTM* D_r2, *D_pB2, *D_pE2;
-   T* D_v2;
+   T* D_v2 = NULL;
    
    const int shifts = getScalarStructDef<int>(prhs[3],"shifts",1); // undocumented function
 

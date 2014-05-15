@@ -11,6 +11,7 @@ get_architecture;
 %   - 'gcc' (gnu compiler), good choice (for Mac, use gcc >= 4.6 for
 %           the multi-threaded version, otherwise set use_multithread=false).
 %           For windows, you need to have cygwin installed.
+%   - 'clang'
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
@@ -25,7 +26,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='mkl';
+blas='builtin';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -54,8 +55,8 @@ if strcmp(compiler,'gcc')
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7';
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -63,6 +64,10 @@ if strcmp(compiler,'gcc')
        path_to_compiler='C:\cygwin\bin\';
        path_to_compiler_libraries='C:\cygwin\lib\gcc\i686-pc-cygwin\4.5.3\';
     end
+elseif strcmp(compiler,'clang') 
+   path_to_compiler='/usr/bin/';
+   path_to_compiler_libraries='/usr/lib/clang/3.5/lib/';
+   path_to_libstd='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
 elseif strcmp(compiler,'open64') 
    % example when compiler='gcc' for Linux/Mac:   (path containing libgcc_s.*)
    path_to_compiler_libraries='/opt/amdsdk/v1.0/x86_open64-4.2.4/lib/gcc-lib/x86_64-open64-linux/4.2.4/';
@@ -95,8 +100,8 @@ end
 % set up the path to the blas/lapack libraries. 
 if strcmp(blas,'mkl')
    if linux || mac
-      path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -134,10 +139,6 @@ out_dir='./build/';
 mkdir(out_dir);
 
 COMPILE = { 
-            % compile image toolbox
-            '-I./image/ -I./linalg/ -I./prox/ image/mex/mexConvFista.cpp', 
-            '-I./image/ -I./linalg/ image/mex/mexExtractPatches.cpp', 
-            '-I./image/ -I./linalg/ image/mex/mexCombinePatches.cpp', 
             % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
@@ -179,6 +180,10 @@ COMPILE = {
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMPMask.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexSOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexSparseProject.cpp',
+            % compile image toolbox
+            '-I./image/ -I./linalg/ -I./prox/ image/mex/mexConvFista.cpp', 
+            '-I./image/ -I./linalg/ image/mex/mexExtractPatches.cpp', 
+            '-I./image/ -I./linalg/ image/mex/mexCombinePatches.cpp', 
             % misc
             '-I./linalg/ linalg/mex/mexBayer.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexGraphOfGroupStruct.cpp',  
@@ -186,6 +191,7 @@ COMPILE = {
             '-I./linalg/ -I./prox/ prox/mex/mexReadGroupStruct.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexSimpleGroupTree.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexTreeOfGroupStruct.cpp'};
+
 if linux || mac
    fid=fopen('run_matlab.sh','w+');
    fprintf(fid,'#!/bin/sh\n');
@@ -331,7 +337,7 @@ elseif strcmp(compiler,'gcc')
    if debug
       compile_flags='-O2 -g'; 
    else
-      compile_flags='-O3 -mtune=native -fomit-frame-pointer -funsafe-loop-optimizations'; 
+      compile_flags='-O3 -mtune=native -fomit-frame-pointer'; 
    end
    links_lib=[links_lib ' -L"' path_to_compiler_libraries '" -L' path_to_blas];
    if mac
@@ -347,6 +353,26 @@ elseif strcmp(compiler,'gcc')
       compile_flags=[compile_flags ' -fopenmp'];
       links_lib=[links_lib ' -lgomp'];
    end
+elseif strcmp(compiler,'clang')
+   DEFCOMP=sprintf('CXX=%s/clang++ -Dchar16_t=uint16_T',path_to_compiler);
+   compile_flags='-O3 -mtune=native -fomit-frame-pointer'; 
+   links_lib=[links_lib ' -L"' path_to_compiler_libraries '" -L' path_to_blas];
+   if mac
+      fprintf(fid,'export LIB_GCC=%s\n',path_to_compiler_libraries);
+      fprintf(fid,sprintf('export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:%s:%s\n',path_to_compiler_libraries,path_to_blas));
+ %     fprintf(fid,'export DYLD_INSERT_LIBRARIES=$LIB_GCC/libgfortran.so:$LIB_GCC/libgcc_s.so:$LIB_GCC/libstdc++.so:$LIB_GCC/libgomp.so\n');
+   elseif linux
+      fprintf(fid,'export LIB_GCC=%s\n',path_to_compiler_libraries);
+      fprintf(fid,'export LIB_STD=%s\n',path_to_libstd);
+      fprintf(fid,sprintf('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s:%s:\n',path_to_compiler_libraries,path_to_blas,path_to_libstd));
+%      fprintf(fid,'export LD_PRELOAD=$LIB_GCC/libgfortran.so:$LIB_GCC/libgcc_s.so:$LIB_GCC/libstdc++.so:$LIB_GCC/libgomp.so\n');
+      fprintf(fid,'export LD_PRELOAD=$LIB_STD/libstdc++.so\n');
+   end
+   if use_multithread
+      compile_flags=[compile_flags ' -fopenmp'];
+      links_lib=[links_lib ' -lgomp'];
+   end
+
 elseif strcmp(compiler,'vs')
    DEFCOMP='COMPILER=cl';
    compile_flags='/c /02';
@@ -390,11 +416,10 @@ for k = 1:length(COMPILE),
        str = [str ' -outdir ' out_dir, ' ' DEFS ' ' links_lib ' OPTIMFLAGS="' compile_flags '" ']; 
     else
        if verLessThan('matlab','8.3.0')
-          str = [str ' -v -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' links_lib];
+          str = [str ' -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' links_lib];
        else
-          str = [str ' -v -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' ' LINKLIBS="$LINKLIBS ' links_lib '" '];
+          str = [str ' -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' ' LINKLIBS="$LINKLIBS ' links_lib '" '];
        end
-       %str = [str ' -v -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' '" LINKLIBS ' links_lib '" '];
     end
     args = regexp(str, '\s+', 'split');
     args = args(find(~cellfun(@isempty, args)));

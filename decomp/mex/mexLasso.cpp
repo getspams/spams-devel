@@ -64,7 +64,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
       int length_path = MAX(2,getScalarStructDef<int>(prhs[2],"length_path",4*L));
       int numThreads = getScalarStructDef<int>(prhs[2],"numThreads",-1);
       bool pos = getScalarStructDef<bool>(prhs[2],"pos",false);
-      bool verbose = getScalarStructDef<bool>(prhs[2],"verbose",false);
+      //bool verbose = getScalarStructDef<bool>(prhs[2],"verbose",false);
       bool ols = getScalarStructDef<bool>(prhs[2],"ols",false);
       bool cholesky = ols || getScalarStructDef<bool>(prhs[2],"cholesky",false);
       constraint_type mode = (constraint_type)getScalarStructDef<int>(prhs[2],"mode",PENALTY);
@@ -153,7 +153,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
       int length_path = getScalarStructDef<int>(prhs[3],"length_path",4*L);
       int numThreads = getScalarStructDef<int>(prhs[3],"numThreads",-1);
       bool pos = getScalarStructDef<bool>(prhs[3],"pos",false);
-      bool verbose = getScalarStructDef<bool>(prhs[3],"verbose",true);
+//      bool verbose = getScalarStructDef<bool>(prhs[3],"verbose",true);
       bool ols = getScalarStructDef<bool>(prhs[3],"ols",false);
       bool cholesky = ols || getScalarStructDef<bool>(prhs[3],"cholesky",false);
       constraint_type mode = (constraint_type)getScalarStructDef<int>(prhs[3],"mode",PENALTY);

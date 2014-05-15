@@ -30,7 +30,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    int *degrees = reinterpret_cast<int*>(mxGetPr(prhs[0]));
    const mwSize* dims = mxGetDimensions(prhs[0]);
    int n = dims[1];
-   mwSize cdims[] = {n};
+   mwSize cdims[] = {static_cast<mwSize>(n)};
    std::vector<NodeElem *> *gstruct = _simpleGroupTree<double>(degrees,n);
    cdims[0] = gstruct->size();
    mxArray* mxgstruct = mxCreateCellArray((mwSize)1,cdims);

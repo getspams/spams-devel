@@ -58,7 +58,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    double* D_v;
    mwSize* D_r, *D_pB, *D_pE;
    INTM* D_r2, *D_pB2, *D_pE2;
-   T* D_v2;
+   T* D_v2 = NULL;
    if (mxIsSparse(prhs[1])) {
       D_v=static_cast<double*>(mxGetPr(prhs[1]));
       D_r=mxGetIr(prhs[1]);

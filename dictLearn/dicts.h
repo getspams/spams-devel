@@ -59,7 +59,7 @@ struct regul_def {
 #define NBREGUL sizeof(regul_table)/sizeof(struct regul_def)
 
 FISTA::regul_t regul_from_string(const char* regul) {
-  for(int i = 0;i < NBREGUL;i++)
+  for(uint i = 0;i < NBREGUL;i++)
     if (strcmp(regul,regul_table[i].name)==0) return regul_table[i].regul;
   return FISTA::INCORRECT_REG;
 }
@@ -68,7 +68,7 @@ void regul_error(char *buffer, int bufsize,const char *message) {
   int size = n1;
   if(n1 < bufsize) {
     // calculate size
-    for(int i = 0;i < NBREGUL;i++)
+    for(uint i = 0;i < NBREGUL;i++)
       size += strlen(regul_table[i].name) + 1;
   } 
   if (size >= bufsize) {
@@ -76,7 +76,7 @@ void regul_error(char *buffer, int bufsize,const char *message) {
     strncpy(buffer,"Invalid regularization\n",n1);
   } else {
     strncpy(buffer,message,n1);
-    for(int i = 0;i < NBREGUL;i++) {
+    for(uint i = 0;i < NBREGUL;i++) {
       int k = strlen(regul_table[i].name);
       strncpy(&buffer[n1],regul_table[i].name,k);
       buffer[n1+k] = ' ';
@@ -457,17 +457,17 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
    Matrix<T> Aodd(K,K);
    Matrix<T> Beven(n,K);
    Matrix<T> Aeven(K,K);
-   SpVector<T>* spcoeffT=new SpVector<T>[_NUM_THREADS];
-   Vector<T>* DtRT=new Vector<T>[_NUM_THREADS];
-   Vector<T>* XT=new Vector<T>[_NUM_THREADS];
-   Matrix<T>* BT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* AT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* GsT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* GaT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* invGsT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* workT=new Matrix<T>[_NUM_THREADS];
-   Vector<T>* uT=new Vector<T>[_NUM_THREADS];
-   for (int i = 0; i<_NUM_THREADS; ++i) {
+   SpVector<T>* spcoeffT=new SpVector<T>[NUM_THREADS];
+   Vector<T>* DtRT=new Vector<T>[NUM_THREADS];
+   Vector<T>* XT=new Vector<T>[NUM_THREADS];
+   Matrix<T>* BT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* AT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* GsT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* GaT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* invGsT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* workT=new Matrix<T>[NUM_THREADS];
+   Vector<T>* uT=new Vector<T>[NUM_THREADS];
+   for (int i = 0; i<NUM_THREADS; ++i) {
       spcoeffT[i].resize(K);
       DtRT[i].resize(K);
       XT[i].resize(n);
@@ -531,7 +531,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
                param.modeD,param.gamma1,param.gamma2);
       G.addDiag(MAX(param.lambda2,1e-10));
       int j;
-      for (j = 0; j<_NUM_THREADS; ++j) {
+      for (j = 0; j<NUM_THREADS; ++j) {
          AT[j].setZeros();
          BT[j].setZeros();
       }
@@ -607,7 +607,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
       if (param.batch) {
          _A.setZeros();
          _B.setZeros();
-         for (j = 0; j<_NUM_THREADS; ++j) {
+         for (j = 0; j<NUM_THREADS; ++j) {
             _A.add(AT[j]);
             _B.add(BT[j]);
          }
@@ -641,7 +641,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
       } else if (param.stochastic) {
          _A.setZeros();
          _B.setZeros();
-         for (j = 0; j<_NUM_THREADS; ++j) {
+         for (j = 0; j<NUM_THREADS; ++j) {
             _A.add(AT[j]);
             _B.add(BT[j]);
          }
@@ -708,7 +708,7 @@ void Trainer<T>::train(const Data<T>& X, const ParamDictLearn<T>& param) {
             _A.setZeros();
             _B.setZeros();
          }
-         for (j = 0; j<_NUM_THREADS; ++j) {
+         for (j = 0; j<NUM_THREADS; ++j) {
             Aeven.add(AT[j],scal2);
             Beven.add(BT[j],scal2);
          }
@@ -879,18 +879,18 @@ void Trainer<T>::train_fista(const Data<T>& X, const ParamDictLearn<T>& param,
    Matrix<T> Aodd(K,K);
    Matrix<T> Beven(n,K);
    Matrix<T> Aeven(K,K);
-   SpVector<T>* spcoeffT=new SpVector<T>[_NUM_THREADS];
-   Vector<T>* DtRT=new Vector<T>[_NUM_THREADS];
-   Vector<T>* XT=new Vector<T>[_NUM_THREADS];
-   Matrix<T>* BT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* AT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* GsT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* GaT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* invGsT=new Matrix<T>[_NUM_THREADS];
-   Matrix<T>* workT=new Matrix<T>[_NUM_THREADS];
-   Vector<T>* uT=new Vector<T>[_NUM_THREADS];
-   FISTA::Loss<T>** losses = new FISTA::Loss<T>*[_NUM_THREADS];
-   FISTA::Regularizer<T>** regularizers= new FISTA::Regularizer<T>*[_NUM_THREADS];
+   SpVector<T>* spcoeffT=new SpVector<T>[NUM_THREADS];
+   Vector<T>* DtRT=new Vector<T>[NUM_THREADS];
+   Vector<T>* XT=new Vector<T>[NUM_THREADS];
+   Matrix<T>* BT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* AT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* GsT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* GaT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* invGsT=new Matrix<T>[NUM_THREADS];
+   Matrix<T>* workT=new Matrix<T>[NUM_THREADS];
+   Vector<T>* uT=new Vector<T>[NUM_THREADS];
+   FISTA::Loss<T>** losses = new FISTA::Loss<T>*[NUM_THREADS];
+   FISTA::Regularizer<T>** regularizers= new FISTA::Regularizer<T>*[NUM_THREADS];
    Vector<T>* alphaT = new Vector<T>[_NUM_THREADS];
    Matrix<T> G;
    FISTA::ParamFISTA<T> param_fista;
@@ -913,7 +913,7 @@ void Trainer<T>::train_fista(const Data<T>& X, const ParamDictLearn<T>& param,
      cerr << "dicts.h : regul_for_matrices not implemented\n";
      exit(1);
    }
-   for (int i = 0; i<_NUM_THREADS; ++i) {
+   for (int i = 0; i<NUM_THREADS; ++i) {
       spcoeffT[i].resize(K);
       alphaT[i].resize(K);
       DtRT[i].resize(K);
@@ -980,7 +980,7 @@ void Trainer<T>::train_fista(const Data<T>& X, const ParamDictLearn<T>& param,
                param.modeD,param.gamma1,param.gamma2);
       G.addDiag(MAX(param.lambda2,1e-10));
       int j;
-      for (j = 0; j<_NUM_THREADS; ++j) {
+      for (j = 0; j<NUM_THREADS; ++j) {
          AT[j].setZeros();
          BT[j].setZeros();
       }
@@ -1068,7 +1068,7 @@ void Trainer<T>::train_fista(const Data<T>& X, const ParamDictLearn<T>& param,
       if (param.batch) {
          _A.setZeros();
          _B.setZeros();
-         for (j = 0; j<_NUM_THREADS; ++j) {
+         for (j = 0; j<NUM_THREADS; ++j) {
             _A.add(AT[j]);
             _B.add(BT[j]);
          }
@@ -1102,7 +1102,7 @@ void Trainer<T>::train_fista(const Data<T>& X, const ParamDictLearn<T>& param,
       } else if (param.stochastic) {
          _A.setZeros();
          _B.setZeros();
-         for (j = 0; j<_NUM_THREADS; ++j) {
+         for (j = 0; j<NUM_THREADS; ++j) {
             _A.add(AT[j]);
             _B.add(BT[j]);
          }
@@ -1169,7 +1169,7 @@ void Trainer<T>::train_fista(const Data<T>& X, const ParamDictLearn<T>& param,
             _A.setZeros();
             _B.setZeros();
          }
-         for (j = 0; j<_NUM_THREADS; ++j) {
+         for (j = 0; j<NUM_THREADS; ++j) {
             Aeven.add(AT[j],scal2);
             Beven.add(BT[j],scal2);
          }
@@ -1223,7 +1223,7 @@ void Trainer<T>::train_fista(const Data<T>& X, const ParamDictLearn<T>& param,
    delete[](uT);
    delete[](XT);
    delete[](workT);
-   for (int i = 0; i<_NUM_THREADS; ++i) {
+   for (int i = 0; i<NUM_THREADS; ++i) {
      delete (losses[i]);
      losses[i] = NULL;
      delete (regularizers[i]);

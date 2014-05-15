@@ -1598,7 +1598,8 @@ template <typename T> inline void Matrix<T>::singularValues(Vector<T>& u) const 
       u.thrsPos();
       u.Sqrt();
    } else {
-      T* vu, *vv;
+      T* vu = NULL;
+      T* vv = NULL;
       Matrix<T> copyX;
       copyX.copy(*this);
       gesvd<T>(no,no,_m,_n,copyX._X,_m,u.rawX(),vu,1,vv,1);
@@ -5055,7 +5056,6 @@ template <typename T> void inline SpVector<T>::toSpMatrix(
    out.resize(m,n,_L);
    cblas_copy<T>(_L,_v,1,out._v,1);
    INTM current_col=0;
-   T* out_v=out._v;
    INTM* out_r=out._r;
    INTM* out_pB=out._pB;
    out_pB[0]=current_col;
@@ -5370,9 +5370,9 @@ template <typename T> class ShiftMatrix : public AbstractMatrixB<T> {
       INTM _m;
       INTM _n;
       int _shifts;
-      bool _centered;
       Vector<T> _means;
       const AbstractMatrixB<T>* _inputmatrix;
+      bool _centered;
 };
 
 template <typename T> void ShiftMatrix<T>::multTrans(const
@@ -5650,8 +5650,6 @@ template <typename T> void DoubleRowMatrix<T>::print(const string& name) const {
 // solve (A'A+lambda I)x = A'b+delta
 template <typename T> void AbstractMatrixB<T>::ridgeCG(const Vector<T>& b, const Vector<T>& delta,
       Vector<T>& x, const T lambda, const T tol, const int itermax) const {
-   const int m = this->m();
-   const int n = this->n();
    Vector<T> copyb;
    copyb.copy(b);
    List<int> missingvalues;
@@ -5775,7 +5773,7 @@ template <typename T> void AbstractMatrixB<T>::ridgeCG(const Vector<T>& b,
 
 template <typename T> void AbstractMatrixB<T>::ridgeCG(const Matrix<T>& mb,
       Matrix<T>& mx, const T lambda, const T tol, const int itermax,const int numThreads) const {
-   const int NUM_THREADS = init_omp(numThreads);
+   init_omp(numThreads);
    const int num_probs=mb.n();
    int i = 0;
 #pragma omp parallel for private(i) 
@@ -5791,7 +5789,7 @@ template <typename T> void AbstractMatrixB<T>::ridgeCG(const Matrix<T>& mb,
 
 template <typename T> void AbstractMatrixB<T>::ridgeCG(const Matrix<T>& mb, const Matrix<T>& mdelta,
       Matrix<T>& mx, const T lambda, const T tol, const int itermax,const int numThreads) const {
-   const int NUM_THREADS = init_omp(numThreads);
+   init_omp(numThreads);
    const int num_probs=mb.n();
    int i = 0;
 #pragma omp parallel for private(i) 
