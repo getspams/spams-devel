@@ -257,64 +257,6 @@ def test_somp():
     print "%f signals processed per second" %(X.shape[1] / t)
     return None
 
-### from lsqsplx ###
-########################################
-# Least Square with Simplex Constraints
-########################################
-
-def test_gpFISTA():
-    np.random.seed(0)
-    # data generation
-    A = np.asfortranarray(np.random.normal(size=(100,10000))) 
-    b = np.asfortranarray(np.random.normal(size=(100)))
-    # initial guess of the Lipschitz constant, by default is 1.0
-    L0 = 1.0
-    # increasing rate of Lips constant, by default is 1.0/0.7
-    eta = 1.0/0.7
-    # stop condition on objective function, by default is 1e-5
-    epsilon = 1e-7
-    tic = time.time()
-    x = spams.gpFISTA(A,b,L0,eta,epsilon)
-    tac = time.time()
-    t = tac - tic
-    print "%f signals processed per second\n" %(float(A.shape[1]) / t)
-
-def test_gpFISTAFor():
-    np.random.seed(0)
-    # data generation
-    A = np.asfortranarray(np.random.normal(size=(100,10000))) 
-    b = np.asfortranarray(np.random.normal(size=(100)))
-    # initial guess of the Lipschitz constant, by default is 1.0
-    L0 = 1.0
-    # increasing rate of Lips constant, by default is 1.0/0.7
-    eta = 1.0/0.7
-    # number of iterations, by default is 50
-    I = 50
-    tic = time.time()
-    x = spams.gpFISTAFor(A,b,L0,eta,I)
-    tac = time.time()
-    t = tac - tic
-    print "%f signals processed per second\n" %(float(A.shape[1]) / t)
-
-### based on active-set method
-def test_activeSet():
-    np.random.seed(0)
-    # data generation
-    A = np.asfortranarray(np.random.normal(size=(100,10000))) 
-    b = np.asfortranarray(np.random.normal(size=(100)))
-    # lambda2^2 is the ridge regulazation, to prevent AtA from being rank deficient
-    # by default is 1e-5
-    lambda2 = 1e-5
-    # stop condition in activeSet method, by default is 1e-5
-    # it is exact zero in ideal case
-    epsilon = 1e-7
-    tic = time.time()
-    x = spams.activeSet(A,b,lambda2,epsilon)
-    tac = time.time()
-    t = tac - tic
-    print "%f signals processed per second\n" %(float(A.shape[1]) / t)
-
-
 tests = [
     'sparseProject' , test_sparseProject,
     'cd' , test_cd,
@@ -325,7 +267,4 @@ tests = [
     'omp' , test_omp,
     'ompMask' , test_ompMask,
     'somp' , test_somp,
-    'gpFISTA', test_gpFISTA,
-    'gpFISTAFor', test_gpFISTAFor,
-    'activeSet', test_activeSet,
     ]
