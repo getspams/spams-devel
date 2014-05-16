@@ -453,30 +453,6 @@ void _l1L2BCD(Matrix<T> *X,Matrix<T> *D,Matrix<T>*alpha0,Vector<int> *groups,T l
   delete[](alpha);
 }
 
-/* from decomp/lsqsplx */
-template <typename T>
-Vector<T> *_gpFISTAFor(Matrix<T>* A, Vector<T>* b, T L0, T eta, int I) throw (const char *){
-  Vector<T>* xCurr = new Vector<T>();
-  gpFISTAFor((Matrix<T>&)(*A), (Vector<T>&)(*b), (Vector<T>&) *xCurr, L0, eta, I);
-  return xCurr;
-}
-
-template <typename T>
-Vector<T> *_gpFISTA(Matrix<T>* A, Vector<T>* b, T L0, T eta, T epsilon) throw (const char *){
-  Vector<T>* xCurr = new Vector<T>();
-  gpFISTA((Matrix<T>&)(*A), (Vector<T>&)(*b), (Vector<T>&) *xCurr, L0, eta, epsilon);
-  return xCurr;
-}
-
-// ignore variable warm for extenal use
-template <typename T>
-Vector<T> *_activeSet(Matrix<T>* A, Vector<T>* b, T lambda2, T epsilon) throw (const char *) {
-  Vector<T>* xCurr = new Vector<T>();
-  activeSet<T>((Matrix<T>&)(*A), (Vector<T>&)(*b), (Vector<T>&)(*xCurr), lambda2, epsilon);
-  return xCurr;
-}
-
-/* end decomp/lsqsplx */
 /* end decomp */
 
 /* from prox */
@@ -1362,94 +1338,23 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
 }
 /* from dictLearn/arch */
 template <typename T>
-Matrix<T> *_archContinueForAS(Matrix<T>* X, Matrix<T>* Z0, int I, bool warm, T lambda2, T epsilon) throw(const char*){
+Matrix<T> *_archetypalAnalysisContinue(Matrix<T>* X, Matrix<T>* Z0, bool robust, T epsilon2, bool computeXtX, int stepsFISTA, int stepsAS) {
   Matrix<T>* Z = new Matrix<T>();
-  archContinueForAS<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), I, warm, lambda2, epsilon);
+  archetypalAnalysisContinue((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), robust, epsilon2, computeXtX, stepsFISTA, stepsAS);
   return Z;
 }
 
 template <typename T>
-Matrix<T> *_archForAS(Matrix<T>* X, int p, int I, bool randominit, bool warm, T lambda2, T epsilon) throw(const char*){
+Matrix<T> *_archetypalAnalysis(Matrix<T>* X, int p, bool robust, T epsilon2, bool computeXtX, int stepsFISTA, int stepsAS, bool randominit) {
   Matrix<T>* Z = new Matrix<T>();
-  archForAS<T>((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), I, randominit, warm, lambda2, epsilon);
+  archetypalAnalysis((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), robust, epsilon2, computeXtX, stepsFISTA, stepsAS, randominit);
   return Z;
 }
 
 template <typename T>
-Matrix<T> *_archContinueForASMemo(Matrix<T>* X, Matrix<T>* Z0, int I, bool warm, T lambda2, T epsilon) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archContinueForASMemo<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), I, warm, lambda2, epsilon);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archForASMemo(Matrix<T>* X, int p, int I, bool randominit, bool warm, T lambda2, T epsilon) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archForASMemo<T>((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), I, randominit, warm, lambda2, epsilon);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archRobustContinueForAS(Matrix<T>* X, Matrix<T>* Z0, int I, bool warm, T lambda2, T epsilon, T epsilon2) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archRobustContinueForAS<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), I, warm, lambda2, epsilon, epsilon2);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archRobustForAS(Matrix<T>* X, int p, int I, bool randominit, bool warm, T lambda2, T epsilon, T epsilon2) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archRobustForAS<T>((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), I, randominit, warm, lambda2, epsilon, epsilon2);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archContinueForFISTA(Matrix<T>* X, Matrix<T>* Z0, int I, int IF, T eta) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archContinueForFISTA<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), I, IF, eta);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archForFISTA(Matrix<T>* X, int p, int I, bool randominit, int IF, T eta) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archForFISTA<T>((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), I, randominit, IF, eta);
-  return Z;
-}
-
-// ignore subproblem parameters such as lambda2, epsilon, IF, eta
-template <typename T>
-Matrix<T> *_archContinueForCombined(Matrix<T>* X, Matrix<T>* Z0, int I1, int I2) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archContinueForCombined<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), I1, I2);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archForCombined(Matrix<T>* X, int p, int I1, int I2, bool randominit) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archForCombined<T>((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), I1, I2, randominit);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archRobustContinueForCombined(Matrix<T>* X, Matrix<T>* Z0, int I1, int I2) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archRobustContinueForCombined<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), I1, I2);
-  return Z;
-}
-
-template <typename T>
-Matrix<T> *_archRobustForCombined(Matrix<T>* X, int p, int I1, int I2, bool randominit) throw(const char*){
-  Matrix<T>* Z = new Matrix<T>();
-  archRobustForCombined<T>((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), I1, I2, randominit);
-  return Z;
-}
-
-template <typename T>
-SpMatrix<T> *_alphaArchAS(Matrix<T>* X, Matrix<T>* Z) throw(const char*){
+SpMatrix<T> *_decompSimplex(Matrix<T>* X, Matrix<T>* Z, bool computeZtZ) throw(const char*){
   SpMatrix<T>* alpha = new SpMatrix<T>();
-  alphaArchAS<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z), (SpMatrix<T>&) (*alpha));
+  decompSimplex<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z), (SpMatrix<T>&) (*alpha), computeZtZ);
   return alpha;
 }
 

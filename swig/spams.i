@@ -171,27 +171,15 @@ INSTANTIATE_DATA(ompMask)
 INSTANTIATE_DATA(somp)
 INSTANTIATE_DATA(cd)
 INSTANTIATE_DATA(l1L2BCD)
-INSTANTIATE_DATA(gpFISTAFor)
-INSTANTIATE_DATA(gpFISTA)
-INSTANTIATE_DATA(activeSet)
 
 /**** dictLearn ****/
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};
 INSTANTIATE_DATA(alltrainDL)
 /* from arch */
-INSTANTIATE_DATA(archContinueForAS)
-INSTANTIATE_DATA(archForAS)
-INSTANTIATE_DATA(archContinueForASMemo)
-INSTANTIATE_DATA(archForASMemo)
-INSTANTIATE_DATA(archRobustContinueForAS)
-INSTANTIATE_DATA(archRobustForAS)
-INSTANTIATE_DATA(archContinueForFISTA)
-INSTANTIATE_DATA(archForFISTA)
-INSTANTIATE_DATA(archContinueForCombined)
-INSTANTIATE_DATA(archForCombined)
-INSTANTIATE_DATA(archRobustContinueForCombined)
-INSTANTIATE_DATA(archRobustForCombined)
-INSTANTIATE_DATA(alphaArchAS)
+INSTANTIATE_DATA(archetypalAnalysisContinue)
+INSTANTIATE_DATA(archetypalAnalysis)
+INSTANTIATE_DATA(decompSimplex)
+
 
 /**** prox ****/
 INSTANTIATE_DATA(fistaFlat)
