@@ -50,8 +50,8 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
      int m=static_cast<int>(dimsX[0]);
      int n=static_cast<int>(dimsX[1]);
 
-     T* prZ = reinterpret_cast<T*>(mxGetPr(prhs[0]));
-     const mwSize* dimsZ=mxGetDimensions(prhs[0]);
+     T* prZ = reinterpret_cast<T*>(mxGetPr(prhs[1]));
+     const mwSize* dimsZ=mxGetDimensions(prhs[1]);
      int mZ=static_cast<int>(dimsZ[0]);
      int p=static_cast<int>(dimsZ[1]);
 
