@@ -1,5 +1,5 @@
 /*!
-/* Software SPAMS v2.2 - Copyright 2009-2011 Julien Mairal 
+ * Software SPAMS v2.5 - Copyright 2009-2014 Julien Mairal 
  *
  * This file is part of SPAMS.
  *

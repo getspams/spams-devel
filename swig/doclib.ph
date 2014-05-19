@@ -20,6 +20,8 @@ my %undocumented = ("mult",1,"im2col_sliding",1,"displayPatches",1);
     "Lasso", "lasso",
     "StructTrainDL", "structTrainDL",
     "TrainDL", "trainDL",
+    "ArchetypalAnalysis", "archetypalAnalysis",
+    "DecompSimplex", "decompSimplex",
     "TrainDL_Memory", "trainDL_Memory",
     "nmf", "nmf",
     "nnsc", "nnsc",

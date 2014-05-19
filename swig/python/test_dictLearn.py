@@ -43,7 +43,7 @@ def _objective(X,D,param,imgname = None):
         image.save("%s.png" %imgname)
     
 def test_trainDL():
-    img_file = '../extdata/boat.png'
+    img_file = 'boat.png'
     try:
         img = Image.open(img_file)
     except:
@@ -134,7 +134,7 @@ def test_trainDL():
     return None
 
 def test_trainDL_Memory():
-    img_file = '../extdata/lena.png'
+    img_file = 'lena.png'
     try:
         img = Image.open(img_file)
     except:
@@ -191,7 +191,7 @@ def test_trainDL_Memory():
     return None
 
 def test_structTrainDL():
-    img_file = '../extdata/lena.png'
+    img_file = 'lena.png'
     try:
         img = Image.open(img_file)
     except Exception as e:
@@ -362,7 +362,7 @@ def test_structTrainDL():
 
 
 def test_nmf():
-    img_file = '../extdata/boat.png'
+    img_file = 'boat.png'
     try:
         img = Image.open(img_file)
     except:
@@ -396,7 +396,7 @@ def test_nmf():
 
 # Archetypal Analysis, run first steps with FISTA and run last steps with activeSet, 
 def test_archetypalAnalysis():
-    img_file = '../extdata/lena.png'
+    img_file = 'lena.png'
     try:
         img = Image.open(img_file)
     except Exception as e:
@@ -416,45 +416,56 @@ def test_archetypalAnalysis():
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
     X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)),dtype = myfloat)
     K = 64 # learns a dictionary with 64 elements
-    robust = True # use robust archetypal analysis or not, default parameter(True)
+    robust = False # use robust archetypal analysis or not, default parameter(True)
     epsilon = 1e-3 # width in Huber loss, default parameter(1e-3)
-    computeXtX = False # memorize the product XtX or not (to trade memory for speed), default parameter(False)
-    stepsFISTA = 3 # 3 alternations by FISTA, default parameter(3)
+    computeXtX = True # memorize the product XtX or not default parameter(True)
+    stepsFISTA = 0 # 3 alternations by FISTA, default parameter(3)
     # a for loop in FISTA is used, we stop at 50 iterations
     # remember that we are not guarantee to descent in FISTA step if 50 is too small
-    stepsAS = 7 # 7 alternations by activeSet, default parameter(50)
-    randominit = False # random initilazation, default parameter(False)
+    stepsAS = 10 # 7 alternations by activeSet, default parameter(50)
+    randominit = True # random initilazation, default parameter(True)
     
     ############# FIRST EXPERIMENT  ##################
     tic = time.time()
     # learn archetypes using activeSet method for each convex sub-problem
-    Z = spams.archetypalAnalysis(np.asfortranarray(X[:, :5000]), K, robust, epsilon, computeXtX, stepsFISTA, stepsAS, randominit)
+    (Z,A,B) = spams.archetypalAnalysis(np.asfortranarray(X[:, :10000]), returnAB= True, p = K, robust = robust, epsilon = epsilon, computeXtX = computeXtX,  stepsFISTA = stepsFISTA , stepsAS = stepsAS, numThreads = -1)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Archetypal Dictionary Learning: %f' %t
 
+    print 'Evaluating cost function...'
+    alpha = spams.decompSimplex(np.asfortranarray(X[:, :10000]),Z = Z, computeXtX = True, numThreads = -1)
+    xd = X[:,:10000] - Z * alpha
+    R = np.sum(xd*xd)
+    print "objective function: %f" %R
+
     ############# FIRST EXPERIMENT  ##################
     tic = time.time()
     # learn archetypes using activeSet method for each convex sub-problem
-    Z2 = spams.archetypalAnalysisContinue(np.asfortranarray(X[:, :5000]), np.asfortranarray(Z), robust, epsilon, computeXtX, stepsFISTA, stepsAS)
+    Z2 = spams.archetypalAnalysis(np.asfortranarray(X[:, :10000]), Z0 = Z, robust = robust, epsilon = epsilon, computeXtX = computeXtX , stepsFISTA = stepsFISTA,stepsAS = stepsAS, numThreads = -1)
     tac = time.time()
     t = tac - tic
     print 'time of computation for Archetypal Dictionary Learning (Continue): %f' %t
 
     print 'Evaluating cost function...'
-    computeZtZ = False # memorize the product ZtZ or not, default parameter(False)
-    alpha = spams.decompSimplex(np.asfortranarray(X[:, :5000]),np.asfortranarray(Z2))
-    xd = X[:,:5000] - Z2 * alpha
-    if robust:
-      R = np.sum(np.sqrt((xd*xd).sum(axis=0)))
-    else:
-      R = np.sqrt(np.sum(xd*xd))
+    alpha = spams.decompSimplex(np.asfortranarray(X[:, :10000]),Z = np.asfortranarray(Z2), computeXtX = True, numThreads = -1)
+    xd = X[:,:10000] - Z2 * alpha
+    R = np.sum(xd*xd)
     print "objective function: %f" %R
+
+    # learn archetypes using activeSet method for each convex sub-problem
+    (Z3,A3,B3) = spams.archetypalAnalysis(np.asfortranarray(X[:, :10000]), returnAB= True, p = K, robust = True, epsilon = epsilon, computeXtX = computeXtX,  stepsFISTA = stepsFISTA , stepsAS = stepsAS, numThreads = -1)
+    tac = time.time()
+    t = tac - tic
+    print 'time of computation for Robust Archetypal Dictionary Learning: %f' %t
+
+
+
 
 tests = [
     'trainDL' , test_trainDL,
     'trainDL_Memory' , test_trainDL_Memory,
+    'archetypalAnalysis', test_archetypalAnalysis,
     'structTrainDL', test_structTrainDL,
-    'nmf' , test_nmf,
-    'archetypalAnalysis', test_archetypalAnalysis
+    'nmf' , test_nmf
 ]

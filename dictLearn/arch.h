@@ -1,5 +1,5 @@
 /*!
-/* Software SPAMS v2.5 - Copyright 2009-2014 Julien Mairal 
+ * Software SPAMS v2.5 - Copyright 2009-2014 Julien Mairal 
  *
  * This file is part of SPAMS.
  *
@@ -35,6 +35,8 @@
 #include "lsqsplx.h"
 #include "projsplx.h"
 
+#define NEW_VERSION
+
 /* **************************
  * Alternating Archetypal Analysis 
  * **************************/
@@ -43,1048 +45,430 @@
 /// Each sub-quadratic programming is solved by ActiveSet Method
 
 template <typename T>
-void archContinueForAS(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
+void arch(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,  SpMatrix<T>& A, SpMatrix<T>& B, const int I1 = 3, const int I2 = 20, const T lambda2 = T(10e-5), const T epsilon = T(10e-5),const bool computeZtZ = true);
 
 template <typename T>
-void archForAS(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
-
-/// Same implementation with memorizing XtX during iterations
-
-template <typename T>
-void archContinueForASMemo(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
-
-template <typename T>
-void archForASMemo(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
-
-/// Robust version 
-
-template <typename T>
-void archRobustContinueForAS(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3));
-
-template <typename T>
-void archRobustForAS(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3));
-
-/// Implementation with FISTA
-/// Each sub-quadratic programming is solved by FISTA Method
- 
-template <typename T>
-void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const int IF = 20, const T eta = T(1.0/0.7));
-
-template <typename T>
-void archForFISTA(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const int IF = 20, const T eta = T(1.0/0.7));
-
-/// A Combined version with first few steps FISTA then AS
-
-template <typename T>
-void archContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
-
-template <typename T>
-void archForCombined(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
-
-template <typename T>
-void archContinueForCombinedMemo(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
-
-template <typename T>
-void archForCombinedMemo(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5));
-
-template <typename T>
-void archRobustContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3));
-
-template <typename T>
-void archRobustForCombined(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3));
-
-template <typename T>
-void archRobustContinueForCombinedMemo(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3));
-
-template <typename T>
-void archRobustForCombinedMemo(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3));
+void archRobust(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,  SpMatrix<T>& A, SpMatrix<T>& B, const int I1 = 3, const int I2 = 20, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3),const bool computeZtZ = true);
 
 /// General functions including previous ones. Less parameters and simple use, for Python and Matlab interface
 
 template <typename T>
-void archetypalAnalysisContinue(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const bool robust = true, const T epsilon2 = T(10e-3), const bool computeXtX = false, const int stepsFISTA = 5, const int stepsAS = 50);
+void archetypalAnalysis(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, SpMatrix<T>& A, SpMatrix<T>& B, const bool robust =false, const T epsilon2 = T(10e-3), const bool computeXtX = false, const int stepsFISTA = 5, const int stepsAS = 50, const int numThreads=-1);
 
 template <typename T>
-void archetypalAnalysis(const Matrix<T>& X, const int p, Matrix<T>& Z, const bool robust = true, const T epsilon2 = T(10e-3), const bool computeXtX = false, const int stepsFISTA = 5, const int stepsAS = 50);
+void archetypalAnalysis(const Matrix<T>& X, Matrix<T>& Z, SpMatrix<T>& A, SpMatrix<T>& B, const bool robust = false, const T epsilon2 = T(10e-3), const bool computeXtX = false, const int stepsFISTA = 5, const int stepsAS = 50, const bool randominit = true, const int numThreads=-1);
 
 template <typename T>
-void decompSimplex(const Matrix<T>& X, const Matrix<T>& Z, SpMatrix<T>& alpha, const bool computerZtZ = false); 
+void decompSimplex(const Matrix<T>& X, const Matrix<T>& Z, SpMatrix<T>& alpha, const bool computerZtZ = false, const int numThreads=-1); 
 
 /* **************************
  *  Implementations 
  * **************************/
 
 template <typename T>
-void archContinueForAS(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-  AlphaT.setZeros();
-  BetaT.setZeros();
-  for(int i=0; i<n; ++i) {
-    AlphaT(0,i)=T(1.0);
-  }
-  for(int l=0; l<p; ++l) {
-    BetaT(0,l)=T(1.0);
-  }
-  T RSS = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
+void arch(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,  SpMatrix<T>& A, SpMatrix<T>& B, const int I1, const int I2, const T lambda2, const T epsilon, const bool computeXtX) {
+   const int m = X.m();
+   const int n = X.n();
+   const int p = Z0.n();
+   Z.copy(Z0);
+   Matrix<T> AlphaT(p,n);
+   Matrix<T> BetaT(n,p);
+   T RSS = -1.0;
+   Vector<T> refColZ;
+   Vector<T> copRowAlphaT;
+   Vector<T> refColBetaT;
+   Matrix<T> matRSS(m,n);
+   Vector<T> vBarre(m);
+   Vector<T> norms;
+   cout.precision(8);
 
-  for(int t=0; t<I; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSet<T>(Z,refColX, refColAlphaT, lambda2, epsilon, warm);
-    }
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      AlphaT.copyRow(l, copRowAlphaT);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      Z.refCol(l, refColZ);
-      // matRSS = X- Z*AlphaT
+   for(int t=0; t<I1; ++t) {
+      // step 1: fix Z to compute Alpha
+#pragma omp parallel for
+      for(int i=0; i<n; ++i) {
+         Vector<T> refColX;
+         Vector<T> refColAlphaT;
+         X.refCol(i,refColX);
+         AlphaT.refCol(i, refColAlphaT);
+         gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), T(1.0/0.7), 50, true);
+      }
+      // step 2: fix Alpha, fix all but one to compute Zi
+      Vector<T> refColX;
+      for(int l=0; l<p; ++l) {
+         AlphaT.copyRow(l, copRowAlphaT);
+         T sumAsq =  copRowAlphaT.nrm2sq();
+         Z.refCol(l, refColZ);
+         // matRSS = X- Z*AlphaT
+         matRSS.copy(X);
+         Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+         if(sumAsq < T(10e-8)) {
+            // singular
+            matRSS.norm_2_cols(norms);
+            int k = norms.max();
+            X.refCol(k, refColX);
+            refColZ.copy(refColX);
+         } else {
+            matRSS.rank1Update(refColZ, copRowAlphaT);
+            matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
+            // least square to get Beta
+            BetaT.refCol(l, refColBetaT);
+            gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 50, true);
+            X.mult(refColBetaT, refColZ);
+         }
+      }
+
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        matRSS.rank1Update(refColZ, copRowAlphaT);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon, warm);
-        X.mult(refColBetaT, refColZ);
+      RSS = matRSS.normFsq();
+      cout << "RSS FISTA = " << RSS << endl;
+      flush(cout);
+   }  
+
+   for(int t=0; t<I2; ++t) {
+      Matrix<T> G;
+      if (computeXtX) {
+         Z.XtX(G);
+         G.addDiag(lambda2*lambda2);
       }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    RSS = matRSS.normF();
-    cout << "RSS = " << RSS << endl;
-  }
-}
-
-template <typename T>
-void archForAS(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archContinueForAS(X, Z0, Z, I, warm, lambda2, epsilon);
-}
-
-template <typename T>
-void archContinueForASMemo(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> GX;
-  X.XtX(GX);
-  GX.addDiag(lambda2*lambda2);
-  Matrix<T> G;
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-  AlphaT.setZeros();
-  BetaT.setZeros();
-  for(int i=0; i<n; ++i) {
-    AlphaT(0,i)=T(1.0);
-  }
-  for(int l=0; l<p; ++l) {
-    BetaT(0,l)=T(1.0);
-  }
-  T RSS = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
-
-  for(int t=0; t<I; ++t) {
-    // step 1: fix Z to compute Alpha
-    // memorize ZtZ
-    Z.XtX(G);
-    G.addDiag(lambda2*lambda2);
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSetS<T>(Z,refColX, refColAlphaT,G, lambda2, epsilon, warm);
-    }
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      AlphaT.copyRow(l, copRowAlphaT);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      Z.refCol(l, refColZ);
-      // matRSS = X- Z*AlphaT
+      // step 1: fix Z to compute Alpha
+#pragma omp parallel for
+      for(int i=0; i<n; ++i) {
+         Vector<T> refColX;
+         Vector<T> refColAlphaT;
+         X.refCol(i,refColX);
+         AlphaT.refCol(i, refColAlphaT);
+         if (computeXtX) {
+            activeSetS<T>(Z,refColX, refColAlphaT, G, lambda2, epsilon);
+         } else {
+            activeSet<T>(Z,refColX, refColAlphaT, lambda2, epsilon);
+         }
+      }
+      // step 2: fix Alpha, fix all but one to compute Zi
+#ifdef NEW_VERSION
+      // new version
+      Vector<T> refColX;
+      Vector<T> tmp;
       matRSS.copy(X);
       Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        matRSS.rank1Update(refColZ, copRowAlphaT);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        activeSetS<T>(X, vBarre, refColBetaT, GX, lambda2, epsilon, warm);
-        X.mult(refColBetaT, refColZ);
+      for(int l=0; l<p; ++l) {
+         AlphaT.copyRow(l, copRowAlphaT);
+         T sumAsq =  copRowAlphaT.nrm2sq();
+         Z.refCol(l, refColZ);
+         // matRSS = X- Z*AlphaT
+         if(sumAsq < T(10e-8)) {
+            // singular
+            matRSS.norm_2_cols(norms);
+            int k = norms.max();
+            X.refCol(k, refColX);
+            refColZ.copy(refColX);
+         } else {
+            //matRSS.rank1Update(refColZ, copRowAlphaT);
+            matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
+            vBarre.add(refColZ);
+            tmp.copy(refColZ);
+            // least square to get Beta
+            BetaT.refCol(l, refColBetaT);
+            activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon);
+            X.mult(refColBetaT, refColZ);
+            tmp.sub(refColZ);
+            matRSS.rank1Update(tmp, copRowAlphaT);
+         }
       }
-    }
+#else
+      // end new version
 
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    RSS = matRSS.normF();
-    cout << "RSS = " << RSS << endl;
-  }
+      Vector<T> refColX;
+      for(int l=0; l<p; ++l) {
+         AlphaT.copyRow(l, copRowAlphaT);
+         T sumAsq =  copRowAlphaT.nrm2sq();
+         Z.refCol(l, refColZ);
+         // matRSS = X- Z*AlphaT
+         matRSS.copy(X);
+         Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+         if(sumAsq < T(10e-8)) {
+            // singular
+            matRSS.norm_2_cols(norms);
+            int k = norms.max();
+            X.refCol(k, refColX);
+            refColZ.copy(refColX);
+         } else {
+            matRSS.rank1Update(refColZ, copRowAlphaT);
+            matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
+            // least square to get Beta
+            BetaT.refCol(l, refColBetaT);
+            activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon);
+            X.mult(refColBetaT, refColZ);
+         }
+      }
+
+      matRSS.copy(X);
+      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+#endif
+      RSS = matRSS.normFsq();
+      cout << "RSS AS = " << RSS << endl;
+      flush(cout);
+   }
+   AlphaT.toSparse(A);
+   BetaT.toSparse(B);
 }
 
 template <typename T>
-void archForASMemo(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archContinueForASMemo(X, Z0, Z, I, warm, lambda2, epsilon);
-}
+void archRobust(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z,  SpMatrix<T>& A, SpMatrix<T>& B, const int I1, const int I2, const T lambda2, const T epsilon, const T epsilon2, const bool computeXtX) {
+   const int m = X.m();
+   const int n = X.n();
+   const int p = Z0.n();
+   Z.copy(Z0);
+   Matrix<T> AlphaT(p,n);
+   Matrix<T> BetaT(n,p);
 
-template <typename T>
-void archRobustContinueForAS(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const bool warm = false, const T lambda2 = (10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-  AlphaT.setZeros();
-  BetaT.setZeros();
-  for(int i=0; i<n; ++i) {
-    AlphaT(0,i)=T(1.0);
-  }
-  for(int l=0; l<p; ++l) {
-    BetaT(0,l)=T(1.0);
-  }
+   T RSN = -1.0;
+   Vector<T> refColZ;
+   Vector<T> copRowAlphaT;
+   Vector<T> refColBetaT;
+   Matrix<T> matRSS(m,n);
+   Vector<T> vBarre(m);
+   Vector<T> norms;
+   cout.precision(8);
 
-  T RSN = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
+   for(int t=0; t<I1; ++t) {
+      // step 1: fix Z to compute Alpha
+#pragma omp parallel for
+      for(int i=0; i<n; ++i) {
+         Vector<T> refColX;
+         Vector<T> refColAlphaT;
+         X.refCol(i,refColX);
+         AlphaT.refCol(i, refColAlphaT);
+         gpFISTAFor(Z, refColX, refColAlphaT, T(1.0), T(1.0/0.7), 10, true);
+      }
+      // update scale factors
+      matRSS.copy(X);
+      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+      matRSS.norm_2_cols(norms);
+      norms.thrsmax(epsilon2);
+      norms.Sqrt();
+      Vector<T> refColX;
+      // step 2: fix Alpha, fix all but one to compute Zi
+      for(int l=0; l<p; ++l) {
+         Z.refCol(l, refColZ);
 
-  for(int t=0; t<I; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSet<T>(Z,refColX, refColAlphaT, lambda2, epsilon, warm);
-    }
-    // update scale factors
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    norms.thrsmax(epsilon2);
-    norms.Sqrt();
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      Z.refCol(l, refColZ);
+         AlphaT.copyRow(l, copRowAlphaT);
+         copRowAlphaT.div(norms);
+         T sumAsq =  copRowAlphaT.nrm2sq();
+
+         matRSS.copy(X);
+         Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+
+         if(sumAsq < T(10e-8)) {
+            // singular
+            matRSS.norm_2_cols(norms);
+            int k = norms.max();
+            X.refCol(k, refColX);
+            refColZ.copy(refColX);
+         } else {
+            // absorbe the weights by rowAlphaT
+            copRowAlphaT.div(norms);
+            matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
+            vBarre.add(refColZ);
+            // least square to get Beta
+            BetaT.refCol(l, refColBetaT);
+            gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 10, true); 
+            X.mult(refColBetaT, refColZ);
+         }
+      }
+
+      matRSS.copy(X);
+      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+      matRSS.norm_2_cols(norms);
+      for (int i=0; i<norms.n(); ++i)
+         if (norms[i] <= epsilon2)
+            norms[i]=norms[i]*norms[i]/(2*epsilon2) + epsilon2/2;
+      RSN = norms.sum();
+      cout << "RSN FISTA= " << RSN << endl;
+      flush(cout);
+   }
+
+   for(int t=0; t<I2; ++t) {
+      Matrix<T> G;
+      if (computeXtX) {
+         Z.XtX(G);
+         G.addDiag(lambda2*lambda2);
+      }
+      // step 1: fix Z to compute Alpha
+#pragma omp parallel for
+      for(int i=0; i<n; ++i) {
+         Vector<T> refColX;
+         Vector<T> refColAlphaT;
+         X.refCol(i,refColX);
+         AlphaT.refCol(i, refColAlphaT);
+         if (computeXtX) {
+            activeSetS<T>(Z,refColX, refColAlphaT, G, lambda2, epsilon);
+         } else {
+            activeSet<T>(Z,refColX, refColAlphaT, lambda2, epsilon);
+         }
+      }
+      // update scale factors
+#ifndef NEW_VERSION
+      matRSS.copy(X);
+      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+      matRSS.norm_2_cols(norms);
+      norms.thrsmax(epsilon2);
+      norms.Sqrt();
+      // step 2: fix Alpha, fix all but one to compute Zi
+      Vector<T> refColX;
+      for(int l=0; l<p; ++l) {
+         Z.refCol(l, refColZ);
+
+         AlphaT.copyRow(l, copRowAlphaT);
+         copRowAlphaT.div(norms);
+         T sumAsq =  copRowAlphaT.nrm2sq();
+
+         matRSS.copy(X);
+         Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+
+         if(sumAsq < T(10e-8)) {
+            // singular
+            matRSS.norm_2_cols(norms);
+            int k = norms.max();
+            X.refCol(k, refColX);
+            refColZ.copy(refColX);
+         } else {
+            // absorbe the weights by rowAlphaT
+            copRowAlphaT.div(norms);
+            matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
+            vBarre.add(refColZ);
+            // least square to get Beta
+            BetaT.refCol(l, refColBetaT);
+            activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon);
+            X.mult(refColBetaT, refColZ);
+         }
+      }
+
+      matRSS.copy(X);
+      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+#else
+      /// new version
+      Vector<T> refColX;
+      Vector<T> tmp;
+      Vector<T> tmp2;
+      matRSS.copy(X);
+      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+      matRSS.norm_2_cols(norms);
+      norms.thrsmax(epsilon2);
+      norms.Sqrt();
+      for(int l=0; l<p; ++l) {
+         Z.refCol(l, refColZ);
+
+         AlphaT.copyRow(l, copRowAlphaT);
+         tmp2.copy(copRowAlphaT);
+         copRowAlphaT.div(norms);
+         T sumAsq =  copRowAlphaT.nrm2sq();
+
+         if(sumAsq < T(10e-8)) {
+            // singular
+            matRSS.norm_2_cols(tmp);
+            int k = tmp.max();
+            X.refCol(k, refColX);
+            refColZ.copy(refColX);
+         } else {
+            // absorbe the weights by rowAlphaT
+            copRowAlphaT.div(norms);
+            matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
+            vBarre.add(refColZ);
+            tmp.copy(refColZ);
+            // least square to get Beta
+            BetaT.refCol(l, refColBetaT);
+            activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon);
+            X.mult(refColBetaT, refColZ);
+            tmp.sub(refColZ);
+            matRSS.rank1Update(tmp,tmp2);
+         }
+      }
+#endif
+      /// end new version
       
-      AlphaT.copyRow(l, copRowAlphaT);
-      copRowAlphaT.div(norms);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
+      matRSS.norm_2_cols(norms);
+      for (int i=0; i<norms.n(); ++i)
+         if (norms[i] <= epsilon2)
+            norms[i]=norms[i]*norms[i]/(2*epsilon2) + epsilon2/2;
+      RSN = norms.sum();
+      cout << "RSN AS= " << RSN << endl;
+      flush(cout);
+   }
+   AlphaT.toSparse(A);
+   BetaT.toSparse(B);
+}
 
-      if(sumAsq < (10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        // absorbe the weights by rowAlphaT
-        copRowAlphaT.div(norms);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        vBarre.add(refColZ);
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon, warm);
-        X.mult(refColBetaT, refColZ);
+template <typename T>
+void archetypalAnalysis(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, SpMatrix<T>& A, SpMatrix<T>& B, const bool robust, const T epsilon2, const bool computeXtX, const int stepsFISTA, const int stepsAS, const int numThreads) {
+   init_omp(numThreads);
+   const T epsilon = 1e-5;
+   const T lambda2 = 1e-5;
+   if (!robust) {
+      arch(X, Z0, Z, A, B, stepsFISTA, stepsAS, epsilon,lambda2,computeXtX);
+   } else {
+      archRobust(X, Z0, Z, A, B, stepsFISTA, stepsAS, epsilon,lambda2,epsilon2,computeXtX);
+   }
+}
+
+template <typename T>
+void archetypalAnalysis(const Matrix<T>& X, Matrix<T>& Z, SpMatrix<T>& A, SpMatrix<T>& B, const bool robust, const T epsilon2, const bool computeXtX, const int stepsFISTA, const int stepsAS, const bool randominit, const int numThreads) {
+
+   const int m = X.m();
+   const int n = X.n();
+   const int p = Z.n();
+   Matrix<T> Z0(m,p);
+   Vector<T> refColZ0;
+   Vector<T> refColX;
+   if(!randominit) {
+      for(int i=0; i<p; i++) {
+         X.refCol(i%n, refColX);
+         Z0.refCol(i%n, refColZ0);
+         refColZ0.copy(refColX);
       }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    RSN = norms.sum();
-    cout << "RSN = " << RSN << endl;
-  }
-}
-
-template <typename T>
-void archRobustForAS(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archRobustContinueForAS(X, Z0, Z, I, warm, lambda2, epsilon, epsilon2);
-}
-
-template <typename T>
-void archContinueForFISTA(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I = 20, const int IF = 20, const T eta = T(1.0/0.7)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-  T RSS = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
-
-  for(int t=0; t<I; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), eta, IF, true);
-    }
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      AlphaT.copyRow(l, copRowAlphaT);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      Z.refCol(l, refColZ);
-      // matRSS = X- Z*AlphaT
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        matRSS.rank1Update(refColZ, copRowAlphaT);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), eta, IF, true);
-        X.mult(refColBetaT, refColZ);
+   } else {
+      srandom(0);
+      for(int i=0; i<p; i++) {
+         int k = random() % n;
+         X.refCol(k, refColX);
+         Z0.refCol(i, refColZ0);
+         refColZ0.copy(refColX);
       }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    RSS = matRSS.normF();
-    cout << "RSS = " << RSS << endl;
-  }
+   }
+   archetypalAnalysis(X, Z0, Z, A, B, robust, epsilon2, computeXtX, stepsFISTA, stepsAS,numThreads);
 }
 
 template <typename T>
-void archForFISTA(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I = 20, const bool randominit = false, const int IF = 20, const T eta = T(1.0/0.7)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archContinueForFISTA(X, Z0, Z, I, IF, eta);
-}
-
-template <typename T>
-void archContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-  T RSS = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
-
-  for(int t=0; t<I1; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), T(1.0/0.7), 50, true);
-    }
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      AlphaT.copyRow(l, copRowAlphaT);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      Z.refCol(l, refColZ);
-      // matRSS = X- Z*AlphaT
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        matRSS.rank1Update(refColZ, copRowAlphaT);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 50, true);
-        X.mult(refColBetaT, refColZ);
+void decompSimplex(const Matrix<T>& X, const Matrix<T>& Z, SpMatrix<T>& alpha, const bool computeZtZ, const int numThreads) {
+   init_omp(numThreads);
+   const int n = X.n();
+   const int p = Z.n();
+   Matrix<T> AlphaT(p,n);
+   int i;
+   if(computeZtZ) {
+      Matrix<T> G;
+      Z.XtX(G);
+      T lambda2 = 1e-5;
+      G.addDiag(lambda2*lambda2);
+#pragma omp parallel for private(i)
+      for(i=0; i<n; ++i) {
+         Vector<T> refColX;
+         Vector<T> refColAlphaT;
+         X.refCol(i,refColX);
+         AlphaT.refCol(i, refColAlphaT);
+         activeSetS(Z,refColX, refColAlphaT, G);
       }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    RSS = matRSS.normF();
-    cout << "RSS FISTA = " << RSS << endl;
-  }  
-
-  for(int t=0; t<I2; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSet<T>(Z,refColX, refColAlphaT, lambda2, epsilon, warm);
-    }
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      AlphaT.copyRow(l, copRowAlphaT);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      Z.refCol(l, refColZ);
-      // matRSS = X- Z*AlphaT
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        matRSS.rank1Update(refColZ, copRowAlphaT);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon, warm);
-        X.mult(refColBetaT, refColZ);
+      AlphaT.toSparse(alpha);
+   } else {
+#pragma omp parallel for private(i)
+      for(i=0; i<n; ++i) {
+         Vector<T> refColX;
+         Vector<T> refColAlphaT;
+         X.refCol(i,refColX);
+         AlphaT.refCol(i, refColAlphaT);
+         activeSet(Z,refColX, refColAlphaT);
       }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    RSS = matRSS.normF();
-    cout << "RSS AS = " << RSS << endl;
-  }
-}
-
-template <typename T>
-void archForCombined(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archContinueForCombined(X, Z0, Z, I1, I2, warm, lambda2, epsilon);
-}
-
-template <typename T>
-void archContinueForCombinedMemo(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> GX;
-  X.XtX(GX);
-  GX.addDiag(lambda2*lambda2);
-  Matrix<T> G;
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-  T RSS = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
-
-  for(int t=0; t<I1; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z,refColX, refColAlphaT, T(1.0), T(1.0/0.7), 50, true);
-    }
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      AlphaT.copyRow(l, copRowAlphaT);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      Z.refCol(l, refColZ);
-      // matRSS = X- Z*AlphaT
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        matRSS.rank1Update(refColZ, copRowAlphaT);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 50, true);
-        X.mult(refColBetaT, refColZ);
-      }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    RSS = matRSS.normF();
-    cout << "RSS FISTA = " << RSS << endl;
-  }  
-
-  for(int t=0; t<I2; ++t) {
-    // step 1: fix Z to compute Alpha
-    // memorize ZtZ
-    Z.XtX(G);
-    G.addDiag(lambda2*lambda2);
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSetS<T>(Z,refColX, refColAlphaT, G, lambda2, epsilon, warm);
-    }
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      AlphaT.copyRow(l, copRowAlphaT);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      Z.refCol(l, refColZ);
-      // matRSS = X- Z*AlphaT
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        matRSS.rank1Update(refColZ, copRowAlphaT);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        activeSetS<T>(X, vBarre, refColBetaT, GX, lambda2, epsilon, warm);
-        X.mult(refColBetaT, refColZ);
-      }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    RSS = matRSS.normF();
-    cout << "RSS AS = " << RSS << endl;
-  }
-}
-
-template <typename T>
-void archForCombinedMemo(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archContinueForCombinedMemo(X, Z0, Z, I1, I2, warm, lambda2, epsilon);
-}
-
-template <typename T>
-void archRobustContinueForCombined(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-
-  T RSN = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
-
-  for(int t=0; t<I1; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z, refColX, refColAlphaT, T(1.0), T(1.0/0.7), 10, true);
-    }
-    // update scale factors
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    norms.thrsmax(epsilon2);
-    norms.Sqrt();
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      Z.refCol(l, refColZ);
-      
-      AlphaT.copyRow(l, copRowAlphaT);
-      copRowAlphaT.div(norms);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        // absorbe the weights by rowAlphaT
-        copRowAlphaT.div(norms);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        vBarre.add(refColZ);
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 10, true); 
-        X.mult(refColBetaT, refColZ);
-      }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    RSN = norms.sum();
-    cout << "RSN FISTA= " << RSN << endl;
-  }
-
-  for(int t=0; t<I2; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSet<T>(Z,refColX, refColAlphaT, lambda2, epsilon, warm);
-    }
-    // update scale factors
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    norms.thrsmax(epsilon2);
-    norms.Sqrt();
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      Z.refCol(l, refColZ);
-      
-      AlphaT.copyRow(l, copRowAlphaT);
-      copRowAlphaT.div(norms);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        // absorbe the weights by rowAlphaT
-        copRowAlphaT.div(norms);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        vBarre.add(refColZ);
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        activeSet<T>(X, vBarre, refColBetaT, lambda2, epsilon, warm);
-        X.mult(refColBetaT, refColZ);
-      }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    RSN = norms.sum();
-    cout << "RSN AS= " << RSN << endl;
-  }
-}
-
-template <typename T>
-void archRobustForCombined(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archRobustContinueForCombined(X, Z0, Z, I1, I2, warm, lambda2, epsilon, epsilon2);
-}
-
-template <typename T>
-void archRobustContinueForCombinedMemo(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3)) {
-  const int m = X.m();
-  const int n = X.n();
-  const int p = Z0.n();
-  Z.copy(Z0);
-  Matrix<T> GX;
-  X.XtX(GX);
-  GX.addDiag(lambda2*lambda2);
-  Matrix<T> G;
-  Matrix<T> AlphaT(p,n);
-  Matrix<T> BetaT(n,p);
-
-  T RSN = -1.0;
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  Vector<T> refColZ;
-  Vector<T> copRowAlphaT;
-  Vector<T> refColBetaT;
-  Matrix<T> matRSS(m,n);
-  Vector<T> vBarre(m);
-  Vector<T> norms;
-  cout.precision(8);
-
-  for(int t=0; t<I1; ++t) {
-    // step 1: fix Z to compute Alpha
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      gpFISTAFor(Z, refColX, refColAlphaT, T(1.0), T(1.0/0.7), 10, true);
-    }
-    // update scale factors
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    norms.thrsmax(epsilon2);
-    norms.Sqrt();
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      Z.refCol(l, refColZ);
-      
-      AlphaT.copyRow(l, copRowAlphaT);
-      copRowAlphaT.div(norms);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        // absorbe the weights by rowAlphaT
-        copRowAlphaT.div(norms);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        vBarre.add(refColZ);
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        gpFISTAFor(X, vBarre, refColBetaT, T(1.0), T(1.0/0.7), 10, true); 
-        X.mult(refColBetaT, refColZ);
-      }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    RSN = norms.sum();
-    cout << "RSN FISTA= " << RSN << endl;
-  }
-
-  for(int t=0; t<I2; ++t) {
-    // step 1: fix Z to compute Alpha
-    Z.XtX(G);
-    G.addDiag(lambda2*lambda2); 
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSetS<T>(Z,refColX, refColAlphaT, G, lambda2, epsilon, warm);
-    }
-    // update scale factors
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    norms.thrsmax(epsilon2);
-    norms.Sqrt();
-    // step 2: fix Alpha, fix all but one to compute Zi
-    for(int l=0; l<p; ++l) {
-      Z.refCol(l, refColZ);
-      
-      AlphaT.copyRow(l, copRowAlphaT);
-      copRowAlphaT.div(norms);
-      T sumAsq =  copRowAlphaT.nrm2sq();
-      
-      matRSS.copy(X);
-      Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-
-      if(sumAsq < T(10e-8)) {
-        // singular
-        matRSS.norm_2_cols(norms);
-        int k = norms.max();
-        X.refCol(k, refColX);
-        refColZ.copy(refColX);
-      } else {
-        // absorbe the weights by rowAlphaT
-        copRowAlphaT.div(norms);
-        matRSS.mult(copRowAlphaT, vBarre, 1/sumAsq, T());
-        vBarre.add(refColZ);
-        // least square to get Beta
-        BetaT.refCol(l, refColBetaT);
-        activeSetS<T>(X, vBarre, refColBetaT, GX, lambda2, epsilon, warm);
-        X.mult(refColBetaT, refColZ);
-      }
-    }
-
-    matRSS.copy(X);
-    Z.mult(AlphaT, matRSS, false, false, T(-1.0), T(1.0));
-    matRSS.norm_2_cols(norms);
-    RSN = norms.sum();
-    cout << "RSN AS= " << RSN << endl;
-  }
-}
-
-template <typename T>
-void archRobustForCombinedMemo(const Matrix<T>& X, const int p, Matrix<T>& Z, const int I1 = 3, const int I2 = 20, const bool randominit = false, const bool warm = false, const T lambda2 = T(10e-5), const T epsilon = T(10e-5), const T epsilon2 = T(10e-3)) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archRobustContinueForCombinedMemo(X, Z0, Z, I1, I2, warm, lambda2, epsilon, epsilon2);
-}
-
-template <typename T>
-void archetypalAnalysisContinue(const Matrix<T>& X, const Matrix<T>& Z0, Matrix<T>& Z, const bool robust = true, const T epsilon2 = T(10e-3), const bool computeXtX = false, const int stepsFISTA = 5, const int stepsAS = 50) {
-  bool warm = false;
-  T lambda2 = 1e-5;
-  T epsilon = 1e-5;
-  if (!robust) {
-    if (!computeXtX) 
-      archContinueForCombined(X, Z0, Z, stepsFISTA, stepsAS, warm, epsilon, epsilon2);
-    else
-      archContinueForCombinedMemo(X, Z0, Z, stepsFISTA, stepsAS, warm, epsilon, epsilon2);
-  } else {
-    if (!computeXtX)
-      archRobustContinueForCombined(X, Z0, Z, stepsFISTA, stepsAS, warm, epsilon, epsilon2);
-    else
-      archRobustContinueForCombinedMemo(X, Z0, Z, stepsFISTA, stepsAS, warm, epsilon, epsilon2);
-  }
-}
-
-template <typename T>
-void archetypalAnalysis(const Matrix<T>& X, const int p, Matrix<T>& Z, const bool robust = true, const T epsilon2 = T(10e-3), const bool computeXtX = false, const int stepsFISTA = 5, const int stepsAS = 50, const bool randominit = false) {
-  const int m = X.m();
-  const int n = X.n();
-  Matrix<T> Z0(m,p);
-  Vector<T> refColZ0;
-  Vector<T> refColX;
-  if(!randominit ) {
-    for(int i=0; i<p; i++) {
-      X.refCol(i%n, refColX);
-      Z0.refCol(i%n, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  } else {
-    for(int i=0; i<p; i++) {
-      int k = random() % n;
-      X.refCol(k, refColX);
-      Z0.refCol(i, refColZ0);
-      refColZ0.copy(refColX);
-    }
-  }
-  archetypalAnalysisContinue(X, Z0, Z, robust, epsilon2, computeXtX, stepsFISTA, stepsAS);
-}
-
-template <typename T>
-void decompSimplex(const Matrix<T>& X, const Matrix<T>& Z, SpMatrix<T>& alpha, const bool computeZtZ = false) {
-  const int n = X.n();
-  const int p = Z.n();
-  Matrix<T> AlphaT(p,n);
-  Vector<T> refColX;
-  Vector<T> refColAlphaT;
-  if(computeZtZ) {
-    Matrix<T> G;
-    Z.XtX(G);
-    T lambda2 = 1e-5;
-    G.addDiag(lambda2*lambda2);
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSetS(Z,refColX, refColAlphaT, G);
-    }
-    AlphaT.toSparse(alpha);
-  } else {
-    for(int i=0; i<n; ++i) {
-      X.refCol(i,refColX);
-      AlphaT.refCol(i, refColAlphaT);
-      activeSet(Z,refColX, refColAlphaT);
-    }
-    AlphaT.toSparse(alpha);
-  }
+      AlphaT.toSparse(alpha);
+   }
 }
 
 #endif

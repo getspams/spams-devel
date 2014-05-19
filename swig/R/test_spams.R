@@ -46,7 +46,7 @@ Xtest <- function(expr1,expr2) {
   return(max(abs(y2 - y1)))
 }
 
-allmodules <- list('linalg','decomp','prox','dictLearn')
+allmodules <- list('dictLearn','linalg','decomp','prox')
 modules = list()
 
 for (s in allmodules) {

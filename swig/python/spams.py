@@ -560,19 +560,23 @@ def nnsc(X,return_lasso= False,model= None,lambda1= None,
     return(U,V)
 
 ### from arch ###
-def archRobustForCombined(X, Z, I1 = 3, I2 = 20, randominit = False):
-  return spams_wrap.archRobustForCombined(X, Z ,I1, I2, randominit)
 
-def archetypalAnalysisContinue(X, Z0, robust=True, epsilon=1e-3, computeXtX=False, stepsFISTA=3, stepsAS=50):
-  return spams_wrap.archetypalAnalysisContinue(X, Z0, robust, epsilon, computeXtX, stepsFISTA, stepsAS)
+def archetypalAnalysis(X, p = 10, Z0 = None, returnAB = False, robust=False, epsilon=1e-3, computeXtX=False, stepsFISTA=3, stepsAS=50, randominit=False,numThreads=-1):
+    if Z0 == None:
+        (Z,(indptr,indices,data,shape),(indptr2,indices2,data2,shape2)) = spams_wrap.archetypalAnalysis(X, p, robust, epsilon, computeXtX, stepsFISTA, stepsAS, randominit,numThreads)
+    else:
+        (Z,(indptr,indices,data,shape),(indptr2,indices2,data2,shape2)) = spams_wrap.archetypalAnalysisInit(X, Z0, robust, epsilon, computeXtX, stepsFISTA, stepsAS,numThreads)
+    if (returnAB):
+        A = ssp.csc_matrix((data,indices,indptr),shape)
+        B = ssp.csc_matrix((data2,indices2,indptr2),shape2)
+        return (Z,A,B)
+    else:
+        return Z
 
-def archetypalAnalysis(X, p, robust=True, epsilon=1e-3, computeXtX=False, stepsFISTA=3, stepsAS=50, randominit=False):
-  return spams_wrap.archetypalAnalysis(X, p, robust, epsilon, computeXtX, stepsFISTA, stepsAS, randominit)
-
-def decompSimplex(X, Z, computeZtZ=False):
-  (indptr,indices,data,shape) = spams_wrap.decompSimplex(X, Z, computeZtZ)
-  alpha = ssp.csc_matrix((data,indices,indptr),shape)
-  return alpha
+def decompSimplex(X, Z, computeXtX=False,numThreads=-1):
+    (indptr,indices,data,shape) = spams_wrap.decompSimplex(X,Z,computeXtX,numThreads)
+    alpha = ssp.csc_matrix((data,indices,indptr),shape)
+    return alpha
 
 ###########  END dictLearn ##############
 def im2col_sliding(A,m,n,RGB = False):

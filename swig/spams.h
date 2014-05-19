@@ -113,7 +113,6 @@ throw(const char *)
 {
   SpMatrix<T> *alpha = new SpMatrix<T>();
   int n = X->m();
-  int M = X->n();
   int nD = D->m();
   int K = D->n();
   if (n != nD)
@@ -196,7 +195,6 @@ throw(const char *)
 {
   SpMatrix<T> *alpha = new SpMatrix<T>();
   int n = X->m();
-  int M = X->n();
   int nD = D->m();
   int K = D->n();
   if (n != nD)
@@ -253,7 +251,6 @@ template <typename T>
 SpMatrix<T> *_omp(Matrix<T> *X,Matrix<T> *D,Matrix<T> **path,bool return_reg_path,bool given_L,Vector<int>*L,bool given_eps,Vector<T>*eps,bool given_Lambda,Vector<T>*Lambda,const int numThreads) throw(const char *){
   SpMatrix<T> *alpha = new SpMatrix<T>();
     int n = X->m();
-    int M = X->n();
     int nD = D->m();
     int K = D->n();
     if (n != nD)
@@ -544,7 +541,7 @@ using namespace FISTA;
   param.pos = pos;
   param.clever = clever;
 
-  if(groups->n() == 0) { // groups is not given
+  if (groups->n() == 0) { // groups is not given
       param.size_group = size_group;
   } else {
     param.ngroups = groups->n();
@@ -552,7 +549,7 @@ using namespace FISTA;
       throw("fistaFlat : Wrong size of param.groups");
     param.groups = groups->rawX();
   }
-  if(param.log = log) {
+  if (param.log) {
     int n = strlen(logName);
     if(n == 0) 
       throw("fistaFlat : missing field logName");
@@ -695,7 +692,7 @@ using namespace FISTA;
   param.pos = pos;
   param.clever = clever;
 
-  if(param.log = log) {
+  if(param.log) {
     int n = strlen(logName);
     if(n == 0) 
       throw("fistaTree : missing field logName");
@@ -863,7 +860,7 @@ throw(const char *)
   param.pos = pos;
   param.clever = clever;
 
-  if(param.log = log) {
+  if (param.log) {
     int n = strlen(logName);
     if(n == 0) 
       throw("fistaGraph : missing field logName");
@@ -875,8 +872,8 @@ throw(const char *)
   param.subgrad = subgrad;
   param.is_inner_weights = is_inner_weights;
 
-  if(is_inner_weights) {
-    if(inner_weights == NULL)
+  if (is_inner_weights) {
+    if (inner_weights == NULL)
       throw("fistaGraph : missing inner_heights ");
     param.inner_weights = inner_weights->rawX();
   }
@@ -1193,7 +1190,6 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   if (in_memory) return_model = false;
   if (batch_size < 0) batch_size = 256 * (num_threads + 1);
   int n = X->m();
-  int M = X->n();
   Trainer<T>* trainer;
   if(D1->n() == 0) { // D1 is not given
     if (K < 0)
@@ -1241,7 +1237,7 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   param.modeParam = static_cast<mode_compute>(modeParam);
   param.batch = batch;
   param.iter_updateD = iter_updateD;
-  if(param.log = log) {
+  if(param.log) {
     int n = strlen(logName);
     if(n == 0) 
       throw("trainDL : missing field logName");
@@ -1335,28 +1331,34 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   }
   delete(trainer);
   return D;
-}
+};
+
 /* from dictLearn/arch */
 template <typename T>
-Matrix<T> *_archetypalAnalysisContinue(Matrix<T>* X, Matrix<T>* Z0, bool robust, T epsilon2, bool computeXtX, int stepsFISTA, int stepsAS) {
-  Matrix<T>* Z = new Matrix<T>();
-  archetypalAnalysisContinue((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), robust, epsilon2, computeXtX, stepsFISTA, stepsAS);
+Matrix<T> *_archetypalAnalysisInit(Matrix<T>* X, Matrix<T>* Z0, SpMatrix<T>** spA, SpMatrix<T>** spB, bool robust, T epsilon, bool computeXtX, int stepsFISTA, int stepsAS, int numThreads) throw(const char *)  {
+  Matrix<T>* Z = new Matrix<T>(Z0->m(),Z0->n());
+  *spA = new SpMatrix<T>();
+  *spB = new SpMatrix<T>();
+  archetypalAnalysis((Matrix<T>&)(*X), (Matrix<T>&)(*Z0), (Matrix<T>&)(*Z), (SpMatrix<T>&)(**spA), (SpMatrix<T>&)(**spB), robust, epsilon, computeXtX, stepsFISTA, stepsAS,numThreads);
   return Z;
 }
 
 template <typename T>
-Matrix<T> *_archetypalAnalysis(Matrix<T>* X, int p, bool robust, T epsilon2, bool computeXtX, int stepsFISTA, int stepsAS, bool randominit) {
-  Matrix<T>* Z = new Matrix<T>();
-  archetypalAnalysis((Matrix<T>&)(*X), p, (Matrix<T>&)(*Z), robust, epsilon2, computeXtX, stepsFISTA, stepsAS, randominit);
+Matrix<T> *_archetypalAnalysis(Matrix<T>* X, int p, SpMatrix<T>** spA, SpMatrix<T>** spB, bool robust, T epsilon, bool computeXtX, int stepsFISTA, int stepsAS, bool randominit, int numThreads) throw(const char *) {
+  Matrix<T>* Z = new Matrix<T>(X->m(),p);
+  *spA = new SpMatrix<T>();
+  *spB = new SpMatrix<T>();
+  archetypalAnalysis((Matrix<T>&)(*X), (Matrix<T>&)(*Z), (SpMatrix<T>&)(**spA), (SpMatrix<T>&)(**spB), robust, epsilon, computeXtX, stepsFISTA, stepsAS, randominit,numThreads);
   return Z;
 }
 
 template <typename T>
-SpMatrix<T> *_decompSimplex(Matrix<T>* X, Matrix<T>* Z, bool computeZtZ) throw(const char*){
+  SpMatrix<T> *_decompSimplex(Matrix<T>* X, Matrix<T>* Z, bool computeXtX, int numThreads) throw(const char*){
   SpMatrix<T>* alpha = new SpMatrix<T>();
-  decompSimplex<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z), (SpMatrix<T>&) (*alpha), computeZtZ);
+  decompSimplex<T>((Matrix<T>&)(*X), (Matrix<T>&)(*Z), (SpMatrix<T>&) (*alpha), computeXtX,numThreads);
   return alpha;
 }
+
 
 /* end dictLearn/arch */
 /* end  dictLearn */

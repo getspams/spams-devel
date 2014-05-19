@@ -17,6 +17,62 @@ if (! (library(png,logical.return= TRUE))) {
   }
  
 }
+
+test_archetypalAnalysis <- function() {
+  I = readPNG(paste(.imagesDir,'boat.png',sep= '/'))
+  if (length(dim(I)) == 3) {
+    A = matrix(I,nrow = nrow(I),ncol = 3 * ncol(I))
+  } else {
+    A = I
+  }
+
+  m = 8;n = 8;
+  X = spams.im2col_sliding(A,m,n)
+  #X = X[,seq(from = 1,to = ncol(X),by = 10)]
+  X = X[,1:10000]
+
+  X = X - matrix(rep(colMeans(X),nrow(X)),nrow(X),ncol(X),byrow = T)
+  X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+
+########## FIRST EXPERIMENT ###########
+  tic = proc.time()
+  outputAA <- spams.archetypalAnalysis(X,p = 64,returnAB = TRUE, numThreads = -1, stepsFISTA = 0, stepsAS = 10)
+  tac = proc.time()
+  Z <- outputAA[[1]]
+  A <- outputAA[[2]]
+  B <- outputAA[[3]]
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Archetypal Analysis: %f\n",t)
+  alpha <- spams.decompSimplex(X, Z, computeXtX = TRUE, numThreads = -1)
+  R = sum(colSums((X - Z %*% alpha) ^ 2))
+  .printf("objective function: %f\n",R)
+  
+  tic = proc.time()
+  outputAA2 <- spams.archetypalAnalysis(X,Z0 = Z,returnAB = TRUE, numThreads = -1, stepsFISTA = 0, stepsAS = 10)
+  tac = proc.time()
+  Z2 <- outputAA[[1]]
+  A2 <- outputAA[[2]]
+  B2 <- outputAA[[3]]
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Archetypal Analysis: %f\n",t)
+  alpha <- spams.decompSimplex(X, Z2, computeXtX = TRUE, numThreads = -1)
+  R = sum(colSums((X - Z %*% alpha) ^ 2))
+  .printf("objective function: %f\n",R)
+
+  tic = proc.time()
+  outputAA <- spams.archetypalAnalysis(X,p = 64,returnAB = TRUE, robust=TRUE, numThreads = -1, stepsFISTA = 0, stepsAS = 10)
+  tac = proc.time()
+  Z3 <- outputAA[[1]]
+  A3 <- outputAA[[2]]
+  B3 <- outputAA[[3]]
+  t = (tac - tic)[['elapsed']]
+  .printf("time of computation for Robust Archetypal Analysis: %f\n",t)
+
+  return(NULL)
+}
+
+
+
 test_trainDL <- function() {
   I = readPNG(paste(.imagesDir,'boat.png',sep= '/'))
   if (length(dim(I)) == 3) {
@@ -318,7 +374,8 @@ test_nmf <- function() {
 }
 
 
-test_dictLearn.tests = list('trainDL' = test_trainDL,
+test_dictLearn.tests = list('archetypalAnalysis' = test_archetypalAnalysis,
+  'trainDL' = test_trainDL,
   'trainDL_Memory' = test_trainDL_Memory,
   'structTrainDL' = test_structTrainDL,
   'nmf' = test_nmf

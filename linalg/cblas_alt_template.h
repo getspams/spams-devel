@@ -393,7 +393,7 @@ template <> inline void cblas_copy<float>( INTT n,  float* X,  INTT incX,
    scopy_(&n,X,&incX,Y,&incY);
 };
 /// Implementation of the INTTerface for cblas_scopy
-template <> inline void cblas_copy<INTT>( INTT n, INTM* X,  INTT incX, 
+template <> inline void cblas_copy<INTM>( INTT n, INTM* X,  INTT incX, 
       INTM* Y,  INTT incY) {
    for (int i = 0; i<n; ++i)
       Y[incY*i]=X[incX*i];

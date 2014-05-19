@@ -490,7 +490,7 @@ extern "C" {
 
 %typemap(out) (std::vector<StructNodeElem<DATA_TYPE> *> *)
 {	      
-  int n = result->size();
+  //int n = result->size();
   PyObject* node_list = PyList_New(0);
   for(std::vector<StructNodeElem<DATA_TYPE> *>::iterator it = result->begin();it != result->end();it++) {
     PyObject* tuple = PyTuple_New(4);

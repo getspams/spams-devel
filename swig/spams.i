@@ -99,7 +99,9 @@ Use of spams functions should only be done through module spams."
 %enddef
 %define argout_spmatrices(ctype)
     SpMatrix<ctype> **pgroups,
-    SpMatrix<ctype> **pgroups_var
+    SpMatrix<ctype> **pgroups_var,
+    SpMatrix<ctype> **spA,
+    SpMatrix<ctype> **spB
 %enddef
 
 %define inplace_dspmatrices(ctype)
@@ -176,8 +178,8 @@ INSTANTIATE_DATA(l1L2BCD)
 enum constraint_type_D { L2,  L1L2, L1L2FL, L1L2MU};
 INSTANTIATE_DATA(alltrainDL)
 /* from arch */
-INSTANTIATE_DATA(archetypalAnalysisContinue)
 INSTANTIATE_DATA(archetypalAnalysis)
+INSTANTIATE_DATA(archetypalAnalysisInit)
 INSTANTIATE_DATA(decompSimplex)
 
 

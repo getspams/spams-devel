@@ -1,4 +1,4 @@
-/* Software SPAMS v2.1 - Copyright 2009-2011 Julien Mairal
+/* Software SPAMS v2.5 - Copyright 2009-2014 Julien Mairal
  *
  * This file is part of SPAMS.
  *
@@ -18,14 +18,14 @@
 
 /*!
  * \file
- *                toolbox dictLearn
+ *                toolbox decomp
  *
- *                by Julien Mairal
+ *                by Yuansi Chen and Julien Mairal
  *                julien.mairal@inria.fr
  *
- *                File mexArchetypalAnalysisContinue.cpp
- * \brief mex-file, function mexArchetypalAnalysisContinue
- * Usage: [Z] = mexArchetypalAnalysisContinue(X,Z0,param);
+ *                File mexDecompSimplex.cpp
+ * \brief mex-file, function mexDecompSimplex
+ * Usage: [alpha] = mexDecompSimplex(X,Z);
  * output a dictionary Z
  */
 
@@ -35,43 +35,42 @@
 template <typename T>
 inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
       const int nlhs) {
-    if (nrhs==3) {
       if (!mexCheckType<T>(prhs[0]))
         mexErrMsgTxt("type of argument 1 is not consistent");
       if (mxIsSparse(prhs[0])) 
         mexErrMsgTxt("argument 1 should be full");
-      if (!mxIsStruct(prhs[2])) 
-        mexErrMsgTxt("argument 3 should be struct");
+      if (!mexCheckType<T>(prhs[1]))
+        mexErrMsgTxt("type of argument 1 is not consistent");
+      if (mxIsSparse(prhs[1])) 
+        mexErrMsgTxt("argument 1 should be full");
 
      T* prX = reinterpret_cast<T*>(mxGetPr(prhs[0]));
      const mwSize* dimsX=mxGetDimensions(prhs[0]);
      int m=static_cast<int>(dimsX[0]);
      int n=static_cast<int>(dimsX[1]);
 
-     T* prZ0 = reinterpret_cast<T*>(mxGetPr(prhs[1]));
-     const mwSize* dimsZ0=mxGetDimensions(prhs[1]);
-     int mZ0=static_cast<int>(dimsZ0[0]);
-     int p=static_cast<int>(dimsZ0[1]);
+     T* prZ = reinterpret_cast<T*>(mxGetPr(prhs[1]));
+     const mwSize* dimsZ=mxGetDimensions(prhs[1]);
+     int mZ=static_cast<int>(dimsZ[0]);
+     int p=static_cast<int>(dimsZ[1]);
+     bool computeXtX = getScalarStructDef<bool>(prhs[2],"computeXtX",true);
+     int numThreads = getScalarStructDef<int>(prhs[2],"numThreads",-1);
 
-     if (m != mZ0) mexErrMsgTxt("argument sizes are not consistent");
-     bool robust = getScalarStructDef<bool>(prhs[2],"robust",true);
-     T epsilon = getScalarStructDef<T>(prhs[2],"epsilon",1e-3);
-     bool computeXtX = getScalarStructDef<bool>(prhs[2],"computeXtX",false);
-     int stepsFISTA = getScalarStructDef<int>(prhs[2],"stepsFISTA",3);
-     int stepsAS = getScalarStructDef<int>(prhs[2],"stepsAS",50);
+     if (m != mZ) mexErrMsgTxt("argument sizes are not consistent"); 
      
-     plhs[0]=createMatrix<T>(m,p);
-     T* prZ = reinterpret_cast<T*>(mxGetPr(plhs[0]));
      Matrix<T> X(prX,m,n);
-     Matrix<T> Z0(prZ0,m,p);
      Matrix<T> Z(prZ,m,p);
-     archetypalAnalysisContinue<T>(X,Z0,Z,robust,epsilon,computeXtX,stepsFISTA,stepsAS);
-   }
+     SpMatrix<T> alpha;
+     
+     decompSimplex<T>(X, Z, alpha, computeXtX,numThreads);
+     convertSpMatrix(plhs[0],alpha.m(),alpha.n(),alpha.n(),
+            alpha.nzmax(),alpha.v(),alpha.r(),alpha.pB());
 }
 
    void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {
       if (nrhs != 3)
          mexErrMsgTxt("Bad number of inputs arguments");
+
       if (nlhs != 1)
          mexErrMsgTxt("Bad number of output arguments");
 

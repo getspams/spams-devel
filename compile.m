@@ -15,7 +15,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='gcc';
+compiler='icc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -26,7 +26,7 @@ compiler='gcc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='builtin';
+blas='mkl';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -38,6 +38,11 @@ use_multithread=true; % (might not compatible with compiler=mex)
 use_64bits_integers=true;
 % use this option if you have VERY large arrays/matrices 
 % this option allows such matrices, but may slightly reduce the speed of the computations.
+
+
+use_mkl_threads=false;
+% use this option is you use the mkl library and intends to use intensively BLAS3/lapack routines
+% (for multiclass logistic regression, regularization with the trace norm for instance)
 
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
@@ -140,6 +145,7 @@ mkdir(out_dir);
 
 COMPILE = { 
             % compile dictLearn toolbox
+            '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexArchetypalAnalysis.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL_Memory.cpp',
@@ -170,6 +176,7 @@ COMPILE = {
             '-I./linalg/ linalg/mex/mexSort.cpp', 
             '-I./linalg/ linalg/mex/mexNormalize.cpp',  
             % compile decomp toolbox
+            '-I./linalg/ -I./dictLearn/ -I./decomp/ decomp/mex/mexDecompSimplex.cpp', 
             '-I./linalg/ -I./decomp/ decomp/mex/mexOMP.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLasso.cpp',
             '-I./linalg/ -I./decomp/ decomp/mex/mexLassoWeighted.cpp',
@@ -214,35 +221,39 @@ if windows
    DEFCOMMON=[DEFCOMMON ' -DWINDOWS -DREMOVE_'];
 end
 
+
 DEFBLAS='';
 if strcmp(blas,'mkl') 
+   if use_mkl_threads
+      name_mkl='mkl_intel_thread';
+   else
+      name_mkl='mkl_sequential';
+   end
    DEFBLAS='-DUSE_BLAS_LIB -DAXPBY';
    if strcmp(arch,'GLNXA64')
       if use_64bits_integers
-         %blas_link = sprintf('-ldl -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core',path_to_blas,path_to_blas,path_to_blas);
-         %blas_link = sprintf('-ldl -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core -lmkl_avx2',path_to_blas,path_to_blas,path_to_blas);
-         blas_link = sprintf('-Wl,--start-group %slibmkl_intel_ilp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
+         blas_link = sprintf('-Wl,--start-group %slibmkl_intel_ilp64.a %slib%s.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,name_mkl,path_to_blas);
       else
-         blas_link = sprintf('-Wl,--start-group %slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,path_to_blas);
+         blas_link = sprintf('-Wl,--start-group %slibmkl_intel_lp64.a %slib%s.a %slibmkl_core.a -Wl,--end-group -ldl',path_to_blas,path_to_blas,name_mkl,path_to_blas);
       end
    elseif strcmp(arch,'GLNX86')
-      blas_link = sprintf('-Wl,--start-group %slibmkl_intel.a %slibmkl_sequential.a %slibmkl_core.a -Wl,--end-group',path_to_blas,path_to_blas,path_to_blas);
+      blas_link = sprintf('-Wl,--start-group %slibmkl_intel.a %slib%s.a %slibmkl_core.a -Wl,--end-group',path_to_blas,path_to_blas,name_mkl,path_to_blas);
    elseif strcmp(arch,'MACI64')
       if use_64bits_integers
-         blas_link = sprintf('%slibmkl_intel_ilp64.a %slibmkl_sequential.a %slibmkl_core.a',path_to_blas,path_to_blas,path_to_blas);
+         blas_link = sprintf('%slibmkl_intel_ilp64.a %slib%s.a %slibmkl_core.a',path_to_blas,path_to_blas,name_mkl,path_to_blas);
       else
-         blas_link = sprintf('%slibmkl_intel_lp64.a %slibmkl_sequential.a %slibmkl_core.a',path_to_blas,path_to_blas,path_to_blas);
+         blas_link = sprintf('%slibmkl_intel_lp64.a %slib%s.a %slibmkl_core.a',path_to_blas,path_to_blas,name_mkl,path_to_blas);
       end
    elseif strcmp(arch,'MACI') || strcmp(arch,'MAC')
-      blas_link = sprintf('%slibmkl_intel.a %slibmkl_sequential.a %slibmkl_core.a',path_to_blas,path_to_blas,path_to_blas);
+      blas_link = sprintf('%slibmkl_intel.a %slib%s.a %slibmkl_core.a',path_to_blas,path_to_blas,name_mkl,path_to_blas);
    elseif strcmp(arch,'PCWIN64')
       if use_64bits_integers
-         blas_link = sprintf(' -L"%s" -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core',path_to_blas);
+         blas_link = sprintf(' -L"%s" -lmkl_intel_ilp64 -l%s -lmkl_core',path_to_blas,name_mkl);
       else
-         blas_link = sprintf(' -L"%s" -lmkl_intel_lp64 -lmkl_sequential -lmkl_core',path_to_blas);
+         blas_link = sprintf(' -L"%s" -lmkl_intel_lp64 -l%s -lmkl_core',path_to_blas,name_mkl);
       end
    elseif strcmp(arch,'PCWIN')
-      blas_link = sprintf(' -L"%s" -lmkl_intel -lmkl_sequential -lmkl_core',path_to_blas);
+      blas_link = sprintf(' -L"%s" -lmkl_intel -l%s -lmkl_core',path_to_blas,name_mkl);
    else
       'unsupported achitecture'
       return;
@@ -337,7 +348,7 @@ elseif strcmp(compiler,'gcc')
    if debug
       compile_flags='-O2 -g'; 
    else
-      compile_flags='-O3 -mtune=native -fomit-frame-pointer'; 
+      compile_flags='-O3 -mtune=native -fomit-frame-pointer -Wall'; 
    end
    links_lib=[links_lib ' -L"' path_to_compiler_libraries '" -L' path_to_blas];
    if mac
@@ -360,12 +371,10 @@ elseif strcmp(compiler,'clang')
    if mac
       fprintf(fid,'export LIB_GCC=%s\n',path_to_compiler_libraries);
       fprintf(fid,sprintf('export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:%s:%s\n',path_to_compiler_libraries,path_to_blas));
- %     fprintf(fid,'export DYLD_INSERT_LIBRARIES=$LIB_GCC/libgfortran.so:$LIB_GCC/libgcc_s.so:$LIB_GCC/libstdc++.so:$LIB_GCC/libgomp.so\n');
    elseif linux
       fprintf(fid,'export LIB_GCC=%s\n',path_to_compiler_libraries);
       fprintf(fid,'export LIB_STD=%s\n',path_to_libstd);
       fprintf(fid,sprintf('export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:%s:%s:\n',path_to_compiler_libraries,path_to_blas,path_to_libstd));
-%      fprintf(fid,'export LD_PRELOAD=$LIB_GCC/libgfortran.so:$LIB_GCC/libgcc_s.so:$LIB_GCC/libstdc++.so:$LIB_GCC/libgomp.so\n');
       fprintf(fid,'export LD_PRELOAD=$LIB_STD/libstdc++.so\n');
    end
    if use_multithread
@@ -398,7 +407,11 @@ else
 end
 
 if ~windows
-   fprintf(fid,[path_matlab 'matlab $* -singleCompThread -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n']); 
+   if use_mkl_threads
+      fprintf(fid,[path_matlab 'matlab $* -singleCompThread -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''4''); setenv(''MKL_SERIAL'',''NO'');setenv(''MKL_DYNAMIC'',''FALSE'');"\n']); 
+   else
+      fprintf(fid,[path_matlab 'matlab $* -singleCompThread -r \"addpath(''./build/''); addpath(''./test_release''); setenv(''MKL_NUM_THREADS'',''1''); setenv(''MKL_SERIAL'',''YES'');"\n']); 
+   end
    fclose(fid);
    !chmod +x run_matlab.sh
 end

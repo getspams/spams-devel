@@ -54,14 +54,19 @@
 \lstset{language=Matlab, style=colors,basicstyle=\ttfamily, backgroundcolor=\color{lightblue}, showspaces=false, showstringspaces=false, showtabs=false, frame=single, breaklines=true, basewidth=5.5pt,fontadjust=true }
 \fi
 
-\title{SPAMS: a SPArse Modeling Software, v2.4}
+\title{SPAMS: a SPArse Modeling Software, v2.5}
 \date{\today}
 
 \author{Julien Mairal \\
    \url{julien.mairal@m4x.org} \\ 
    ~\\
    Python and R interfaces by Jean-Paul Chieze
-}
+   ~\\
+   Archetypal Analysis by Yuansi Chen
+   ~\\
+   and the output of numerous collaborations with \\
+   Rodolphe Jenatton, Francis Bach, Jean Ponce, \\ Guillaume Obozinski, Bin Yu, Guillermo Sapiro, \\ and Zaid
+Harchaoui.  }
 
 \begin{document}
 \maketitle
@@ -75,21 +80,20 @@ machine learning and signal processing problems involving sparse
 regularizations.
 
 The library is coded in C++, is compatible with Linux, Mac, and Windows 32bits
-and 64bits Operating Systems. It is interfaced with Matlab, but can be called
-from any C++ application. R and Python interfaces have been developed by
-Jean-Paul Chieze.
+and 64bits Operating Systems. It is interfaced with Matlab, R and Python, but
+can be called from any C++ application (by hacking the code a bit).
 
-It requires an implementation of BLAS and LAPACK for performing
-linear algebra operations. The ones shipped with matlab and R can be used,
-but also external libraries such as atlas, the netlib implementation, or the
-Intel Math Kernel Library.  It also exploits multi-core CPUs when this feature
-is supported by the compiler, through OpenMP.
+It requires an implementation of BLAS and LAPACK for performing linear algebra
+operations. The ones shipped with matlab and R can be used, but also external
+libraries such as atlas, the netlib implementation, or the Intel Math Kernel
+Library can be used.  It also exploits multi-core CPUs when this feature is
+supported by the compiler, through OpenMP.
 
 The current licence is GPLv3, which is available at
-\url{http://www.gnu.org/licenses/gpl.html}.  For other usages (such as the use
-in proprietary softwares), please contact the author.
+\url{http://www.gnu.org/licenses/gpl.html}.  For other licensing possibilities 
+allowing its use in proprietary softwares, please contact the author.
 
-Version 2.4 of SPAMS is divided into four ``toolboxes'' and has a few
+Version 2.5 of SPAMS is divided into several ``toolboxes'' and has a few
 additional miscellaneous functions:
 \begin{itemize}
 \item The \textbf{Dictionary learning and matrix factorization toolbox}
@@ -100,14 +104,15 @@ variants for solving various matrix factorization problems:
 \item sparse principal component analysis (seen as a sparse matrix factorization problem);
 \item non-negative matrix factorization;
 \item non-negative sparse coding;
-\item dictionary learning with structured sparsity.
+\item dictionary learning with structured sparsity;
+\item archetypal analysis~\cite{Cut94,ChenCVPR}.
 \end{itemize}
 \item The \textbf{Sparse decomposition toolbox} contains efficient implementations of
 \begin{itemize}
 \item Orthogonal Matching Pursuit, (or Forward Selection)~\cite{weisberg,mallat4};
 \item the LARS/homotopy algorithm~\cite{osborne,efron} (variants for solving Lasso and Elastic-Net problems);
 \item a weighted version of LARS; 
-\item OMP and LARS when data come with a binary mask;
+\item OMP and LARS when data comes with a binary mask;
 \item a coordinate-descent algorithm for $\ell_1$-decomposition problems~\cite{fu,friedman,wu}; 
 \item a greedy solver for simultaneous signal approximation as defined in~\cite{tropp2,tropp3} (SOMP);
 \item a solver for simulatneous signal approximation with $\ell_1/\ell_2$-regularization based on block-coordinate descent;
@@ -116,6 +121,7 @@ variants for solving various matrix factorization problems:
 inducing sparsity such as the $\ell_1$-ball using the method of
 \cite{brucker,maculan,duchi}, and Elastic-Net or Fused Lasso constraint sets as
 proposed in the appendix of~\cite{mairal9}.
+\item an active-set algorithm for simplex decomposition problems~\cite{ChenCVPR}.
 \end{itemize}
 \item The \textbf{Proximal toolbox}: An implementation of proximal methods
 (ISTA and FISTA~\cite{beck}) for solving a large class of sparse approximation
@@ -166,6 +172,8 @@ Francis Bach (INRIA), Jean Ponce (Ecole Normale Sup\'erieure), Guillermo Sapiro
 (INRIA).
 
 R and Python interfaces have been written by Jean-Paul Chieze (INRIA).
+The archetypal analysis implementation was written by Yuansi Chen, during
+an internship at INRIA, with the collaboration of Zaid Harchaoui.
 
 \section{Installation}
 The toolbox used to come with pre-compiled binaries for various plateforms. 
@@ -231,9 +239,6 @@ problem of non-negative matrix factorization formulated in \cite{lee2}.  Note
 that mexTrainDL can be replaced by mexTrainDL\_Memory in this function for
 small or medium datasets.
 
-% {\footnotesize
-%    \verbatiminput{../src_release/nmf.m}
-% }
 \lstinputlisting{../src_release/nmf.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_nmf.m}
@@ -244,13 +249,15 @@ problem of non-negative sparse coding as defined in \cite{hoyer}.  Note that
 mexTrainDL can be replaced by mexTrainDL\_Memory in this function for small or
 medium datasets.
 
-% {\footnotesize
-%    \verbatiminput{../src_release/nnsc.m}
-% }
 \lstinputlisting{../src_release/nnsc.m}
-% The following piece of code illustrates how to use this function.
-% \lstinputlisting{../test_release/test_nnsc.m}
 
+\subsection{Function mexArchetypalAnalysis}
+The function optimizes the archetypal analysis formulation of~\cite{Cut94}. It follows the
+methodology presented in the following paper~\cite{ChenCVPR}.
+
+\lstinputlisting{../src_release/mexArchetypalAnalysis.m}
+The following piece of code illustrates how to use this function.
+\lstinputlisting{../test_release/test_archetypalAnalysis.m}
 
 
 \section{Sparse Decomposition Toolbox}
@@ -274,9 +281,6 @@ This is a fast implementation of the Orthogonal Matching Pursuit algorithm (or f
      decomposition with a Cholesky-based algorithm (see \cite{cotter} for instance).
 
      Note that mexOMP can return the ``greedy'' regularization path if needed (see below):
-% {\footnotesize
-%    \verbatiminput{../src_release/mexOMP.m}
-% }
 \lstinputlisting{../src_release/mexOMP.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_OMP.m}
@@ -298,9 +302,6 @@ Given a binary mask $\B=[\betab^1,\ldots,\betab^n]$ in $\{0,1\}^{m \times n}$, i
    \end{equation}
    where $\diag(\betab)$ is a diagonal matrix with the entries of $\betab$ on the diagonal.
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexOMPMask.m}
-% }
 \lstinputlisting{../src_release/mexOMPMask.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_OMPMask.m}
@@ -339,9 +340,6 @@ This is a fast implementation of the LARS algorithm~\cite{efron} (variant for so
    and can handle implicitely the matrix~$\D$ if the quantities~$\D^T\D$ and~$\D^T\x$ are passed
    as an argument, see below:
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexLasso.m}
-% }
 \lstinputlisting{../src_release/mexLasso.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_Lasso.m}
@@ -365,9 +363,6 @@ This is a fast implementation of a weighted version of LARS~\cite{efron}. Given 
      the solutions $\alphab$.  This function is potentially useful for
      implementing efficiently the randomized Lasso of \cite{meinshausen}, or reweighted-$\ell_1$ schemes~\cite{candes4}.
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexLassoWeighted.m}
-% }
 \lstinputlisting{../src_release/mexLassoWeighted.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_LassoWeighted.m}
@@ -388,9 +383,6 @@ For every column $\x$ of $\X$, $\betab$ of $\B$, it computes a column $\alphab$ 
    \min_{\alphab \in \Real^p} \frac{1}{2}\|\diag(\betab)(\x-\D\alphab)\|_2^2 + \lambda \frac{\|\betab\|_0}{m}\|\alphab\|_1 + \frac{\lambda_2}{2}\|\alphab\|_2^2. 
    \end{equation}
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexLassoMask.m}
-% }
 \lstinputlisting{../src_release/mexLassoMask.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_LassoMask.m}
@@ -403,9 +395,6 @@ sequence of problems of the form (\ref{eq:lasso}) using simple heuristics.
 Coordinate descent is very simple and in practice very powerful. It performs
 better when the correlation between the dictionary elements is small. 
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexCD.m}
-% }
 \lstinputlisting{../src_release/mexCD.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_CD.m}
@@ -421,9 +410,6 @@ or
 \end{equation}
 To be efficient, the method first compute the covariance matrix $\D^T\D$, then for each signal, it computes $\D^T\X^i$ and performs the decomposition with a Cholesky-based algorithm.
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexSOMP.m}
-% }
 \lstinputlisting{../src_release/mexSOMP.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_SOMP.m}
@@ -439,9 +425,6 @@ or
 \end{equation}
 To be efficient, the method first compute the covariance matrix $\D^T\D$, then for each signal, it computes $\D^T\X^i$ and performs the decomposition with a Cholesky-based algorithm.
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexL1L2BCD.m}
-% }
 \lstinputlisting{../src_release/mexL1L2BCD.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_L1L2BCD.m}
@@ -477,12 +460,16 @@ $\V=[\v_1,\ldots,\v_n]$ in $\Real^{m \times n}$ so that for all column $\u$ of $
    which is in practice close, but not exactly the same as the solution.
    This will be corrected in a future release of the toolbox.
 
-% {\footnotesize
-%    \verbatiminput{../src_release/mexSparseProject.m}
-% }
 \lstinputlisting{../src_release/mexSparseProject.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_SparseProject.m}
+
+\subsection{Function mexDecompSimplex}
+The function implements an active-set algorithm~\cite{ChenCVPR} for solving
+\begin{displaymath}
+   \min_{\alphab \in \Real^p} \frac{1}{2}\|\x-\D\alphab\|_2^2 \st \alphab \geq 0 ~~\text{and}~~ \sum_{j=1}^p \alphab[j] = 1.
+\end{displaymath}
+\lstinputlisting{../src_release/mexDecompSimplex.m}
 
 \section{Proximal Toolbox}
 The previous toolbox we have presented is well
@@ -527,6 +514,9 @@ Our software can handle the following regularization functions~$\psi$ for vector
 \item \textbf{The tree-structured sum of $\ell_2$-norms}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_2$, where $\GG$ is a tree-structured set of groups~\cite{jenatton3}, and the $\eta_g$ are positive weights.
 \item \textbf{The tree-structured sum of $\ell_\infty$-norms}: $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_\infty$. See \cite{jenatton3}
 \item \textbf{General sum of $\ell_\infty$-norms}:  $\psi(\w) \defin \sum_{g \in \GG} \eta_g \|\w_g\|_\infty$, where no assumption are made on the groups $\GG$.
+\item \textbf{The path-coding penalties} of~\cite{mairal14}.
+\item \textbf{the~$\ell_1$-constraint}.
+\item \textbf{a few undocumented ones}.
 \end{itemize}
 Our software also handles regularization functions~$\psi$ on matrices~$\W$ in~$\Real^{p \times r}$ (note that $\W$ can be transposed in these formulations). In particular,
 \begin{itemize}
@@ -621,10 +611,7 @@ or
 \end{equation}
 where $\V^j$ is the $j$-th column of $\V$.
 
-   See usage details below:
-% {\footnotesize
-%    \verbatiminput{../src_release/mexProximalFlat.m}
-% }
+See details below:
 \lstinputlisting{../src_release/mexProximalFlat.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalFlat.m}
@@ -655,10 +642,6 @@ This function computes the proximal operators associated to tree-structured regu
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalTree.m}
 
-%          {\footnotesize
-%          \verbatiminput{../src_release/mexProximalTree.m}
-%          }
-
 \subsection{Function mexProximalGraph}
 This function computes the proximal operators associated to structured sparse regularization, for input signals $\U=[\u^1,\ldots,\u^n]$ in $\Real^{p \times n}$, and a set of groups~\cite{mairal10}, it returns a matrix $\V=[\v^1,\ldots,\v^n]$ in $\Real^{p \times n}$.
 When one uses a regularization function on vectors, it computes a column $\v$ of $\V$ for every column $\u$ of $\U$:
@@ -684,7 +667,6 @@ This function is associated to a function to evaluate the penalties:
 \lstinputlisting{../src_release/mexEvalPathCoding.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_EvalPathCoding.m}
-
 
 After having presented the regularization terms which our software can handle,
 we present the various formulations that we address
@@ -791,6 +773,15 @@ Similarly, the toolbox handles the penalties of~\cite{mairal14} with the followi
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_FistaPathCoding.m}
 
+\subsection{Function solverPoisson}
+The following problem is addressed here
+\begin{displaymath}
+   \min_{\w \in \Real_+^p}  \sum_{j=1}^p \x_i^\top \w + \delta - y_i \log(\x_i^\top \w +\delta) + \lambda \psi(\w).
+\end{displaymath}
+\lstinputlisting{../src_release/solverPoisson.m}
+The following piece of code illustrates how to use this function.
+\lstinputlisting{../test_release/test_solverPoisson.m}
+
 \subsection{Function mexIncrementalProx}
 This implements the incremental solver MISO~\cite{mairal16}.
 \lstinputlisting{../src_release/mexIncrementalProx.m}
@@ -802,6 +793,15 @@ This implements the stochastic proximal gradient solver~\cite{mairal15}.
 \lstinputlisting{../src_release/mexStochasticProx.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_StochasticProx.m}
+
+\section{A few Functions for manipulating images}
+This functions are not well documented yet
+\subsection{Function mexExtractPatches}
+\lstinputlisting{../src_release/mexExtractPatches.m}
+\subsection{Function mexCombinePatches}
+\lstinputlisting{../src_release/mexCombinePatches.m}
+\subsection{Function mexConvFistaFlat}
+\lstinputlisting{../src_release/mexConvFistaFlat.m}
 
 \section{Miscellaneous Functions}
 

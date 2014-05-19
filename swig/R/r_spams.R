@@ -57,13 +57,12 @@ spams.calcXYt <- function(X,Y) {
 spams.calcXtY <- function(X,Y) {
     return(spams.mult(X,Y,T,F))
 }
-
-
 spams.bayer <- function(X,offset) {
   y =c(X)
   applyBayerPattern(y,offset)
   return(y)
 }
+
 
 spams.conjGrad <- function(A,b,x0 = NULL,tol = 1e-10,itermax = NULL) {
   n = ncol(A)
@@ -591,6 +590,40 @@ spams.structTrainDL <- function(X,return_model= FALSE,model= NULL,D = NULL,
   }
 
   return (.TrainDL(X,return_model,model,FALSE,D,graph,tree,numThreads,0.000001,TRUE,FALSE,batchsize,K,lambda1,lambda2,lambda3,iter,t0,'FISTAMODE',regul,posAlpha,posD,expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,stochastic_deprecated,modeParam,batch,log_deprecated,logName))
+}
+
+spams.archetypalAnalysis <- function(X,p = 10, Z0 = NULL, returnAB = FALSE, robust=FALSE, epsilon=1e-3, computeXtX=TRUE, stepsFISTA=3, stepsAS=50, randominit=TRUE,numThreads=-1)  {
+   if (is.null(Z0)) {
+      x = archetypalAnalysis(X=X, p=p, robust=robust, epsilon=epsilon, computeXtX = computeXtX, stepsFISTA = stepsFISTA, stepsAS = stepsAS, randominit = randominit, numThreads = numThreads)
+   } else {
+      x = archetypalAnalysisInit(X=X, Z0=Z0, robust=robust, epsilon=epsilon, computeXtX = computeXtX, stepsFISTA = stepsFISTA, stepsAS = stepsAS, numThreads = numThreads)
+   }
+   Z = x[[1]]
+   if (returnAB) {
+      indptr = x[[2]][[1]]
+      indices = x[[2]][[2]]
+      data = x[[2]][[3]]
+      shape = x[[2]][[4]]
+      A = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+      indptr2 = x[[3]][[1]]
+      indices2 = x[[3]][[2]]
+      data2 = x[[3]][[3]]
+      shape2 = x[[3]][[4]]
+      B = sparseMatrix(i = indices2, p = indptr2, x = data2,dims = shape2, index1 = FALSE)
+      return (list(Z,A,B))
+   } else {
+      return(Z)
+   }
+}
+
+spams.decompSimplex <- function(X, Z, computeXtX = FALSE, numThreads = -1) {
+   x = decompSimplex(X,Z,computeXtX,numThreads)
+   indptr = x[[1]]
+   indices = x[[2]]
+   data = x[[3]]
+   shape = x[[4]]
+   A = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
+   return(A)
 }
 
 spams.nmf <- function(X,return_lasso= FALSE,model= NULL,numThreads = -1,batchsize = -1,K= -1,

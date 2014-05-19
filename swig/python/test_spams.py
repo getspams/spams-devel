@@ -2,7 +2,7 @@ import sys
 import time
 import test_utils
 
-all_modules = ['linalg', 'decomp', 'prox', 'dictLearn']
+all_modules = ['linalg', 'decomp', 'prox','dictLearn']
 
 modules = []
 
