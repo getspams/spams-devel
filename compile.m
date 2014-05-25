@@ -15,7 +15,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='icc';
+compiler='gcc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -26,7 +26,7 @@ compiler='icc';
 %   - blas: (netlib version of blas/lapack), free
 %   - atlas: (atlas version of blas/lapack), free,
 % ==> you can also tweak this script to include your favorite blas/lapack library
-blas='mkl';
+blas='builtin';
 
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
@@ -43,6 +43,7 @@ use_64bits_integers=true;
 use_mkl_threads=false;
 % use this option is you use the mkl library and intends to use intensively BLAS3/lapack routines
 % (for multiclass logistic regression, regularization with the trace norm for instance)
+% this results in a loss of performance for many other functions
 
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
@@ -58,8 +59,6 @@ add_flag='';
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7';
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler='/usr/bin/';
     else
@@ -79,7 +78,6 @@ elseif strcmp(compiler,'open64')
 elseif strcmp(compiler,'icc')
     if linux || mac
        % example when compiler='icc' for Linux/Mac
-       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.7/';
        path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
