@@ -6,10 +6,9 @@ all:
 	pdflatex doc_spams.tex
 	pdflatex doc_spams.tex
 hevea:
-	hevea ${OPT} doc_spams.tex
+	hevea -fix ${OPT} doc_spams.tex
 	bibhva doc_spams
-	hevea ${OPT} doc_spams.tex
-	hevea ${OPT} doc_spams.tex
+	hevea -fix ${OPT} doc_spams.tex
 	hacha -tocbis doc_spams.html
 	cp style.css doc_spams.css
 	mv *.html html/
@@ -17,5 +16,5 @@ hevea:
 	mv *.css html/
 	mv html/style.css ./
 clean:
-	rm -f *.aux *.bbl *.haux *.hbbl *.blg *.toc *.htoc *.log
+	rm -f *.aux *.bbl *.haux *.hbbl *.blg *.toc *.htoc *.log *.html *.gif
 

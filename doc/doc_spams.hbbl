@@ -34,6 +34,11 @@ S.~F. Cotter, J.~Adler, B.~Rao, and K.~Kreutz-Delgado.
 \newblock In {\em IEEE Proceedings of Vision Image and Signal Processing},
   pages 235--244, 1999.
 
+\bibitem{Cut94}
+A.~Cutler and L.~Breiman.
+\newblock Archetypal analysis.
+\newblock {\em Technometrics}, 36(4):338–347, 1994.
+
 \bibitem{duchi}
 J.~Duchi, S.~Shalev-Shwartz, Y.~Singer, and T.~Chandra.
 \newblock Efficient projections onto the $\ell_1$-ball for learning in high
@@ -132,13 +137,14 @@ J.~Mairal and B.~Yu.
 \bibitem{mairal16}
 Julien Mairal.
 \newblock Optimization with first-order surrogate functions.
-\newblock 2013.
+\newblock In {\em International Conference on Machine Learning (ICML)}, 2013.
 
 \bibitem{mairal15}
 Julien Mairal.
 \newblock Stochastic majorization-minimization algorithms for large-scale
   optimization.
-\newblock 2013.
+\newblock In {\em Advances in Neural Information Processing Systems (NIPS)},
+  2013.
 
 \bibitem{mallat4}
 S.~Mallat and Z.~Zhang.
@@ -199,6 +205,12 @@ S.~Weisberg.
 T.~T. Wu and K.~Lange.
 \newblock Coordinate descent algorithms for {L}asso penalized regression.
 \newblock {\em Annals of Applied Statistics}, 2(1):224--244, 2008.
+
+\bibitem{ChenCVPR}
+J.~Mairal Y.~Chen and Z.~Harchaoui.
+\newblock Fast and robust archetypal analysis for representation learning.
+\newblock In {\em Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, 2014.
 
 \bibitem{yuan}
 M.~Yuan and Y.~Lin.

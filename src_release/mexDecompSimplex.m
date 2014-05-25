@@ -3,6 +3,8 @@
 %
 % Name: mexDecompSimplex
 %
+% documentation to appear soon
+%
 % Inputs: X:  double m x n matrix   (input signals)
 %               m is the signal size
 %               n is the number of signals to decompose

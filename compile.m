@@ -51,7 +51,6 @@ path_matlab='';
 %path_matlab='/softs/bin/';
 add_flag='';
 % WARNING: on Mac OS  mountain lion, you may have to uncomment the line
-%add_flag=' -mmacosx-version-min=10.7'
 
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
@@ -132,6 +131,10 @@ elseif strcmp(blas,'acml')
 elseif strcmp(blas,'builtin')
     % leave it to /usr/lib/ for built-in:
     path_to_blas='/';
+end
+
+if mac
+   add_flag=' -mmacosx-version-min=10.6'
 end
    
 debug=false;
