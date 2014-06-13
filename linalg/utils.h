@@ -63,7 +63,7 @@ typedef int mwSize;
 #define MAX_ITER_CGRAD 40
 
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(_WIN32) || defined(WINDOWS)
 
 #include <time.h>
 #include <windows.h>

@@ -67,7 +67,7 @@ if strcmp(compiler,'gcc')
        path_to_compiler='C:\cygwin\bin\';
        path_to_compiler_libraries='C:\cygwin\lib\gcc\i686-pc-cygwin\4.5.3\';
     end
-elseif strcmp(compiler,'clang') 
+elseif strcmp(compiler,'clang')  
    path_to_compiler='/usr/bin/';
    path_to_compiler_libraries='/usr/lib/clang/3.5/lib/';
    path_to_libstd='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
@@ -365,9 +365,9 @@ elseif strcmp(compiler,'gcc')
       compile_flags=[compile_flags ' -fopenmp'];
       links_lib=[links_lib ' -lgomp'];
    end
-elseif strcmp(compiler,'clang')
+elseif strcmp(compiler,'clang') ||strcmp(compiler,'clang++-libc++')  
    DEFCOMP=sprintf('CXX=%s/clang++ -Dchar16_t=uint16_T',path_to_compiler);
-   compile_flags='-O3 -mtune=native -fomit-frame-pointer'; 
+   compile_flags='-stdlib=libstdc++ -O3 -mtune=native -fomit-frame-pointer -Wall'; 
    links_lib=[links_lib ' -L"' path_to_compiler_libraries '" -L' path_to_blas];
    if mac
       fprintf(fid,'export LIB_GCC=%s\n',path_to_compiler_libraries);

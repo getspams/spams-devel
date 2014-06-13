@@ -3,7 +3,7 @@
 %
 % Name: mexDecompSimplex
 %
-% documentation to appear soon
+% Description: documentation to appear soon
 %
 % Inputs: X:  double m x n matrix   (input signals)
 %               m is the signal size

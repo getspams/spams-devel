@@ -124,8 +124,8 @@ template <typename T>
       param.iter=getScalarStruct<int>(prhs[1],"iter");
       param.t0 = getScalarStructDef<T>(prhs[1],"t0",1e-5);
       param.tol = getScalarStructDef<T>(prhs[1],"tol",0.000001);
-      param.ista = getScalarStructDef<T>(prhs[1],"ista",false);
-      param.fixed_step = getScalarStructDef<T>(prhs[1],"fixed_step",true);
+      param.ista = getScalarStructDef<bool>(prhs[1],"ista",false);
+      param.fixed_step = getScalarStructDef<bool>(prhs[1],"fixed_step",true);
   
       param.mode = FISTAMODE;
       getStringStruct(prhs[1],"regul",fista_param.name_regul,fista_param.length_names);

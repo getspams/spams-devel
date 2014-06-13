@@ -107,7 +107,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    param.compute_gram = getScalarStructDef<bool>(prhs[3],"compute_gram",false);
    param.max_iter_backtracking = getScalarStructDef<int>(prhs[3],"max_iter_backtracking",1000);
    param.L0 = getScalarStructDef<T>(prhs[3],"L0",1.0);
-   param.fixed_step = getScalarStructDef<T>(prhs[3],"fixed_step",false);
+   param.fixed_step = getScalarStructDef<bool>(prhs[3],"fixed_step",false);
    param.gamma = MAX(1.01,getScalarStructDef<T>(prhs[3],"gamma",1.5));
    param.c = getScalarStructDef<T>(prhs[3],"c",1.0);
    param.lambda= getScalarStructDef<T>(prhs[3],"lambda",1.0);

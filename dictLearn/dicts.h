@@ -336,7 +336,6 @@ void Trainer<T>::cleanDict(const Data<T>& X, Matrix<T>& G,
 template <typename T>
 void Trainer<T>::cleanDict(Matrix<T>& G) {
    const int k = _D.n();
-   const int n = _D.m();
    T* const pr_G=G.rawX();
    for (int i = 0; i<k; ++i) {
       pr_G[i*k+i] += 1e-10;

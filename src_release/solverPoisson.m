@@ -24,6 +24,10 @@
 %         W: double p x n matrix (non-negative values)
 
 function [W optim] = solverPoisson(Y,X,W0,param)
+Y=Y;
+X=X;
+param.delta=param.delta;
+param.lambda=param.lambda;
 param.ista=true;
 param.intercept=false;
 param.pos=true;
@@ -33,6 +37,9 @@ tabdelta=logspace(0,log10(param.delta),-log10(param.delta));
 for delta = tabdelta
    param2=param;
    param2.delta=delta;
+   param2.verbose=abs(delta-tabdelta(end)) < 1e-10;
+   param2.L0=sum(sum(Y .* repmat(sum(X.^2,2),[1 size(Y,2)])))/param2.delta^2;
    [W optim]=mexFistaFlat(Y,X,W0,param2);
    W0=W;
 end
+

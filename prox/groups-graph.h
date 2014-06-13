@@ -85,7 +85,7 @@ inline char * skip_space(char * s) {
  Return:
     -1 if error, 0 if OK
  */
-static int parse_line(char *s,std::vector<std::string> &vresult) {
+static inline int parse_line(char *s,std::vector<std::string> &vresult) {
   char *p = skip_space(s);
   if(p == NULL) return -1;
   for(int i = 0;i < 4;i++) vresult.push_back(std::string(""));

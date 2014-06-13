@@ -533,7 +533,7 @@ namespace FISTA {
                prim_var.resize(_X->m());
                prim_var.setZeros();
             }
-            inline void prox_prim_var(Vector<T>& out,const Vector<T>& dual_var, 
+/*            inline void prox_prim_var(Vector<T>& out,const Vector<T>& dual_var, 
                   const Vector<T>& prim_var, const T lambda, const T c) const {
                const T gamma=T(1.0)/c;
                out.copy(dual_var);
@@ -548,7 +548,7 @@ namespace FISTA {
                      out[i]=_y[i];
                   }
                }
-            }
+            }*/
             inline void compute_new_prim(Vector<T>& prim, const Vector<T>& prim_var, 
                   const Vector<T>& dual_var, const T gamma, const T delta) const { 
                Vector<T> tmp;
@@ -1104,6 +1104,20 @@ namespace FISTA {
                Vector<T> col;
                for (int i = 0; i<this->_N; ++i) 
                   this->_losses[i]=new SqLossMissing<T>(X);
+            }
+            virtual void dummy() { };
+            virtual ~LossMat() { };
+      };
+
+   template <typename T>
+      class LossMat<T, PoissonLoss<T> > : public LossMatSup<T, PoissonLoss<T> > {
+         public:
+            LossMat(const int N, const AbstractMatrixB<T>& X,const T delta) {
+               this->_N=N;
+               this->_losses=new PoissonLoss<T>*[this->_N];
+               Vector<T> col;
+               for (int i = 0; i<this->_N; ++i)
+                  this->_losses[i]=new PoissonLoss<T>(X,delta);
             }
             virtual void dummy() { };
             virtual ~LossMat() { };
@@ -2781,8 +2795,8 @@ namespace FISTA {
          ///    2: Barzilai-Borwein
          ///    3: back_tracking in both directions
          D sbb, xbb;
-         const T alphamax=1/L;
-         const T alphamin=10e-12*alphamax;
+         const T alphamax=10e30*1/L;
+         const T alphamin=1/L;
 
          const bool duality = loss.is_fenchel() && regularizer.is_fenchel();
          const bool dc = regularizer.is_concave();
@@ -3691,6 +3705,7 @@ namespace FISTA {
                                   loss=new SqLossMat<T>(D); 
                                }
                                break;
+                  case POISSON: loss=new LossMat<T, PoissonLoss<T> >(X.n(),D,param.delta);  break;
                   case SQUARE_MISSING: loss=new LossMat<T, SqLossMissing<T> >(X.n(),D);  break;
                   case LOG:  loss = new LossMat<T, LogLoss<T,false> >(X.n(),D); break;
                   case LOGWEIGHT:  loss = new LossMat<T, LogLoss<T,true> >(X.n(),D); break;

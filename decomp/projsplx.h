@@ -90,7 +90,6 @@ void projsplxMatrix(const Matrix<T>& Beta, Matrix<T>& BetaOut) {
 
 template <typename T>
 void projsplxMatrixOn(const Matrix<T>& Beta) {
-  const int n = Beta.m();
   const int p = Beta.n();
   Vector<T> refColBeta;
   Vector<T> b;
