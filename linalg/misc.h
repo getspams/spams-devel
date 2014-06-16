@@ -17,7 +17,7 @@
 #include <math.h>
 #include "utils.h"
 
-#ifdef WINDOWS
+#if defined(_MSC_VER) || defined(_WIN32) || defined(WINDOWS)
 #define isnan _isnan
 #define isinf !_finite
 #endif
