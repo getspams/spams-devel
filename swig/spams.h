@@ -549,6 +549,7 @@ using namespace FISTA;
       throw("fistaFlat : Wrong size of param.groups");
     param.groups = groups->rawX();
   }
+  param.log=log;
   if (param.log) {
     int n = strlen(logName);
     if(n == 0) 
@@ -692,6 +693,7 @@ using namespace FISTA;
   param.pos = pos;
   param.clever = clever;
 
+  param.log=log;
   if(param.log) {
     int n = strlen(logName);
     if(n == 0) 
@@ -859,6 +861,7 @@ throw(const char *)
   param.verbose = verbose;
   param.pos = pos;
   param.clever = clever;
+  param.log=log;
 
   if (param.log) {
     int n = strlen(logName);
@@ -1237,6 +1240,7 @@ Matrix<T> *_alltrainDL(Data<T> *X,bool in_memory, Matrix<T> **omA,Matrix<T> **om
   param.modeParam = static_cast<mode_compute>(modeParam);
   param.batch = batch;
   param.iter_updateD = iter_updateD;
+  param.log=log;
   if(param.log) {
     int n = strlen(logName);
     if(n == 0) 

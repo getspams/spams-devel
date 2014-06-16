@@ -85,8 +85,7 @@
 %            param.linesearch_mode (line-search scheme when ista=true:
 %                      0: default, monotonic backtracking scheme
 %                      1: monotonic backtracking scheme, with restart at each iteration
-%                      2: Barzilai-Borwein step sizes (similar to SparSA by Wright et al.) Then, L0 should be an 
-%                         upper-bound on the Lipschitz constant
+%                      2: Barzilai-Borwein step sizes (similar to SparSA by Wright et al.) 
 %                      3: non-monotonic backtracking
 %            param.compute_gram (optional, pre-compute X^TX, false by default).
 %            param.intercept (optional, do not regularize last row of W, false by default).
