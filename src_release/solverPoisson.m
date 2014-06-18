@@ -29,6 +29,7 @@ param.lambda=param.lambda;
 param.ista=true;
 param.intercept=false;
 param.pos=true;
+param.L0=1e-5;
 param.linesearch_mode=2;
 param.loss='poisson';
 tabdelta=logspace(0,log10(param.delta),1-log10(param.delta));

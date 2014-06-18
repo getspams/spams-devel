@@ -2795,8 +2795,8 @@ namespace FISTA {
          ///    2: Barzilai-Borwein
          ///    3: back_tracking in both directions
          D sbb, xbb;
-         const T alphamax=10e20*1/L;
-         const T alphamin=10e-20*1/L;
+         const T alphamax=10e30*1/L;
+         const T alphamin=10e-30*1/L;
 
          const bool duality = loss.is_fenchel() && regularizer.is_fenchel();
          const bool dc = regularizer.is_concave();

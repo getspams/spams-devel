@@ -844,6 +844,7 @@ throw(const char *)
   param.it0 = it0;
   param.max_iter_backtracking = max_iter_backtracking;
   param.loss = loss_from_string(name_loss);
+  param.linesearch_mode=linesearch_mode;
   if (param.loss==INCORRECT_LOSS)
     throw("fistaGraph: Unknown loss");
   param.compute_gram = compute_gram;
@@ -871,7 +872,6 @@ throw(const char *)
     strcpy(param.logName,logName);
   }
   param.ista = ista;
-  param.linesearch_mode=linesearch_mode;
   param.subgrad = subgrad;
   param.is_inner_weights = is_inner_weights;
 
