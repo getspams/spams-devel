@@ -58,7 +58,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],const int nrhs,
    } else {
       p=getScalarStruct<int>(prhs[1],"p");
    }
-   bool robust = getScalarStructDef<bool>(prhs[1],"robust",true);
+   bool robust = getScalarStructDef<bool>(prhs[1],"robust",false);
    T epsilon = getScalarStructDef<T>(prhs[1],"epsilon",1e-3);
    bool computeXtX = getScalarStructDef<bool>(prhs[1],"computeXtX",true);
    int stepsFISTA = getScalarStructDef<int>(prhs[1],"stepsFISTA",3);

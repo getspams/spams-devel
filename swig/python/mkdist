@@ -68,6 +68,7 @@ name=spams-python
 mv $dir $name
 tgz=$name-$fullvers.tar.gz
 tar zcf $tgz $name
+mv $tgz ../../../
 #cp -p $tgz ../${name}_svn.tar.gz
 exit 0
 # zip :

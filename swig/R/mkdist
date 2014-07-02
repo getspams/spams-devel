@@ -78,6 +78,7 @@ echo "$fullvers" >$dir/Release-name
 
 tgz=$pkg-$fullvers.tar.gz
 tar zcf $tgz $pkg
+mv $tgz ../../../
 #cp -p $tgz ../${pkg}_svn.tar.gz
 exit 0
 

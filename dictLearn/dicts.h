@@ -59,7 +59,7 @@ struct regul_def {
 #define NBREGUL sizeof(regul_table)/sizeof(struct regul_def)
 
 FISTA::regul_t regul_from_string(const char* regul) {
-  for(uint i = 0;i < NBREGUL;i++)
+  for(unsigned int i = 0;i < NBREGUL;i++)
     if (strcmp(regul,regul_table[i].name)==0) return regul_table[i].regul;
   return FISTA::INCORRECT_REG;
 }
@@ -68,7 +68,7 @@ void regul_error(char *buffer, int bufsize,const char *message) {
   int size = n1;
   if(n1 < bufsize) {
     // calculate size
-    for(uint i = 0;i < NBREGUL;i++)
+    for(unsigned int i = 0;i < NBREGUL;i++)
       size += strlen(regul_table[i].name) + 1;
   } 
   if (size >= bufsize) {
@@ -76,7 +76,7 @@ void regul_error(char *buffer, int bufsize,const char *message) {
     strncpy(buffer,"Invalid regularization\n",n1);
   } else {
     strncpy(buffer,message,n1);
-    for(uint i = 0;i < NBREGUL;i++) {
+    for(unsigned int i = 0;i < NBREGUL;i++) {
       int k = strlen(regul_table[i].name);
       strncpy(&buffer[n1],regul_table[i].name,k);
       buffer[n1+k] = ' ';
