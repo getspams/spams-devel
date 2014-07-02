@@ -1797,14 +1797,14 @@ namespace FISTA {
             }
             virtual ~GroupProx() { 
                delete(_prox); 
-               for (int i = 0; i<_groups.size(); ++i) delete(_groups[i]);
+               for (int i = 0; i<static_cast<int>(_groups.size()); ++i) delete(_groups[i]);
             };
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
                y.copy(x);
                const int maxn= this->_intercept ? x.n()-1 : x.n();
                if (!_groups.empty()) {
-                  for (int i = 0; i<_groups.size(); ++i) {
+                  for (int i = 0; i<static_cast<int>(_groups.size()); ++i) {
                      list_int* group=_groups[i];
                      Vector<T> tmp(group->size());
                      Vector<T> tmp2(group->size());
@@ -1833,7 +1833,7 @@ namespace FISTA {
                const int maxn= this->_intercept ? x.n()-1 : x.n();
                T sum=0;
                if (!_groups.empty()) {
-                  for (int i = 0; i<_groups.size(); ++i) {
+                  for (int i = 0; i<static_cast<int>(_groups.size()); ++i) {
                      list_int* group=_groups[i];
                      Vector<T> tmp(group->size());
                      int count=0;
@@ -1860,7 +1860,7 @@ namespace FISTA {
                scal=T(1.0);
                val=0;
                if (!_groups.empty()) {
-                  for (int i = 0; i<_groups.size(); ++i) {
+                  for (int i = 0; i<static_cast<int>(_groups.size()); ++i) {
                      list_int* group=_groups[i];
                      Vector<T> tmp(group->size());
                      int count=0;
@@ -2598,7 +2598,7 @@ namespace FISTA {
                for (int i = 0; i<N; ++i) {
                   for (int j = 0; j<Ng; ++j) {
                      gv_jc[i*Ng+j]=count;
-                     for (int k = graph_st.gv_jc[j]; k<graph_st.gv_jc[j+1]; ++k) {
+                     for (mwSize k = graph_st.gv_jc[j]; k<graph_st.gv_jc[j+1]; ++k) {
                         gv_ir[count++] =Nv*i+graph_st.gv_ir[k]; 
                      }
                   }
@@ -2617,7 +2617,7 @@ namespace FISTA {
                for (int i = 0; i<N; ++i) {
                   for (int j = 0; j<Ng; ++j) {
                      gg_jc[i*Ng+j] = count;
-                     for (int k = graph_st.gg_jc[j]; k<graph_st.gg_jc[j+1]; ++k) {
+                     for (mwSize k = graph_st.gg_jc[j]; k<graph_st.gg_jc[j+1]; ++k) {
                         gg_ir[count++] = i*Ng+graph_st.gg_ir[k];
                      }
                   }

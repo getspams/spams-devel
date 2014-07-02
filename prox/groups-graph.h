@@ -54,7 +54,7 @@ m_ones(int nb) {
 template<typename T>
 inline void del_gstruct(std::vector<StructNodeElem<T> *> *gstruct) {
   if (gstruct == static_cast<std::vector<StructNodeElem<T> *> *>(0)) return;
-  for(int i = 0;i < gstruct->size();i++) 
+  for(int i = 0;i <static_cast<int>(gstruct->size());i++) 
     delete (*gstruct)[i];
   delete gstruct;
 }
@@ -368,16 +368,16 @@ bool checkGroupTree(std::vector<StructNodeElem<T> *> *gstruct, bool tree_mode, i
     // check variables
     // for graph struct, unicity of subtrees is checked when building groups and group_vars
     int max_var = 0;
-    for(int i = 0;i < all_vars.size();i++) 
+    for(int i = 0;i < static_cast<int>(all_vars.size());i++) 
       if (all_vars[i] > max_var) max_var = all_vars[i];
     nb_vars = max_var + 1;
-    if(nb_vars > all_vars.size()) {
+    if(nb_vars > static_cast<int>(all_vars.size())) {
       std::cout << "There are missing variables\n";
       *nbVars = all_vars.size();
       return false;
     }
     int *used_vars = newzeros<int>(nb_vars);
-    for(int i = 0;i < all_vars.size();i++) {
+    for(int i = 0;i < static_cast<int>(all_vars.size());i++) {
       int v = all_vars[i];
       if(v < 0 || v >= nb_vars) {
 	std::cout << "Bad var " << v << "(not in [0-" << nb_vars << "]\n";
@@ -497,12 +497,12 @@ Vector<T> *_graphOfGroupStruct(std::vector<StructNodeElem<T> *> *gstruct,SpMatri
     std::vector<int> *vars = node->vars;
     std::vector<int> *children = node->children;
     bool *pv = dgroups_var + (nb_vars * i);
-    for(int j = 0;j < vars->size();j++) {
+    for(int j = 0;j < static_cast<int>(vars->size());j++) {
       int k = (*vars)[j];
       *(pv + k) = 1;
     }
     bool *pg = dgroups + (nb_groups * i);
-    for(int k = 0;k < children->size();k++) {
+    for(int k = 0;k < static_cast<int>(children->size());k++) {
       int j = (*children)[k];
       *(pg + j) = 1;
     }
@@ -516,7 +516,7 @@ Vector<T> *_graphOfGroupStruct(std::vector<StructNodeElem<T> *> *gstruct,SpMatri
       if( *(pv + (g * nb_vars)))
 	l.push_back(g);
     if(l.size() > 1) {
-      for(int k = 0;k < l.size();k++) {
+      for(int k = 0;k < static_cast<int>(l.size());k++) {
 	int g = l[k];
 	bool *pg = dgroups + g;
 	for(int j = 0;j < nb_groups;j++) {

@@ -203,7 +203,7 @@ int inline Tree_Seq<T>::perform_order(const int current_node, const int pointer)
    int cur_pointer=pointer;
    _size_variables[current_node]=_size_own_variables[current_node];
    _pr_variables[current_node]=_pr_own_variables[current_node];
-   for (int i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
+   for (mwSize i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
       cur_pointer=this->perform_order(_groups_ir[i],cur_pointer);
       _size_variables[current_node]+=_size_variables[_groups_ir[i]];
       _pr_variables[current_node]= MIN(_pr_variables[current_node],_pr_variables[_groups_ir[i]]);
@@ -216,7 +216,7 @@ template <typename T>
 int inline Tree_Seq<T>::perform_dfs(const int current_node, const int pointer) {
    int cur_pointer=pointer;
    _order_dfs[cur_pointer++]=current_node;
-   for (int i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
+   for (mwSize i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
       cur_pointer=this->perform_dfs(_groups_ir[i],cur_pointer);
    }
    return cur_pointer;
@@ -233,7 +233,7 @@ T inline Tree_Seq<T>::val_norm(const T* pr_alpha, const int current_node, const 
 template <typename T>
 T inline Tree_Seq<T>::val_norm2(const T* pr_alpha, const int current_node, T& tmp, const bool l1) {
    T sum=0;
-   for (int i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
+   for (mwSize i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
       T tmp2=0;
       sum+=this->val_norm2(pr_alpha,_groups_ir[i],tmp2,l1);
       tmp= l1 ? MAX(tmp,tmp2) : tmp+tmp2;
@@ -253,7 +253,7 @@ T inline Tree_Seq<T>::val_norm2(const T* pr_alpha, const int current_node, T& tm
 template <typename T>
 T inline Tree_Seq<T>::val_zero2(const T* pr_alpha, const int current_node, bool& tmp) {
    T sum=0;
-   for (int i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
+   for (mwSize i = _groups_jc[current_node];  i<_groups_jc[current_node+1]; ++i) {
       bool tmp2=false;
       sum+=this->val_zero2(pr_alpha,_groups_ir[i],tmp2);
       tmp = tmp || tmp2;
@@ -342,7 +342,7 @@ void inline Tree_Seq<T>::proj(Vector<T>& input, const bool l1,
          const int node=_order_dfs[i];
          if (_thrs[node] == 0) {
             memset(_variables+_pr_own_variables[node],0,_size_own_variables[node]*sizeof(T));
-            for (int j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
+            for (mwSize j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
                _thrs[_groups_ir[j]]=0;
             }
          } else {
@@ -351,7 +351,7 @@ void inline Tree_Seq<T>::proj(Vector<T>& input, const bool l1,
                _variables[_pr_own_variables[node]+j] = tmp > _thrs[node] ? _thrs[node] :
                   tmp < -_thrs[node] ? -_thrs[node] : tmp;
             }
-            for (int j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
+            for (mwSize j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
                _thrs[_groups_ir[j]]= MIN(_thrs[_groups_ir[j]],_thrs[node]);
             }
          }
@@ -363,7 +363,7 @@ void inline Tree_Seq<T>::proj(Vector<T>& input, const bool l1,
          _work[node]=0;
          for (int j = 0; j<_size_own_variables[node]; ++j)
             _work[node]+=_variables[_pr_own_variables[node]+j]*_variables[_pr_own_variables[node]+j];
-         for (int j = _groups_jc[node]; j<_groups_jc[node+1];++j)
+         for (mwSize j = _groups_jc[node]; j<_groups_jc[node+1];++j)
             _work[node] += _work[_groups_ir[j]];
          _thrs[node] = MAX(0,1-fact*_lambda[node]/sqrt(_work[node]));
          _work[node]*= _thrs[node]*_thrs[node];
@@ -372,13 +372,13 @@ void inline Tree_Seq<T>::proj(Vector<T>& input, const bool l1,
          const int node=_order_dfs[i];
          if (_thrs[node] == 0) {
             memset(_variables+_pr_own_variables[node],0,_size_own_variables[node]*sizeof(T));
-            for (int j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
+            for (mwSize j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
                _thrs[_groups_ir[j]]=0;
             }
          } else {
             for (int j = 0; j<_size_own_variables[node]; ++j) 
                _variables[_pr_own_variables[node]+j] *= _thrs[node];
-            for (int j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
+            for (mwSize j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
                _thrs[_groups_ir[j]] *= _thrs[node];
             }
          }
@@ -397,7 +397,7 @@ void inline Tree_Seq<T>::proj_zero(Vector<T>& input, const T fact) {
          _work[node]+=_variables[_pr_own_variables[node]+j]*_variables[_pr_own_variables[node]+j];
       _work[node] *= -0.5;
       _work[node] += fact*_lambda[node];
-      for (int j = _groups_jc[node]; j<_groups_jc[node+1];++j)
+      for (mwSize j = _groups_jc[node]; j<_groups_jc[node+1];++j)
          _work[node] += _work[_groups_ir[j]];
       if (_work[node] > 0) _work[node]=0;
    }
@@ -405,7 +405,7 @@ void inline Tree_Seq<T>::proj_zero(Vector<T>& input, const T fact) {
       const int node=_order_dfs[i];
       if (_work[node] == 0) {
          memset(_variables+_pr_own_variables[node],0,_size_own_variables[node]*sizeof(T));
-         for (int j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
+         for (mwSize j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) {
             _work[_groups_ir[j]]=0;
          }
       } 
@@ -436,7 +436,7 @@ T inline Tree_Seq<T>::dual_norm_inf(const Vector<T>& input) {
          const int node=nodes.front();
          nodes.pop_front();
          sum_weights+=_lambda[node];
-         for (int j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) 
+         for (mwSize j = _groups_jc[node];  j<_groups_jc[node+1]; ++j) 
             if (_thrs[_groups_ir[j]] > EPSILON) {
                nodes.push_front(_groups_ir[j]);
             } else {
@@ -3163,7 +3163,7 @@ void GraphPath<T,Int>::init_graph(const GraphPathStruct<T>& graph) {
    num_arcs[n2-2]=_n+1; // s connexions
    num_arcs[n2-1]=_n+1; // t connexions
    for (int i = 0; i<_n; ++i) {
-      for (int j = graph.jc[i]; j<graph.jc[i+1]; ++j) {
+      for (mwSize j = graph.jc[i]; j<graph.jc[i+1]; ++j) {
          num_arcs[i+_n]++;
          num_arcs[graph.ir[j]]++;  // i'-j connexions
       }
@@ -3205,7 +3205,7 @@ void GraphPath<T,Int>::init_graph(const GraphPathStruct<T>& graph) {
    }
    // other connexions
    for (int i = 0; i<_n; ++i) {
-      for (int j= graph.jc[i]; j<graph.jc[i+1]; ++j) {
+      for (mwSize j= graph.jc[i]; j<graph.jc[i+1]; ++j) {
          const Int cost=static_cast<Int>(ceil(graph.weights[j]*_sf));
          const double double_cost=static_cast<double>((graph.weights[j]));
          _min_cost_flow->add_edge(i+_n,graph.ir[j],cost,double_cost,_infinite_capacity);
