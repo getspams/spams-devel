@@ -211,7 +211,7 @@ std::vector<StructNodeElem<T> *> *_groupStructOfString(const char *data) throw(c
     std::vector<string> lst;
     if(parse_line(buffer,lst) < 0) {
       char tmp[1024];
-      snprintf(tmp,1024,"Bad inode line <%s>\n",buffer);
+   //   snprintf(tmp,1024,"Bad inode line <%s>\n",buffer);
       throw(tmp);
     }
     int inode = atoi(lst[0].c_str());

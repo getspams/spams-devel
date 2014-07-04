@@ -141,10 +141,10 @@ namespace FISTA {
    }
 
    template <typename T> struct ParamFISTA { 
-      ParamFISTA() { num_threads=1; max_it=100; L0=0.1; gamma=1.5; tol=1e-10; 
+      ParamFISTA() { num_threads=1; max_it=100; L0=T(0.1); gamma=T(1.5); tol=T(1e-10); 
          it0=10; max_iter_backtracking=1000; loss=SQUARE; compute_gram=false; admm=false; lin_admm=false;
          intercept=false; regul=RIDGE; resetflow=false; delta=0; lambda2=0; lambda3=0; verbose=false; 
-         pos=false; clever=true; a=1.0; b=0.0; c=1.0;
+         pos=false; clever=true; a=T(1.0); b=T(0.0); c=T(1.0);
          log=false; logName=NULL; ista=false; subgrad=false;
          length_names=30; 
          name_regul=new char[length_names];
@@ -1756,7 +1756,7 @@ namespace FISTA {
 
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
                y.resize(x.n());
-               int size_vec=this->_intercept ? x.n()-1 : x.n();
+               int size_vec=static_cast<int>(this->_intercept ? x.n()-1 : x.n());
                Matrix<T> mX(x.rawX(),_size_group,size_vec/_size_group);
                Matrix<T> mY(y.rawX(),_size_group,size_vec/_size_group);
                _proxy->prox(mX,mY,lambda);

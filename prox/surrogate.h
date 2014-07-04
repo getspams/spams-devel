@@ -149,7 +149,7 @@ class SmoothFunction {
                rho_sample += _L[_current_batch[i]];
             }
             rho_sample /= _sizebatch;
-            rho_sample=MAX(rho_sample,0.1*rho);
+            rho_sample=MAX(rho_sample,T(0.1)*rho);
             const T new_rho=(1-w)*rho + w*rho_sample;
             //const T new_rho=rho;
             typename U::col spw;
@@ -387,7 +387,7 @@ class SquareFunction :  public SmoothFunction<T, U > {
       virtual ~SquareFunction() { };
 
       virtual T inline eval_simple(const T y, const T s) const {
-         return 0.5*(y-s)*(y-s);
+         return T(0.5)*(y-s)*(y-s);
       };
       virtual T inline gradient_simple(const T y, const T s) const {
          return s-y;
@@ -501,7 +501,7 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
                _z3.sub(z_old);
                //old_value = _stats4[num_batch] + _function->dotprod_gradient3(_z3,_stats3)+0.5*rho_old*_scalL*_z3.nrm2sq();
                old_value = _stats4[num_batch] + _function->dotprod_gradient3(_z3,_stats3); // f_old+ nabla f(old)'( new-old)
-               old_valueb=0.5*rho_old*_z3.nrm2sq();
+               old_valueb=T(0.5)*rho_old*_z3.nrm2sq();
             }
             z_old.copy(input);
             _z.add(z_old,rho_old);
@@ -514,7 +514,7 @@ class QuadraticSurrogate : public IncrementalSurrogate<T,U> {
          }
       };
       virtual void initialize_incremental(const Vector<T>& input, const int strategy) {
-         const int p = input.n();
+         const int p = static_cast<int>(input.n());
          this->_strategy = strategy;
         // _z.resize(p);
        //  _z.setZeros();
@@ -740,7 +740,7 @@ class StochasticSolver {
 template <typename T, typename U>
 void StochasticSolver<T,U>::auto_parameters(const Vector<T>& w0, Vector<T>& w, Vector<T>& wav, const int averaging_mode) {
    const int newn= this->n()/20;
-   const int iters = ceil(this->n()/(20*_minibatches));
+   const int iters = ceil(static_cast<T>(this->n()/(20*_minibatches)));
    /// inspired from bottou's determineta0 function
    T factor = 0.5;
    T lo_t0 = _t0;
@@ -1012,11 +1012,11 @@ void StochasticSmoothL1Solver<T>::solve(const Vector<T>& w0, Vector<T>& w, Vecto
       _function->refData(col); // might be counter instead
       T* v = col.rawX();
       INTM * r = col.rawR();
-      const int L = col.L();
+      const int L = static_cast<int>(col.L());
       T s = 0;
 
       for (int i = 0; i< L; ++i) {
-         const int ind=r[i];
+         const int ind=static_cast<int>(r[i]);
          T& prx = pr_t[ind].x;
          T& prz = pr_t[ind].z;
          const int& prs = pr_t[ind].s;
@@ -1081,7 +1081,7 @@ void StochasticSmoothL1Solver<T>::solve(const Vector<T>& w0, Vector<T>& w, Vecto
       /// pr_z is updated except for the gradient
       counter = next_counter;
       for (int i = 0; i< L; ++i) {
-         const int ind=r[i];
+         const int ind=static_cast<int>(r[i]);
          T& prx = pr_t[ind].x;
          T& prz = pr_t[ind].z;
          int& prs = pr_t[ind].s;
@@ -1189,7 +1189,7 @@ template <typename T, typename U>
 void stochasticProximal(const Vector<T>& y, const U& X, const Matrix<T>& w0M,
       Matrix<T>& wM, Matrix<T>& wavM, const ParamFISTA<T>& paramprox, const ParamSurrogate<T>& param, 
       const Vector<T>& lambdaV, Matrix<T>& logsM) {
-   const int num_lambdas=lambdaV.n();
+   const int num_lambdas=static_cast<int>(lambdaV.n());
    int i;
 #pragma omp parallel for private(i) 
    for (i = 0; i<num_lambdas; ++i) {
@@ -1209,7 +1209,7 @@ template <typename T>
 void stochasticProximalSparse(const Vector<T>& y, const SpMatrix<T>& X, const Matrix<T>& w0M,
       Matrix<T>& wM, Matrix<T>& wavM, const ParamFISTA<T>& paramprox, const ParamSurrogate<T>& param, 
       const Vector<T>& lambdaV, Matrix<T>& logsM) {
-   const int num_lambdas=lambdaV.n();
+   const int num_lambdas=static_cast<int>(lambdaV.n());
    int i;
 #pragma omp parallel for private(i) 
    for (i = 0; i<num_lambdas; ++i) {

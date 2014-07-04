@@ -43,7 +43,7 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
 
    Matrix<T> w0;
    getMatrix(prhs[2],w0);
-   int pw = w0.m();
+   INTM pw = w0.m();
    if (pw != p) mexErrMsgTxt("third argument should be p x nlambda");
    
    mxArray *pr_lambdas = mxGetField(prhs[3],0,"lambda");
@@ -51,11 +51,11 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
       mexErrMsgTxt("Missing field lambda");
    Vector<T> lambdas;
    getVector(pr_lambdas,lambdas);
-   int nlambdas=lambdas.n();
+   INTM nlambdas=lambdas.n();
    if (nlambdas != w0.n()) mexErrMsgTxt("third argument should be p x nlambda");
 
-   plhs[0]=createMatrix<T>(p,nlambdas);
-   plhs[1]=createMatrix<T>(p,nlambdas); 
+   plhs[0]=createMatrix<T>(static_cast<int>(p),nlambdas);
+   plhs[1]=createMatrix<T>(static_cast<int>(p),nlambdas); 
    Matrix<T> w;
    getMatrix(plhs[0],w);
    Matrix<T> wav;

@@ -245,26 +245,26 @@ template <typename T> void cblas_trmm( CBLAS_ORDER order,
        T*A,  INTT lda,T *B,  INTT ldb);
 
 // interfaces to a few functions from the intel Vector Mathematical Library
-/// interface to v*Sqr
-template <typename T> void vSqrt( int n,  T* vecIn, T* vecOut);
-/// interface to v*Sqr
-template <typename T> void vInvSqrt( int n,  T* vecIn, T* vecOut);
-/// interface to v*Sqr
-template <typename T> void vSqr( int n,  T* vecIn, T* vecOut);
-/// interface to v*Sub
-template <typename T> void vSub( int n,  T* vecIn,  T* vecIn2, T* vecOut);
-/// interface to v*Div
-template <typename T> void vDiv( int n,  T* vecIn,  T* vecIn2, T* vecOut);
-/// interface to v*Exp
-template <typename T> void vExp( int n,  T* vecIn, T* vecOut);
-/// interface to v*Inv
-template <typename T> void vInv( int n,  T* vecIn, T* vecOut);
-/// interface to v*Add
-template <typename T> void vAdd( int n,  T* vecIn,  T* vecIn2, T* vecOut);
-/// interface to v*Mul
-template <typename T> void vMul( int n,  T* vecIn,  T* vecIn2, T* vecOut);
-/// interface to v*Abs
-template <typename T> void vAbs( int n,  T* vecIn, T* vecOut);
+/// INTTerface to v*Sqr
+template <typename T> void vSqrt( INTT n,  T* vecIn, T* vecOut);
+/// INTTerface to v*Sqr
+template <typename T> void vInvSqrt( INTT n,  T* vecIn, T* vecOut);
+/// INTTerface to v*Sqr
+template <typename T> void vSqr( INTT n,  T* vecIn, T* vecOut);
+/// INTTerface to v*Sub
+template <typename T> void vSub( INTT n,  T* vecIn,  T* vecIn2, T* vecOut);
+/// INTTerface to v*Div
+template <typename T> void vDiv( INTT n,  T* vecIn,  T* vecIn2, T* vecOut);
+/// INTTerface to v*Exp
+template <typename T> void vExp( INTT n,  T* vecIn, T* vecOut);
+/// INTTerface to v*Inv
+template <typename T> void vInv( INTT n,  T* vecIn, T* vecOut);
+/// INTTerface to v*Add
+template <typename T> void vAdd( INTT n,  T* vecIn,  T* vecIn2, T* vecOut);
+/// INTTerface to v*Mul
+template <typename T> void vMul( INTT n,  T* vecIn,  T* vecIn2, T* vecOut);
+/// INTTerface to v*Abs
+template <typename T> void vAbs( INTT n,  T* vecIn, T* vecOut);
 
 // interfaces to a few LAPACK functions
 /// interface to *trtri
@@ -468,7 +468,7 @@ template <> inline void cblas_axpy<INTM>( INTT n,  INTM a, INTM* X,
 template <> inline void cblas_axpy<bool>( INTT n,  bool a,  bool* X,
        INTT incX, bool* Y,  INTT incY) {
    for (int i = 0; i<n; ++i)
-      Y[i] = a*X[i];
+      Y[i] = a & X[i];
 };
 
 
@@ -1046,48 +1046,48 @@ template <> inline INTT cblas_iamin<float>( INTT n,  float* X,
 
 #else*/
 /// Slow implementation of vdSqr and vsSqr
-template <typename T> inline void vSqr( int n,  T* vecIn, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=vecIn[i]*vecIn[i];
+template <typename T> inline void vSqr( INTT n,  T* vecIn, T* vecOut) {
+   for (INTT i = 0; i<n; ++i) vecOut[i]=vecIn[i]*vecIn[i];
 };
-template <typename T> inline void vSqrt( int n,  T* vecIn, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=sqr<T>(vecIn[i]);
+template <typename T> inline void vSqrt( INTT n,  T* vecIn, T* vecOut) {
+   for (INTT i = 0; i<n; ++i) vecOut[i]=sqr<T>(vecIn[i]);
 };
-template <typename T> inline void vInvSqrt( int n,  T* vecIn, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=T(1.0)/sqr<T>(vecIn[i]);
+template <typename T> inline void vInvSqrt( INTT n,  T* vecIn, T* vecOut) {
+   for (INTT i = 0; i<n; ++i) vecOut[i]=T(1.0)/sqr<T>(vecIn[i]);
 };
 
 /// Slow implementation of vdSub and vsSub
-template <typename T> inline void vSub( int n,  T* vecIn1, 
+template <typename T> inline void vSub( INTT n,  T* vecIn1, 
        T* vecIn2, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=vecIn1[i]-vecIn2[i];
+   for (INTT i = 0; i<n; ++i) vecOut[i]=vecIn1[i]-vecIn2[i];
 };
 /// Slow implementation of vdInv and vsInv
-template <typename T> inline void vInv( int n,  T* vecIn, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=1.0/vecIn[i];
+template <typename T> inline void vInv( INTT n,  T* vecIn, T* vecOut) {
+   for (INTT i = 0; i<n; ++i) vecOut[i]=1.0/vecIn[i];
 };
 /// Slow implementation of vdExp and vsExp
-template <typename T> inline void vExp( int n,  T* vecIn, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=exp(vecIn[i]);
+template <typename T> inline void vExp( INTT n,  T* vecIn, T* vecOut) {
+   for (INTT i = 0; i<n; ++i) vecOut[i]=exp(vecIn[i]);
 };
 /// Slow implementation of vdAdd and vsAdd
-template <typename T> inline void vAdd( int n,  T* vecIn1, 
+template <typename T> inline void vAdd( INTT n,  T* vecIn1, 
        T* vecIn2, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=vecIn1[i]+vecIn2[i];
+   for (INTT i = 0; i<n; ++i) vecOut[i]=vecIn1[i]+vecIn2[i];
 };
 /// Slow implementation of vdMul and vsMul
-template <typename T> inline void vMul( int n,  T* vecIn1, 
+template <typename T> inline void vMul( INTT n,  T* vecIn1, 
        T* vecIn2, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=vecIn1[i]*vecIn2[i];
+   for (INTT i = 0; i<n; ++i) vecOut[i]=vecIn1[i]*vecIn2[i];
 };
 /// Slow implementation of vdDiv and vsDiv
-template <typename T> inline void vDiv( int n,  T* vecIn1, 
+template <typename T> inline void vDiv( INTT n,  T* vecIn1, 
        T* vecIn2, T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=vecIn1[i]/vecIn2[i];
+   for (INTT i = 0; i<n; ++i) vecOut[i]=vecIn1[i]/vecIn2[i];
 };
 /// Slow implementation of vAbs
-template <typename T> inline void vAbs( int n,  T* vecIn, 
+template <typename T> inline void vAbs( INTT n,  T* vecIn, 
       T* vecOut) {
-   for (int i = 0; i<n; ++i) vecOut[i]=abs<T>(vecIn[i]);
+   for (INTT i = 0; i<n; ++i) vecOut[i]=abs<T>(vecIn[i]);
 };
 
 /// Slow implementation of cblas_idamin and cblas_isamin

@@ -242,7 +242,7 @@ inline bool checkField(const mxArray* pr_struct,
 template <typename T> inline T getScalarStructDef(const mxArray* pr_struct,
       const char* name, const T def) {
    mxArray *pr_field = mxGetField(pr_struct,0,name);
-   return pr_field ? (T)(mxGetScalar(pr_field)) :
+   return pr_field ? static_cast<T>(mxGetScalar(pr_field)) :
       def;
 }
 

@@ -50,12 +50,11 @@ use_mkl_threads=false;
 
 path_matlab='';
 %path_matlab='/softs/bin/';
-add_flag='';
-% WARNING: on Mac OS  mountain lion, you may have to uncomment the line
 
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
 % set up the path to the compiler libraries that you intend to use below
+add_flag='';
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
