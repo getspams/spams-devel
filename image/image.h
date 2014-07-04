@@ -172,7 +172,7 @@ void Image<T>::extractPatches(Matrix<T>& Xm,
 template <typename T>
 void Image<T>::combinePatches(const Matrix<T>& Xm, const T lambda,
       const INTM st, const bool normalize) {
-   const INTM n = static_cast<INTM>(sqrt(Xm.m()/_V));
+   const INTM n = static_cast<INTM>(sqrt(static_cast<T>(Xm.m()/_V)));
    if (Xm.m() != n*n*_V)
       return;
    T* X = Xm.rawX();
@@ -414,7 +414,7 @@ ConvolveDictionary<T>::ConvolveDictionary(const Matrix<T>& D, const INTM w, cons
    _h=h;
    _nim=nim;
    _D.copy(D);
-   _sizeEdges=static_cast<INTM>(sqrt(D.m()/nim));
+   _sizeEdges=static_cast<INTM>(sqrt(static_cast<T>(D.m()/nim)));
    _m=_h*_w*_nim;
    _sizeMapX=_h-_sizeEdges+1;
    _sizeMapY=_w-_sizeEdges+1;
