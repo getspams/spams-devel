@@ -77,13 +77,13 @@ typedef int mwSize;
 #endif
 
 
-struct timezone
+struct spams_timezone
 {
    int  tz_minuteswest; /* minutes W of Greenwich */
    int  tz_dsttime;     /* type of dst correction */
 };
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
+int gettimeofday(struct timeval *tv, struct spams_timezone *tz)
 {
    FILETIME ft;
    unsigned __int64 tmpres = 0;
