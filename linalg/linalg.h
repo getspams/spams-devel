@@ -608,6 +608,8 @@ template<typename T> class Vector {
    /// change the data of the vector
    inline void setPointer(T* X, const INTM n);
    inline void setData(T* X, const INTM n) { this->setPointer(X,n); };
+   inline void refSubVec(INTM i, INTM n, Vector<T>& mat) const { mat.setData(_X+i,n); };
+
    /// put a random permutation of size n (for integral vectors)
    inline void randperm(int n);  
    /// put random values in the vector (White Gaussian Noise)
