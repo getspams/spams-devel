@@ -1579,7 +1579,6 @@ void inline MaxFlow<T>::perform_maxflow_component(const list_int& component) {
    /// discharge the source and relabel
    this->component_relabelling(component,max_label,true);
 #ifdef VERBB
-   PRINT_I(_current_max_label)
       this->print_component2(component);
    this->print_component(component);
    stop();

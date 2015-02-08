@@ -35,7 +35,7 @@ use_multithread=true; % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
-use_64bits_integers=true;
+use_64bits_integers=false;
 % use this option if you have VERY large arrays/matrices 
 % this option allows such matrices, but may slightly reduce the speed of the computations.
 
@@ -131,7 +131,7 @@ elseif strcmp(blas,'builtin')
 end
 
 if mac
-   add_flag=' -mmacosx-version-min=10.6'
+   add_flag=' -mmacosx-version-min=10.6';
 end
    
 debug=false;
@@ -145,6 +145,7 @@ mkdir(out_dir);
 
 COMPILE = { 
             % compile dictLearn toolbox
+            '-I./linalg/ -I./prox/ prox/mex/mexProximalTree.cpp',  
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexArchetypalAnalysis.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 

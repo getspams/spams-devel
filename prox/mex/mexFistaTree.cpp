@@ -57,9 +57,13 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    INTM p=static_cast<INTM>(dimsD[1]);
    AbstractMatrixB<T>* D;
 
-   double* D_v;
-   mwSize* D_r, *D_pB, *D_pE;
-   INTM* D_r2, *D_pB2, *D_pE2;
+   double* D_v = NULL;
+   mwSize* D_r = NULL;
+   mwSize *D_pB = NULL;
+   mwSize *D_pE;
+   INTM* D_r2 = NULL;
+   INTM* D_pB2 = NULL;
+   INTM* D_pE2 = NULL;
    T* D_v2 = NULL;
    if (mxIsSparse(prhs[1])) {
       D_v=static_cast<double*>(mxGetPr(prhs[1]));

@@ -57,9 +57,13 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    AbstractMatrixB<T>* D2 = NULL;
    AbstractMatrixB<T>* D3 = NULL;
 
-   double* D_v;
-   mwSize* D_r, *D_pB, *D_pE;
-   INTM* D_r2, *D_pB2, *D_pE2;
+   double* D_v = NULL;
+   mwSize* D_r = NULL;
+   mwSize *D_pB = NULL;
+   mwSize *D_pE;
+   INTM* D_r2 = NULL;
+   INTM* D_pB2 = NULL;
+   INTM* D_pE2 = NULL;
    T* D_v2 = NULL;
    
    const int shifts = getScalarStructDef<int>(prhs[3],"shifts",1); // undocumented function

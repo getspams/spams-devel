@@ -32,11 +32,12 @@ param.pos=true;
 param.L0=1e-5;
 param.linesearch_mode=2;
 param.loss='poisson';
+param.verbose=false;
 tabdelta=logspace(0,log10(param.delta),1-log10(param.delta));
 for delta = tabdelta
    param2=param;
    param2.delta=delta;
-   param2.verbose=abs(delta-tabdelta(end)) < 1e-10;
+   param2.verbose=abs(delta-tabdelta(end)) < 1e-10 && param.verbose;
    [W optim]=mexFistaFlat(Y,X,W0,param2);
    W0=W;
 end

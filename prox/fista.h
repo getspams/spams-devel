@@ -1268,6 +1268,7 @@ namespace FISTA {
             void inline prox(const Vector<T>& x, Vector<T>& y, const T lambda) {
                y.resize(x.n());
                for (int i = 0; i<x.n(); ++i) y[i]=softThrs<T>(x[i],lambda*_weights[i]);
+               if (this->_pos) y.thrsPos();
             };
             void inline linearize(const Vector<T> &x) {
                _weights.resize(x.n());

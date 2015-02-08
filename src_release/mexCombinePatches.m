@@ -1,5 +1,5 @@
 % 
-% Usage:   I =mexCombinePatches(X,I0,n,step,lambda,normalize);
+% Usage:   I =mexCombinePatches(X,I0,n,lambda,step,normalize);
 %
 % Name: mexCombinePatches
 %

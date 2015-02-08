@@ -40,7 +40,7 @@
 %     min_{D in C} (1/n) sum_{i=1}^n 0.5||x_i-Dalpha_i||_2^2 +lambda||alpha_i||_0  
 %                                           
 %
-%%     C is a convex set verifying
+%     C is a convex set verifying
 %        1) if param.modeD=0
 %           C={  D in Real^{m x p}  s.t.  forall j,  ||d_j||_2^2 <= 1 }
 %        2) if param.modeD=1
@@ -52,7 +52,6 @@
 %        4) if param.modeD=3
 %           C={  D in Real^{m x p}  s.t.  forall j,  (1-gamma1)||d_j||_2^2 + ... 
 %                                  gamma1||d_j||_1 <= 1 }
-
 %
 %     Potentially, n can be very large with this algorithm.
 %

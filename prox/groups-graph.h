@@ -67,7 +67,7 @@ inline void del_gstruct(std::vector<StructNodeElem<T> *> *gstruct) {
  */
 inline char * skip_space(char * s) {
   char *ps = s;
-  while(isspace(*ps))
+  while(std::isspace(*ps))
     ps++;
   if(*ps == 0)
     return (char *)0;
@@ -92,7 +92,7 @@ static inline int parse_line(char *s,std::vector<std::string> &vresult) {
   // node id
   char *p0 = p;
   int n = 0;
-  while(! isspace(*p) && (*p != 0)) {
+  while(! std::isspace(*p) && (*p != 0)) {
     if(! isdigit(*p)) return -1;
     p++;
     n++;
@@ -103,7 +103,7 @@ static inline int parse_line(char *s,std::vector<std::string> &vresult) {
   if(*p != '[') {
     p0 = p;
     n = 0;
-    while(! isspace(*p)) {
+    while(! std::isspace(*p)) {
       if(!isprint(*p)) return -1;
       p++;
       n++;
@@ -124,7 +124,7 @@ static inline int parse_line(char *s,std::vector<std::string> &vresult) {
   }
   if (n > 0) {
     char *p1 = p - 1;
-    while(isspace(*p1)) {
+    while(std::isspace(*p1)) {
       p1--;
       n--;
     }
@@ -144,7 +144,7 @@ static inline int parse_line(char *s,std::vector<std::string> &vresult) {
     n++;
   }
   p--;
-  while(isspace(*p)) {
+  while(std::isspace(*p)) {
     p--;
     n--;
   }
