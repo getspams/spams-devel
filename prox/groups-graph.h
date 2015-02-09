@@ -588,7 +588,7 @@ int _treeOfGroupStruct(std::vector<StructNodeElem<T> *> *gstruct,int **pperm,int
     if (n > 0)
       down_variables[i] = (*vars)[0];
     bool *pg = dgroups + (i * nb_groups);
-    for(int j = 0; j < children->size();j++) {
+    for(unsigned int j = 0; j < children->size();j++) {
       int k = (*children)[j];
       *(pg + k) = true;
     }

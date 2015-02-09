@@ -49,7 +49,7 @@ use_mkl_threads=false;
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
 path_matlab='';
-%path_matlab='/softs/bin/';
+path_matlab='/softs/bin/';
 
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
@@ -58,7 +58,7 @@ add_flag='';
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -78,8 +78,11 @@ elseif strcmp(compiler,'icc')
     if linux || mac
        % example when compiler='icc' for Linux/Mac
        path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
+       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
+       path_to_compiler='/scratch2/clear/mairal/intel/composerxe/bin/';
+       path_to_compiler_libraries='/scratch2/clear/mairal/intel/composerxe/lib/intel64';
     else
        % example when compiler='icc' for Windows
        path_to_compiler_libraries='C:\Program Files (x86)\Intel\Composer XE\compiler\lib\intel64\';
@@ -101,8 +104,8 @@ end
 % set up the path to the blas/lapack libraries. 
 if strcmp(blas,'mkl')
    if linux || mac
-      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end

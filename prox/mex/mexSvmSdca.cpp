@@ -67,8 +67,9 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
 
    const int minibatches = getScalarStructDef<int>(prhs[3],"minibatches",1);
    const int max_it = getScalarStructDef<int>(prhs[3],"max_it",100*n);
-   const T eps = getScalarStructDef<int>(prhs[3],"eps",0.001);
-   sdca(y,X,W,tablambda,eps,max_it,minibatches); 
+   const T eps = getScalarStructDef<T>(prhs[3],"eps",0.001);
+   const bool random = getScalarStructDef<bool>(prhs[3],"random",false);
+   sdca(y,X,W,tablambda,eps,max_it,minibatches,random); 
 }
 
    void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {

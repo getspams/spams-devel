@@ -4,7 +4,7 @@
 #include <linalg.h>
 
 template <typename T>
-void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>& tablambda, const T eps, const int max_iter, const int minibatch) {
+void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>& tablambda, const T eps, const int max_iter, const int minibatch,const bool random_cycle) {
    const int n = y.n();
    const int p = X.m();
    const int nlambda=tablambda.n();
@@ -48,12 +48,12 @@ void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>&
             T dualA=-0.5*(lambda)*primalB;
             T dualB= y.dot(alpha)/n;
             const T dual = dualA + dualB;
-            cout << "Iteration: " << ii << ", primal: " << primal << ", dual: " << dual << ", gap: " << primal-dual << endl;
-            if ((primal - dual)/primal < eps) break;
+            cout << "Iteration: " << ii << ", primal: " << primal << ", dual: " << dual << ", gap: " << (primal-dual) << endl;
+            if ((primal - dual) < eps) break;
          }
 
-         const int ind = random() % n;
          if (minibatch == 1) {
+            const int ind = random_cycle ? random() % n : ii % n;
             const T yi=y[ind];
             X.refCol(ind,xi);
             const T A = normX[ind]/(n*lambda);
@@ -62,6 +62,7 @@ void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>&
             alpha[ind]+=delta;
             w.add(xi,delta/(lambda*n));
          } else {
+            const int ind = random() % n;
             const int sizebatch= MIN(minibatch,n-ind);
             y.refSubVec(ind,sizebatch,ys);
             normX.refSubVec(ind,sizebatch,normXs);
