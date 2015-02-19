@@ -1,10 +1,10 @@
 #ifndef SVM_H
-#define SVM_H
+#define SVM_H  
 
 #include <linalg.h>
 
 template <typename T>
-void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>& tablambda, const T eps, const int max_iter, const int minibatch,const bool random_cycle) {
+void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>& tablambda, const T eps, const int max_iter) {
    const int n = y.n();
    const int p = X.m();
    const int nlambda=tablambda.n();
@@ -17,14 +17,9 @@ void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>&
    Vector<T> normX;
    X.norm_2sq_cols(normX);
    Vector<T> w;
-   W.refCol(0,w);
+   W.refCol(0,w);    
    Vector<T> tmp;
    Vector<T> xi;
-   Vector<T> ys;
-   Matrix<T> Xs;
-   Vector<T> grad;
-   Vector<T> alphas;
-   Vector<T> normXs;
 
    cout << "Problem size: p x n: " << p << " " << n << endl;
    for (int jj = 0; jj<nlambda; ++jj) {
@@ -38,7 +33,7 @@ void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>&
          w.scal(tablambda[jj-1]/lambda);
       }
       for (int ii = 0; ii<max_iter; ++ii) {
-         if (ii > 0 && (ii % (10*n/minibatch)) == 0) {
+         if (ii > 0 && (ii % (10*n)) == 0) {
             T primalA=0;
             X.multTrans(w,z);
             for (int kk=0; kk<n; ++kk) primalA += MAX(0,1-y[kk]*z[kk]);
@@ -52,37 +47,72 @@ void sdca(const Vector<T>& y, const Matrix<T>& X, Matrix<T>& W, const Vector<T>&
             if ((primal - dual) < eps) break;
          }
 
-         if (minibatch == 1) {
-            const int ind = random_cycle ? random() % n : ii % n;
-            const T yi=y[ind];
-            X.refCol(ind,xi);
-            const T A = normX[ind]/(n*lambda);
-            const T deltaT = (yi-xi.dot(w))/A;
-            const T delta=yi*MAX(0,MIN(1,yi*(alpha[ind]+deltaT)))-alpha[ind];
-            alpha[ind]+=delta;
-            w.add(xi,delta/(lambda*n));
-         } else {
-            const int ind = random() % n;
-            const int sizebatch= MIN(minibatch,n-ind);
-            y.refSubVec(ind,sizebatch,ys);
-            normX.refSubVec(ind,sizebatch,normXs);
-            X.refSubMat(ind,sizebatch,Xs);
-            alpha.refSubVec(ind,sizebatch,alphas);
-            Xs.mult(alpha,tmp);
-            Xs.multTrans(tmp,grad);
-            grad.scal(-T(1.0)/((lambda*n)*n));
-            grad.add(ys,T(1.0)/n);
-            const T L = sqrt(normXs.sum())/((lambda*n)*n);
-            alphas.add(grad,-T(1.0)/L);
-            for (int kk=0; kk<alphas.n(); ++kk) 
-               if (ys[kk] > 0) {
-                  alphas[kk]=MIN(MAX(alphas[kk],-1),0);
-               } else {
-                  alphas[kk]=MIN(MAX(alphas[kk],0),1);
-               }
-         }
+         const int ind = random() % n;
+         const T yi=y[ind];
+         X.refCol(ind,xi);
+         const T A = normX[ind]/(n*lambda);
+         const T deltaT = (yi-xi.dot(w))/A;
+         const T delta=yi*MAX(0,MIN(1,yi*(alpha[ind]+deltaT)))-alpha[ind];
+         alpha[ind]+=delta;
       }
    }
 }
 
+/// for square hinge loss
+template <typename T>
+void sdca_smoothloss_aux(const Vector<T>& y, const Matrix<T>& X, Vector<T>& w, Vector<T>& alpha, Vector<T>& v, T& gap, const Vector<T>& kappa, const T lambda, const T eps, const T s, const int loss, const int max_iter) {
+   const int n = y.n();
+   const int p = X.m();
+   Vector<T> xi;
+   X.mult(alpha,v,T(1.0)/(lambda*n));  // TODO: remove
+   w.copy(kappa);
+   
+ for (int ii = 0; ii<max_iter; ++ii) {
+   if (loss==0) {
+      if (ii > 0 && (ii % (5*n)) == 0) {
+         T primal=0;
+         T dual=0;
+         for (int jj=0; jj<n; ++jj) {
+            X.refCol(jj,xi);
+            primal+=logexp<T>(y[jj]*xi.dot(w));
+         }
+         primal/=n;
+         primal += lambda*
+      }
+      const int ind = random() % n;
+      const T yi=y[ind];
+      X.refCol(ind,xi);
+      const T z = xi.dot(w);
+      T gradphi;
+      switch (loss) {
+         case 0: gradphi=-yi/(T(1.0)+alt_exp(yi*z)); break;  // L=0.25
+         case 1: gradphi=yi*z >= 1 ? 0 : 2*(z-yi); break;   // L=2
+         default: exit(1);
+      }
+   } else if (loss==1) {
+
+   }
+   const T delta = s*(-gradphi-alpha[ind]);
+   alpha[ind]+=delta;
+   v.add(xi,delta/(lambda*n));
+   w.copy(kappa);
+   w.add(v);
+ }
+}
+
+
+template <typename T>
+void miso_aux(const Vector<T>& y, const Matrix<T>& X, Vector<T>& alpha, Vector<T>& w, const T lambda, const T delta, const T eps, const int max_iter) {
+    const int n=X.n();
+    const int p=X.m();
+    X.mult(alpha,w);   // TODO remove
+    w.scal(T(1.0)/n);
+
+    for (int ii=0; ii<max_iter; ++ii) {
+       const int ind = random() % n;
+
+
+    }
+}
+ 
 #endif
