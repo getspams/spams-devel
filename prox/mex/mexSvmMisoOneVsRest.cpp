@@ -21,7 +21,7 @@
 #include <mexutils.h>
 #include <svm.h>
 
-// w=mexSvmSdca(y,X,tablambda,param);
+// w=mexSvmMiso(y,X,tablambda,param);
 
 template <typename T>
 inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
@@ -34,13 +34,8 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    if (!mexCheckType<T>(prhs[1])) 
       mexErrMsgTxt("type of argument 2 is not consistent");
 
-   if (!mexCheckType<T>(prhs[2])) 
-      mexErrMsgTxt("type of argument 3 is not consistent");
-   if (mxIsSparse(prhs[2])) 
-      mexErrMsgTxt("argument 3 should not be sparse");
-
-   if (!mxIsStruct(prhs[3])) 
-      mexErrMsgTxt("argument 4 should be a struct");
+   if (!mxIsStruct(prhs[2])) 
+      mexErrMsgTxt("argument 3 should be a struct");
 
    T* pry = reinterpret_cast<T*>(mxGetPr(prhs[0]));
    const mwSize* dimsy=mxGetDimensions(prhs[0]);
@@ -54,29 +49,31 @@ inline void callFunction(mxArray* plhs[], const mxArray*prhs[],
    INTM n=static_cast<INTM>(dimsX[1]);
    Matrix<T> X(prX,p,n);
 
-   T* prlambda = reinterpret_cast<T*>(mxGetPr(prhs[2]));
-   const mwSize* dimslambda=mxGetDimensions(prhs[2]);
-   INTM ml=static_cast<INTM>(dimslambda[0]);
-   INTM nl=static_cast<INTM>(dimslambda[1]);
-   Vector<T> tablambda(prlambda,ml*nl);
-   const int nlambda=ml*nl;
-
-   plhs[0]=createMatrix<T>(p,nlambda);
+   const int nclasses=y.maxval()+1;
+   plhs[0]=createMatrix<T>(p,nclasses);
    T* prw=reinterpret_cast<T*>(mxGetPr(plhs[0]));
-   Matrix<T> W(prw,p,nlambda);
+   Matrix<T> W(prw,p,nclasses);
 
-   const int minibatches = getScalarStructDef<int>(prhs[3],"minibatches",1);
-   const int max_it = getScalarStructDef<int>(prhs[3],"max_it",100*n);
-   const T eps = getScalarStructDef<T>(prhs[3],"eps",0.001);
-   const bool random = getScalarStructDef<bool>(prhs[3],"random",false);
-   sdca(y,X,W,tablambda,eps,max_it,minibatches,random); 
+   const int max_it = getScalarStructDef<int>(prhs[2],"max_it",1000*n);
+   const T eps = getScalarStructDef<T>(prhs[2],"eps",0.001);
+   int threads = getScalarStructDef<T>(prhs[2],"threads",-1);
+   const T lambda = getScalarStruct<T>(prhs[2],"lambda");
+   const bool accelerated = getScalarStructDef<T>(prhs[2],"accelerated",false);
+   if (threads == -1) {
+      threads=1;
+#ifdef _OPENMP
+      threads =  MIN(MAX_THREADS,omp_get_num_procs());
+#endif
+   } 
+   threads=init_omp(threads);
+   miso_svm_onevsrest(y,X,W,lambda,eps,max_it,accelerated); 
 }
 
    void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {
-      if (nrhs != 4)
+      if (nrhs != 3)
          mexErrMsgTxt("Bad number of inputs arguments");
 
-      if (nlhs != 1 && nlhs != 2) 
+      if (nlhs != 1) 
          mexErrMsgTxt("Bad number of output arguments");
 
       if (mxGetClassID(prhs[0]) == mxDOUBLE_CLASS) {

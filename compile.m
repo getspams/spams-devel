@@ -35,7 +35,7 @@ use_multithread=true; % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
-use_64bits_integers=false;
+use_64bits_integers=true;
 % use this option if you have VERY large arrays/matrices 
 % this option allows such matrices, but may slightly reduce the speed of the computations.
 
@@ -48,8 +48,8 @@ use_mkl_threads=false;
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
-path_matlab='';
 path_matlab='/softs/bin/';
+path_matlab='';
 
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
@@ -77,12 +77,12 @@ elseif strcmp(compiler,'open64')
 elseif strcmp(compiler,'icc')
     if linux || mac
        % example when compiler='icc' for Linux/Mac
-       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
-       path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
-       path_to_compiler='/opt/intel/composerxe/bin/';
+       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
        path_to_compiler='/scratch2/clear/mairal/intel/composerxe/bin/';
        path_to_compiler_libraries='/scratch2/clear/mairal/intel/composerxe/lib/intel64';
+       path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
+       path_to_compiler='/opt/intel/composerxe/bin/';
     else
        % example when compiler='icc' for Windows
        path_to_compiler_libraries='C:\Program Files (x86)\Intel\Composer XE\compiler\lib\intel64\';
@@ -104,8 +104,8 @@ end
 % set up the path to the blas/lapack libraries. 
 if strcmp(blas,'mkl')
    if linux || mac
-      path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -148,7 +148,9 @@ mkdir(out_dir);
 
 COMPILE = { 
             % compile dictLearn toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexSvmSdca.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexSvmMiso.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexSvmMisoOneVsRest.cpp',  
+            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexProximalTree.cpp',  
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexArchetypalAnalysis.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
