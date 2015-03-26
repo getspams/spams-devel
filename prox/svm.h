@@ -138,6 +138,7 @@ void accelerated_miso_svm_aux(const Vector<T>& y, const Matrix<T>& X, Vector<T>&
    T gap=T(1.0);
    int total_iters=0;
    int counter = 1;
+   T gapold=T(1.0);
    for (int ii=0; ii<max_iter; ++ii) {
       epsk *= (T(1.0)-qp);
       // check if continue or not
@@ -153,32 +154,25 @@ void accelerated_miso_svm_aux(const Vector<T>& y, const Matrix<T>& X, Vector<T>&
       }
       const T diffNorm = normsq(z,zold);
       gapk=(n*(gapk + T(0.5)*(kappa*kappa/(lambda+kappa))*diffNorm));
-      bool skip_optim =  gapk <= epsk;
-      if (!skip_optim) {
-         T loss;
-         int num_iters;
-         accelerated_miso_svm_aux2(y, X, w, alpha, C, loss, gapk, num_iters, z, kappa, R, lambda, epsk);
-         total_iters += num_iters;
-         const T primal = loss+T(0.5)*lambda*w.nrm2sq();
-         Vector<T> ws;
-         ws.copy(w);
-         ws.scal((kappa+lambda)/lambda);
-         ws.add(z,-kappa/lambda);
-         const T dual=C.mean() - T(0.5)*lambda*ws.nrm2sq();
-         gap=primal-dual;
-         if (gap <= eps || total_iters >= max_iter) {
-#pragma omp critical
-            {
-                              cout << "Iteration " << total_iters << ", inner it: " << ii << ", loss: " << loss << ", primal: " << primal << ", dual: " << dual << ", gap: " << (primal-dual) << endl;
-            }
-            break;
-         }
-      } else {
+      T loss;
+      int num_iters;
+      accelerated_miso_svm_aux2(y, X, w, alpha, C, loss, gapk, num_iters, z, kappa, R, lambda, epsk);
+      total_iters += num_iters;
+      const T primal = loss+T(0.5)*lambda*w.nrm2sq();
+      Vector<T> ws;
+      ws.copy(w);
+      ws.scal((kappa+lambda)/lambda);
+      ws.add(z,-kappa/lambda);
+      const T dual=C.mean() - T(0.5)*lambda*ws.nrm2sq();
+      gap=primal-dual;
+      if ((ii > 30 && gap >= gapold) || gap <= eps || total_iters >= max_iter) {
 #pragma omp critical
          {
-            cout << "Skip iteration" << endl;
+            cout << "Iteration " << total_iters << ", inner it: " << ii << ", loss: " << loss << ", primal: " << primal << ", dual: " << dual << ", gap: " << (primal-dual) << endl;
          }
+         break;
       }
+      gapold=gap;
       zold.copy(z);
       z.copy(w);
       z.scal(T(1.0)+betak);
