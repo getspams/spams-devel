@@ -15,7 +15,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='icc';
+compiler='gcc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -48,8 +48,8 @@ use_mkl_threads=false;
 % if you use the options 'mex' and 'builtin', you can proceed with the compilation by
 % typing 'compile' in the matlab shell. Otherwise, you need to set up a few path below.
 
-path_matlab='/softs/bin/';
 path_matlab='';
+path_matlab='/softs/bin/';
 
 %%%%%%%%%%%% PATH CONFIGURATION %%%%%%%%%%%%%%%%%%%%
 % only if you do not use the options 'mex' and 'builtin'
@@ -59,6 +59,7 @@ if strcmp(compiler,'gcc')
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.9.2/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -79,10 +80,11 @@ elseif strcmp(compiler,'icc')
        % example when compiler='icc' for Linux/Mac
        path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8/';
-       path_to_compiler='/scratch2/clear/mairal/intel/composerxe/bin/';
-       path_to_compiler_libraries='/scratch2/clear/mairal/intel/composerxe/lib/intel64';
+       path_to_gcccompiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.9.2/';
        path_to_compiler_libraries='/opt/intel/composerxe/lib/intel64/';
        path_to_compiler='/opt/intel/composerxe/bin/';
+       path_to_compiler='/scratch2/clear/mairal/intel/composerxe/bin/';
+       path_to_compiler_libraries='/scratch2/clear/mairal/intel/composerxe/lib/intel64';
     else
        % example when compiler='icc' for Windows
        path_to_compiler_libraries='C:\Program Files (x86)\Intel\Composer XE\compiler\lib\intel64\';
@@ -104,8 +106,8 @@ end
 % set up the path to the blas/lapack libraries. 
 if strcmp(blas,'mkl')
    if linux || mac
-      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
       path_to_blas='/opt/intel/composerxe/mkl/lib/intel64/';
+      path_to_blas='/scratch2/clear/mairal/intel/composerxe/mkl/lib/intel64/';
    else
       path_to_blas='C:\Program Files (x86)\Intel\Composer XE\mkl\lib\intel64\';
    end
@@ -148,7 +150,6 @@ mkdir(out_dir);
 
 COMPILE = { 
             % compile dictLearn toolbox
-            '-I./linalg/ -I./prox/ prox/mex/mexSvmMiso.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexSvmMisoOneVsRest.cpp',  
             '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
             '-I./linalg/ -I./prox/ prox/mex/mexProximalTree.cpp',  
@@ -306,7 +307,7 @@ if strcmp(compiler,'icc')
        compile_flags='/Qvc10  /Qopenmp /MD /QaxSSE2,SSE3,SSE4.1,SSE4.2,AVX,CORE-AVX2,CORE-AVX-I /O2';
    else
        DEFCOMP=sprintf('CXX=%s/icpc LDCXX=%s/icpc',path_to_compiler,path_to_compiler);
-       compile_flags='-fPIC -march=native -pipe -w -w0 -O3 -fomit-frame-pointer -fno-alias -align -falign-functions';
+       compile_flags='-fPIC -march=native -pipe -w -w0 -fast -fomit-frame-pointer -fno-alias -align -falign-functions';
        %link_flags=[link_flags sprintf(' -cxxlib=%s',path_to_gcc_libraries)];
        %link_flags=[link_flags ' -gcc-version=430'];
    end
