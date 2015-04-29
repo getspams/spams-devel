@@ -100,4 +100,42 @@ void projsplxMatrixOn(const Matrix<T>& Beta) {
   }
 }
 
+template <typename T>
+void projsplx_raw(const Vector<T>& x, Vector<T>& y, const T thrs) {
+   y.copy(x);
+   T* prU = y.rawX();
+   T sum=0;
+   int sum_card=0;
+   int sizeU = y.n();
+   while (sizeU > 0) {
+      // put the pivot in prU[0]
+      swap(prU[0],prU[sizeU/2]);
+      const T pivot = prU[0];
+      int sizeG=1;
+      T sumG=prU[0];
+
+      for (int i = 1; i<sizeU; ++i) {
+         if (prU[i] >= pivot) {
+            sumG += prU[i];
+            swap(prU[sizeG++],prU[i]);
+         }
+      }
+      if (sum + sumG - pivot*(sum_card + sizeG) <= thrs) {
+         sum_card += sizeG;
+         sum += sumG;
+         prU +=sizeG;
+         sizeU -= sizeG;
+      } else {
+         ++prU;
+         sizeU = sizeG-1;
+      }
+   }
+   const T lambda = (sum-thrs)/sum_card;
+   const int n = y.n();
+   T* prX = x.rawX();
+   T* prY = y.rawX();
+   for (int ii = 0; ii<n; ++ii) 
+      prY[ii]=MAX(prX[ii]-lambda,0);
+}
+
 #endif
