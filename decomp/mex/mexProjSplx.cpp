@@ -43,15 +43,16 @@ template <typename T>
 
       T* prX = reinterpret_cast<T*>(mxGetPr(prhs[0]));
       const mwSize* dimsX=mxGetDimensions(prhs[0]);
-      int m=static_cast<int>(dimsX[0])*static_cast<int>(dimsX[1]);
+      int m=static_cast<int>(dimsX[0]);
+      int n=static_cast<int>(dimsX[1]);
 
-      plhs[0]=createMatrix<T>(m,1);
+      plhs[0]=createMatrix<T>(m,n);
       T* prY=reinterpret_cast<T*>(mxGetPr(plhs[0]));
 
-      Vector<T> x(prX,m);
-      Vector<T> y(prY,m);
+      Matrix<T> x(prX,m,n);
+      Matrix<T> y(prY,m,n);
       T thrs = getScalarStructDef<T>(prhs[1],"tau",T(1.0));
-      projsplx_raw(x,y,thrs);
+      projsplxMatrix2(x,y,thrs);
    }
 
 void mexFunction(int nlhs, mxArray *plhs[],int nrhs, const mxArray *prhs[]) {
