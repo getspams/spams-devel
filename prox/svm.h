@@ -185,7 +185,7 @@ void accelerated_miso_svm_aux(const Vector<T>& y, const Matrix<T>& X, Vector<T>&
 template <typename T>
 void accelerated_miso_svm_aux2(const Vector<T>& y, const Matrix<T>& X, Vector<T>& w, Vector<T>& alpha, Vector<T>& C, T& loss,T& gap, int& num_iters,  const Vector<T>& z, const T kappa, const T R, const T lambda, const T eps) {
    const int n = y.n();
-   const int p = X.m();
+//   const int p = X.m();
    const long long max_iter = static_cast<long long>(floor(log(double(eps)/double(gap))/log(double(1.0)-double(1.0)/n)));
    Vector<T> tmp;
    Vector<T> xi;

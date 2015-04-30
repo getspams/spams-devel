@@ -15,7 +15,7 @@ get_architecture;
 %   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
-compiler='icc';
+compiler='gcc';
 
  %%%%%%%%%%%% BLAS/LAPACK CONFIGURATION %%%%%%%%%%%%%%
 % set up the blas/lapack library you want to use. Possible choices are
@@ -58,8 +58,8 @@ add_flag='';
 if strcmp(compiler,'gcc') 
     if linux || mac
        % example when compiler='gcc' for Linux/Mac:   (path containing the files libgcc_s.*)
-       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.9.2/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
@@ -149,10 +149,9 @@ out_dir='./build/';
 mkdir(out_dir);
 
 COMPILE = { 
-            % compile dictLearn toolbox
             '-I./linalg/ -I./prox/ prox/mex/mexSvmMisoOneVsRest.cpp',  
-            '-I./linalg/ -I./prox/ prox/mex/mexFistaFlat.cpp',
-            '-I./linalg/ -I./prox/ prox/mex/mexProximalTree.cpp',  
+            '-I./linalg/ -I./decomp/ decomp/mex/mexProjSplx.cpp',  
+            % compile dictLearn toolbox
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexArchetypalAnalysis.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexTrainDL.cpp', 
             '-I./linalg/ -I./decomp/ -I./prox/ -I./dictLearn/ dictLearn/mex/mexStructTrainDL.cpp', 
