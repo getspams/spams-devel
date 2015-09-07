@@ -43,6 +43,18 @@ Installing on macOS:
 	and "R CMD INSTALL" worked fine,
 	but I had to redefine TMPDIR (export TMPDIR=/var/tmp)
 
+ Special thanks to Karthikeyan Natesan Ramamurthy for his report about issues
+he encountered on MAC OSX Yosemite:
+
+{
+the installer could not figure out the library paths for gfortran and quadmath. 
+      ... this is common issue with recent versions of MAC OSX, and we may have to install gfortran from https://gcc.gnu.org/wiki/GFortranBinaries (or some other place), and add soft links like this:
+
+sudo ln -s /usr/local/gfortran/lib/libgfortran.* /usr/local/lib/
+
+ sudo ln -s /usr/local/gfortran/lib/libquadmath.* /usr/local/lib/
+}
+
 Installing on windows :
 ======================
 
