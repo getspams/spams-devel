@@ -2,8 +2,6 @@
 
 This directory contains files to install and use (at the end) the python interfaces to the functions of SPAMS library already interfaced with matlab.
 
-
-
 Manipulated objects are imported from numpy and scipy. Matrices should be stored by columns, and sparse matrices should be "column compressed".
 
 The python SPAMS package consists of 4 files:
@@ -21,7 +19,7 @@ that should be in the path of the python interpreter (for instance in the curren
 
 Available functions in python are defined in `spams.py` and documented (the doc is extracted from matlab files).
 
-This file describes how to directly install the interface from sources.
+This file describes how to directly install the interface from sources. Build details are described in [README_spams2.6_python2.x.md](README_spams2.6_python2.x.md)
 
 ## INTERFACE INSTALLATION (python2.x) for LINUX and MacOS
 
@@ -45,7 +43,8 @@ Two documentations are installed in `$inst/doc`:
 ### Testing the interface :
 
 ```
-export PYTHONPATH=$inst/lib/python2.7/site-packages
+PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
 python test_spams.py -h # to get help
 python test_spams.py  # will run all the tests
@@ -70,6 +69,8 @@ export CC=/opt/local/bin/gcc-mp-4.3;export CXX=/opt/local/bin/g++-mp-4.3
 ```
 
 ## INTERFACE INSTALLATION (python2.x) for Windows
+
+Examples with python2.7
 
 ### Installation of the binary windows packages
 

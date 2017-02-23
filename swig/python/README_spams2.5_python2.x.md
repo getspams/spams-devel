@@ -19,7 +19,7 @@ that should be in the path of the python interpreter (for instance in the curren
 
 Available functions in python are defined in `spams.py` and documented (the doc is extracted from matlab files).
 
-This file describes how to directly install the interface from sources.
+This file describes how to directly install the interface from sources. Build details are described in [README_spams2.5_python2.x.md](README_spams2.5_python2.x.md)
 
 ## INTERFACE INSTALLATION (python2.x) for LINUX and MacOS
 
@@ -43,7 +43,8 @@ Two documentations are installed in `$inst/doc`:
 ### Testing the interface :
 
 ```
-export PYTHONPATH=$inst/lib/python2.6/site-packages
+PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
 python test_spams.py -h # to get help
 python test_spams.py  # will run all the tests
@@ -60,7 +61,7 @@ If you don't have libblas.so and liblapack.so in /lib or /usr/lib, you need to e
 #### MacOS:
 The installation has been tested with MacOS 10 (Lion), it required that packages were installed with `port install`:
 ```
-port install atlas;port install py26-numpy;install py26-scipy
+port install atlas;port install py27-numpy;install py27-scipy
 ```
 Maybe necessary to add `/opt/local/bin` to `PATH` and specified the compiler by setting CC and CXX, for example:
 ```
@@ -69,9 +70,11 @@ export CC=/opt/local/bin/gcc-mp-4.3;export CXX=/opt/local/bin/g++-mp-4.3
 
 ## INTERFACE INSTALLATION (python2.x) for Windows
 
+Examples with python2.7
+
 ### Installation of the binary windows packages
 
-They are named `spams-python-%FULLVERSION%.win32-py2.7.exe` and   `spams-python-%FULLVERSION%.win-amd64-py2.7.exe`
+They are named `spams-python-%FULLVERSION%.win32-py2.7.exe` and `spams-python-%FULLVERSION%.win-amd64-py2.7.exe`
 
 These packages are for python-2.7.
 

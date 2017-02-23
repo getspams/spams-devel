@@ -20,6 +20,8 @@ You will find in `$inst`:
 ## Running test programs :
 ```
 cd $inst/test
+PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 python test_spams.py -h # to get help
 python test_spams.py  # will run all the tests
 python test_spams.py linalg # test of linalg functions
@@ -97,6 +99,3 @@ python test_spams.py name1 name2 ... # run named tests
 * `./win-build.sh`<br/>
   to be run in a command window MinGW on Windows to make a windows binary package (.exe)<br/>
   The package will be 32 or 64bits depending on the system.
-  a executer dans une fenetre de commande MinGW sous windows pour
-
-Build details are described in [README_spams2.6_python2.x.md](README_spams2.6_python2.x.md)
