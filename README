@@ -1,18 +1,42 @@
-This is the source code of the software SPAMS, which needs to be compiled before begin used.
+This is the source code of the software  (you can use the precompiled toolbox
+or compile the sources before using it).
 
 There are several possible configurations. In particular,
-   - it should work with 32 and 64 bits operating systems.
-   - Linux, Windows and Mac OS.
-   - it can use either the netlib blas/lapack library, or the intel mkl
-     library, or your favorite BLAS library (ACML for instance).
-   - it can be compiled using either gcc for Linux and Mac (a recent gcc >= 4.5
-     is recommended), Microsoft visual studio compiler for Windows and the
-     intel compiler for all platforms.
-   - it can either be used as an C++ library, or interfaced with Matlab, and it now
-     comes with a preliminary R/Python interface.
+- it should work with 32 and 64 bits operating systems.
+- Linux, Windows (at least for version <= 2.5) and Mac OS.
+- it can use either the netlib blas/lapack library, or the intel mkl
+  library, or your favorite BLAS library (ACML for instance).
+- it can be compiled using either gcc for Linux and Mac (a recent gcc >= 4.5
+  is recommended), Microsoft visual studio compiler for Windows and the
+  intel compiler for all platforms.
+- it can either be used as a C++ library, or interfaced with Matlab, and it
+  now comes with a preliminary R/Python interface.
 
 
-The best way to compile the library is to open the file compile.m and follow instructions.
+# SPAMS-2.6
+
+SPAMS is now available in version 2.6
+
+## Matlab users
+
+### Precompiled toolbox
+You can use the precompiled toolbox `spams-matlab-precompiled-v2.6-%LAST_DATE%-%OS%.tar.gz`
+for Linux or MacOS. You extract the tarball and run matlab in the current
+directory. You have to use the command `start_spams` in matlab to load the
+precompiled functions.
+
+The precompiled version for MacOS was compiled on MacOS X Maverick (10.9.5),
+please let us know if you encounter any issues on more recent MacOS version.
+
+At the moment, no precompiled version is available for Windows users, we are
+currently working on it.
+
+### Building the library (more advanced users)
+
+The best way to compile the library is to open the file [compile.m](./compile.m)
+and follow instructions. You can modify the beginning of the file to choose
+the compiler, the blas library, set some options and the different paths, then
+run `compile.m` in matlab.
 
 After all the mex-files are compiled, a script run_matlab.sh is also created,
 at least for the Linux and/or Mac OS version. Depending on your configuration,
@@ -21,4 +45,7 @@ toolbox (in order to preload multi-threading libraries).
 Otherwise, just type "start_spams;" and use the SPAMS library.
 
 
-For R/Python users, an interface with some instructions are available in the folder "swig"
+## R/Python
+
+For R/Python users, an interface with some instructions are available in the
+folder [swig](./swig)
