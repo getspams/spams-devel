@@ -1,4 +1,4 @@
-# CORRECTIONS
+# CHANGES
 
 ## VERSION 2.6
 
