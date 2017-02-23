@@ -14,6 +14,6 @@ Description: The 'spams' package provides an R interface to the SPArse
     decomposition problems (l1/l2, l1/linf, sparse group lasso,
     tree-structured regularization, structured sparsity with
     overlapping groups,...).
-License: GPL (>=3)
+License: GPL-3
 LazyLoad: yes
 Depends: R (>= 2.0), methods, lattice, Matrix
