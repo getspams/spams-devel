@@ -1,0 +1,20 @@
+swig export-ignore
+wiki export-ignore
+
+.gitattributes_matlab export-ignore
+.gitattributes_cpp export-ignore
+.gitignore export-ignore
+
+compile_gcc.m export-ignore
+compile_intel.m export-ignore
+compile_mex_linux.m export-ignore
+compile_mex_macosx.m export-ignore
+
+export_matlab_src_git.sh export-ignore
+export_matlab_src_svn.sh export-ignore
+extract_matlab_src.sh export-ignore
+
+make_matlab_linux.sh export-ignore
+make_matlab_macosx.sh export-ignore
+
+TODO export-ignore
