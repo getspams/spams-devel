@@ -1,6 +1,6 @@
 # Build SPAMS 2.6 and python2.x
 
-This file describes how to build spams-2.5 for python with python2.7 and the different tools available (at the end)
+This file describes how to build spams-2.6 for python with python2.7 and the different tools available (at the end)
 
 ----------------------------------------
 ## Building from sources (you need SWIG and perl):
