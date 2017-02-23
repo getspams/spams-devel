@@ -74,12 +74,12 @@ def usage(msg = None):
     Prints the help message, that must have been built with prepare_doc
     """
     if(msg != None):
-        print(msg)
+        print msg
     rexp = re.compile('\*')
     rexp2 = re.compile('\n\|')
     s = re.sub(rexp,'',cur_doc)
     s = re.sub(rexp2,'\n',s)
-    print("Usage: ",  s)
+    print "Usage: ",  s
     sys.exit(1)
     
 def parse_args(options,argv,usage = usage):
@@ -132,7 +132,7 @@ def parse_args(options,argv,usage = usage):
         else:
             args.append(opt)
     l = []
-    for opt in list(found_required.keys()):
+    for opt in found_required.keys():
         if (not found_required[opt]):
             l.append(opt)
     if (len(l) != 0):

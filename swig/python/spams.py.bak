@@ -621,8 +621,8 @@ def displayPatches(D):
     tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
 #    patch = np.zeros(sizeEdge,sizeEdge)
     mm = sizeEdge * sizeEdge
-    for ii in range(0,nBins):
-        for jj in range(0,nBins):
+    for ii in xrange(0,nBins):
+        for jj in xrange(0,nBins):
             io = ii
             jo = jj
             offsetx = 0
