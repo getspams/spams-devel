@@ -1,1 +1,0 @@
-../python/mytest_build2.sh
