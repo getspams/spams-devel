@@ -9,11 +9,11 @@ def main(argv):
     y = np.sum(X,0)
     dX = np.divide(X,np.tile(y,(N,1)))
     z = np.sum(dX,0)
-    print "%s y %s, z %s\n%s" %(str(dX.shape),str(y.shape),str(z.shape),str(z))
+    print("%s y %s, z %s\n%s" %(str(dX.shape),str(y.shape),str(z.shape),str(z)))
     f = open("textes.txt","w")
-    for j in xrange(0,dX.shape[1]):
-        for i in xrange(0,dX.shape[0]):
-            print >>f, "%f" %dX[i,j]
+    for j in range(0,dX.shape[1]):
+        for i in range(0,dX.shape[0]):
+            print("%f" %dX[i,j], file=f)
     f.close()
 
 if __name__ == "__main__":
