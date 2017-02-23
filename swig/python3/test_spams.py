@@ -50,7 +50,8 @@ def main(argv):
         l = []
         for m in modules:
             l.append("%s :" %m)
-            exec('lstm = test_%s.tests' %m)
+            # exec('lstm = test_%s.tests' %m)
+            lstm = locals()['test_%s' %m].tests
             l.append('  %s' %(' '.join([ lstm[i] for i in range(0,len(lstm),2)])))
         usage(l)
     if(len(lst) == 0):
@@ -58,14 +59,16 @@ def main(argv):
     for testname in lst:
         if testname in modules:
             print("**** %s ****" %testname)
-            exec('lstm = test_%s.tests' %testname)
+            # exec('lstm = test_%s.tests' %testname)
+            lstm = locals()['test_%s' %testname].tests
             for i in range(0,len(lstm),2):
                 run_test(lstm[i],lstm[i+1])
             continue
         else:
             found = False
             for m in modules:
-                exec('lstm = test_%s.tests' %m)
+                # exec('lstm = test_%s.tests' %m)
+                lstm = locals()['test_%s' %m].tests
                 for i in range(0,len(lstm),2):
                     if (lstm[i] == testname):
                         found = True
