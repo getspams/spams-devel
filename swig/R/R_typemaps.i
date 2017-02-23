@@ -1,5 +1,6 @@
 %{
-extern "C" {
+//extern "C" {
+//#define NO_C_HEADERS (DEPRECATED, instead removed extern "C")
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
@@ -10,7 +11,7 @@ extern "C" {
 #endif
 #include <R_ext/RS.h>
 #include <R_ext/Error.h>
-}
+//}
 #include "spams.h"
 
 /* ********************
