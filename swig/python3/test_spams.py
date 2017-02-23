@@ -42,7 +42,7 @@ def main(argv):
         lst.append(s)
     for s in all_modules:
         try:
-            exec ('import test_%s' %s)
+            exec('import test_%s' %s)
             modules.append(s)
         except:
             print("Removing %s" %s)
