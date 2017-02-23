@@ -23,4 +23,4 @@ alpha = spams.lassoMask(X,D,mask,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY'
 tac = proc.time()
 t = (tac - tic)[['elapsed']]
 .printf("%f signals processed per second\n",as.double(ncol(X)) / t)
-#alpha
+str(alpha)

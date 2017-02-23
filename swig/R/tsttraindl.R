@@ -24,15 +24,17 @@ lambda1 = 0.15
 
 ########## FIRST EXPERIMENT ###########
 tic = proc.time()
- D <- spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000)
-  tac = proc.time()
-  t = (tac - tic)[['elapsed']]
-  .printf("time of computation for Dictionary Learning: %f\n",t)
+D <- spams.trainDL(X,K = 100,lambda1 = lambda1, numThreads = 4, batchsize = 400,iter = 1000)
+tac = proc.time()
+t = (tac - tic)[['elapsed']]
+.printf("time of computation for Dictionary Learning: %f\n",t)
+str(D)
 
-  .printf("Evaluating cost function...\n")
-  alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
-  R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
-  .printf("objective function: %f\n",R)
+.printf("Evaluating cost function...\n")
+alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = lambda1, numThreads = 4)
+R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + lambda1 * colSums(abs(alpha)))
+.printf("objective function: %f\n",R)
+str(alpha)
 
 quit()
 
@@ -50,9 +52,11 @@ D = res[[1]]
 model = res[[2]]
 t = (tac - tic)[['elapsed']]
 .printf("time of computation for Dictionary Learning: %f\n",t)
+str(res)
 
 .printf("Evaluating cost function...\n")
 alpha = spams.Lasso(X,D,param)
+str(alpha)
 
 R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + param[['lambda']] * colSums(abs(alpha)))
 .printf("objective function: %f\n",R)
@@ -68,9 +72,11 @@ D = res[[1]]
 model = res[[2]]
 t = (tac - tic)[['elapsed']]
 .printf("time of computation for Dictionary Learning: %f\n",t)
+str(res)
 
 .printf("Evaluating cost function...\n")
 alpha = spams.Lasso(X,D,param)
+str(alpha)
 
 R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + param[['lambda']] * colSums(abs(alpha)))
 .printf("objective function: %f\n",R)
@@ -91,9 +97,11 @@ tac = proc.time()
 D = res[[1]]
 t = (tac - tic)[['elapsed']]
 .printf("time of computation for Dictionary Learning: %f\n",t)
+str(res)
 
 .printf("Evaluating cost function...\n")
 alpha = spams.Lasso(X,D,param)
+str(alpha)
 
 R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + param[['lambda']] * colSums(abs(alpha)))
 .printf("objective function: %f\n",R)
@@ -110,9 +118,11 @@ tac = proc.time()
 D = res[[1]]
 t = (tac - tic)[['elapsed']]
 .printf("time of computation for Dictionary Learning: %f\n",t)
+str(res)
 
 .printf("Evaluating cost function...\n")
 alpha = spams.Lasso(X,D,param)
+str(alpha)
 
 R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + param[['lambda']] * colSums(abs(alpha)))
 .printf("objective function: %f\n",R)

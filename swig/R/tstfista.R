@@ -13,7 +13,7 @@ library("spams",lib.loc = "./lib")
   X = matrix(rnorm(m * n),nrow = m,ncol = n,byrow = FALSE)
 #  l = scan(file= "../python/datax",what =  double(0))
 #  X = matrix(l,nrow = m,ncol = n,byrow = TRUE)
-  
+
   X = X - matrix(rep(colMeans(X),nrow(X)),nrow(X),ncol(X),byrow = T)
   X = spams.Normalize(X)
   Y = matrix(rnorm(m),nrow = m,ncol = 1,byrow = FALSE)
@@ -35,6 +35,7 @@ library("spams",lib.loc = "./lib")
   param['max_it'] = 500
   param['it0'] = 50
   res = spams.FistaFlat(Y,X,W0,param,TRUE)
+  str(res)
   W = res[[1]]
   optim_info = res[[2]]
   .printf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4])
@@ -49,6 +50,7 @@ library("spams",lib.loc = "./lib")
   nclasses = max(Y) + 1
   W0 = matrix(0,nrow = ncol(X),nclasses * ncol(Y),byrow = FALSE)
   res = spams.FistaFlat(Y,X,W0,param,TRUE)
+  str(res)
   W = res[[1]]
   optim_info = res[[2]]
   cat(sprintf("mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n",optim_info[1],optim_info[3],optim_info[4]))
