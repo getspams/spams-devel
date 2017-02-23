@@ -29,7 +29,13 @@
         * e2e8e17947363ce7811b20e5b2a3f2f60d206740: Commande `swig -c++ -python ...` replaced by `swig -c++ -py3 -python ...` in case of python3 (specific argument, empty with python2)
 
     * 18123a6fcc8f5985ef652bb0288944ca22ef7bc9: Swig directive depends on python version in [swig/python/numpy.i](swig/python/numpy.i), two functions `PyFile_Check` and `PyInstance_Check` have been removed from the C API for python 3, so removed calls to those two functions from numpy.i for PY_MAJOR_VERSION >= 3 (also see https://github.com/numpy/numpy/pull/2923)
-    * TODO: New import and new setup in [python/setup.py.in](python/setup.py.in)
+    * 11da3bc382b6c6edc171b869c781b535eddeca44: In [python/setup.py.in](python/setup.py.in)
+        * New import: `from distutils.sysconfig import get_python_inc` to automatically get python library directory
+        * New setup, based on the previous import and compliant with python3 (diff):
+            ```
+            -# python setup.py install --prefix=dist, -incs = ['.'] + [os.path.join('spams',x) for x in [ 'linalg', 'prox', 'decomp', 'dictLearn']] + [numpy.get_include()] + ['/usr/include/python2.7/']
+            +# python setup.py install --prefix=dist, +incs = ['.'] + [os.path.join('spams',x) for x in [ 'linalg', 'prox', 'decomp', 'dictLearn']] + [numpy.get_include()] + [get_python_inc()]`
+            ```
 
 <!-- * dfddf3c75bce140b4eab7a30264cf734df35f918 (CANCELED BY 8dc622a6956a61d3d514dd4fb708464ca5fd285f and f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67): Automatic script conversion from python2 to python3 with `2to3`, former version of the files saved in .py.bak, in case scripts are not python2.7 compatible anymore
 * 8dc622a6956a61d3d514dd4fb708464ca5fd285f: Automatic script conversion from python2 to python3 with `2to3`, creation of files `*-3.py` (equivalent to `*.py` files but with python3 compliant syntax).
@@ -45,10 +51,18 @@
 
     * ff550dd3d15c7043aec3524f0086b31a96d86ce4: In numpy, `np.random.random_integers` deprecated, to be replaced by `np.random.randint`. CAREFUL `random_integers` draws in `[low,high]`, whereas `randint` draws in `[low,high)`, hence `np.random.random_integers(low,high,...)` replaced by `np.random.randint(low, high+1,...)` in [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python/tstfista.py](swig/python3/tstfista.py)
     * c9b7da38587f2112810b1ab031be3dd2253ff778: Integer division `/` replaced by `//` in [swig/python3/test_dictLearn](swig/python3/test_dictLearn) and [swig/python3/tsttraindl.py](swig/python3/tsttraindl.py)
+* 8c838258e118704e3d3228bb0fd67a6e077fad97: replace `exec('lstm = test_%s.tests' %testname)` by `lstm = locals()['test_%s' %testname].tests` in [swig/python3/test_spams.py](swig/python3/test_spams.py) because `lstm` variable was not visible to environment.
 
 * New doc:
-    * [swig/python/README_spams2.5_python2.x.md](swig/python/README_spams2.5_python2.x.md): for users
-    * [swig/python/README_dev_spams2.5_python2.x.md](swig/python/README_dev_spams2.5_python2.x.md): for developpers
+    * Archives for SPAMS-2.5
+        * [swig/python/README_spams2.5_python2.x.md](swig/python/README_spams2.5_python2.x.md): for users
+        * [swig/python/README_dev_spams2.5_python2.x.md](swig/python/README_dev_spams2.5_python2.x.md): for developpers
+    * For SPAMS-2.6 and python2.x
+        * [swig/python/README_spams2.6_python2.x.md](swig/python/README_spams2.6_python2.x.md): for users
+        * [swig/python/README_dev_spams2.6_python2.x.md](swig/python/README_dev_spams2.6_python2.x.md): for developpers
+    * For SPAMS-2.6 and python3.x
+        * [swig/python/README_spams2.6_python3.x.md](swig/python/README_spams2.6_python3.x.md): for users
+        * [swig/python/README_dev_spams2.6_python3.x.md](swig/python/README_dev_spams2.6_python3.x.md): for developpers
 
 ### SWIG/R
 
