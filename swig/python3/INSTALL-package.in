@@ -1,6 +1,8 @@
 This directory contains files to build the python interfaces
 to the functions of V%VERSION% SPAMS library already interfaced with matlab.
 
+This version is compatible with python3.x
+
 The interface consists of 4 files : spams.py myscipy_rand.py spams_wrap.py _spams_wrap.so
 Note: myscipy_rand.py supplies a random generator for sparse matrix
       for some old scipy distributions
