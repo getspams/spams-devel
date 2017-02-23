@@ -62,7 +62,7 @@ cp -p spams_wrap-windows.cpp $tmpd
 ../setRelease INSTALL-windows.in >$tmpd/INSTALL-windows
 
 cp -p win-build.sh $tmpd
-rm -f $tmpd/README
+# rm -f $tmpd/README
 # doc
 cd $cdir
 [ $rmdoc -ne 0 ] && /bin/rm -rf tmp-doc
