@@ -24,6 +24,7 @@
         INC_PYTHON=$(python -c "from distutils.sysconfig import get_python_inc; print('-I'+get_python_inc())")
         INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn ${INC_PYTHON}"
         ```
+        * : add an option to use python3 (-py3)
         * TODO: Commande `swig -c++ -python ...` replaced by `swig -c++ -py3 -python ...`
 
     * Swig directive depends on python version in [swig/python/numpy.i](swig/python/numpy.i)
