@@ -64,6 +64,9 @@ if [ $debug -ne 0 ]; then
     rfiles="$rfiles r_debug.R"
     cfiles="$cfiles spams-tst.h"
 fi
+###### HACK to avoid the class export issue ######
+sed -i -e 's/ans <\- new/\#ans <\- new/g' spams.R
+##################################################
 cp $rfiles $pkdir/R
 cp $cfiles $pkdir/src
 cp $mkvar $pkdir/src/Makevars
@@ -92,4 +95,5 @@ R CMD build --binary pkg/spams
 [ $? -ne 0 ] && exit 1
 rm -rf lib;mkdir lib
 cd lib
-tar zxf ../spams_${VERSION}_R_x86_64-pc-linux-gnu.tar.gz
+# tar zxf ../spams_${VERSION}.tar.gz
+R CMD INSTALL --library=. ../spams_${VERSION}.tar.gz
