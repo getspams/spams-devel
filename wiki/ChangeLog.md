@@ -32,7 +32,8 @@
     <!-- * dfddf3c75bce140b4eab7a30264cf734df35f918 (CANCELED BY 8dc622a6956a61d3d514dd4fb708464ca5fd285f and f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67): Automatic script conversion from python2 to python3 with `2to3`, former version of the files saved in .py.bak, in case scripts are not python2.7 compatible anymore
     * 8dc622a6956a61d3d514dd4fb708464ca5fd285f: Automatic script conversion from python2 to python3 with `2to3`, creation of files `*-3.py` (equivalent to `*.py` files but with python3 compliant syntax).
     * f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67: Come back to python2 compliant files in `*.py` (cancel dfddf3c75bce140b4eab7a30264cf734df35f918) -->
-    * 017c39e919bd72acceddcb537809535519449734: New directory for python3 compliant files, unmodified files are symlinked to python directory
+    * 017c39e919bd72acceddcb537809535519449734: New directory [swig/python3](swig/python3) for python3 compliant files, unmodified files are symlinked to python directory [swig/python](swig/python)
+    * 097c44dee2c40805ef284265412dfdbb707e07a7 and 097c44dee2c40805ef284265412dfdbb707e07a7: replace *.py symlinks in [swig/python3](swig/python3) by hard copies and automatic script conversion from python2 to python3 with `2to3`
     * TODO: New import and new setup in [python/setup.py.in](python/setup.py.in)
 
 ### SWIG/R
