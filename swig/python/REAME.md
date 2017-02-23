@@ -19,7 +19,7 @@ that should be in the path of the python interpreter (for instance in the curren
 
 Available functions in python are defined in `spams.py` and documented (the doc is extracted from matlab files).
 
-This file describes how to directly install the interface from sources. Build details are described in [README_spams2.6_python2.x.md](README_spams2.6_python2.x.md)
+This file describes how to directly install the interface from sources. Build details are described in [README_dev.md](README_dev.md)
 
 ## INTERFACE INSTALLATION (python2.x) for LINUX and MacOS
 
