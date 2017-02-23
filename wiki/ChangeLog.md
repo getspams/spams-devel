@@ -29,6 +29,7 @@
         * TODO: Commande `swig -c++ -python ...` replaced by `swig -c++ -py3 -python ...`
 
     * 18123a6fcc8f5985ef652bb0288944ca22ef7bc9: Swig directive depends on python version in [swig/python/numpy.i](swig/python/numpy.i), two functions `PyFile_Check` and `PyInstance_Check` have been removed from the C API for python 3, so removed calls to those two functions from numpy.i for PY_MAJOR_VERSION >= 3 (also see https://github.com/numpy/numpy/pull/2923)
+    * dfddf3c75bce140b4eab7a30264cf734df35f918: Automatic script conversion from python2 to python3 with `2to3`, former version of the files saved in .py.bak, in case scripts are not python2.7 compatible anymore
     * TODO: New import and new setup in [python/setup.py.in](python/setup.py.in)
 
 ### SWIG/R
