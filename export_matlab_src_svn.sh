@@ -2,15 +2,15 @@
 
 ### Create the tar gzipped files with the Matlab and C++ sources
 
-# remove previous version if necessary
-rm -rf spams-matlab*
-
 # file name with date and version
 DA=$(``date +%F)
 echo $DA
 VERSION=`cat swig/Version`
 WDIR="spams-matlab-v$VERSION"
 WFILE="spams-matlab-v$VERSION-$da.tar.gz"
+
+# remove previous version if necessary
+rm -rf $WDIR
 
 # create the directory
 svn export ./ $WDIR
