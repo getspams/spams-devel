@@ -1,0 +1,14 @@
+* checking compilation flags in Makevars ... WARNING
+Non-portable flags in variable 'PKG_CXXFLAGS':
+  -fopenmp -O3 -mtune=native
+* checking for GNU extensions in Makefiles ... WARNING
+Found the following file(s) containing GNU extensions:
+  src/Makevars
+Portable Makefiles do not use GNU extensions such as +=, :=, $(shell),
+$(wildcard), ifeq ... endif. See section ‘Writing portable packages’ in
+the ‘Writing R Extensions’ manual.
+* checking for portable use of $(BLAS_LIBS) and $(LAPACK_LIBS) ... OK
+* checking compiled code ... NOTE
+/usr/bin/nm: /home/thoth/gdurif/Codes/spams-devel/swig/R/spams.Rcheck/spams/libs/spams.so: aucun symbole
+/usr/bin/nm: /home/thoth/gdurif/Codes/spams-devel/swig/R/spams.Rcheck/spams/libs/spams.so: aucun symbole
+See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
