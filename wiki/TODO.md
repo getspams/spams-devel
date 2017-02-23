@@ -4,6 +4,10 @@
 
 ## VERSION 2.6
 
+### MATLAB
+
+`****` Error in doc: function `displayPatches` called `mexDisplayPatches`
+
 ### SWIG/R
 
 `*` Fix NOTEs and WARNINGs (in doc generation and compilation flags)
