@@ -81,7 +81,7 @@ def test_fistaFlat():
     print('\nFISTA + Group Lasso L2 with variable size of groups')
     param['regul'] = 'group-lasso-l2'
     param2=param.copy()
-    param2['groups'] = np.array(np.random.random_integers(1,5,X.shape[1]),dtype = np.int32)
+    param2['groups'] = np.array(np.random.randint(1,5+1,X.shape[1]),dtype = np.int32)
     param2['lambda1'] *= 10
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:],0)))

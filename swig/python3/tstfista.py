@@ -48,7 +48,7 @@ if False:
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 param['regul'] = 'group-lasso-l2'
 param2=param
-param2['groups'] = np.array(np.random.random_integers(1,5,X.shape[1]),dtype = np.int32)
+param2['groups'] = np.array(np.random.randint(1,5+1,X.shape[1]),dtype = np.int32)
 param2['lambda1'] *= 10
 (W, optim_info) = spams.fistaFlat(Y,X,W0,True,**param)
 exit()
