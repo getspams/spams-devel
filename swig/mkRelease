@@ -12,7 +12,7 @@ usage () {
     exit 1
 }
 date=`date +%Y-%m-%d`
-rel=svn$date
+rel=$date
 if [ $# -eq 0 ]; then
     echo "$rel"
     exit 0
