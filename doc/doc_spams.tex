@@ -86,7 +86,7 @@ and 64bits Operating Systems. It is interfaced with Matlab, R and Python, but
 can be called from any C++ application (by hacking the code a bit).
 
 It requires an implementation of BLAS and LAPACK for performing linear algebra
-operations. The ones shipped with matlab and R can be used, but also external
+operations. The ones shipped with Matlab and R can be used, but also external
 libraries such as atlas, the netlib implementation, or the Intel Math Kernel
 Library can be used.  It also exploits multi-core CPUs when this feature is
 supported by the compiler, through OpenMP.
@@ -179,8 +179,7 @@ The archetypal analysis implementation was written by Yuansi Chen, during
 an internship at INRIA, with the collaboration of Zaid Harchaoui.
 
 \section{Installation}
-The toolbox used to come with pre-compiled binaries for various plateforms.
-Now the sources are available and you will have to compile it yourself.
+The Matlab toolbox is available with pre-compiled binaries for various plateforms. For more advanced users, the sources are available and you can compile it yourself.
 
 The user has the choice of the BLAS library, but the Intel MKL is recommended
 for the best performance. Note that the builtin blas library of Matlab is a
@@ -189,13 +188,13 @@ a good performance.
 
 The folder \verb|doc| contains the documentation in pdf and html. \verb|build/|
 contains the binary files, including the help for each command.
-\verb|test_release| contains various matlab scripts which call the different
+\verb|test_release| contains various Matlab scripts which call the different
 functions of this toolbox.
 
 The software package comes also with a script bash that has to be used to
-launch matlab for Linux and/or Mac OS versions.  The install procedure is
+launch Matlab for Linux and/or Mac OS versions.  The install procedure is
 described in a file called \verb|HOW_TO_INSTALL| and in the file
-\verb|compile.m| for the Matlab version.
+\verb|compile.m| for the compilation of the Matlab version.
 
 \section{Dictionary Learning and Matrix Factorization Toolbox}
 This is the section for dictionary learning and matrix factorization, corresponding to~\cite{mairal7,mairal9}.
@@ -833,7 +832,7 @@ The following piece of code illustrates how to use this function.
 
 \subsection{Function mexCalcAAt}
 
-For an input sparse matrix $\A$, this function returns $\A\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent matlab command \verb|X*A'|.
+For an input sparse matrix $\A$, this function returns $\A\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent Matlab command \verb|X*A'|.
 % {\footnotesize
 %    \verbatiminput{../src_release/mexCalcAAt.m}
 % }
@@ -843,7 +842,7 @@ The following piece of code illustrates how to use this function.
 
 
 \subsection{Function mexCalcXAt}
-For an input sparse matrix $\A$ and a matrix $\X$, this function returns $\X\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent matlab command \verb|X*A'|.
+For an input sparse matrix $\A$ and a matrix $\X$, this function returns $\X\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent Matlab command \verb|X*A'|.
 % {\footnotesize
 %    \verbatiminput{../src_release/mexCalcXAt.m}
 % }
