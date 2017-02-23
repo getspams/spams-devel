@@ -22,7 +22,7 @@ while [ $# -gt 0 ]; do
     case $1 in
 	-ns) nswg=1;;
 	-nb) build=0;;
-	-D)debug=1;;
+	-D) debug=1;;
 	-g) mkvar=Makevars-g;;
 	-*) echo "BAD OPTION $1";usage;;
     esac
