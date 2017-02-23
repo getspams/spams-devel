@@ -12,7 +12,8 @@
 
 ### SWIG/python
 
-* : Apply patch from https://aur.archlinux.org/packages/python-spams-svn
+* Apply patch from https://aur.archlinux.org/packages/python-spams-svn
+    * d07923cf97288583600c6e2ba00888dcf3894cbe: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` in swig conf file [swig/pyhton/py_typemaps.i](swig/python/py_typemaps.i)
     * New include directives and swig options in [swig/python/mkpy](swig/python/mkpy)
         * fb6679590495478e086b0271bd8639513db5e7a3: Modified variables: `INC_PYTHON` and `INC`
         ```
@@ -27,8 +28,7 @@
         * 56405c4d4ccc139c5ad4100a9df37e895c91c769: add an option to use python3 (-py3)
         * TODO: Commande `swig -c++ -python ...` replaced by `swig -c++ -py3 -python ...`
 
-    * Swig directive depends on python version in [swig/python/numpy.i](swig/python/numpy.i)
-    * d07923cf97288583600c6e2ba00888dcf3894cbe: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` in swig conf file [swig/pyhton/py_typemaps.i](swig/python/py_typemaps.i)
+    * 18123a6fcc8f5985ef652bb0288944ca22ef7bc9: Swig directive depends on python version in [swig/python/numpy.i](swig/python/numpy.i), two functions `PyFile_Check` and `PyInstance_Check` have been removed from the C API for python 3, so removed calls to those two functions from numpy.i for PY_MAJOR_VERSION >= 3 (also see https://github.com/numpy/numpy/pull/2923)
     * TODO: New import and new setup in [python/setup.py.in](python/setup.py.in)
 
 ### SWIG/R
