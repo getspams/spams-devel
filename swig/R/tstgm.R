@@ -1,4 +1,4 @@
-library("spams")
+library("spams",lib.loc = "./lib")
 
 n=1
 m=100

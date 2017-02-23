@@ -1,5 +1,4 @@
-library("spams")
-library('Matrix')
+library("spams",lib.loc = "./lib")
 library(png)
 
 .printf <- function(...) {
@@ -117,4 +116,3 @@ alpha = spams.Lasso(X,D,param)
 
 R = mean(0.5 * colSums((X - D %*% alpha) ^ 2) + param[['lambda']] * colSums(abs(alpha)))
 .printf("objective function: %f\n",R)
-
