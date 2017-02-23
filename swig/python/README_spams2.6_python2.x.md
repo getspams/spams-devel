@@ -2,6 +2,8 @@
 
 This directory contains files to install and use (at the end) the python interfaces to the functions of SPAMS library already interfaced with matlab.
 
+
+
 Manipulated objects are imported from numpy and scipy. Matrices should be stored by columns, and sparse matrices should be "column compressed".
 
 The python SPAMS package consists of 4 files:
@@ -43,7 +45,7 @@ Two documentations are installed in `$inst/doc`:
 ### Testing the interface :
 
 ```
-export PYTHONPATH=$inst/lib/python2.6/site-packages
+export PYTHONPATH=$inst/lib/python2.7/site-packages
 cd $inst/test
 python test_spams.py -h # to get help
 python test_spams.py  # will run all the tests
@@ -60,7 +62,7 @@ If you don't have libblas.so and liblapack.so in /lib or /usr/lib, you need to e
 #### MacOS:
 The installation has been tested with MacOS 10 (Lion), it required that packages were installed with `port install`:
 ```
-port install atlas;port install py26-numpy;install py26-scipy
+port install atlas;port install py27-numpy;install py27-scipy
 ```
 Maybe necessary to add `/opt/local/bin` to `PATH` and specified the compiler by setting CC and CXX, for example:
 ```
