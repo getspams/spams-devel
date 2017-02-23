@@ -37,14 +37,13 @@
 * 017c39e919bd72acceddcb537809535519449734: New directory [swig/python3](swig/python3) for python3 compliant files, unmodified files are symlinked to python directory [swig/python](swig/python)
 * 097c44dee2c40805ef284265412dfdbb707e07a7 and 097c44dee2c40805ef284265412dfdbb707e07a7: replace *.py symlinks in [swig/python3](swig/python3) by hard copies and automatic script conversion from python2 to python3 with `2to3`
 * Manually fix compliances with python3 new directives that are not fixed by `2to3` (need to run `python -3` on [swig/python/*.py](swig/python/*.py) to find these)
-    * Parameter `order="FORTRAN"` replaced by `order="F"`
-        * Commit? Regarding `numpy.empty` parameters in [swig/python3/spams.py](swig/python3/spams.py)
-        * Commit? Regarding `numpy.array` parameters in [swig/python3/spams.py](swig/python3/spams.py)
-        * Commit? Regarding `numpy.zeros` parameters in [swig/python3/spams.py](swig/python3/spams.py), [swig/python3/test_decomp.py](swig/python3/test_decomp.py), [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python3/tstfista.py](swig/python3/tstfista.py)
-        *
-        *
-    * Commit? `np.random.random_integers` deprecated, to be replaced by `np.random.randint`. CAREFUL `random_integers` draws in `[low,high]`, whereas `randint` draws in `[low,high)`, hence `np.random.random_integers(low,high,...)` replaced by `np.random.randint(low, high+1,...)` in [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python/tstfista.py](swig/python3/tstfista.py)
-    * Commit? Integer division `/` replaced by `//` in [swig/python3/test_dictLearn](swig/python3/test_dictLearn) and [swig/python3/tsttraindl.py](swig/python3/tsttraindl.py)
+    * In numpy, parameter `order="FORTRAN"` replaced by `order="F"`
+        * 85ab23939f30bdd17190b05be7070928b1c69953: Regarding `np.empty` parameters in [swig/python3/spams.py](swig/python3/spams.py)
+        * 70adeb6a6af580920f8bd6964886a27c1d9e1bd7: Regarding `np.array` parameters in [swig/python3/spams.py](swig/python3/spams.py)
+        * ce0a97bc511efabe39cdeaf5b4f790a7f99e709b: Regarding `np.zeros` parameters in [swig/python3/spams.py](swig/python3/spams.py), [swig/python3/test_decomp.py](swig/python3/test_decomp.py), [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python3/tstfista.py](swig/python3/tstfista.py)
+
+    * ff550dd3d15c7043aec3524f0086b31a96d86ce4: In numpy, `np.random.random_integers` deprecated, to be replaced by `np.random.randint`. CAREFUL `random_integers` draws in `[low,high]`, whereas `randint` draws in `[low,high)`, hence `np.random.random_integers(low,high,...)` replaced by `np.random.randint(low, high+1,...)` in [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python/tstfista.py](swig/python3/tstfista.py)
+    * c9b7da38587f2112810b1ab031be3dd2253ff778: Integer division `/` replaced by `//` in [swig/python3/test_dictLearn](swig/python3/test_dictLearn) and [swig/python3/tsttraindl.py](swig/python3/tsttraindl.py)
 
 ### SWIG/R
 
