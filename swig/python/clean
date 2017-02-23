@@ -4,4 +4,4 @@ case $1 in -x) set -x;shift;;esac
 nom=spams
 /bin/rm -f $nom.o ${nom}_wrap.o ${nom}_wrap.py $nom.pyc ${nom}_wrap.cpp ${nom}_wrap-windows.cpp _${nom}_wrap.so *.pyc
 /bin/rm -rf build dist tmp-doc spams.new.py spams-*.tar.gz spams-*.exe setup.py
-/bin/rm MANIFEST
+/bin/rm -f MANIFEST
