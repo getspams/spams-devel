@@ -18,10 +18,10 @@ mkdir $WDIR/doc
 cp -r ./build/ $WDIR
 cp -r ./src_release/ $WDIR
 cp -r ./test_release/ $WDIR
-cp -r ./README $WDIR
-cp -r ./HOW_TO_INSTALL.txt $WDIR
-cp -r ./HOW_TO_USE.txt $WDIR
-cp -r ./start_spams.m $WDIR
+cp ./README $WDIR
+cp ./HOW_TO_INSTALL.txt $WDIR
+cp ./HOW_TO_USE.txt $WDIR
+cp ./start_spams.m $WDIR
 cp ./doc/doc_spams.pdf $WDIR/doc
 cp -r ./doc/html $WDIR/doc
 
