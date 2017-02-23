@@ -279,7 +279,7 @@ def fistaFlat(
 ##    params = __param_struct(paramlist,param)
 #    W = np.empty((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="F")
     if groups == None:
-        groups = np.array([],dtype=np.int32,order="FORTRAN")
+        groups = np.array([],dtype=np.int32,order="F")
     if inner_weights == None:
         inner_weights = np.array([0.],dtype=X.dtype)
     W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
@@ -327,7 +327,7 @@ def fistaGraph(
     eta_g = graph['eta_g']
     groups = graph['groups']
     if groups == None:
-        groups = np.array([],dtype=np.int32,order="FORTRAN")
+        groups = np.array([],dtype=np.int32,order="F")
     if inner_weights == None:
         inner_weights = np.array([0.],dtype=X.dtype)
     groups_var = graph['groups_var']
@@ -350,7 +350,7 @@ def proximalFlat(U,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.
 #    params = __param_struct(paramlist,param)
 
     if groups == None:
-        groups = np.array([],dtype=np.int32,order="FORTRAN")
+        groups = np.array([],dtype=np.int32,order="F")
 
     eval = return_val_loss
     alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
@@ -414,7 +414,7 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
                  whiten=False,clean=True,verbose=True,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=1,
                  stochastic_deprecated=False,modeParam=0,batch=False,log_deprecated=False,logName=''):
 
-#    paramlist = [("D",np.array([[],[]],dtype=np.float64,order="FORTRAN")),("numThreads" ,-1),("batchsize", -1),
+#    paramlist = [("D",np.array([[],[]],dtype=np.float64,order="F")),("numThreads" ,-1),("batchsize", -1),
 #                 ("K", -1),('lambda', None),('lambda2', 10e-10),
 #                 ('iter',-1),('t0',1e-5),('mode',spams_wrap.PENALTY),
 #                 ('posAlpha',False),('posD',False),('expand',False),
@@ -426,13 +426,13 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
 #                 ]
 #    params = __param_struct(paramlist,param)
     if D == None:
-        D = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+        D = np.array([[],[]],dtype=X.dtype,order="F")
     if lambda1 == None:
         raise ValueError("trainDL : lambda1 must be defined")
 
     if tree == None and graph == None:
-        eta_g = np.array([],dtype=X.dtype,order="FORTRAN")
-        groups = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
+        eta_g = np.array([],dtype=X.dtype,order="F")
+        groups = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="F"))
     if tree != None:
         if not ('eta_g' in tree and 'groups' in tree and
                 'own_variables' in tree and 'N_own_variables' in tree):
@@ -444,8 +444,8 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
         own_variables = tree['own_variables']
         N_own_variables = tree['N_own_variables']
     else:
-        own_variables = np.array([],dtype=np.int32,order="FORTRAN")
-        N_own_variables = np.array([],dtype=np.int32,order="FORTRAN")
+        own_variables = np.array([],dtype=np.int32,order="F")
+        N_own_variables = np.array([],dtype=np.int32,order="F")
 
     if graph != None:
         if not ('eta_g' in graph and 'groups' in graph and 'groups_var' in graph):
@@ -454,11 +454,11 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
         groups = graph['groups']
         groups_var = graph['groups_var']
     else:
-        groups_var = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
+        groups_var = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="F"))
 
     if model == None:
-        m_A = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
-        m_B = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+        m_A = np.array([[],[]],dtype=X.dtype,order="F")
+        m_B = np.array([[],[]],dtype=X.dtype,order="F")
         m_iter = 0
     else:
         m_A = model['A']
