@@ -43,7 +43,8 @@
         * Commit? Regarding `numpy.zeros` parameters in [swig/python3/spams.py](swig/python3/spams.py), [swig/python3/test_decomp.py](swig/python3/test_decomp.py), [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python3/tstfista.py](swig/python3/tstfista.py)
         *
         *
-    * Commit? `np.random.random_integers` deprecated, to be replaced by `np.random.randint`. CAREFUL `random_integers` draws in `[low,high]`, whereas `randint` draws in `[low,high)`, hence `np.random.random_integers(low,high,...)` replaced by `np.random.randint(low, high+1,...)` in [swig/python3/test_prox.py](swig/python/test_prox.py) and [swig/python/tstfista.py](swig/python/tstfista.py)
+    * Commit? `np.random.random_integers` deprecated, to be replaced by `np.random.randint`. CAREFUL `random_integers` draws in `[low,high]`, whereas `randint` draws in `[low,high)`, hence `np.random.random_integers(low,high,...)` replaced by `np.random.randint(low, high+1,...)` in [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python/tstfista.py](swig/python3/tstfista.py)
+    * Commit? Integer division `/` replaced by `//` in [swig/python3/test_dictLearn](swig/python3/test_dictLearn) and [swig/python3/tsttraindl.py](swig/python3/tsttraindl.py)
 
 ### SWIG/R
 

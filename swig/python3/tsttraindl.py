@@ -67,8 +67,8 @@ image.save('xx.png')
 #### SECOND EXPERIMENT ####
 print("*********** SECOND EXPERIMENT ***********")
 
-X1 = X[:,0:X.shape[1]/2]
-X2 = X[:,X.shape[1]/2 -1:]
+X1 = X[:,0:X.shape[1]//2]
+X2 = X[:,X.shape[1]//2 -1:]
 param['iter'] = 500
 tic = time.time()
 (D,model) = spams.trainDL(X1,return_model = True,**param)
@@ -150,7 +150,7 @@ if I.ndim == 3:
 else:
     A = np.asfortranarray(I,dtype = myfloat)
     rgb = False
-    
+
 m = 8;n = 8;
 X = spams.im2col_sliding(A,m,n,rgb)
 

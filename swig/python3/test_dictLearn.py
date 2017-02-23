@@ -41,7 +41,7 @@ def _objective(X,D,param,imgname = None):
         x = np.uint8(img[:,:,0] * 255.)
         image = Image.fromarray(x,mode = 'L')
         image.save("%s.png" %imgname)
-    
+
 def test_trainDL():
     img_file = 'boat.png'
     try:
@@ -80,8 +80,8 @@ def test_trainDL():
     #### SECOND EXPERIMENT ####
     print("*********** SECOND EXPERIMENT ***********")
 
-    X1 = X[:,0:X.shape[1]/2]
-    X2 = X[:,X.shape[1]/2 -1:]
+    X1 = X[:,0:X.shape[1]//2]
+    X2 = X[:,X.shape[1]//2 -1:]
     param['iter'] = 500
     tic = time.time()
     (D,model) = spams.trainDL(X1,return_model = True,**param)
@@ -130,7 +130,7 @@ def test_trainDL():
     t = tac - tic
     print('time of computation for Dictionary Learning: %f' %t)
     _objective(X,D,param)
-    
+
     return None
 
 def test_trainDL_Memory():
@@ -225,7 +225,7 @@ def test_structTrainDL():
     print('time of computation for Dictionary Learning: %f' %t)
     _objective(X,D,param)
 
-#    
+#
     param['regul'] = 'l2'
     print("with Fista Regression %s" %param['regul'])
     tic = time.time()
@@ -236,7 +236,7 @@ def test_structTrainDL():
 
     _objective(X,D,param)
 
-#    
+#
     param['regul'] = 'elastic-net'
     print("with Fista %s" %param['regul'])
     param['lambda2'] = 0.1
@@ -349,7 +349,7 @@ def test_structTrainDL():
     print('time of computation for Dictionary Learning: %f' %t)
 
     _objective(X,D,param)
-    
+
     param['regul'] = 'tree-linf'
     print("with Fista %s" %param['regul'])
     tic = time.time()
@@ -394,7 +394,7 @@ def test_nmf():
     return None
 
 
-# Archetypal Analysis, run first steps with FISTA and run last steps with activeSet, 
+# Archetypal Analysis, run first steps with FISTA and run last steps with activeSet,
 def test_archetypalAnalysis():
     img_file = 'lena.png'
     try:
@@ -424,7 +424,7 @@ def test_archetypalAnalysis():
     # remember that we are not guarantee to descent in FISTA step if 50 is too small
     stepsAS = 10 # 7 alternations by activeSet, default parameter(50)
     randominit = True # random initilazation, default parameter(True)
-    
+
     ############# FIRST EXPERIMENT  ##################
     tic = time.time()
     # learn archetypes using activeSet method for each convex sub-problem
