@@ -1,4 +1,5 @@
 useDynLib(spams)
 exportPattern("^spams\\.[[:alpha:]]+")
 #importClassesFrom('Matrix',index, numIndex, number, replValue)
-importClassesFrom('Matrix',index, number, replValue)
+importClassesFrom('Matrix', index, number, replValue)
+importFrom("methods", "as", "is", "new", "setClass", "slot")
