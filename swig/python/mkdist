@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 case $1 in -x) set -x;shift;;esac
 # The main version number is in ../Version
 
