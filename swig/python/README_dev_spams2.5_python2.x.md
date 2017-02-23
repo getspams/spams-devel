@@ -1,4 +1,4 @@
-# Build SPAMS 2.5 and python2.x
+# Build SPAMS 2.5 and python2.x (ARCHIVE)
 
 This file describes how to build spams-2.5 for python with python2.7 and the different tools available (at the end)
 
@@ -78,14 +78,13 @@ python test_spams.py name1 name2 ... # run named tests
  -cl: clean previously generated files<br/>
  -ns (noswig): not run swig<br/>
  -g: compile with -g option<br/>
- -D: compile with -DDEBUG<br/>
- <!-- -py3 : for python3 compatibility (to do in swig/python3 directory) -->
+ -D: compile with -DDEBUG
 
 * `./clean`<br/>
   Remove all intermediate files created by the different tool scripts
 
 * `./mtopy <in > out`
-  Help for translation matlab -> python
+  Help for translation matlab -> python<br/>
   /!\\ Partial translation (comment, print)
 
 * `../conv-matlab-array [-r|-p] < data`<br/>
