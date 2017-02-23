@@ -3,8 +3,8 @@ use strict;
 
 require "doclib.ph";
 
-# fabrique dans man les docs spams.<nom>.Rd, a partir des mex*,
-# pour les fonctions definies dans un fichier R (r_spams.R par ex)
+# make in 'man' dir the docs spams.<nom>.Rd from the mex*,
+# for the function defined in an R file (e.g. r_spams.R)
 my $dir = $main::mlab_dir;
 
 @main::keys = ('Name','Description','Usage','Inputs','Param','detail','Output','Author','Note', 'WARNING', 'Examples');
@@ -73,11 +73,11 @@ my @indx = sort {$a <=> $b} @idx;
 if($flg_out > 0) {
     my $txt = "library(spams)\n";
     foreach my $f (@main::tests) {
-	my @lines = ();
-	my %testtbl = ();
-	$f = "test_$f.R";
-	read_test($f,1,\&find_test,\&find_Rend,\@lines,\%testtbl);
-	write_tex_examples(1,$doc_dir,\&replace_Xtest,$txt,\%testtbl,\@lines);
+        my @lines = ();
+        my %testtbl = ();
+        $f = "test_$f.R";
+        read_test($f,1,\&find_test,\&find_Rend,\@lines,\%testtbl);
+        write_tex_examples(1,$doc_dir,\&replace_Xtest,$txt,\%testtbl,\@lines);
     }
     make_tex_doc(1,$doc_dir,\@indx,\%iprogs,\@spams,\%progdefs);
     exit 0;
@@ -100,7 +100,7 @@ system "cp ./refman/*.Rd man";
 exit 0;
 
 # $flag : 0 if search for begining of def
-# out : ($prog,$found) 
+# out : ($prog,$found)
 #     $prog : progname if 1st line of def, "" else
 # $found : 0 : not a function def, -1 : unfinished def, 1 = end of def
 sub find_Rdef {
@@ -121,7 +121,7 @@ sub find_Rdef {
 }
 
 # in : $s = string
-# out : ($prog,$found) 
+# out : ($prog,$found)
 #     $prog : progname if test function def, "" else
 # $found = 0 (not a test def) / 1 (test def)
 sub find_test {
@@ -252,8 +252,7 @@ sub write_man {
 	    print OUT join("\n",@res), "\n}\n";
 	}
     }
-	
+
     close(OUT);
 #    exit;
 }
-
