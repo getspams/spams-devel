@@ -217,7 +217,7 @@ spams.omp <- function(X,D,L = NULL,eps = NULL,lambda1 = NULL,return_reg_path = F
   } else {
     given_lambda1 = TRUE
   }
-  
+
 #  if(! is.vector(eps)) {
 #    eps = as.vector(c(eps),mode='double')
 #  }
@@ -300,7 +300,7 @@ spams.somp  <- function(X,D,list_groups,L = NULL,eps = 0.,numThreads = -1){
   shape = x[[4]]
   alpha = sparseMatrix(i = indices, p = indptr, x = data,dims = shape, index1 = FALSE)
   return(alpha)
-  
+
 }
 
 spams.l1L2BCD  <- function(X,D,alpha0,list_groups,lambda1 = NULL, mode= 'PENALTY', itermax = 100, tol = 1e-3,numThreads = -1) {
@@ -310,17 +310,17 @@ spams.l1L2BCD  <- function(X,D,alpha0,list_groups,lambda1 = NULL, mode= 'PENALTY
   alpha = matrix(alpha0,nrow = nrow(alpha0),ncol = ncol(alpha0))
   l1L2BCD(X,D,alpha,list_groups,lambda1,mode,itermax,tol,numThreads)
   return(alpha)
-  
+
 }
 
-  
+
 
 ###########  END decomp ##############
 ##################################################
 
 ###########  prox ##################
-# W = FistaFlat(Y,X,W0,param,return_optim_info = False)
-# (W,optim_info) = FistaFlat(Y,X,W0,param,return_optim_info = True)
+# W = FistaFlat(Y,X,W0,param,return_optim_info = FALSE)
+# (W,optim_info) = FistaFlat(Y,X,W0,param,return_optim_info = TRUE)
 spams.fistaFlat <- function(Y,X,W0,return_optim_info = FALSE,numThreads =-1,max_it =1000,L0=1.0,
               fixed_step=FALSE,gamma=1.5,lambda1=1.0,delta=1.0,lambda2=0.,lambda3=0.,
               a=1.0,b=0.,c=1.0,tol=0.000001,it0=100,max_iter_backtracking=1000,
@@ -392,9 +392,9 @@ spams.fistaGraph <- function(Y,X,W0,graph,return_optim_info = FALSE,numThreads =
     return(list(W,optim_info))
   else
     return (W)
-  
+
 }
-  
+
 spams.proximalFlat <- function(U,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
                  lambda3=0.,intercept=FALSE,resetflow=FALSE,regul="",verbose=FALSE,
                  pos=FALSE,clever=TRUE,size_group=1,groups = NULL,transpose=FALSE) {
@@ -413,7 +413,7 @@ spams.proximalFlat <- function(U,return_val_loss = FALSE,numThreads =-1,lambda1=
     return(list(alpha,val_loss))
   else
     return (alpha)
-  
+
 }
 
 spams.proximalTree <- function(U,tree,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
@@ -437,7 +437,7 @@ spams.proximalTree <- function(U,tree,return_val_loss = FALSE,numThreads =-1,lam
     return(list(alpha,val_loss))
   else
     return (alpha)
-  
+
 }
 
 spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,lambda1=1.0,lambda2=0.,
@@ -458,7 +458,7 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
     return(list(alpha,val_loss))
   else
     return (alpha)
-  
+
 }
 
 ###########  END prox ##############
@@ -467,7 +467,7 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
 ###########  dictLearn ##################
 .TrainDL <- function(X,return_model= NULL,model = NULL,in_memory= FALSE,D = NULL,
                      graph= NULL, tree = NULL,numThreads = -1,
-                     tol = 0.000001,fixed_step = True,ista = False,
+                     tol = 0.000001,fixed_step = TRUE, ista = FALSE,
                      batchsize = -1,K= -1,lambda1= NULL,lambda2= 10e-10,lambda3 = 0.,iter=-1,t0=1e-5,
                      mode='PENALTY',regul= "none",posAlpha=FALSE,posD=FALSE,
                      expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,
@@ -481,7 +481,7 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
   if(is.null(lambda1)) {
     stop("ERROR trainDL : lambda1 must be defined\n")
   }
-  
+
   .verif_enum(modeD,'constraint_type_D','modeD in TrainDL')
   .verif_enum(mode,'constraint_type','mode in TrainDL')
   if(is.null(graph) && is.null(tree)) {
@@ -531,7 +531,7 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
     iter,t0,mode,regul,posAlpha,posD,
     expand,modeD,whiten,clean,verbose,gamma1,gamma2,rho,iter_updateD,
     stochastic_deprecated,modeParam,batch,log_deprecated,logName)
-  
+
   D = x[[1]]
   if(return_model) {
     A = x[[2]]
@@ -542,13 +542,13 @@ spams.proximalGraph <- function(U,graph,return_val_loss = FALSE,numThreads =-1,l
   } else {
     return(D)
   }
-  
+
 }
 
 spams.trainDL <- function(X,return_model= FALSE,model= NULL,D = NULL,numThreads = -1,batchsize = -1,
             K= -1,lambda1= NULL,lambda2= 10e-10,iter=-1,t0=1e-5,mode='PENALTY',
                  posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=NULL,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
-  
+
   if (is.null(iter_updateD)) {
     if(batch) {
       iter_updateD = 5
@@ -580,7 +580,7 @@ spams.structTrainDL <- function(X,return_model= FALSE,model= NULL,D = NULL,
                K= -1,lambda1= NULL,lambda2= 10e-10,lambda3 = 0.,iter=-1,t0=1e-5,regul='none',
                posAlpha=FALSE,posD=FALSE,expand=FALSE,modeD='L2',whiten=FALSE,clean=TRUE,
                verbose=TRUE,gamma1=0.,gamma2=0.,rho=1.0,iter_updateD=NULL,stochastic_deprecated=FALSE,modeParam=0,batch=FALSE,log_deprecated=FALSE,logName='') {
-  
+
   if (is.null(iter_updateD)) {
     if(batch) {
       iter_updateD = 5
@@ -631,7 +631,7 @@ spams.nmf <- function(X,return_lasso= FALSE,model= NULL,numThreads = -1,batchsiz
   lambda1 = 0
 
   U = spams.trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
-    K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=FALSE, 
+    K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=FALSE,
     modeParam = modeParam,batch = batch, lambda1 = lambda1,
     mode = 'PENALTY', posAlpha=TRUE,posD=TRUE,whiten=FALSE)
   if (! return_lasso) {
@@ -649,12 +649,12 @@ spams.nmf <- function(X,return_lasso= FALSE,model= NULL,numThreads = -1,batchsiz
 spams.nnsc <- function(X,return_lasso= FALSE,model= NULL,lambda1= NULL,
                        numThreads = -1,batchsize = -1,K= -1,iter=-1,t0=1e-5,
                        clean=TRUE,rho=1.0,modeParam=0,batch=FALSE) {
-  
+
   if(is.null(lambda1)) {
     stop("ERROR nnsc : lambda1 must be defined\n")
   }
   U = spams.trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
-                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=FALSE, 
+                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=FALSE,
                 modeParam = modeParam,batch = batch, lambda1 = lambda1,
                 mode = 'PENALTY', posAlpha=TRUE,posD=TRUE,whiten=FALSE)
   if (! return_lasso) {
@@ -734,7 +734,7 @@ spams.displayPatches <- function(D) {
   }
 #
   return(tmp)
-  
+
 }
 
 ##################################################
