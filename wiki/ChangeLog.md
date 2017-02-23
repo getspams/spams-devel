@@ -15,5 +15,5 @@
 * ae3543ab08d018c610d5e5a9f335344ab05dc087: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` in swig conf file [swig/R/R_typemaps.i](swig/R/R_typemaps.i)
 
 * 164a2b5343241a569b6dc04fc3378d3a81a0ec8a: Fix R pkg compilation (redefinition of std math function)
-    * Library `math.h` replaced by `math` in h/Cpp files
+    * Library `math.h` replaced by `cmath` in h/Cpp files
     * Directive `extern "C"` removed in swig conf file [swig/R/R_typemaps.i](swig/R/R_typemaps.i)
