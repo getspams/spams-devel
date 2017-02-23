@@ -98,4 +98,4 @@ python test_spams.py name1 name2 ... # run named tests
   The package will be 32 or 64bits depending on the system.
   a executer dans une fenetre de commande MinGW sous windows pour
 
-Build details are described in [README_spams2.5_python2.7]
+Build details are described in [README_spams2.5_python2.x.md](README_spams2.5_python2.x.md)
