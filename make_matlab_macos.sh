@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## make matlab precompiled mexfiles
-matlab -nodisplay -r "compile_mex; exit;"
+matlab -nodisplay -r "compile_mex_macosx; exit;"
 
 ## make the archives
 DA=$(``date +%F)
