@@ -98,7 +98,7 @@ def  sparseProject(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,
     m = U.shape[0];
     n = U.shape[1];
 #    paramlist = [('thrs',1.0),('mode',1),('lambda1',0.0),('lambda2',0.0),('lambda3',0.0),('pos',0),('numThreads',-1)]
-    V = np.empty((m,n),dtype=U.dtype,order="FORTRAN")
+    V = np.empty((m,n),dtype=U.dtype,order="F")
     params = (thrs,mode,lambda1,lambda2,lambda3,pos,numThreads)
     spams_wrap.sparseProject(U,V,thrs,mode,lambda1,lambda2,lambda3,pos,numThreads)
     return V
