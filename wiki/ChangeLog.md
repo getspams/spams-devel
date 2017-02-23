@@ -1,4 +1,4 @@
-# CHANGES
+# ChangeLog
 
 ## VERSION 2.6
 
