@@ -30,7 +30,7 @@ blas='builtin';
 %%%%%%%%%%%% MULTITHREADING CONFIGURATION %%%%%%%%%%%%%%
 % set true if you want to use multi-threaded capabilities of the toolbox. You
 % need an appropriate compiler for that (intel compiler, most recent gcc, or visual studio pro)
-use_multithread=true; % (might not compatible with compiler=mex)
+use_multithread=false; % (might not compatible with compiler=mex)
 % if the compilation fails on Mac, try the single-threaded version.
 % to run the toolbox on a cluster, it can be a good idea to deactivate this
 
@@ -133,11 +133,11 @@ elseif strcmp(blas,'acml')
     end
 elseif strcmp(blas,'builtin')
     % leave it to /usr/lib/ for built-in:
-    path_to_blas='/';
+    path_to_blas='/usr/lib/';
 end
 
 if mac
-    add_flag=' -mmacosx-version-min=10.6';
+    add_flag=' -mmacosx-version-min=10.9';
 end
 
 debug=false;
