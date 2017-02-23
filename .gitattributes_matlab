@@ -1,6 +1,7 @@
-./swig export-ignore
-./wiki export-ignore
+swig export-ignore
+wiki export-ignore
 
+.gitattributes export-ignore
 .gitattributes_matlab export-ignore
 .gitattributes_cpp export-ignore
 .gitignore export-ignore

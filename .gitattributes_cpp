@@ -1,10 +1,11 @@
-./build export-ignore
-./dags export-ignore
-./src_release
-./test_release
-./swig export-ignore
-./wiki export-ignore
+build export-ignore
+dags export-ignore
+src_release export-ignore
+test_release export-ignore
+swig export-ignore
+wiki export-ignore
 
+.gitattributes export-ignore
 .gitattributes_matlab export-ignore
 .gitattributes_cpp export-ignore
 .gitignore export-ignore
