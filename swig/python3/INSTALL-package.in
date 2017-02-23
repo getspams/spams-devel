@@ -29,12 +29,7 @@ Linux :
       you need to edit setup.py
 
 MacOS:
-	the build has been tested with MacOS 10 (Lion) and required
-	packages were installed with 'port install' :
-	port install atlas;port install py26-numpy;install py26-scipy
-	I have added /opt/local/bin to my PATH
-	and specified the compiler by setting CC and CXX, for example:
-	export CC=/opt/local/bin/gcc-mp-4.3;export CXX=/opt/local/bin/g++-mp-4.3
+	TODO
 
 
 
@@ -48,7 +43,8 @@ Windows 64bits :
 Testing the interface :
 
 - Linux or Mac :
-export PYTHONPATH=$inst/lib/python3/site-packages
+PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
 python3 test_spams.py -h : to get help
 python3 test_spams.py  : will run all the tests
