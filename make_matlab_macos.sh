@@ -8,6 +8,6 @@ DA=$(``date +%F)
 echo $DA
 
 VERSION=`cat swig/Version`
-TARGET=`uname -s`
+TARGET=`sw_vers -productVersion`
 
-tar zcvf spams-matlab-precompiled-v$VERSION-$DA-$TARGET.tar.gz ./build/ ./src_release/ ./test_release/ ./README ./start_spams.m ./doc/doc_spams.pdf
+tar zcvf spams-matlab-precompiled-v$VERSION-$DA-MacOSX-$TARGET.tar.gz ./build/ ./src_release/ ./test_release/ ./README ./start_spams.m ./doc/doc_spams.pdf
