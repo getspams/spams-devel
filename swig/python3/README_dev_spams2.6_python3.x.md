@@ -1,14 +1,14 @@
 # Build SPAMS 2.6 and python3.x
 
-This file describes how to build spams-2.5 for python with python2.7 and the different tools available (at the end)
+This file describes how to build spams-2.6 for python with python3 and the different tools available (at the end)
 
 ----------------------------------------
 ## Building from sources (you need SWIG and perl):
 ```
-./mkdist
-cd dist/spams-python
-inst=$HOME/python
-python setup.py install --prefix=$inst
+./mkdist -py3
+cd dist/spams-python3
+inst=$HOME/python3
+python3 setup.py install --prefix=$inst
 ```
 
 You will find in `$inst`:
@@ -19,11 +19,12 @@ You will find in `$inst`:
 ----------------------------------------
 ## Running test programs :
 ```
-cd $inst/test
-python test_spams.py -h # to get help
-python test_spams.py  # will run all the tests
-python test_spams.py linalg # test of linalg functions
-python test_spams.py name1 name2 ... # run named tests
+PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+export PYTHONPATH=$inst/lib/python${PYV}/site-packages
+python3 test_spams.py -h # to get help
+python3 test_spams.py  # will run all the tests
+python3 test_spams.py linalg # test of linalg functions
+python3 test_spams.py name1 name2 ... # run named tests
 ```
 
 ========================================
@@ -43,18 +44,18 @@ python test_spams.py name1 name2 ... # run named tests
 Normal build (with setup)
 ```
 mkdir inst
-swig -c++ -python -o spams_wrap.cpp spams.i
-python setup.py install --prefix=inst
+swig -c++ -py3 -python -o spams_wrap.cpp spams.i
+python3 setup.py install --prefix=inst
 ```
 
 --------------------
 ## Tests:
 ```
 cd $inst/test
-python test_spams.py -h # to get help
-python test_spams.py  # will run all the tests
-python test_spams.py linalg # test of linalg functions
-python test_spams.py name1 name2 ... # run named tests
+python3 test_spams.py -h # to get help
+python3 test_spams.py  # will run all the tests
+python3 test_spams.py linalg # test of linalg functions
+python3 test_spams.py name1 name2 ... # run named tests
 ```
 
 ==================================================
@@ -64,6 +65,7 @@ python test_spams.py name1 name2 ... # run named tests
 * `./mkdist [-h][-f]`<br/>
   make source distribution in `./dist`<br/>
   -f (fast): avoid remaking the doc if it already exists
+  -py3 : for python3 compatibility (to do in swig/python3 directory)
 
 * `../mkdoc [-h] [-s] [-t]`<br/>
   make the doc in `./tmp-doc`, except if this directory already exists<br/>
