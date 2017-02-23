@@ -13,8 +13,17 @@ TARGET=`uname -s`
 WDIR="spams-matlab-v$VERSION"
 
 mkdir $WDIR
+mkdir $WDIR/doc
 
-cp -r {./build/ ./src_release/ ./test_release/ ./README ./HOW_TO_INSTALL.txt ./HOW_TO_USE.txt ./start_spams.m ./doc/doc_spams.pdf ./doc/html} $WDIR
+cp -r ./build/ $WDIR
+cp -r ./src_release/ $WDIR
+cp -r ./test_release/ $WDIR
+cp -r ./README $WDIR
+cp -r ./HOW_TO_INSTALL.txt $WDIR
+cp -r ./HOW_TO_USE.txt $WDIR
+cp -r ./start_spams.m $WDIR
+cp ./doc/doc_spams.pdf $WDIR/doc
+cp -r ./doc/html $WDIR/doc
 
 tar zcvf spams-matlab-precompiled-v$VERSION-$DA-$TARGET.tar.gz $WDIR
 
