@@ -10,8 +10,8 @@ if [ -x /cygdrive/c/MinGW/msys/1.0/bin/bash ]; then
     exec /cygdrive/c/MinGW/msys/1.0/bin/bash $0 $optx $*
 fi
 
-INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn -I/usr/include/python2.7/"
-INC_PYTHON=-I/usr/include/python2.6
+INC_PYTHON=$(python -c "from distutils.sysconfig import get_python_inc; print('-I'+get_python_inc())")
+INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn ${INC_PYTHON}"
 XCCFLAGS=""
 XLINKFLAGS=""
 # on MacOS, use following definition instead.
@@ -22,7 +22,7 @@ OPTWIN=""
 EXTL=so
 CCFLAGS="-fPIC"
 OMPFLAGS="-fopenmp"
-if [ -d /System/Library/Frameworks ]; then  
+if [ -d /System/Library/Frameworks ]; then
  # MacOs
     macos=1
     INC_PYTHON="-I/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include"
@@ -30,7 +30,7 @@ if [ -d /System/Library/Frameworks ]; then
     XLINKFLAGS="-m32 -framework Python"
 fi
 case `uname` in
-    CYGWIN*|MINGW*) 
+    CYGWIN*|MINGW*)
 	OPTWIN=-mwindows
 	EXTL=pyd
 	flg_swig=0
@@ -40,7 +40,7 @@ case `uname` in
 	DBLAS='-LC:/Program Files/R/R-2.15.1/bin/i386'
 	BLAS='-lRblas -lRlapack'
 	if [ -d C:\Python27 ]; then
-	    CCFLAGS="-DWIN32 -fopenmp"  
+	    CCFLAGS="-DWIN32 -fopenmp"
 	    INC_PYTHON="-IC:\Python27\include -IC:\Python27\Lib\site-packages\numpy\core\include"
 	    LIBS=" -LC:\Python27\libs -lpython27"
 	fi
@@ -83,7 +83,7 @@ if [ $debug -eq 0 ]; then
     OPT_DBG=""
 else
     OPT_DBG=-DDEBUG
-fi    
+fi
 
 err=0
 for nom in $lst; do
@@ -105,5 +105,5 @@ for nom in $lst; do
  #   /bin/rm -f $nom.o ${nom}_wrap.o
 done
 [ $err -ne 0 ] && die "ERROR"
-    
+
 exit 0
