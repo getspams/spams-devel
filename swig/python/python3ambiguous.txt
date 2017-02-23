@@ -1,0 +1,326 @@
+Traceback (most recent call last):
+  File "PIL-win64/setup.py", line 117, in <module>
+    VERSION = find_version("PIL/Image.py")
+  File "PIL-win64/setup.py", line 111, in find_version
+    for line in open(filename).readlines():
+IOError: [Errno 2] No such file or directory: 'PIL/Image.py'
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/PIL/Image.py:48: DeprecationWarning: classic int division
+  MAX_IMAGE_PIXELS = int(1024 * 1024 * 1024 / 4 / 3)
+/usr/lib/python2.7/dist-packages/PIL/Image.py:478: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class Image(object):
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/PIL/Image.py:48: DeprecationWarning: classic int division
+  MAX_IMAGE_PIXELS = int(1024 * 1024 * 1024 / 4 / 3)
+/usr/lib/python2.7/dist-packages/PIL/Image.py:478: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class Image(object):
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:22: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  AAt = np.empty((m,m),dtype=A.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:31: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  XAt = np.empty((m,n),dtype=A.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:44: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  XY = np.empty((m,n),dtype=X.dtype,order="FORTRAN")
+/usr/lib/python2.7/dist-packages/numpy/core/numeric.py:190: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  a = empty(shape, dtype, order)
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:64: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+  if x0 == None:
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:101: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  V = np.empty((m,n),dtype=U.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:119: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+  if D == None:
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_decomp.py:109: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  alpha0 = np.zeros((D.shape[1],X.shape[1]),dtype= myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:23: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:282: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  groups = np.array([],dtype=np.int32,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:285: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:84: DeprecationWarning: This function is deprecated. Please call randint(1, 5 + 1) instead
+  param2['groups'] = np.array(np.random.random_integers(1,5,X.shape[1]),dtype = np.int32)
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:165: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:165: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:177: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:229: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:229: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:276: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:334: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:381: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:381: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:398: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:439: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:439: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:467: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:309: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:538: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:538: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:549: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:573: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:573: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:580: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_prox.py:580: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:353: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  groups = np.array([],dtype=np.int32,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:356: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:397: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:374: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:587: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  B = np.empty((M,N),dtype=A.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:429: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  D = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:434: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  eta_g = np.array([],dtype=X.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:435: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  groups = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:447: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  own_variables = np.array([],dtype=np.int32,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:448: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  N_own_variables = np.array([],dtype=np.int32,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:457: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  groups_var = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:460: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  m_A = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:461: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  m_B = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+Time elapsed : 7.3374
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:621: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:636: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  patchCol = patchCol.reshape((sizeEdge,sizeEdge,V),order= 'F')
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:638: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  jj * (sizeEdge+1)+1:(jj + 1) * (sizeEdge+1),:] = patchCol;
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_dictLearn.py:83: DeprecationWarning: classic int division
+  X1 = X[:,0:X.shape[1]/2]
+/home/thoth/gdurif/Codes/spams-devel/swig/python/test_dictLearn.py:84: DeprecationWarning: classic int division
+  X2 = X[:,X.shape[1]/2 -1:]
+Time elapsed : 3.82376
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:428: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+  if D == None:
+Time elapsed : 3.36386
+Time elapsed : 3.91178
+Time elapsed : 6.00144
+num param iterD: 1
+Time elapsed : 7.11484
+Time elapsed : 7.04767
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:565: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+  if Z0 == None:
+Time elapsed : 0.027271
+Time elapsed : 0.091325
+Time elapsed : 0.040174
+Time elapsed : 17.4094
+Time elapsed : 11.4079
+Time elapsed : 0.349482
+Time elapsed : 0.293196
+Time elapsed : 0.658524
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+Traceback (most recent call last):
+  File "tstcalc.py", line 6, in <module>
+    import myscipy
+ImportError: No module named myscipy
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+tstfista.py:41: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="FORTRAN")
+tstfista.py:51: DeprecationWarning: This function is deprecated. Please call randint(1, 5 + 1) instead
+  param2['groups'] = np.array(np.random.random_integers(1,5,X.shape[1]),dtype = np.int32)
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:281: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+  if groups == None:
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:285: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:119: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+  if D == None:
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:353: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  groups = np.array([],dtype=np.int32,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:356: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:14: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import multiarray
+/usr/lib/python2.7/dist-packages/numpy/core/__init__.py:21: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from . import umath
+/usr/lib/python2.7/dist-packages/numpy/random/__init__.py:99: DeprecationWarning: CObject type is not supported in 3.x. Please use capsule objects instead.
+  from .mtrand import *
+/usr/lib/python2.7/dist-packages/PIL/Image.py:48: DeprecationWarning: classic int division
+  MAX_IMAGE_PIXELS = int(1024 * 1024 * 1024 / 4 / 3)
+/usr/lib/python2.7/dist-packages/PIL/Image.py:478: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class Image(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/base.py:61: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class spmatrix(object):
+/usr/lib/python2.7/dist-packages/scipy/sparse/compressed.py:21: DeprecationWarning: Overriding __eq__ blocks inheritance of __hash__ in 3.x
+  class _cs_matrix(_data_matrix, _minmax_mixin, IndexMixin):
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:587: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  B = np.empty((M,N),dtype=A.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:429: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  D = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:434: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  eta_g = np.array([],dtype=X.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:435: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  groups = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:447: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  own_variables = np.array([],dtype=np.int32,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:448: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  N_own_variables = np.array([],dtype=np.int32,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:457: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  groups_var = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:460: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  m_A = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:461: DeprecationWarning: Non length-one string passed in for the array ordering. Please pass in 'C', 'F', 'A', or 'K' instead
+  m_B = np.array([[],[]],dtype=X.dtype,order="FORTRAN")
+Time elapsed : 0.131341
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:119: FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.
+  if D == None:
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:621: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:636: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  patchCol = patchCol.reshape((sizeEdge,sizeEdge,V),order= 'F')
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:638: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  jj * (sizeEdge+1)+1:(jj + 1) * (sizeEdge+1),:] = patchCol;
+tsttraindl.py:70: DeprecationWarning: classic int division
+  X1 = X[:,0:X.shape[1]/2]
+tsttraindl.py:71: DeprecationWarning: classic int division
+  X2 = X[:,X.shape[1]/2 -1:]
+Time elapsed : 3.34295
