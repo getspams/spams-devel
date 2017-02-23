@@ -1,0 +1,17 @@
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:621: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
+
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:636: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  patchCol = patchCol.reshape((sizeEdge,sizeEdge,V),order= 'F')
+
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:638: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  jj * (sizeEdge+1)+1:(jj + 1) * (sizeEdge+1),:] = patchCol;
+
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:621: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
+
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:636: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  patchCol = patchCol.reshape((sizeEdge,sizeEdge,V),order= 'F')
+
+/home/thoth/gdurif/Codes/spams-devel/swig/python/spams.py:638: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+  jj * (sizeEdge+1)+1:(jj + 1) * (sizeEdge+1),:] = patchCol;
