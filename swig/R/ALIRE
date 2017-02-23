@@ -36,14 +36,14 @@ outils:
 
 - ./mkdist [-h][-f]
  fabrique une distribution source dans ./dist
- -f (fast) : ne pas refaire la doc (dans tmp-doc) si elle existe déjà
+ -f (fast) : ne pas refaire la doc (dans tmp-doc) si elle existe deja
 
 - ../mkdoc [-h]
- Fabrique la doc latex dans ./tmp-doc ,sauf si ce répertoire existe déjà.
- Cette doc est faite à partir de la doc de Julien (doc_spams.tex et fichiers de doc matlab).
+ Fabrique la doc latex dans ./tmp-doc ,sauf si ce repertoire existe deja.
+ Cette doc est faite a partir de la doc de Julien (doc_spams.tex et fichiers de doc matlab).
 
 - ./docmatlab2python
-  script utilisé par mkdoc pour extraire la doc des fichiers matlab et la
+  script utilise par mkdoc pour extraire la doc des fichiers matlab et la
   mettre au format latex.
 
 - ./mybuild  [-h] [-ns] [-nb] [-g] [-D]
@@ -51,20 +51,20 @@ outils:
   (voir ./mybuild -h)
 
 - ./clean
-  supprime tous les fichiers intermédiaires (i.e. créé par les différents scripts).
+  supprime tous les fichiers intermediaires (i.e. crees par les differents scripts).
 
 - ../conv-matlab-array [-r|-p] < data
-  convertit un tableau tel qu'il est affiché par matlab,
+  convertit un tableau tel qu'il est affiche par matlab,
   dans le format lisible par python (-p) ou R (-r)
 
-- ../doc2gforge 
-  installe la doc (à partir de ./tmp-doc) sur gforge.inria.fr, dans /home/groups/spams-devel/htdocs/python
+- ../doc2gforge
+  installe la doc (a partir de ./tmp-doc) sur gforge.inria.fr, dans /home/groups/spams-devel/htdocs/python
 
 - ./win-build.sh
-  à exécuter dans une fenêtre de commande MinGW sous windows pour
+  a executer dans une fenetre de commande MinGW sous windows pour
   fabriquer un package binaire windows.
   Avec un windows 64 bits on obtiendra un package (.zip) contenant
   les 2 versions 32 et 64 bits.
   Un package fait sous windows7 64bits est utilisable en XP 32bits.
-  Le nom du fichier (spams_2.3.zip) ne doit pas être modifié.
-  Les détails de fabrication sont décrits dans INSTALL-package.
+  Le nom du fichier (spams_2.3.zip) ne doit pas etre modifie.
+  Les details de fabrication sont decrits dans INSTALL-package.
