@@ -10,7 +10,35 @@ if [ -x /cygdrive/c/MinGW/msys/1.0/bin/bash ]; then
     exec /cygdrive/c/MinGW/msys/1.0/bin/bash $0 $optx $*
 fi
 
-INC_PYTHON=$(python -c "from distutils.sysconfig import get_python_inc; print('-I'+get_python_inc())")
+die () {
+    echo "$1"
+    exit 1
+}
+usage () {
+    echo "Usage $0 [-cl][-ns][-g][-D] nom+"
+    echo "  -cl : clear"
+    die "   -ns : don't redo swig"
+}
+
+lst=""
+optc="-O -DNDEBUG"
+#CXX=g++-4.2
+CXX=g++
+PYTHON=$(which python)
+while [ $# -gt 0 ]; do
+    case $1 in
+	-cl) flg_clear=1;;
+	-ns) flg_swig=0;;
+	-g) optc="-g";OMPFLAGS="";;
+	-D) debug=1;;
+    -py3) PYTHON=$(which python3); if [ -z $PYTHON ]; then PYTHON=$(which python); fi;;
+	-*) usage;;
+	*) lst="$lst $1";;
+    esac
+    shift
+done
+
+INC_PYTHON=$($PYTHON -c "from distutils.sysconfig import get_python_inc; print('-I'+get_python_inc())")
 INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn ${INC_PYTHON}"
 XCCFLAGS=""
 XLINKFLAGS=""
@@ -46,32 +74,6 @@ OMPFLAGS="-fopenmp"
 # 	fi
 # 	;;
 # esac
-
-die () {
-    echo "$1"
-    exit 1
-}
-usage () {
-    echo "Usage $0 [-cl][-ns][-g][-D] nom+"
-    echo "  -cl : clear"
-    die "   -ns : don't redo swig"
-}
-
-lst=""
-optc="-O -DNDEBUG"
-#CXX=g++-4.2
-CXX=g++
-while [ $# -gt 0 ]; do
-    case $1 in
-	-cl) flg_clear=1;;
-	-ns) flg_swig=0;;
-	-g) optc="-g";OMPFLAGS="";;
-	-D) debug=1;;
-	-*) usage;;
-	*) lst="$lst $1";;
-    esac
-    shift
-done
 
 if [ $flg_clear -gt 0 ]; then
     for nom in $lst; do
