@@ -17,3 +17,6 @@
 * 164a2b5343241a569b6dc04fc3378d3a81a0ec8a: Fix R pkg compilation (redefinition of std math function)
     * Library `math.h` replaced by `cmath` in h/Cpp files
     * Directive `extern "C"` removed in swig conf file [swig/R/R_typemaps.i](swig/R/R_typemaps.i)
+
+
+* b796f3f690fce75ad4406f4fd8323ca75b886aa3: Fix error execution (after working compilation), C++ exported classes are not visible to R. In swig-generated R file [swig/R/spams.R](swig/R/spams.R), [swig/R/mybuild](swig/R/mybuild) automatically comments of all instructions `ans <- new(...)` to avoid calling the non-exported classes. TEMPORARY HACK, to be further investigated.
