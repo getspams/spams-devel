@@ -10,6 +10,26 @@
 
 * 19f2a0ebbe0353a11d26de9138cbe10e9f349072: Compilation: use `mex -v GCC='/usr/bin/g++-4.7'` to specify the compatible version of gcc to default matlab compiler (see [compile_mex.m](compile_mex.m))
 
+### SWIG/python
+
+* : Apply patch from https://aur.archlinux.org/packages/python-spams-svn
+    * New include directives and swig options in [swig/python/mkpy](swig/python/mkpy)
+        * fb6679590495478e086b0271bd8639513db5e7a3: Modified variables: `INC_PYTHON` and `INC`
+        ```
+        INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn -I/usr/include/python2.7/"
+        INC_PYTHON=-I/usr/include/python2.6
+        ```
+        replaced by
+        ```
+        INC_PYTHON=$(python -c "from distutils.sysconfig import get_python_inc; print('-I'+get_python_inc())")
+        INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn ${INC_PYTHON}"
+        ```
+        * TODO: Commande `swig -c++ -python ...` replaced by `swig -c++ -py3 -python ...`
+
+    * Swig directive depends on python version in [swig/python/numpy.i](swig/python/numpy.i)
+    * d07923cf97288583600c6e2ba00888dcf3894cbe: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` in swig conf file [swig/pyhton/py_typemaps.i](swig/python/py_typemaps.i)
+    * TODO: New import and new setup in [python/setup.py.in](python/setup.py.in)
+
 ### SWIG/R
 
 * ae3543ab08d018c610d5e5a9f335344ab05dc087: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` in swig conf file [swig/R/R_typemaps.i](swig/R/R_typemaps.i)
