@@ -36,9 +36,13 @@
 * f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67: Come back to python2 compliant files in `*.py` (cancel dfddf3c75bce140b4eab7a30264cf734df35f918) -->
 * 017c39e919bd72acceddcb537809535519449734: New directory [swig/python3](swig/python3) for python3 compliant files, unmodified files are symlinked to python directory [swig/python](swig/python)
 * 097c44dee2c40805ef284265412dfdbb707e07a7 and 097c44dee2c40805ef284265412dfdbb707e07a7: replace *.py symlinks in [swig/python3](swig/python3) by hard copies and automatic script conversion from python2 to python3 with `2to3`
-* Compliance with python3 new directives that are not fix by `2to3` (need to run `python -3` on [swig/python/*.py](swig/python/*.py) to find these)
-    * Commit? Regarging `numpy.empty` parameters in [swig/python3/spams.py](swig/python3/spams.py), `np.empty(...,order="FORTRAN")` replaced by `np.empty(...,order="F")`
-    *
+* Manually fix compliances with python3 new directives that are not fixed by `2to3` (need to run `python -3` on [swig/python/*.py](swig/python/*.py) to find these)
+    * Parameter `order="FORTRAN"` replaced by `order="F"`
+        * Commit? Regarding `numpy.empty` parameters in [swig/python3/spams.py](swig/python3/spams.py)
+        * Commit? Regarding `numpy.array` parameters in [swig/python3/spams.py](swig/python3/spams.py)
+        * Commit? Regarding `numpy.zeros` parameters in [swig/python3/spams.py](swig/python3/spams.py), [swig/python3/test_decomp.py](swig/python3/test_decomp.py), [swig/python3/test_prox.py](swig/python3/test_prox.py) and [swig/python3/tstfista.py](swig/python3/tstfista.py)
+
+
 ### SWIG/R
 
 * ae3543ab08d018c610d5e5a9f335344ab05dc087: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` and in swig conf file [swig/R/R_typemaps.i](swig/R/R_typemaps.i)
