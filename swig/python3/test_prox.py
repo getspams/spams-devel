@@ -20,8 +20,8 @@ def test_fistaFlat():
     Y = np.asfortranarray(np.random.normal(size = (m,1)))
     Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)),dtype=myfloat)
     Y = spams.normalize(Y)
-    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
-    # Regression experiments 
+    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="F")
+    # Regression experiments
     # 100 regression problems with the same design matrix X.
     print('\nVarious regression experiments')
     param['compute_gram'] = True
@@ -77,7 +77,7 @@ def test_fistaFlat():
     param['size_group'] = 2
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:],0)))
-    
+
     print('\nFISTA + Group Lasso L2 with variable size of groups')
     param['regul'] = 'group-lasso-l2'
     param2=param.copy()
@@ -91,22 +91,22 @@ def test_fistaFlat():
     param['size_group'] = 5
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:])))
-    
-####    
-   
+
+####
+
     print('\nFISTA + Regression Fused-Lasso')
     param['regul'] = 'fused-lasso'
     param['lambda2'] = 0.1
     param['lambda3'] = 0.1; #
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:])))
-    
+
     print('\nFISTA + Regression no regularization')
     param['regul'] = 'none'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:])))
-    
-    
+
+
     print('\nFISTA + Regression l1 with intercept ')
     param['intercept'] = True
     param['regul'] = 'l1'
@@ -114,7 +114,7 @@ def test_fistaFlat():
     W01 = np.asfortranarray(np.concatenate((W0,np.zeros((1,W0.shape[1]))),0),dtype=myfloat)
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,x1,W01,True,**param)',locals()) # adds a column of ones to X for the intercept,True)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
-    
+
     print('\nFISTA + Regression l1 with intercept+ non-negative ')
     param['pos'] = True
     param['regul'] = 'l1'
@@ -129,9 +129,9 @@ def test_fistaFlat():
     param['regul'] = 'l0'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:])))
-    
+
 # Classification
-    
+
     print('\nOne classification experiment')
 #*    Y = 2 * double(randn(100,1) > 0)-1
     Y = np.asfortranarray(2 * np.asarray(np.random.normal(size = (100,1)) > 0,dtype=myfloat) - 1)
@@ -149,66 +149,66 @@ def test_fistaFlat():
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 # can be used of course with other regularization functions, intercept,...
 #!    pause
-    
+
     print('\nFISTA + Logistic l1 + sparse matrix')
     param['loss'] = 'logistic'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,ssp.csc_matrix(X),W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 # can be used of course with other regularization functions, intercept,...
-    
+
 
 # Multi-Class classification
     Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,1000))) - 1,dtype=myfloat)
     param['loss'] = 'multi-logistic'
     print('\nFISTA + Multi-Class Logistic l1')
     nclasses = np.max(Y[:])+1
-    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="F")
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
 
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 # can be used of course with other regularization functions, intercept,...
-    
-    
+
+
 # Multi-Task regression
     Y = np.asfortranarray(np.random.normal(size = (100,100)),dtype=myfloat)
     Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)),dtype=myfloat)
     Y = spams.normalize(Y)
     param['compute_gram'] = False
-    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="F")
     param['loss'] = 'square'
     print('\nFISTA + Regression l1l2 ')
     param['regul'] = 'l1l2'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
-    
+
     print('\nFISTA + Regression l1linf ')
     param['regul'] = 'l1linf'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
-    
-    
+
+
     print('\nFISTA + Regression l1l2 + l1 ')
     param['regul'] = 'l1l2+l1'
     param['lambda2'] = 0.1
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:])))
-    
-    
+
+
     print('\nFISTA + Regression l1linf + l1 ')
     param['regul'] = 'l1linf+l1'
     param['lambda2'] = 0.1
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:])))
-    
-    
+
+
     print('\nFISTA + Regression l1linf + row + columns ')
     param['regul'] = 'l1linf-row-column'
     param['lambda2'] = 0.1
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
-    
+
 # Multi-Task Classification
-    
+
     print('\nFISTA + Logistic + l1l2 ')
     param['regul'] = 'l1l2'
     param['loss'] = 'logistic'
@@ -217,8 +217,8 @@ def test_fistaFlat():
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 # Multi-Class + Multi-Task Regularization
-    
-    
+
+
     print('\nFISTA + Multi-Class Logistic l1l2 ')
 #*    Y = double(ceil(5*rand(100,1000))-1)
     Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,1000))) - 1,dtype=myfloat)
@@ -226,12 +226,12 @@ def test_fistaFlat():
     param['loss'] = 'multi-logistic'
     param['regul'] = 'l1l2'
     nclasses = np.max(Y[:])+1
-    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="F")
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 # can be used of course with other regularization functions, intercept,...
-    
-    
+
+
 #############
 def test_fistaGraph():
     np.random.seed(0)
@@ -273,8 +273,8 @@ def test_fistaGraph():
     Y = np.asfortranarray(np.random.normal(size = (100,1)))
     Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)),dtype=myfloat)
     Y = spams.normalize(Y)
-    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
-    # Regression experiments 
+    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="F")
+    # Regression experiments
     # 100 regression problems with the same design matrix X.
     print('\nVarious regression experiments')
     compute_gram = True
@@ -372,13 +372,13 @@ def test_fistaGraph():
 # can be used of course with other regularization functions, intercept,...
 
 # Multi-Class classification
-    
+
     Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,Y.shape[1]))) - 1,dtype=myfloat)
     loss = 'multi-logistic'
     regul = 'graph'
     print('\nFISTA + Multi-Class Logistic + graph')
     nclasses = np.max(Y) + 1
-    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="F")
     tic = time.time()
     (W, optim_info) = spams.fistaGraph(
         Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
@@ -395,7 +395,7 @@ def test_fistaGraph():
     Y = np.asfortranarray(np.random.normal(size = (100,Y.shape[1])))
     Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)),dtype=myfloat)
     Y = spams.normalize(Y)
-    W0 = W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="F")
     compute_gram = False
     verbose = True
     loss = 'square'
@@ -436,7 +436,7 @@ def test_fistaGraph():
     loss = 'multi-logistic'
     regul = 'multi-task-graph'
     nclasses = np.max(Y) + 1
-    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="F")
     tic = time.time()
     (W, optim_info) = spams.fistaGraph(
         Y,X,W0,graph,True,numThreads = num_threads,verbose = verbose,
@@ -464,7 +464,7 @@ def test_fistaTree():
     Y = np.asfortranarray(np.random.normal(size = (m,m)))
     Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)),dtype=myfloat)
     Y = spams.normalize(Y)
-    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="F")
     own_variables =  np.array([0,0,3,5,6,6,8,9],dtype=np.int32)
     N_own_variables =  np.array([0,3,2,1,0,2,1,1],dtype=np.int32)
     eta_g = np.array([1,1,1,2,2,2,2.5,2.5],dtype=myfloat)
@@ -535,7 +535,7 @@ def test_fistaTree():
     param['regul'] = 'tree-l2'
     print('\nFISTA + Multi-Class Logistic + tree-l2')
     nclasses = np.max(Y[:])+1
-    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="F")
     (W, optim_info) = Xtest1('spams','spams.fistaTree(Y,X,W0,tree,True,**param)',locals())
     print('mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[3,:],0)))
 # can be used of course with other regularization functions, intercept,...
@@ -546,7 +546,7 @@ def test_fistaTree():
     Y = spams.normalize(Y)
     param['compute_gram'] = False
     param['verbose'] = True;   # verbosity, False by default
-    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="F")
     param['loss'] = 'square'
     print('\nFISTA + Regression  multi-task-tree')
     param['regul'] = 'multi-task-tree'
@@ -570,14 +570,14 @@ def test_fistaTree():
     param['loss'] = 'multi-logistic'
     param['regul'] = 'multi-task-tree'
     nclasses = np.max(Y[:])+1
-    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="F")
     (W, optim_info) = Xtest1('spams','spams.fistaTree(Y,X,W0,tree,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:]),np.mean(optim_info[3,:],0)))
 # can be used of course with other regularization functions, intercept,...
 
     print('\nFISTA + Multi-Class Logistic +multi-task-tree + sparse matrix')
     nclasses = np.max(Y[:])+1
-    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="FORTRAN")
+    W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=myfloat,order="F")
     X2 = ssp.csc_matrix(X)
     (W, optim_info) = Xtest1('spams','spams.fistaTree(Y,X2,W0,tree,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:]),np.mean(optim_info[3,:],0)))
@@ -589,7 +589,7 @@ def test_proximalFlat():
              'lambda1' : 0.1 }
     m = 100;n = 1000
     U = np.asfortranarray(np.random.normal(size = (m,n)),dtype=myfloat)
-    
+
     # test L0
     print("\nprox l0")
     param['regul'] = 'l0'
@@ -666,7 +666,7 @@ def test_proximalGraph():
     num_threads = -1 # all cores (-1 by default)
     verbose = True   # verbosity, false by default
     pos = False       # can be used with all the other regularizations
-    intercept = False # can be used with all the other regularizations     
+    intercept = False # can be used with all the other regularizations
 
     U = np.asfortranarray(np.random.normal(size = (10,100)),dtype=myfloat)
     print('First graph example')
@@ -732,7 +732,7 @@ def test_proximalGraph():
     print('\ntest no regularization')
     regul = 'none'
     alpha = Xtest1('spams','spams.proximalGraph(U,graph,False,lambda1 = lambda1,lambda2 = lambda2,numThreads  = num_threads ,verbose = verbose,pos = pos,intercept = intercept,regul = regul)',locals())
-    
+
     return None
 
 def test_proximalTree():
@@ -753,7 +753,7 @@ def test_proximalTree():
     eta_g = np.array([1,1,1],dtype=myfloat) # weights for each group, they should be non-zero to use fenchel duality
     groups = np.asfortranarray([[0,0,0],
                                 [1,0,0],
-                                [1,0,0]],dtype = np.bool) 
+                                [1,0,0]],dtype = np.bool)
     # first group should always be the root of the tree
     # non-zero entriees mean inclusion relation ship, here g2 is a children of g1,
     # g3 is a children of g1
@@ -796,7 +796,7 @@ def test_proximalTree():
     print('\ntest prox tree-l0')
     param['regul'] = 'tree-l0'
     alpha = Xtest1('spams','spams.proximalTree(U,tree,False,**param)',locals())
-    
+
     print('\ntest prox tree-l2')
     param['regul'] = 'tree-l2'
     alpha = Xtest1('spams','spams.proximalTree(U,tree,False,**param)',locals())
@@ -809,7 +809,7 @@ def test_proximalTree():
     print('\nprox l1, intercept, positivity constraint')
     param['regul'] = 'l1'
     param['pos'] = True       # can be used with all the other regularizations
-    param['intercept'] = True # can be used with all the other regularizations     
+    param['intercept'] = True # can be used with all the other regularizations
     alpha = Xtest1('spams','spams.proximalTree(U,tree,False,**param)',locals())
 
     print('\nprox multi-task tree')

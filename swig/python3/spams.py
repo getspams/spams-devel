@@ -282,7 +282,7 @@ def fistaFlat(
         groups = np.array([],dtype=np.int32,order="F")
     if inner_weights == None:
         inner_weights = np.array([0.],dtype=X.dtype)
-    W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+    W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="F")
     optim_info = spams_wrap.fistaFlat(Y,X,W0,W,groups,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose,linesearch_mode)
     if return_optim_info:
         return(W,optim_info)
@@ -306,7 +306,7 @@ def fistaTree(
     groups = tree['groups']
     own_variables = tree['own_variables']
     N_own_variables = tree['N_own_variables']
-    W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+    W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="F")
     optim_info = spams_wrap.fistaTree(Y,X,W0,W,eta_g,groups,own_variables,N_own_variables,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose,linesearch_mode)
     if return_optim_info:
         return(W,optim_info)
@@ -331,7 +331,7 @@ def fistaGraph(
     if inner_weights == None:
         inner_weights = np.array([0.],dtype=X.dtype)
     groups_var = graph['groups_var']
-    W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+    W = np.zeros((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="F")
     optim_info = spams_wrap.fistaGraph(Y,X,W0,W,eta_g,groups,groups_var,numThreads ,max_it ,L0,fixed_step,gamma,lambda1,delta,lambda2,lambda3,a,b,c,tol,it0,max_iter_backtracking,compute_gram,lin_admm,admm,intercept,resetflow,regul,loss,verbose,pos,clever,log,ista,subgrad,logName,is_inner_weights,inner_weights,size_group,sqrt_step,transpose,linesearch_mode)
     if return_optim_info:
         return(W,optim_info)
@@ -353,7 +353,7 @@ def proximalFlat(U,return_val_loss = False,numThreads =-1,lambda1=1.0,lambda2=0.
         groups = np.array([],dtype=np.int32,order="F")
 
     eval = return_val_loss
-    alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+    alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="F")
     val_loss = spams_wrap.proximalFlat(U,alpha,groups,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
     if return_val_loss:
         return(alpha,val_loss)
@@ -371,7 +371,7 @@ def proximalTree(U,tree,return_val_loss = False,numThreads =-1,lambda1=1.0,lambd
 #                 ('size_group',1),('transpose',False)]
 #    params = __param_struct(paramlist,param)
     eval = return_val_loss
-    alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+    alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="F")
     if(len(tree) != 4):
         raise ValueError("proximalTree : tree should be a named list of 4 elements")
     eta_g = tree['eta_g']
@@ -394,7 +394,7 @@ def proximalGraph(U,graph,return_val_loss = False,numThreads =-1,lambda1=1.0,lam
     eta_g = graph['eta_g']
     groups = graph['groups']
     groups_var = graph['groups_var']
-    alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="FORTRAN")
+    alpha = np.zeros((U.shape[0],U.shape[1]),dtype=U.dtype,order="F")
     val_loss = spams_wrap.proximalGraph(U,alpha,eta_g,groups,groups_var,numThreads ,lambda1,lambda2,lambda3,intercept,resetflow,regul,verbose,pos,clever,eval,size_group,transpose)
     if return_val_loss:
         return(alpha,val_loss)

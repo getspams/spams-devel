@@ -38,7 +38,7 @@ f.close()
 ##
 Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)))
 Y = spams.normalize(Y)
-W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="FORTRAN")
+W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="F")
 param['compute_gram'] = True
 param['verbose'] = True
 param['loss'] = 'square'
@@ -78,7 +78,7 @@ if not tsteq(X0,X):
     print("X MODIFIE")
 if not tsteq(Y0,Y):
     print("Y MODIFIE")
-#W00 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="FORTRAN")
+#W00 = np.zeros((X.shape[1],Y.shape[1]),dtype=np.float64,order="F")
 (W, optim_info) = spams.fistaFlat(Y,X,W0,param,True)
 print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 print("ERR %f" %abs(W).max())
@@ -86,10 +86,9 @@ Y = np.asfortranarray(np.ceil(5 * np.random.random(size = (100,1000))) - 1)
 param['loss'] = 'multi-logistic'
 print('\nFISTA + Multi-Class Logistic l1')
 nclasses = np.max(Y[:])+1
-W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=np.float64,order="FORTRAN")
+W0 = np.zeros((X.shape[1],nclasses * Y.shape[1]),dtype=np.float64,order="F")
 print("X %s, Y %s, W0 %s" %(str(X.shape),str(Y.shape),str(W0.shape)))
 (W, optim_info) = spams.fistaFlat(Y,X,W0,param,True)
 
 print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 # can be used of course with other regularization functions, intercept,...
- 

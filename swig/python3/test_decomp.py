@@ -39,7 +39,7 @@ def test_sparseProject():
         print("%f signals of size %d projected per second" %((X.shape[1] / t),X.shape[0]))
     constraints = (X1*X1).sum(axis=0) + param['lambda1'] * np.abs(X1).sum(axis=0)
     print('Checking constraint: %f, %f (Projection is approximate : stops at a kink)' %(min(constraints),max(constraints)))
-    
+
     print("\n  Projection on the FLSA")
     param['mode'] = 6       # projection on the FLSA
     param['lambda1'] = 0.7
@@ -106,7 +106,7 @@ def test_l1L2BCD():
     lambda1 = 0.15 # squared norm of the residual should be less than 0.1
     numThreads = -1 # number of processors/cores to use the default choice is -1
                     # and uses all the cores of the machine
-    alpha0 = np.zeros((D.shape[1],X.shape[1]),dtype= myfloat,order="FORTRAN")
+    alpha0 = np.zeros((D.shape[1],X.shape[1]),dtype= myfloat,order="F")
     tic = time.time()
     alpha = spams.l1L2BCD(X,D,alpha0,ind_groups,lambda1 = lambda1,mode = mode,itermax = itermax,tol = tol,numThreads = numThreads)
     tac = time.time()
@@ -141,7 +141,7 @@ def test_lasso():
     t = tac - tic
     print("%f signals processed per second\n" %(float(X.shape[1]) / t))
 ########################################
-# Regularization path of a single signal 
+# Regularization path of a single signal
 ########################################
     X = np.asfortranarray(np.random.normal(size=(64,1)),dtype= myfloat)
     D = np.asfortranarray(np.random.normal(size=(64,10)))
@@ -172,7 +172,7 @@ def test_lassoMask():
     tac = time.time()
     t = tac - tic
     print("%f signals processed per second\n" %(float(X.shape[1]) / t))
-   
+
     return None
 
 def test_lassoWeighted():
@@ -187,14 +187,14 @@ def test_lassoWeighted():
     D = np.asfortranarray(np.random.normal(size=(64,256)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)),dtype= myfloat)
     param = { 'L' : 20,
-        'lambda1' : 0.15, 'numThreads' : 8, 'mode' : spams.PENALTY} 
+        'lambda1' : 0.15, 'numThreads' : 8, 'mode' : spams.PENALTY}
     W = np.asfortranarray(np.random.random(size = (D.shape[1],X.shape[1])),dtype= myfloat)
     tic = time.time()
     alpha = spams.lassoWeighted(X,D,W,**param)
     tac = time.time()
     t = tac - tic
     print("%f signals processed per second\n" %(float(X.shape[1]) / t))
-    
+
     return None
 
 def test_omp():
@@ -212,7 +212,7 @@ def test_omp():
     t = tac - tic
     print("%f signals processed per second\n" %(float(X.shape[1]) / t))
 ########################################
-# Regularization path of a single signal 
+# Regularization path of a single signal
 ########################################
     X = np.asfortranarray(np.random.normal(size=(64,1)),dtype= myfloat)
     D = np.asfortranarray(np.random.normal(size=(64,10)))
@@ -225,9 +225,9 @@ def test_ompMask():
     np.random.seed(0)
     print('test ompMask')
 
-########################################    
+########################################
 # Decomposition of a large number of signals
-########################################    
+########################################
     X = np.asfortranarray(np.random.normal(size=(300,300)))
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)),dtype= myfloat)
     D = np.asfortranarray(np.random.normal(size=(300,50)))
@@ -241,7 +241,7 @@ def test_ompMask():
     tac = time.time()
     t = tac - tic
     print("%f signals processed per second\n" %(float(X.shape[1]) / t))
-    
+
     return None
 
 def test_somp():
