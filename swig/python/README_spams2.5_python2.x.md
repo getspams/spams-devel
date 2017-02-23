@@ -1,7 +1,6 @@
 # SPAMS 2.5 and python2.x
 
-This directory contains files to install the python interfaces
-to the functions of SPAMS library already interfaced with matlab.
+This directory contains files to install and use (at the end) the python interfaces to the functions of SPAMS library already interfaced with matlab.
 
 Manipulated objects are imported from numpy and scipy. Matrices should be stored by columns, and sparse matrices should be "column compressed".
 
@@ -149,3 +148,35 @@ cd spams-python
 Ignore error "mt.exe not found"
 
 The result should be  spams-python-%FULLVERSION%.win-amd64-py2.7.exe
+
+## Using the interface
+
+* setup your PYTHONPATH and `import spams`
+
+The spams functions accept only numpy dense vectors or "Fortran" matrices and
+scipy sparce matrices of csc type.
+
+Examples :
+* `CalcXY`
+```
+import numpy as np
+import spams
+X = np.asfortranarray(np.random.random((64,200)))
+Y = np.asfortranarray(np.random.random((200,20000)))
+Z = spams.CalcXY(X,Y)
+```
+* `CalcAAt` (the file `myscipy.py` can be required because current `scipy.sparse` from Ubuntu does not have the `rand` function)
+```
+import numpy as np
+import scipy
+import scipy.sparse
+import spams
+
+if not ('rand' in scipy.sparse.__dict__):
+    import myscipy as ssp
+else:
+    import scipy.sparse as ssp
+    m=200; n = 200000; d= 0.05
+    A = ssp.rand(m,n,density=d,format='csc',dtype=np.float64)
+    B = spams.CalcAAt(A)
+```
