@@ -10,6 +10,4 @@ WDIR="spams-cpp-v$VERSION"
 WFILE="spams-cpp-v$VERSION-$da.tar.gz"
 
 # create the tar gzipped file
-mv .gitattributes_cpp .gitattributes
 git archive --format=tar.gz --prefix=$WDIR --output=$WFILE HEAD
-mv .gitattributes .gitattributes_cpp
