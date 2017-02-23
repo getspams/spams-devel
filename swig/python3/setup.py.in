@@ -1,13 +1,14 @@
 import os
 #os.environ['DISTUTILS_DEBUG'] = "1"
 from distutils.core import setup, Extension
+from distutils.sysconfig import get_python_inc
 import distutils.util
 import numpy
 
 # includes numpy : package numpy.distutils , numpy.get_include()
 # python setup.py build --inplace
-# python setup.py install --prefix=dist, 
-incs = ['.'] + [os.path.join('spams',x) for x in [ 'linalg', 'prox', 'decomp', 'dictLearn']] + [numpy.get_include()] + ['/usr/include/python2.7/']
+# python setup.py install --prefix=dist,
+incs = ['.'] + [os.path.join('spams',x) for x in [ 'linalg', 'prox', 'decomp', 'dictLearn']] + [numpy.get_include()] + [get_python_inc()]
 
 osname = distutils.util.get_platform()
 cc_flags = ['-fPIC', '-fopenmp']
@@ -78,7 +79,7 @@ setup (name = 'spams',
 #       scripts = ['test_spams.py'],
        data_files = [
         ('test',['test_spams.py', 'test_decomp.py', 'test_dictLearn.py', 'test_linalg.py', 'test_prox.py', 'test_utils.py']),
-        ('doc',['doc_spams.pdf', 'python-interface.pdf']), 
+        ('doc',['doc_spams.pdf', 'python-interface.pdf']),
         ('doc/sphinx/_sources',mkhtml('_sources')),
         ('doc/sphinx/_static',mkhtml('_static')),
         ('doc/sphinx',mkhtml()),
