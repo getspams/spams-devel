@@ -5,6 +5,7 @@
 ### C++ code
 
 * 648151c7e1654ce03756669d972fda70541f539e: Fix compilation error C++: `if isnan(lambda)` replaced by `if (isnan(lambda))` in [linalg/linalg.h](linalg/linalg.h)
+* d282e4f391b96298bfa9eccbff779524c608d2dd: Export of the C++ source files with [export_cpp_src_git.sh](./export_cpp_src_git.sh)
 
 ### Matlab
 
