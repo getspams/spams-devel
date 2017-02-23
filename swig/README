@@ -1,9 +1,10 @@
-python and R interfaces are build with swig
+python and R interfaces are built with swig
 
-- python interface : see README in ./python
+- python2.x interface : see README in ./python
+- python3.x interface : see README in ./python3
 - R interface : see README in ./R
 
 Files spams.h, spams.i, spamstools.i are used to build both interfaces
 
-A good document for correspondance between matlab python and R :
+A good document for correspondance between matlab python and R:
 http://mathesaurus.sourceforge.net/matlab-python-xref.pdf
