@@ -26,12 +26,13 @@
         INC="-I. -Ispams/linalg -Ispams/prox -Ispams/decomp -Ispams/dictLearn ${INC_PYTHON}"
         ```
         * 56405c4d4ccc139c5ad4100a9df37e895c91c769: add an option to use python3 (-py3)
-        * TODO: Commande `swig -c++ -python ...` replaced by `swig -c++ -py3 -python ...`
+        * e2e8e17947363ce7811b20e5b2a3f2f60d206740: Commande `swig -c++ -python ...` replaced by `swig -c++ -py3 -python ...` in case of python3 (specific argument, empty with python2)
 
     * 18123a6fcc8f5985ef652bb0288944ca22ef7bc9: Swig directive depends on python version in [swig/python/numpy.i](swig/python/numpy.i), two functions `PyFile_Check` and `PyInstance_Check` have been removed from the C API for python 3, so removed calls to those two functions from numpy.i for PY_MAJOR_VERSION >= 3 (also see https://github.com/numpy/numpy/pull/2923)
-    * dfddf3c75bce140b4eab7a30264cf734df35f918 (CANCELED BY 8dc622a6956a61d3d514dd4fb708464ca5fd285f and f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67): Automatic script conversion from python2 to python3 with `2to3`, former version of the files saved in .py.bak, in case scripts are not python2.7 compatible anymore
+    <!-- * dfddf3c75bce140b4eab7a30264cf734df35f918 (CANCELED BY 8dc622a6956a61d3d514dd4fb708464ca5fd285f and f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67): Automatic script conversion from python2 to python3 with `2to3`, former version of the files saved in .py.bak, in case scripts are not python2.7 compatible anymore
     * 8dc622a6956a61d3d514dd4fb708464ca5fd285f: Automatic script conversion from python2 to python3 with `2to3`, creation of files `*-3.py` (equivalent to `*.py` files but with python3 compliant syntax).
-    * f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67: Come back to python2 compliant files in `*.py` (cancelled dfddf3c75bce140b4eab7a30264cf734df35f918)
+    * f3189c95dd1a4a0c8c8a9bcd747a1a9727eceb67: Come back to python2 compliant files in `*.py` (cancel dfddf3c75bce140b4eab7a30264cf734df35f918) -->
+    * 017c39e919bd72acceddcb537809535519449734: New directory for python3 compliant files, unmodified files are symlinked to python directory
     * TODO: New import and new setup in [python/setup.py.in](python/setup.py.in)
 
 ### SWIG/R
