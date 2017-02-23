@@ -7,7 +7,7 @@ DA=$(``date +%F)
 echo $DA
 VERSION=`cat swig/Version`
 WDIR="spams-matlab-v$VERSION"
-WFILE="spams-matlab-v$VERSION-$da.tar.gz"
+WFILE="spams-matlab-v$VERSION-$DA.tar.gz"
 
 # remove previous version if necessary
 rm -rf $WDIR
