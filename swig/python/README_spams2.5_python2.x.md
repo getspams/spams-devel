@@ -1,4 +1,4 @@
-# SPAMS 2.5 and python2.x
+# SPAMS 2.5 and python2.x (ARCHIVE)
 
 This directory contains files to install and use (at the end) the python interfaces to the functions of SPAMS library already interfaced with matlab.
 
