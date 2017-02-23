@@ -92,7 +92,7 @@ SEXP appendOutput(SEXP value,SEXP result) {
 }
 %typemap(argout) (Vector<DATA_TYPE> **ARGOUT_VECTOR )
 {
-    # test argout
+    //# test argout
     if(data_temp$argnum != NULL) {
         R_len_t n = data_temp$argnum->n();
         DATA_TYPE *data = data_temp$argnum->rawX();
@@ -190,7 +190,7 @@ SEXP appendOutput(SEXP value,SEXP result) {
 }
 %typemap(argout) (Matrix<DATA_TYPE> **ARGOUT_MATRIX )
 {
-    # test argout
+    //# test argout
     if(data_temp$argnum != NULL) {
 	    R_len_t m = data_temp$argnum->m();
 	    R_len_t n = data_temp$argnum->n();
