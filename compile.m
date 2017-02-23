@@ -12,7 +12,6 @@ get_architecture;
 %           the multi-threaded version, otherwise set use_multithread=false).
 %           For windows, you need to have cygwin installed.
 %   - 'clang'
-%   - 'open64' (amd compiler), optimized for opteron cpus.
 %   - 'vs'  (visual studio compiler) for windows computers (10.0 or more is recommended)
 %            for some unknown reason, the performance obtained with vs is poor compared to icc/gcc
 compiler='gcc';
@@ -61,6 +60,7 @@ if strcmp(compiler,'gcc')
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.9.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-redhat-linux/4.7.2/';
        path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/4.8.2/';
+       path_to_compiler_libraries='/usr/lib/gcc/x86_64-linux-gnu/5/';
        path_to_compiler='/usr/bin/';
     else
        % example when compiler='gcc' for Windows+cygwin:   (the script does not
