@@ -83,7 +83,7 @@ python test_spams.py name1 name2 ... # run named tests
 * `./clean`<br/>
   Remove all intermediate files created by the different tool scripts
 
-* `./mtopy <in > out`
+* `./mtopy <in > out`<br/>
   Help for translation matlab -> python<br/>
   /!\\ Partial translation (comment, print)
 
