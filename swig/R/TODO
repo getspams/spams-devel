@@ -1,3 +1,4 @@
+COMPILATION WARNING
 * checking compilation flags in Makevars ... WARNING
 Non-portable flags in variable 'PKG_CXXFLAGS':
   -fopenmp -O3 -mtune=native
@@ -12,3 +13,13 @@ the ‘Writing R Extensions’ manual.
 /usr/bin/nm: /home/thoth/gdurif/Codes/spams-devel/swig/R/spams.Rcheck/spams/libs/spams.so: aucun symbole
 /usr/bin/nm: /home/thoth/gdurif/Codes/spams-devel/swig/R/spams.Rcheck/spams/libs/spams.so: aucun symbole
 See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
+
+EXECUTION ERROR
+X = matrix(rnorm(100 * 100000),nrow = 100,ncol = 100000,byrow = FALSE)
+X = X / matrix(rep(sqrt(colSums(X*X)),nrow(X)),nrow(X),ncol(X),byrow=T)
+D = matrix(rnorm(100 * 200),nrow = 100,ncol = 200,byrow = FALSE)
+D = D / matrix(rep(sqrt(colSums(D*D)),nrow(D)),nrow(D),ncol(D),byrow=T)
+alpha = spams.lasso(X,D,return_reg_path = FALSE,lambda1 = 0.15,numThreads = -1,mode = 'PENALTY' )
+
+Error in getClass(Class, where = topenv(parent.frame())) : 
+  “_p_SpMatrixT_double_t” is not a defined class
