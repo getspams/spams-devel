@@ -437,9 +437,9 @@ for k = 1:length(COMPILE),
         str = [str ' -outdir ' out_dir, ' ' DEFS ' ' links_lib ' OPTIMFLAGS="' compile_flags '" '];
     else
         if verLessThan('matlab','8.3.0')
-            str = [str ' -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' links_lib];
+            str = [str ' -v GCC=''/usr/bin/g++-4.7'' -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' links_lib];
         else
-            str = [str ' -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' ' LINKLIBS="$LINKLIBS ' links_lib '" '];
+            str = [str ' -v GCC=''/usr/bin/g++-4.7'' -outdir ' out_dir, ' ' DEFS ' CXXOPTIMFLAGS="' compile_flags '" LDOPTIMFLAGS="' link_flags '" ' ' LINKLIBS="$LINKLIBS ' links_lib '" '];
         end
     end
     args = regexp(str, '\s+', 'split');
