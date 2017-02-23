@@ -1,12 +1,14 @@
 This directory contains files to build the python interfaces
 to the functions of V%VERSION% SPAMS library already interfaced with matlab.
 
+This version is compatible with python2.x
+
 The interface consists of 4 files : spams.py myscipy_rand.py spams_wrap.py _spams_wrap.so
 Note: myscipy_rand.py supplies a random generator for sparse matrix
       for some old scipy distributions
 WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
 ########################################
-Interface building 
+Interface building
 
 Packages required: python-numpy, python-scipy, blas + lapack (preferably from atlas).
 
@@ -22,7 +24,7 @@ Two documentations are installed in $inst/doc
   - sphinx/index.html : the documentation of python function extracted by sphinx
 
 ################################
-Linux : 
+Linux :
       carefully install atlas. For example on my ubuntu I had to do
       apt-get install libatlas-dev libatlas3gf-base libatlas-3gf.so
       If you don't have libblas.so and liblapack.so in /lib or /usr/lib,
@@ -31,16 +33,16 @@ Linux :
 MacOS:
 	the build has been tested with MacOS 10 (Lion) and required
 	packages were installed with 'port install' :
-	port install atlas;port install py26-numpy;install py26-scipy
+	port install atlas;port install py27-numpy;install py27-scipy
 	I have added /opt/local/bin to my PATH
 	and specified the compiler by setting CC and CXX, for example:
 	export CC=/opt/local/bin/gcc-mp-4.3;export CXX=/opt/local/bin/g++-mp-4.3
 
-	
+
 
 Windows 32bits:
 	You need packages MinGW, python-2.7, and scipy + numpy for python-2.7
-	
+
 	You will find binary distributions for MinGW on www.mingw.org,
 	python-2.7 on www.python.org,
 	numpy and scipy on www.numpy.org (or www.scipy.org).
@@ -51,7 +53,7 @@ Windows 32bits:
 `	I use blas and lapack dlls fron the package R (2.15.1).
 	I found dlls for blas and lapcak on http://icl.cs.utk.edu/lapack-for-windows/lapack.
 	They work fine, but are slower.
-	
+
  	To make a binary windows installer (spams-%VERSION%.win32-py2.7.exe) :
 	- open a mingw console (msys.bat)
 	- extract files from the .tar.gz source distribution (tar zxf ...)
@@ -66,9 +68,9 @@ Windows 64bits :
 	As I am a windows newbe, it was a nightmare for me to build a win64 distro
 	(the difficulty was to download the right version of each MS component).
 
-	According to http://mattptr.net/2010/07/28/building-python-extensions-in-a-modern-windows-environment/ 
+	According to http://mattptr.net/2010/07/28/building-python-extensions-in-a-modern-windows-environment/
 	(and to my experience) this can only be done with "Visual C++ 2008 express".
-	
+
 	I worked on a virtual machine with a 64 bits windows7.
 
 	Here is what I exactly did.
@@ -79,16 +81,16 @@ Windows 64bits :
        - install R (2.15.1 ) from http://cran.r-project.org/, for blas and lapack libraries.
        - install "Microsoft Visual C++ 2008 SP1 Redistributable Package (x64)"
        	 (vcredist_x64.exe http://www.microsoft.com/fr-fr/download/details.aspx?id=2092)
-      - install "Microsoft Visual Studio 2008 Express with SP1"	
+      - install "Microsoft Visual Studio 2008 Express with SP1"
       	(vcsetup.exe http://www.microsoft.com/fr-fr/download/details.aspx?id=14597)
-     - install (uncheck doc, samples, .NET dev) 
+     - install (uncheck doc, samples, .NET dev)
        "Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1"
 	  (winsdk_web.exe http://www.microsoft.com/en-us/download/details.aspx?id=3138)
     - install (select only "Windows Headers and Libraries")
        "Microsoft Windows SDK for Windows 7 and .NET Framework 4"
        (winsdk_web.exe http://www.microsoft.com/en-us/download/confirmation.aspx?id=8279)
 
-   - create a file "/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 9.0"/VC/bin/amd64/vcvarsamd64.bat 
+   - create a file "/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 9.0"/VC/bin/amd64/vcvarsamd64.bat
      containing just the line
        call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /Release
    - get pexports and copy pexports.exe to C:/Windows/syatem32 or /c/mingw/bin
@@ -96,7 +98,7 @@ Windows 64bits :
 
    - install   a "Python Imaging Library" package (PIL), for example from
       http://www.lfd.uci.edu/~gohlke/pythonlibs/
-   
+
    - untar the source package of spams-python
    - cd spams-python
      ./win-build.sh
