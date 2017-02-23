@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="generator" content="hevea 2.09">
+<meta name="generator" content="hevea 2.23">
 
 <META name="Author" content="Julien Mairal">
 <link rel="stylesheet" href="doc_spams.css"><link rel="stylesheet" type="text/css" href="doc_spams.css">
@@ -25,8 +25,8 @@ operations. The ones shipped with matlab and R can be used, but also external
 libraries such as atlas, the netlib implementation, or the Intel Math Kernel
 Library can be used. It also exploits multi-core CPUs when this feature is
 supported by the compiler, through OpenMP.</p><p>The current licence is GPLv3, which is available at
-<span class="c004">http://www.gnu.org/licenses/gpl.html</span>. For other licensing possibilities 
-allowing its use in proprietary softwares, please contact the author.</p><p>Version 2.5 of SPAMS is divided into several “toolboxes” and has a few
+<span class="c004">http://www.gnu.org/licenses/gpl.html</span>. For other licensing possibilities
+allowing its use in proprietary softwares, please contact the author.</p><p>Version 2.6 of SPAMS is divided into several “toolboxes” and has a few
 additional miscellaneous functions:
 </p><ul class="itemize"><li class="li-itemize">
 The <span class="c010">Dictionary learning and matrix factorization toolbox</span>
@@ -44,9 +44,9 @@ dictionary Learning for sparse coding;
 <ul class="itemize"><li class="li-itemize">
 Orthogonal Matching Pursuit, (or Forward Selection) [<a href="doc_spams010.html#weisberg">35</a>, <a href="doc_spams010.html#mallat4">27</a>];
 </li><li class="li-itemize">the LARS/homotopy algorithm [<a href="doc_spams010.html#osborne">30</a>, <a href="doc_spams010.html#efron">9</a>] (variants for solving Lasso and Elastic-Net problems);
-</li><li class="li-itemize">a weighted version of LARS; 
+</li><li class="li-itemize">a weighted version of LARS;
 </li><li class="li-itemize">OMP and LARS when data comes with a binary mask;
-</li><li class="li-itemize">a coordinate-descent algorithm for ℓ<sub>1</sub>-decomposition problems [<a href="doc_spams010.html#fu">12</a>, <a href="doc_spams010.html#friedman">10</a>, <a href="doc_spams010.html#wu">36</a>]; 
+</li><li class="li-itemize">a coordinate-descent algorithm for ℓ<sub>1</sub>-decomposition problems [<a href="doc_spams010.html#fu">12</a>, <a href="doc_spams010.html#friedman">10</a>, <a href="doc_spams010.html#wu">36</a>];
 </li><li class="li-itemize">a greedy solver for simultaneous signal approximation as defined in [<a href="doc_spams010.html#tropp2">34</a>, <a href="doc_spams010.html#tropp3">33</a>] (SOMP);
 </li><li class="li-itemize">a solver for simulatneous signal approximation with ℓ<sub>1</sub>/ℓ<sub>2</sub>-regularization based on block-coordinate descent;
 </li><li class="li-itemize">a homotopy method for the Fused-Lasso Signal Approximation as defined in [<a href="doc_spams010.html#friedman">10</a>] with the homotopy method presented in the appendix of [<a href="doc_spams010.html#mairal9">21</a>];
@@ -86,7 +86,7 @@ Tikhonov regularization (squared ℓ<sub>2</sub>-norm);
 All of these regularization functions can be used with the following losses
 <ul class="itemize"><li class="li-itemize">
 square loss;
-</li><li class="li-itemize">square loss with missing observations; 
+</li><li class="li-itemize">square loss with missing observations;
 </li><li class="li-itemize">logistic loss, weighted logistic loss;
 </li><li class="li-itemize">multi-class logistic.
 </li></ul>
@@ -100,7 +100,8 @@ conjugate gradient algorithm, manipulating sparse matrices and graphs.
 </li></ul><p>The toolbox was written by Julien Mairal at INRIA, with the collaboration of
 Francis Bach (INRIA), Jean Ponce (Ecole Normale Supérieure), Guillermo Sapiro
 (University of Minnesota), Guillaume Obozinski (INRIA) and Rodolphe Jenatton
-(INRIA).</p><p>R and Python interfaces have been written by Jean-Paul Chieze (INRIA).
+(INRIA).</p><p>R and Python interfaces have been written by Jean-Paul Chieze (INRIA). Porting
+to R-3.x and Python-3.x was done by Ghislain Durif.
 The archetypal analysis implementation was written by Yuansi Chen, during
 an internship at INRIA, with the collaboration of Zaid Harchaoui.</p>
 <hr>

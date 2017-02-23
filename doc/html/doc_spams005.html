@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="generator" content="hevea 2.09">
+<meta name="generator" content="hevea 2.23">
 
 <META name="Author" content="Julien Mairal">
 <link rel="stylesheet" href="doc_spams.css"><link rel="stylesheet" type="text/css" href="doc_spams.css">
@@ -41,7 +41,7 @@ where for each column <span class="c009">x</span> of <span class="c009">X</span>
 </table></td><td class="dcell"> ||<span class="c009">x</span>−<span class="c009">D</span>α||<sub>2</sub><sup>2</sup>   s.t.   ||α||<sub>0</sub> ≤ <span class="c007">L</span>,
     (2)</td></tr>
 </table><p>
-or 
+or
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
@@ -126,12 +126,12 @@ The following piece of code illustrates how to use this function.
 % Decomposition of a large number of signals<br>
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span><br>
 X=<span class="c002">randn</span>(64,100000);<br>
-D=<span class="c002">randn</span>(64,200);<br>
+D=<span class="c002">randn</span>(64,256);<br>
 D=D./repmat(<span class="c002">sqrt</span>(<span class="c002">sum</span>(D.^2)),[<span class="c002">size</span>(D,1) 1]);<br>
 <span class="c001">% parameter of the optimization procedure are chosen</span><br>
 param.L=10; <span class="c001">% not more than 10 non-zeros coefficients</span><br>
-param.<span class="c002">eps</span>=0.1; <span class="c001">% squared norm of the residual should be less than 0.1</span><br>
-param.numThreads=-1; <span class="c001">% number of processors/cores to use; the default choice is -1</span><br>
+param.<span class="c002">eps</span>=0.0; <span class="c001">% squared norm of the residual should be less than 0.1</span><br>
+param.numThreads=4; <span class="c001">% number of processors/cores to use; the default choice is -1</span><br>
                     <span class="c001">% and uses all the cores of the machine</span><br>
 <span class="c002">tic</span><br>
 alpha=mexOMP(X,D,param);<br>
@@ -149,7 +149,7 @@ D=D./repmat(<span class="c002">sqrt</span>(<span class="c002">sum</span>(D.^2)),
 </table>
 <h3 class="subsection" id="sec13">4.2  Function mexOMPMask</h3>
 <p>
-This is a variant of mexOMP with the possibility of handling a binary mask. 
+This is a variant of mexOMP with the possibility of handling a binary mask.
 Given a binary mask <span class="c009">B</span>=[β<sup>1</sup>,…,β<sup><span class="c007">n</span></sup>] in {0,1}<sup><span class="c007">m</span> × <span class="c007">n</span></sup>, it returns a matrix <span class="c009">A</span>=[α<sup>1</sup>,…,α<sup><span class="c007">n</span></sup>] such that for every column <span class="c009">x</span> of <span class="c009">X</span>, β of <span class="c009">B</span>, it computes a column α of <span class="c009">A</span> by addressing
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
@@ -158,7 +158,7 @@ Given a binary mask <span class="c009">B</span>=[β<sup>1</sup>,…,β<sup><span
 </table></td><td class="dcell"> ||diag(β)(<span class="c009">x</span>−<span class="c009">D</span>α)||<sub>2</sub><sup>2</sup>   s.t.   ||α||<sub>0</sub> ≤ <span class="c007">L</span>,
     (5)</td></tr>
 </table><p>
-or 
+or
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
@@ -262,7 +262,7 @@ fprintf</span>(<span class="c003">'%f signals processed per second\n'</span>
 </table>
 <h3 class="subsection" id="sec14">4.3  Function mexRidgeRegression</h3>
 <p>
-This is a ridge regression solver using a conjugate gradient solver. 
+This is a ridge regression solver using a conjugate gradient solver.
 </p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage: [W]=mexRidgeRegression(Y,X,W0,param);<br>
 %<br>
@@ -322,7 +322,7 @@ This is a fast implementation of the LARS algorithm [<a href="doc_spams010.html
 </table></td><td class="dcell"> ||<span class="c009">x</span>−<span class="c009">D</span>α||<sub>2</sub><sup>2</sup>   s.t.   ||α||<sub>1</sub> ≤ λ,
     (8)</td></tr>
 </table><p>
-or 
+or
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
@@ -352,7 +352,7 @@ has also an option to add <span class="c010">positivity constraints</span> on th
 reasonable, this approach can be very efficient. Moreover, it gives the
 solution with an exact precision, and its performance does not depend on the
 correlation of the dictionary elements, except when the solution is not unique
-(the algorithm breaks in this case).</p><p>Note that mexLasso can return the whole regularization path of the first signal <span class="c009">x</span><sub>1</sub> 
+(the algorithm breaks in this case).</p><p>Note that mexLasso can return the whole regularization path of the first signal <span class="c009">x</span><sub>1</sub>
 and can handle implicitely the matrix <span class="c009">D</span> if the quantities <span class="c009">D</span><sup><span class="c007">T</span></sup><span class="c009">D</span> and <span class="c009">D</span><sup><span class="c007">T</span></sup><span class="c009">x</span> are passed
 as an argument, see below:</p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:  [A [path]]=mexLasso(X,D,param);<br>
@@ -459,7 +459,7 @@ such that for every column <span class="c009">x</span> of <span class="c009">X</
 </table></td><td class="dcell"> ||<span class="c009">x</span>−<span class="c009">D</span>α||<sub>2</sub><sup>2</sup>   s.t.   ||diag(<span class="c009">w</span>)α||<sub>1</sub> ≤ λ,
     (11)</td></tr>
 </table><p>
-or 
+or
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
@@ -562,7 +562,7 @@ fprintf</span>(<span class="c003">'%f signals processed per second\n'</span>
 </table>
 <h3 class="subsection" id="sec17">4.6  Function mexLassoMask</h3>
 <p>
-This is a variant of mexLasso with the possibility of adding a mask <span class="c009">B</span>=[β<sup>1</sup>,…,β<sup><span class="c007">n</span></sup>], as in mexOMPMask. 
+This is a variant of mexLasso with the possibility of adding a mask <span class="c009">B</span>=[β<sup>1</sup>,…,β<sup><span class="c007">n</span></sup>], as in mexOMPMask.
 For every column <span class="c009">x</span> of <span class="c009">X</span>, β of <span class="c009">B</span>, it computes a column α of <span class="c009">A</span>, which is the solution of
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
@@ -571,7 +571,7 @@ For every column <span class="c009">x</span> of <span class="c009">X</span>, β 
 </table></td><td class="dcell"> ||diag(β)(<span class="c009">x</span>−<span class="c009">D</span>α)||<sub>2</sub><sup>2</sup>   s.t.   ||α||<sub>1</sub> ≤ λ,
     (14)</td></tr>
 </table><p>
-or 
+or
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
@@ -579,7 +579,7 @@ or
 </table></td><td class="dcell">  ||α||<sub>1</sub>   s.t.   ||diag(β)(<span class="c009">x</span>−<span class="c009">D</span>α)||<sub>2</sub><sup>2</sup> ≤ λ</td><td class="dcell"><table class="display"><tr><td class="dcell c012">||β||<sub>0</sub></td></tr>
 <tr><td class="hbar"></td></tr>
 <tr><td class="dcell c012"><span class="c007">m</span></td></tr>
-</table></td><td class="dcell">, 
+</table></td><td class="dcell">,
     (15)</td></tr>
 </table><p>
 or
@@ -596,7 +596,7 @@ or
 </table></td><td class="dcell">||α||<sub>1</sub> + </td><td class="dcell"><table class="display"><tr><td class="dcell c012">λ<sub>2</sub></td></tr>
 <tr><td class="hbar"></td></tr>
 <tr><td class="dcell c012">2</td></tr>
-</table></td><td class="dcell">||α||<sub>2</sub><sup>2</sup>. 
+</table></td><td class="dcell">||α||<sub>2</sub><sup>2</sup>.
     (16)</td></tr>
 </table><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   A=mexLassoMask(X,D,B,param);<br>
@@ -685,7 +685,7 @@ Eq. (<a href="#eq%3Alasso2">9</a>). Note that unlike mexLasso, it is not implem
 To solve Eq. (<a href="#eq%3Alasso2">9</a>), the algorithm solves a
 sequence of problems of the form (<a href="#eq%3Alasso">10</a>) using simple heuristics.
 Coordinate descent is very simple and in practice very powerful. It performs
-better when the correlation between the dictionary elements is small. </p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
+better when the correlation between the dictionary elements is small.</p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   A=mexCD(X,D,A0,param);<br>
 %<br>
 % Name: mexCD<br>
@@ -780,7 +780,7 @@ This is a fast implementation of the Simultaneous Orthogonal Matching Pursuit al
 </table></td><td class="dcell"> ||<span class="c009">X</span><sup><span class="c007">i</span></sup>−<span class="c009">DA</span><sup><span class="c007">i</span></sup>||<sub><span class="c007">F</span></sub><sup>2</sup>   s.t.   ||<span class="c009">A</span><sup><span class="c007">i</span></sup>||<sub>0,∞</sub> ≤ <span class="c007">L</span>.
     (17)</td></tr>
 </table><p>
-or 
+or
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 ∀ <span class="c007">i</span>   </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
@@ -875,7 +875,7 @@ This is a fast implementation of a simultaneous signal decomposition formulation
 </table></td><td class="dcell">.
     (19)</td></tr>
 </table><p>
-or 
+or
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 ∀ <span class="c007">i</span>   </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
@@ -1000,8 +1000,8 @@ or
     (24)</td></tr>
 </table><p>
 Note that for the two last cases, the method performs a small approximation.
-The method follows the regularization path, goes from one kink to another, and 
-stop whenever the constraint is not satisfied anymore. The solution returned 
+The method follows the regularization path, goes from one kink to another, and
+stop whenever the constraint is not satisfied anymore. The solution returned
 by the algorithm is the one obtained at the last kink of the regularization path,
 which is in practice close, but not exactly the same as the solution.
 This will be corrected in a future release of the toolbox.</p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
@@ -1140,7 +1140,7 @@ The function implements an active-set algorithm [<a href="doc_spams010.html#Che
 %<br>
 % Name: mexDecompSimplex<br>
 %<br>
-% documentation to appear soon<br>
+% Description: documentation to appear soon<br>
 %<br>
 % Inputs: X:  double m x n matrix   (input signals)<br>
 %               m is the signal size<br>

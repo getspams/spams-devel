@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="generator" content="hevea 2.09">
+<meta name="generator" content="hevea 2.23">
 
 <META name="Author" content="Julien Mairal">
 <link rel="stylesheet" href="doc_spams.css"><link rel="stylesheet" type="text/css" href="doc_spams.css">
@@ -40,7 +40,7 @@ possibly large-scale learning problems, with several combinations of losses and
 regularization terms. The method implements the proximal methods
 of [<a href="doc_spams010.html#beck">1</a>], and includes the proximal solvers for the tree-structured
 regularization of [<a href="doc_spams010.html#jenatton3">15</a>], and the solver of [<a href="doc_spams010.html#mairal10">22</a>] for
-general structured sparse regularization. 
+general structured sparse regularization.
 The solver for structured sparse regularization norms includes a C++ max-flow
 implementation of the push-relabel algorithm of [<a href="doc_spams010.html#goldberg">13</a>], with
 heuristics proposed by [<a href="doc_spams010.html#cherkassky">5</a>].</p><p>This implementation also provides robust stopping criteria based on
@@ -57,7 +57,7 @@ can solve take the form
 </table><p>
 where <span class="c007">f</span> is a smooth loss function and ψ is a regularization function.
 When one optimizes a matrix <span class="c009">W</span> in ℝ<sup><span class="c007">p</span> × <span class="c007">r</span></sup> instead of
-a vector <span class="c009">w</span> in ℝ<sup><span class="c007">p</span></sup>, we will write 
+a vector <span class="c009">w</span> in ℝ<sup><span class="c007">p</span></sup>, we will write
 </p><table class="display dcenter"><tr class="c016"><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
 <tr><td class="dcell c012">min</td></tr>
 <tr><td class="dcell c012"><span class="c009">W</span> ∈ ℝ<sup><span class="c007">p</span> × <span class="c007">r</span></sup></td></tr>
@@ -94,7 +94,7 @@ Our software also handles regularization functions ψ on matrices <span class=
 </li><li class="li-itemize"><span class="c010">The </span>ℓ<sub>1</sub>/ℓ<sub>2</sub><span class="c010">+</span>ℓ<sub>1</sub><span class="c010">-norm</span>: ψ(<span class="c009">W</span>) =<sup><span class="c005">▵</span></sup> ∑<sub><span class="c007">i</span>=1</sub><sup><span class="c007">p</span></sup> ||<span class="c009">W</span><sub><span class="c007">i</span></sub>||<sub>2</sub> + λ<sub>2</sub> ∑<sub><span class="c007">i</span>,<span class="c007">j</span></sub>|<span class="c009">W</span><sub><span class="c007">ij</span></sub>|.
 </li><li class="li-itemize"><span class="c010">The </span>ℓ<sub>1</sub>/ℓ<sub>∞</sub><span class="c010">+</span>ℓ<sub>1</sub><span class="c010">-norm</span>: ψ(<span class="c009">W</span>) =<sup><span class="c005">▵</span></sup> ∑<sub><span class="c007">i</span>=1</sub><sup><span class="c007">p</span></sup> ||<span class="c009">W</span><sub><span class="c007">i</span></sub>||<sub>∞</sub>+λ<sub>2</sub> ∑<sub><span class="c007">i</span>,<span class="c007">j</span></sub>|<span class="c009">W</span><sub><span class="c007">ij</span></sub>|,
 </li><li class="li-itemize"><span class="c010">The </span>ℓ<sub>1</sub>/ℓ<sub>∞</sub><span class="c010">-norm on rows and columns</span>: ψ(<span class="c009">W</span>) =<sup><span class="c005">▵</span></sup> ∑<sub><span class="c007">i</span>=1</sub><sup><span class="c007">p</span></sup> ||<span class="c009">W</span><sub><span class="c007">i</span></sub>||<sub>∞</sub>+λ<sub>2</sub> ∑<sub><span class="c007">j</span>=1</sub><sup><span class="c007">r</span></sup>||<span class="c009">W</span><sup><span class="c007">j</span></sup>||<sub>∞</sub>, where <span class="c009">W</span><sup><span class="c007">j</span></sup> denotes the <span class="c007">j</span>-th column of <span class="c009">W</span>.
-</li><li class="li-itemize"><span class="c010">The multi-task tree-structured sum of </span>ℓ<sub>∞</sub><span class="c010">-norms</span>: 
+</li><li class="li-itemize"><span class="c010">The multi-task tree-structured sum of </span>ℓ<sub>∞</sub><span class="c010">-norms</span>:
 <table class="display dcenter"><tr class="c016"><td class="dcell">
 ψ(<span class="c009">W</span>)</td><td class="dcell"><table class="display"><tr><td class="dcell c012"><span class="c005">▵</span></td></tr>
 <tr><td class="dcell c012">=</td></tr>
@@ -260,7 +260,7 @@ where <span class="c008">G</span> is any kind of set of groups.</p><p>This funct
 </table></td><td class="dcell">||<span class="c009">U</span>−<span class="c009">V</span>||<sub><span class="c007">F</span></sub><sup>2</sup> + λ </td><td class="dcell"><table class="display"><tr><td class="dcell c012"><span class="c007">p</span></td></tr>
 <tr><td class="dcell c012"><span class="c006">∑</span></td></tr>
 <tr><td class="dcell c012"><span class="c007">i</span>=1</td></tr>
-</table></td><td class="dcell"> ||<span class="c009">V</span><sub><span class="c007">i</span></sub>||<sub>2</sub>, 
+</table></td><td class="dcell"> ||<span class="c009">V</span><sub><span class="c007">i</span></sub>||<sub>2</sub>,
     (35)</td></tr>
 </table><p>
 where <span class="c009">V</span><sub><span class="c007">i</span></sub> is the <span class="c007">i</span>-th row of <span class="c009">V</span>, or
@@ -274,7 +274,7 @@ where <span class="c009">V</span><sub><span class="c007">i</span></sub> is the <
 </table></td><td class="dcell">||<span class="c009">U</span>−<span class="c009">V</span>||<sub><span class="c007">F</span></sub><sup>2</sup> + λ </td><td class="dcell"><table class="display"><tr><td class="dcell c012"><span class="c007">p</span></td></tr>
 <tr><td class="dcell c012"><span class="c006">∑</span></td></tr>
 <tr><td class="dcell c012"><span class="c007">i</span>=1</td></tr>
-</table></td><td class="dcell"> ||<span class="c009">V</span><sub><span class="c007">i</span></sub>||<sub>∞</sub>, 
+</table></td><td class="dcell"> ||<span class="c009">V</span><sub><span class="c007">i</span></sub>||<sub>∞</sub>,
     (36)</td></tr>
 </table><p>
 or
@@ -294,7 +294,7 @@ or
 </table></td><td class="dcell"><table class="display"><tr><td class="dcell c012"><span class="c007">n</span></td></tr>
 <tr><td class="dcell c012"><span class="c006">∑</span></td></tr>
 <tr><td class="dcell c012"><span class="c007">j</span>=1</td></tr>
-</table></td><td class="dcell"> |<span class="c009">V</span><sub><span class="c007">ij</span></sub>|, 
+</table></td><td class="dcell"> |<span class="c009">V</span><sub><span class="c007">ij</span></sub>|,
     (37)</td></tr>
 </table><p>
 or
@@ -314,7 +314,7 @@ or
 </table></td><td class="dcell"><table class="display"><tr><td class="dcell c012"><span class="c007">n</span></td></tr>
 <tr><td class="dcell c012"><span class="c006">∑</span></td></tr>
 <tr><td class="dcell c012"><span class="c007">j</span>=1</td></tr>
-</table></td><td class="dcell"> |<span class="c009">V</span><sub><span class="c007">ij</span></sub>|, 
+</table></td><td class="dcell"> |<span class="c009">V</span><sub><span class="c007">ij</span></sub>|,
     (38)</td></tr>
 </table><p>
 or
@@ -569,7 +569,7 @@ where δ<sup><span class="c007">g</span></sup>(<span class="c009">v</span>)=0 if
 <tr><td class="dcell c012"><span class="c007">j</span> ∈ <span class="c007">g</span></td></tr>
 </table></td><td class="dcell"> ||<span class="c009">v</span><sub><span class="c007">g</span></sub><sup><span class="c007">j</span></sup>||<sub>∞</sub>,
     (43)</td></tr>
-</table><p> 
+</table><p>
 which is a formulation presented in [<a href="doc_spams010.html#mairal10">22</a>].</p><p>This function can also be used for computing the proximal operators addressed by mexProximalFlat (it will just not take into account the tree structure). The way the tree is incoded is presented below, (and examples are given in the file test_ProximalTree.m, with more usage details:
 </p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:  [V [val_regularizer]]=mexProximalTree(U,tree,param);<br>
@@ -817,7 +817,7 @@ or with a regularization function on matrices, it computes <span class="c009">V<
 <tr><td class="dcell c012"><span class="c007">j</span> ∈ <span class="c007">g</span></td></tr>
 </table></td><td class="dcell"> ||<span class="c009">v</span><sub><span class="c007">g</span></sub><sup><span class="c007">j</span></sup>||<sub>∞</sub>,
     (45)</td></tr>
-</table><p> 
+</table><p>
 This function can also be used for computing the proximal operators addressed by mexProximalFlat. The way the graph is incoded is presented below (and also in the example file test_ProximalGraph.m, with more usage details:
 </p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   [V [val_regularizer]]=mexProximalGraph(U,graph,param);<br>
@@ -962,7 +962,7 @@ alpha=mexProximalGraph(U,graph,param);</td></tr>
 </table>
 <h3 class="subsection" id="sec28">5.5  Function mexProximalPathCoding</h3>
 <p>
-This function computes the proximal operators associated to the path coding penalties of [<a href="doc_spams010.html#mairal14">24</a>]. 
+This function computes the proximal operators associated to the path coding penalties of [<a href="doc_spams010.html#mairal14">24</a>].
 </p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   [V [val_regularizer]]=mexProximalPathCoding(U,DAG,param);<br>
 %<br>
@@ -1164,8 +1164,8 @@ We present here regression or classification formulations and their multi-task v
 </td></tr>
 </table><p>
 where <span class="c007">b</span> is an optional variable acting as an “intercept”, which is not regularized, and ψ
-can be any of the regularization functions presented above. 
-Let us consider the vector <span class="c009">y</span> in ℝ<sup><span class="c007">n</span></sup> that carries the entries <span class="c007">y</span><sub><span class="c007">i</span></sub>. 
+can be any of the regularization functions presented above.
+Let us consider the vector <span class="c009">y</span> in ℝ<sup><span class="c007">n</span></sup> that carries the entries <span class="c007">y</span><sub><span class="c007">i</span></sub>.
 The problem without the intercept takes the following form, which we have already
 encountered in the previous toolbox, but with different notations:
 </p><table class="display dcenter"><tr class="c016"><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
@@ -1401,7 +1401,7 @@ see usage details below:
 %            param.linesearch_mode (line-search scheme when ista=true:<br>
 %                      0: default, monotonic backtracking scheme<br>
 %                      1: monotonic backtracking scheme, with restart at each iteration<br>
-%                      2: Barzilai-Borwein step sizes (similar to SparSA by Wright et al.)<br>
+%                      2: Barzilai-Borwein step sizes (similar to SparSA by Wright et al.) <br>
 %                      3: non-monotonic backtracking<br>
 %            param.compute_gram (optional, pre-compute X^TX, false by default).<br>
 %            param.intercept (optional, do not regularize last row of W, false by default).<br>
@@ -2322,15 +2322,20 @@ The following problem is addressed here
 %         W: double p x n matrix (non-negative values)</span><br>
 <br>
 <span class="c002">function</span> [W optim] = solverPoisson(Y,X,W0,param)<br>
+param.delta=param.delta;<br>
+param.lambda=param.lambda;<br>
 param.ista=true;<br>
 param.intercept=false;<br>
 param.pos=true;<br>
+param.L0=1e-5;<br>
 param.linesearch_mode=2;<br>
 param.loss=<span class="c003">'poisson'</span>;<br>
-tabdelta=<span class="c002">logspace</span>(0,<span class="c002">log10</span>(param.delta),-<span class="c002">log10</span>(param.delta));<br>
+param.verbose=false;<br>
+tabdelta=<span class="c002">logspace</span>(0,<span class="c002">log10</span>(param.delta),1-<span class="c002">log10</span>(param.delta));<br>
 <span class="c002">for</span> delta = tabdelta<br>
    param2=param;<br>
    param2.delta=delta;<br>
+   param2.verbose=<span class="c002">abs</span>(delta-tabdelta(<span class="c002">end</span>)) &lt; 1e-10 &amp;&amp; param.verbose;<br>
    [W optim]=mexFistaFlat(Y,X,W0,param2);<br>
    W0=W;<br>
 <span class="c002">end</span></td></tr>

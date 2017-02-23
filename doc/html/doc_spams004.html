@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="generator" content="hevea 2.09">
+<meta name="generator" content="hevea 2.23">
 
 <META name="Author" content="Julien Mairal">
 <link rel="stylesheet" href="doc_spams.css"><link rel="stylesheet" type="text/css" href="doc_spams.css">
@@ -26,7 +26,7 @@
 This is the section for dictionary learning and matrix factorization, corresponding to [<a href="doc_spams010.html#mairal7">20</a>, <a href="doc_spams010.html#mairal9">21</a>].</p>
 <h3 class="subsection" id="sec5">3.1  Function mexTrainDL</h3>
 <p>
-This is the main function of the toolbox, implementing the learning algorithms of [<a href="doc_spams010.html#mairal9">21</a>]. 
+This is the main function of the toolbox, implementing the learning algorithms of [<a href="doc_spams010.html#mairal9">21</a>].
 Given a training set <span class="c009">x</span><sup>1</sup>,…, . It aims at solving
 </p><table class="display dcenter"><tr class="c016"><td class="dcell">
 </td><td class="dcell"><table class="display"><tr><td class="dcell c012">&nbsp;</td></tr>
@@ -54,11 +54,11 @@ Given a training set <span class="c009">x</span><sup>1</sup>,…, . It aims at s
 ⎠</td><td class="dcell">.
     (1)</td></tr>
 </table><p>
-ψ is a sparsity-inducing regularizer and <span class="c008">C</span> is a constraint set for the dictionary. As shown in [<a href="doc_spams010.html#mairal9">21</a>] 
+ψ is a sparsity-inducing regularizer and <span class="c008">C</span> is a constraint set for the dictionary. As shown in [<a href="doc_spams010.html#mairal9">21</a>]
 and in the help file below, various combinations can be used for ψ and <span class="c008">C</span> for solving different matrix factorization problems.
 What is more, positivity constraints can be added to α as well. The function admits several modes for choosing the optimization parameters, using the parameter-free strategy proposed in [<a href="doc_spams010.html#mairal7">20</a>], or using the parameters <span class="c007">t</span><sub>0</sub> and ρ presented
-in [<a href="doc_spams010.html#mairal9">21</a>]. <span class="c010">Note that for problems of a reasonable size, and when </span>ψ<span class="c010"> is the </span>ℓ<sub>1</sub><span class="c010">-norm, 
-the function mexTrainDL_Memory can be faster but uses more memory.</span> </p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
+in [<a href="doc_spams010.html#mairal9">21</a>]. <span class="c010">Note that for problems of a reasonable size, and when </span>ψ<span class="c010"> is the </span>ℓ<sub>1</sub><span class="c010">-norm,
+the function mexTrainDL_Memory can be faster but uses more memory.</span></p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   [D [model]]=mexTrainDL(X,param[,model]);<br>
 %          model is optional<br>
 %<br>
@@ -100,7 +100,7 @@ the function mexTrainDL_Memory can be faster but uses more memory.</span> </p><t
 %     min_{D in C} (1/n) sum_{i=1}^n 0.5||x_i-Dalpha_i||_2^2 +lambda||alpha_i||_0  <br>
 %                                           <br>
 %<br>
-%%     C is a convex set verifying<br>
+%     C is a convex set verifying<br>
 %        1) if param.modeD=0<br>
 %           C={  D in Real^{m x p}  s.t.  forall j,  ||d_j||_2^2 &lt;= 1 }<br>
 %        2) if param.modeD=1<br>
@@ -112,7 +112,6 @@ the function mexTrainDL_Memory can be faster but uses more memory.</span> </p><t
 %        4) if param.modeD=3<br>
 %           C={  D in Real^{m x p}  s.t.  forall j,  (1-gamma1)||d_j||_2^2 + ... <br>
 %                                  gamma1||d_j||_1 &lt;= 1 }<br>
-<br>
 %<br>
 %     Potentially, n can be very large with this algorithm.<br>
 %<br>
@@ -272,7 +271,7 @@ ImD=displayPatches(D);<br>
 <p>
 Memory-consuming version of mexTrainDL. This function is well adapted to small/medium-size problems:
 It requires storing all the coefficients α and is therefore impractical
-for very large datasets. However, in many situations, one can afford this memory cost and it is better to use this method, which 
+for very large datasets. However, in many situations, one can afford this memory cost and it is better to use this method, which
 is faster than mexTrainDL.
 Note that unlike mexTrainDL this function does not allow warm-restart.</p><table class="lstframe c011"><tr><td class="mouselstlisting"><span class="c001">% <br>
 % Usage:   [D]=mexTrainDL(X,param);<br>
@@ -834,7 +833,7 @@ methodology presented in the following paper [<a href="doc_spams010.html#ChenCV
 %<br>
 % Name: mexArchetypalAnalysis<br>
 %<br>
-% documentation to appear soon<br>
+% Description: documentation to appear soon<br>
 %<br>
 % Inputs: X:  double m x n matrix   (input signals)<br>
 %               m is the signal size<br>
