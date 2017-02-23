@@ -8,7 +8,11 @@
 
 ### Matlab
 
-* 19f2a0ebbe0353a11d26de9138cbe10e9f349072: Compilation: use `mex -v GCC='/usr/bin/g++-4.7'` to specify the compatible version of gcc to default matlab compiler (see [compile_mex.m](compile_mex.m))
+* 19f2a0ebbe0353a11d26de9138cbe10e9f349072: Precompilation for Linux, compilation uses `mex -v GCC='/usr/bin/g++-4.7'` to specify the compatible version of gcc to default matlab compiler (see [compile_mex_linux.m](compile_mex_linux.m))
+* f41ca5c00be28980e463d23b5616595c2ded94e0: Precompilation for MacOS
+    * set `use_multithread=false;` because no support of openMP with clang
+    * specify path to blas library: `path_to_blas='/usr/lib/';`
+    * change minimum version to 10.9: `add_flag=' -mmacosx-version-min=10.9';`
 
 ### SWIG/python
 
