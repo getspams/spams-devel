@@ -17,6 +17,9 @@ die () {
 usage () {
     echo "Usage $0 [-cl][-ns][-g][-D] nom+"
     echo "  -cl : clear"
+    echo "  -g : compile with -g option"
+    echo "  -D : compile with -DDEBUG"
+    echo "  -py3 : for python3 compatibility (to do in swig/python3 directory)"
     die "   -ns : don't redo swig"
 }
 
