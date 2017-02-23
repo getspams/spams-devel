@@ -19,7 +19,7 @@ def calcAAt(A):
     if  A.ndim != 2:
         raise ValueError("calcAAt: not a matrix")
     m = A.shape[0]
-    AAt = np.empty((m,m),dtype=A.dtype,order="FORTRAN")
+    AAt = np.empty((m,m),dtype=A.dtype,order="F")
     spams_wrap.AAt(A,AAt)
     return AAt
 
@@ -28,7 +28,7 @@ def calcXAt(X,A):
         raise ValueError("calcAAt: not a matrix")
     m = X.shape[0]
     n = A.shape[0]
-    XAt = np.empty((m,n),dtype=A.dtype,order="FORTRAN")
+    XAt = np.empty((m,n),dtype=A.dtype,order="F")
     spams_wrap.XAt(A,X,XAt)
     return XAt
 
@@ -41,7 +41,7 @@ def mult(X,Y,transX = False, transY = False):
         n = Y.shape[0]
     else:
         n = Y.shape[1]
-    XY = np.empty((m,n),dtype=X.dtype,order="FORTRAN")
+    XY = np.empty((m,n),dtype=X.dtype,order="F")
     spams_wrap.mult(X,Y,XY,transX,transY,1,0)
     return XY
 
@@ -111,7 +111,7 @@ def lasso(X,D= None,Q = None,q = None,return_reg_path = False,L= -1,lambda1= Non
 #    paramlist = [('L', -1),('lambda', None),('lambda2', 0.),
 #                 ('mode', spams_wrap.PENALTY),('pos', False),('ols', False),('numThreads', -1),
 #                 ('max_length_path', -1),('verbose',True),('cholesky', False)]
-    
+
     if Q != None:
         if q == None:
             raise ValueError("lasso : q is needed when Q is given")
@@ -227,7 +227,7 @@ def ompMask(X,D,B,L=None,eps= None,lambda1 = None,return_reg_path = False, numTh
         return (alpha,path)
     else:
         return alpha
-   
+
 def  cd(X,D,A0,lambda1 = None,mode= spams_wrap.PENALTY,itermax=100,tol = 0.001,numThreads =-1):
     if lambda1 == None:
         raise ValueError("cd : lambda1 must be defined")
@@ -277,7 +277,7 @@ def fistaFlat(
 #                 ('sqrt_step',True),('transpose',False),('linesearch_mode',0)]
 #
 ##    params = __param_struct(paramlist,param)
-#    W = np.empty((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="FORTRAN")
+#    W = np.empty((W0.shape[0],W0.shape[1]),dtype=W0.dtype,order="F")
     if groups == None:
         groups = np.array([],dtype=np.int32,order="FORTRAN")
     if inner_weights == None:
@@ -434,7 +434,7 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
         eta_g = np.array([],dtype=X.dtype,order="FORTRAN")
         groups = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="FORTRAN"))
     if tree != None:
-        if not ('eta_g' in tree and 'groups' in tree and 
+        if not ('eta_g' in tree and 'groups' in tree and
                 'own_variables' in tree and 'N_own_variables' in tree):
             raise ValueError("structTrainDL : incorrect tree structure")
         if graph != None:
@@ -531,7 +531,7 @@ def nmf(X,return_lasso= False,model= None,
     lambda1 = 0
 
     U = trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
-                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=False, 
+                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=False,
                 modeParam = modeParam,batch = batch, lambda1 = lambda1,
                 mode = spams_wrap.PENALTY, posAlpha=True,posD=True,whiten=False)
     if not return_lasso:
@@ -550,7 +550,7 @@ def nnsc(X,return_lasso= False,model= None,lambda1= None,
     if lambda1 == None:
         raise ValueError("nnsc : lambda1 must be defined")
     U = trainDL(X,model = model,numThreads = numThreads,batchsize = batchsize,
-                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=False, 
+                K = K,iter = iter, t0 = t0, clean = clean, rho = rho,verbose=False,
                 modeParam = modeParam,batch = batch, lambda1 = lambda1,
                 mode = spams_wrap.PENALTY, posAlpha=True,posD=True,whiten=False)
     if not return_lasso:
@@ -584,7 +584,7 @@ def im2col_sliding(A,m,n,RGB = False):
     nn = A.shape[1]
     M = m * n
     N =  (mm - m + 1) * (nn -n + 1)
-    B = np.empty((M,N),dtype=A.dtype,order="FORTRAN")
+    B = np.empty((M,N),dtype=A.dtype,order="F")
     spams_wrap.im2col_sliding(A,B,m,n,RGB)
     return B
 
@@ -595,8 +595,8 @@ def displayPatches(D):
     if int(sizeEdge) != sizeEdge:
         V = 3
         sizeEdge=np.sqrt(n/V)
-        
-        
+
+
 #    for ii in xrange(0,D.shape[1]):
 #        if D[0,ii] > 0:
 #            D[:,ii] = - D[:,ii]
