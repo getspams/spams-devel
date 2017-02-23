@@ -4,7 +4,8 @@ Version: %VERSION%
 Date: %DATE%
 Author: Julien MAIRAL for C++ SPAMS code, with contribution
 	from Jean-Paul CHIEZE for interface to language R
-Maintainer: <jean-paul.chieze@inria.fr>
+    and Ghislain DURIF for the porting to R-3.x
+Maintainer: Ghislain DURIF <ghislain.durif@inria.fr>
 Description: The 'spams' package provides an R interface to the SPArse
     Modeling Software (SPAMS) library, an optimization toolbox for
     solving various sparse estimation problems. Dictionary
