@@ -67,7 +67,7 @@
 \tocitem \@locref{sec56}{\begin{@norefs}\@print{7.8}\quad{}Function mexInvSym{}\end{@norefs}}
 \tocitem \@locref{sec57}{\begin{@norefs}\@print{7.9}\quad{}Function mexNormalize{}\end{@norefs}}
 \tocitem \@locref{sec58}{\begin{@norefs}\@print{7.10}\quad{}Function mexSort{}\end{@norefs}}
-\tocitem \@locref{sec59}{\begin{@norefs}\@print{7.11}\quad{}Function mexDisplayPatches{}\end{@norefs}}
+\tocitem \@locref{sec59}{\begin{@norefs}\@print{7.11}\quad{}Function displayPatches{}\end{@norefs}}
 \tocitem \@locref{sec60}{\begin{@norefs}\@print{7.12}\quad{}Function mexCountPathsDAG{}\end{@norefs}}
 \tocitem \@locref{sec61}{\begin{@norefs}\@print{7.13}\quad{}Function mexRemoveCyclesGraph{}\end{@norefs}}
 \tocitem \@locref{sec62}{\begin{@norefs}\@print{7.14}\quad{}Function mexCountConnexComponents{}\end{@norefs}}

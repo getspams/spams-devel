@@ -136,7 +136,7 @@
 \@@addtocsec{htoc}{sec56}{1}{\@print{7.8}\quad{}Function mexInvSym{}}
 \@@addtocsec{htoc}{sec57}{1}{\@print{7.9}\quad{}Function mexNormalize{}}
 \@@addtocsec{htoc}{sec58}{1}{\@print{7.10}\quad{}Function mexSort{}}
-\@@addtocsec{htoc}{sec59}{1}{\@print{7.11}\quad{}Function mexDisplayPatches{}}
+\@@addtocsec{htoc}{sec59}{1}{\@print{7.11}\quad{}Function displayPatches{}}
 \@@addtocsec{htoc}{sec60}{1}{\@print{7.12}\quad{}Function mexCountPathsDAG{}}
 \@@addtocsec{htoc}{sec61}{1}{\@print{7.13}\quad{}Function mexRemoveCyclesGraph{}}
 \@@addtocsec{htoc}{sec62}{1}{\@print{7.14}\quad{}Function mexCountConnexComponents{}}

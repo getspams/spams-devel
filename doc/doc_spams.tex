@@ -58,7 +58,7 @@
 \date{\today}
 
 \author{Julien Mairal \\
-   \url{julien.mairal@m4x.org} \\ 
+   \url{julien.mairal@m4x.org} \\
    ~\\
    Python and R interfaces by Jean-Paul Chieze
    ~\\
@@ -90,7 +90,7 @@ Library can be used.  It also exploits multi-core CPUs when this feature is
 supported by the compiler, through OpenMP.
 
 The current licence is GPLv3, which is available at
-\url{http://www.gnu.org/licenses/gpl.html}.  For other licensing possibilities 
+\url{http://www.gnu.org/licenses/gpl.html}.  For other licensing possibilities
 allowing its use in proprietary softwares, please contact the author.
 
 Version 2.5 of SPAMS is divided into several ``toolboxes'' and has a few
@@ -111,9 +111,9 @@ variants for solving various matrix factorization problems:
 \begin{itemize}
 \item Orthogonal Matching Pursuit, (or Forward Selection)~\cite{weisberg,mallat4};
 \item the LARS/homotopy algorithm~\cite{osborne,efron} (variants for solving Lasso and Elastic-Net problems);
-\item a weighted version of LARS; 
+\item a weighted version of LARS;
 \item OMP and LARS when data comes with a binary mask;
-\item a coordinate-descent algorithm for $\ell_1$-decomposition problems~\cite{fu,friedman,wu}; 
+\item a coordinate-descent algorithm for $\ell_1$-decomposition problems~\cite{fu,friedman,wu};
 \item a greedy solver for simultaneous signal approximation as defined in~\cite{tropp2,tropp3} (SOMP);
 \item a solver for simulatneous signal approximation with $\ell_1/\ell_2$-regularization based on block-coordinate descent;
 \item a homotopy method for the Fused-Lasso Signal Approximation as defined in~\cite{friedman} with the homotopy method presented in the appendix of~\cite{mairal9};
@@ -153,7 +153,7 @@ possible. It also handles sparse feature matrices for large-scale problems. The 
 All of these regularization functions can be used with the following losses
 \begin{itemize}
 \item square loss;
-\item square loss with missing observations; 
+\item square loss with missing observations;
 \item logistic loss, weighted logistic loss;
 \item multi-class logistic.
 \end{itemize}
@@ -176,12 +176,12 @@ The archetypal analysis implementation was written by Yuansi Chen, during
 an internship at INRIA, with the collaboration of Zaid Harchaoui.
 
 \section{Installation}
-The toolbox used to come with pre-compiled binaries for various plateforms. 
+The toolbox used to come with pre-compiled binaries for various plateforms.
 Now the sources are available and you will have to compile it yourself.
 
 The user has the choice of the BLAS library, but the Intel MKL is recommended
 for the best performance. Note that the builtin blas library of Matlab is a
-version of the Intel MKL (not the most recent one though), and offers 
+version of the Intel MKL (not the most recent one though), and offers
 a good performance.
 
 The folder \verb|doc| contains the documentation in pdf and html. \verb|build/|
@@ -198,16 +198,16 @@ described in a file called \verb|HOW_TO_INSTALL| and in the file
 This is the section for dictionary learning and matrix factorization, corresponding to~\cite{mairal7,mairal9}.
 
 \subsection{Function mexTrainDL}
-This is the main function of the toolbox, implementing the learning algorithms of \cite{mairal9}. 
+This is the main function of the toolbox, implementing the learning algorithms of \cite{mairal9}.
 Given a training set $\x^1,\ldots,  $. It aims at solving
 \begin{equation}
 \min_{\D \in \C} \lim_{n \to +\infty} \frac{1}{n} \sum_{i=1}^n \min_{\alphab^i} \Big( \frac{1}{2} \|\x^i-\D\alphab^i\|_2^2 + \psi(\alphab^i)\Big).
 \end{equation}
-$\psi$ is a sparsity-inducing regularizer and $\C$ is a constraint set for the dictionary. As shown in \cite{mairal9} 
+$\psi$ is a sparsity-inducing regularizer and $\C$ is a constraint set for the dictionary. As shown in \cite{mairal9}
 and in the help file below, various combinations can be used for $\psi$ and $\C$ for solving different matrix factorization problems.
 What is more, positivity constraints can be added to $\alphab$ as well. The function admits several modes for choosing the optimization parameters, using the parameter-free strategy proposed in \cite{mairal7}, or using the parameters $t_0$ and $\rho$ presented
-in \cite{mairal9}. {\bf Note that for problems of a reasonable size, and when $\psi$ is the $\ell_1$-norm, 
-   the function mexTrainDL\_Memory can be faster but uses more memory.} 
+in \cite{mairal9}. {\bf Note that for problems of a reasonable size, and when $\psi$ is the $\ell_1$-norm,
+   the function mexTrainDL\_Memory can be faster but uses more memory.}
 
 \lstinputlisting{../src_release/mexTrainDL.m}
 
@@ -218,7 +218,7 @@ The following piece of code illustrates how to use this function.
 \subsection{Function mexTrainDL\_Memory}
 Memory-consuming version of mexTrainDL. This function is well adapted to small/medium-size problems:
 It requires storing all the coefficients $\alphab$ and is therefore impractical
-for very large datasets. However, in many situations, one can afford this memory cost and it is better to use this method, which 
+for very large datasets. However, in many situations, one can afford this memory cost and it is better to use this method, which
 is faster than mexTrainDL.
 Note that unlike mexTrainDL this function does not allow warm-restart.
 
@@ -268,7 +268,7 @@ This is a fast implementation of the Orthogonal Matching Pursuit algorithm (or f
      \begin{equation}
      \min_{\alphab \in \Real^p} \|\x-\D\alphab\|_2^2 \st \|\alphab\|_0 \leq L,
      \end{equation}
-     or 
+     or
      \begin{equation}
      \min_{\alphab \in \Real^p}  \|\alphab\|_0 \st \|\x-\D\alphab\|_2^2 \leq \varepsilon,
      \end{equation}
@@ -287,12 +287,12 @@ The following piece of code illustrates how to use this function.
 
 
 \subsection{Function mexOMPMask}
-This is a variant of mexOMP with the possibility of handling a binary mask. 
+This is a variant of mexOMP with the possibility of handling a binary mask.
 Given a binary mask $\B=[\betab^1,\ldots,\betab^n]$ in $\{0,1\}^{m \times n}$, it returns a matrix $\A=[\alphab^1,\ldots,\alphab^n]$ such that for every column $\x$ of $\X$, $\betab$ of $\B$, it computes a column $\alphab$ of $\A$ by addressing
 \begin{equation}
 \min_{\alphab \in \Real^p} \|\diag(\betab)(\x-\D\alphab)\|_2^2 \st \|\alphab\|_0 \leq L,
    \end{equation}
-   or 
+   or
    \begin{equation}
    \min_{\alphab \in \Real^p}  \|\alphab\|_0 \st \|\diag(\betab)(\x-\D\alphab)\|_2^2 \leq \varepsilon\frac{\|\betab\|_0}{m},
    \end{equation}
@@ -308,7 +308,7 @@ The following piece of code illustrates how to use this function.
 
 
 \subsection{Function mexRidgeRegression}
-This is a ridge regression solver using a conjugate gradient solver.  
+This is a ridge regression solver using a conjugate gradient solver.
 \lstinputlisting{../src_release/mexRidgeRegression.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_RidgeRegression.m}
@@ -318,7 +318,7 @@ This is a fast implementation of the LARS algorithm~\cite{efron} (variant for so
 \begin{equation}
 \min_{\alphab \in \Real^p} \|\x-\D\alphab\|_2^2 \st \|\alphab\|_1 \leq \lambda,
    \end{equation}
-   or 
+   or
    \begin{equation}
    \min_{\alphab \in \Real^p}  \|\alphab\|_1 \st \|\x-\D\alphab\|_2^2 \leq \lambda, \label{eq:lasso2}
    \end{equation}
@@ -336,7 +336,7 @@ This is a fast implementation of the LARS algorithm~\cite{efron} (variant for so
    correlation of the dictionary elements, except when the solution is not unique
    (the algorithm breaks in this case).
 
-   Note that mexLasso can return the whole regularization path of the first signal $\x_1$ 
+   Note that mexLasso can return the whole regularization path of the first signal $\x_1$
    and can handle implicitely the matrix~$\D$ if the quantities~$\D^T\D$ and~$\D^T\x$ are passed
    as an argument, see below:
 
@@ -351,7 +351,7 @@ This is a fast implementation of a weighted version of LARS~\cite{efron}. Given 
      \begin{equation}
      \min_{\alphab \in \Real^p} \|\x-\D\alphab\|_2^2 \st \|\diag(\w)\alphab\|_1 \leq \lambda,
      \end{equation}
-     or 
+     or
      \begin{equation}
      \min_{\alphab \in \Real^p}  \|\diag(\w)\alphab\|_1 \st \|\x-\D\alphab\|_2^2 \leq \lambda,
      \end{equation}
@@ -369,18 +369,18 @@ The following piece of code illustrates how to use this function.
 
 
 \subsection{Function mexLassoMask}
-This is a variant of mexLasso with the possibility of adding a mask $\B=[\betab^1,\ldots,\betab^n]$, as in mexOMPMask. 
+This is a variant of mexLasso with the possibility of adding a mask $\B=[\betab^1,\ldots,\betab^n]$, as in mexOMPMask.
 For every column $\x$ of $\X$, $\betab$ of $\B$, it computes a column $\alphab$ of $\A$,  which is the solution of
 \begin{equation}
 \min_{\alphab \in \Real^p} \|\diag(\betab)(\x-\D\alphab)\|_2^2 \st \|\alphab\|_1 \leq \lambda,
    \end{equation}
-   or 
+   or
    \begin{equation}
-   \min_{\alphab \in \Real^p}  \|\alphab\|_1 \st \|\diag(\betab)(\x-\D\alphab)\|_2^2 \leq \lambda\frac{\|\betab\|_0}{m}, 
+   \min_{\alphab \in \Real^p}  \|\alphab\|_1 \st \|\diag(\betab)(\x-\D\alphab)\|_2^2 \leq \lambda\frac{\|\betab\|_0}{m},
    \end{equation}
    or
    \begin{equation}
-   \min_{\alphab \in \Real^p} \frac{1}{2}\|\diag(\betab)(\x-\D\alphab)\|_2^2 + \lambda \frac{\|\betab\|_0}{m}\|\alphab\|_1 + \frac{\lambda_2}{2}\|\alphab\|_2^2. 
+   \min_{\alphab \in \Real^p} \frac{1}{2}\|\diag(\betab)(\x-\D\alphab)\|_2^2 + \lambda \frac{\|\betab\|_0}{m}\|\alphab\|_1 + \frac{\lambda_2}{2}\|\alphab\|_2^2.
    \end{equation}
 
 \lstinputlisting{../src_release/mexLassoMask.m}
@@ -393,7 +393,7 @@ Eq.~(\ref{eq:lasso2}). Note that unlike mexLasso, it is not implemented to solve
 To solve Eq.~(\ref{eq:lasso2}), the algorithm solves a
 sequence of problems of the form (\ref{eq:lasso}) using simple heuristics.
 Coordinate descent is very simple and in practice very powerful. It performs
-better when the correlation between the dictionary elements is small. 
+better when the correlation between the dictionary elements is small.
 
 \lstinputlisting{../src_release/mexCD.m}
 The following piece of code illustrates how to use this function.
@@ -404,7 +404,7 @@ This is a fast implementation of the Simultaneous Orthogonal Matching Pursuit al
 \begin{equation}
 \forall i~~ \min_{\A^i \in \Real^{p \times n_i}} \|\X^i-\D\A^i\|_F^2 \st \|\A^i\|_{0,\infty} \leq L.
 \end{equation}
-or 
+or
 \begin{equation}
 \forall i~~ \min_{\A^i \in \Real^{p \times n_i}}  \|\A^i\|_{0,\infty} \st \|\X^i-\D\A^i\|_F^2 \leq \varepsilon n_i.
 \end{equation}
@@ -419,7 +419,7 @@ This is a fast implementation of a simultaneous signal decomposition formulation
 \begin{equation}
 \forall i~~ \min_{\A^i \in \Real^{p \times n_i}} \|\X^i-\D\A^i\|_F^2 \st \|\A^i\|_{1,2} \leq \frac{\lambda}{n_i}.
 \end{equation}
-or 
+or
 \begin{equation}
 \forall i~~ \min_{\A^i \in \Real^{p \times n_i}}  \|\A^i\|_{1,2} \st \|\X^i-\D\A^i\|_F^2 \leq \lambda n_i.
 \end{equation}
@@ -454,8 +454,8 @@ $\V=[\v_1,\ldots,\v_n]$ in $\Real^{m \times n}$ so that for all column $\u$ of $
    \min_{\v \in \Real^m} \frac{1}{2}\|\u-\v\|_2^2 + \lambda_1\|\v\|_1 +\lambda_2\|\v\|_2^2+ \lambda_3 FL(\v).
    \end{equation}
    Note that for the two last cases, the method performs a small approximation.
-   The method follows the regularization path, goes from one kink to another, and 
-   stop whenever the constraint is not satisfied anymore. The solution returned 
+   The method follows the regularization path, goes from one kink to another, and
+   stop whenever the constraint is not satisfied anymore. The solution returned
    by the algorithm is the one obtained at the last kink of the regularization path,
    which is in practice close, but not exactly the same as the solution.
    This will be corrected in a future release of the toolbox.
@@ -481,7 +481,7 @@ possibly large-scale learning problems, with several combinations of losses and
 regularization terms. The method implements the proximal methods
 of~\cite{beck}, and includes the proximal solvers for the tree-structured
 regularization of \cite{jenatton3}, and the solver of~\cite{mairal10} for
-general structured sparse regularization. 
+general structured sparse regularization.
 The solver for structured sparse regularization norms includes a C++ max-flow
 implementation of the push-relabel algorithm of~\cite{goldberg}, with
 heuristics proposed by~\cite{cherkassky}.
@@ -494,7 +494,7 @@ can solve take the form
 \end{displaymath}
 where $f$ is a smooth loss function and $\psi$ is a regularization function.
 When one optimizes a matrix $\W$ in $\Real^{p \times r}$ instead of
-a vector $\w$ in $\Real^p$, we will write 
+a vector $\w$ in $\Real^p$, we will write
 \begin{displaymath}
 \min_{\W \in \Real^{p \times r}} [g(\W) \defin f(\W) + \lambda\psi(\W)].
 \end{displaymath}
@@ -525,7 +525,7 @@ Our software also handles regularization functions~$\psi$ on matrices~$\W$ in~$\
 \item \textbf{The $\ell_1/\ell_2$+$\ell_1$-norm}: $\psi(\W) \defin \sum_{i=1}^p \|\W_i\|_2 + \lambda_2 \sum_{i,j}|\W_{ij}|$.
 \item \textbf{The $\ell_1/\ell_\infty$+$\ell_1$-norm}: $\psi(\W) \defin \sum_{i=1}^p \|\W_i\|_\infty+\lambda_2 \sum_{i,j}|\W_{ij}|$,
 \item \textbf{The $\ell_1/\ell_\infty$-norm on rows and columns}: $\psi(\W) \defin \sum_{i=1}^p \|\W_i\|_\infty+\lambda_2 \sum_{j=1}^r\|\W^j\|_\infty$, where $\W^j$ denotes the $j$-th column of $\W$.
-\item \textbf{The multi-task tree-structured sum of $\ell_\infty$-norms}: 
+\item \textbf{The multi-task tree-structured sum of $\ell_\infty$-norms}:
 \begin{equation}
 \psi(\W)\defin \sum_{i=1}^r \sum_{g \in \GG} \eta_g\|\w^i_g\|_\infty + \gamma \sum_{g \in \GG} \eta_g \max_{j \in g}\|\W_j\|_\infty,
 \label{software:eq:struct}
@@ -591,19 +591,19 @@ where $\GG$ is any kind of set of groups.
 
 This function can also solve the following proximal operators on matrices
 \begin{equation}
-\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_2, 
+\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_2,
 \end{equation}
 where $\V_i$ is the $i$-th row of $\V$, or
 \begin{equation}
-\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_\infty, 
+\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_\infty,
 \end{equation}
 or
 \begin{equation}
-\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_2 +\lambda_2 \sum_{i=1}^p\sum_{j=1}^n |\V_{ij}|, 
+\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_2 +\lambda_2 \sum_{i=1}^p\sum_{j=1}^n |\V_{ij}|,
 \end{equation}
 or
 \begin{equation}
-\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_\infty +\lambda_2 \sum_{i=1}^p\sum_{j=1}^n |\V_{ij}|, 
+\min_{\V \in \Real^{p \times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^p \|\V_i\|_\infty +\lambda_2 \sum_{i=1}^p\sum_{j=1}^n |\V_{ij}|,
 \end{equation}
 or
 \begin{equation}
@@ -634,7 +634,7 @@ This function computes the proximal operators associated to tree-structured regu
    When the multi-task tree-structured regularization function is used, it solves
    \begin{equation}
    \min_{\V \in \Real^{p\times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^n\sum_{g \in \TT} \eta^g \|\v^i_g\|_\infty + \lambda_2\sum_{g \in \TT} \max_{j \in g} \|\v^j_g\|_\infty,
-   \end{equation} 
+   \end{equation}
    which is a formulation presented in \cite{mairal10}.
 
    This function can also be used for computing the proximal operators addressed by mexProximalFlat (it will just not take into account the tree structure). The way the tree is incoded is presented below, (and examples are given in the file test\_ProximalTree.m, with more usage details:
@@ -651,14 +651,14 @@ When one uses a regularization function on vectors, it computes a column $\v$ of
 or with a regularization function on matrices, it computes $\V$ solving
 \begin{equation}
 \min_{\V \in \Real^{p\times n}} \frac{1}{2}\|\U-\V\|_F^2 + \lambda \sum_{i=1}^n\sum_{g \in \GG} \eta^g \|\v^i_g\|_\infty + \lambda_2\sum_{g \in \GG} \max_{j \in g} \|\v^j_g\|_\infty,
-\end{equation} 
+\end{equation}
 This function can also be used for computing the proximal operators addressed by mexProximalFlat. The way the graph is incoded is presented below (and also in the example file test\_ProximalGraph.m, with more usage details:
 \lstinputlisting{../src_release/mexProximalGraph.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalGraph.m}
 
 \subsection{Function mexProximalPathCoding}
-This function computes the proximal operators associated to the path coding penalties of~\cite{mairal14}. 
+This function computes the proximal operators associated to the path coding penalties of~\cite{mairal14}.
 \lstinputlisting{../src_release/mexProximalPathCoding.m}
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_ProximalPathCoding.m}
@@ -678,8 +678,8 @@ Given a training set $\{\x^i,y_i\}_{i=1}^n$, with $\x^i \in \Real^p$ and $y_i \i
 \min_{\w \in \Real^p, b \in \Real} \sum_{i=1}^n \frac{1}{2}(y_i-\w^\top\x^i-b)^2 + \lambda\psi(\w),
 \end{displaymath}
 where $b$ is an optional variable acting as an ``intercept'', which is not regularized, and $\psi$
-can be any of the regularization functions presented above. 
-Let us consider the vector $\y$ in $\Real^n$ that carries the entries $y_i$. 
+can be any of the regularization functions presented above.
+Let us consider the vector $\y$ in $\Real^n$ that carries the entries $y_i$.
 The problem without the intercept takes the following form, which we have already
 encountered in the previous toolbox, but with different notations:
 \begin{displaymath}
@@ -830,7 +830,7 @@ The following piece of code illustrates how to use this function.
 
 \subsection{Function mexCalcAAt}
 
-For an input sparse matrix $\A$, this function returns $\A\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent matlab command \verb|X*A'|. 
+For an input sparse matrix $\A$, this function returns $\A\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent matlab command \verb|X*A'|.
 % {\footnotesize
 %    \verbatiminput{../src_release/mexCalcAAt.m}
 % }
@@ -840,7 +840,7 @@ The following piece of code illustrates how to use this function.
 
 
 \subsection{Function mexCalcXAt}
-For an input sparse matrix $\A$ and a matrix $\X$, this function returns $\X\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent matlab command \verb|X*A'|. 
+For an input sparse matrix $\A$ and a matrix $\X$, this function returns $\X\A^T$. For some reasons, when $\A$ has a lot more columns than rows, this function can be much faster than the equivalent matlab command \verb|X*A'|.
 % {\footnotesize
 %    \verbatiminput{../src_release/mexCalcXAt.m}
 % }
@@ -851,7 +851,7 @@ The following piece of code illustrates how to use this function.
 
 
 \subsection{Function mexCalcXY}
-For two input matrices $\X$ and $\Y$, this function returns $\X\Y$. 
+For two input matrices $\X$ and $\Y$, this function returns $\X\Y$.
 % {\footnotesize
 %    \verbatiminput{../src_release/mexCalcXY.m}
 % }
@@ -909,7 +909,7 @@ The following piece of code illustrates how to use this function.
 The following piece of code illustrates how to use this function.
 \lstinputlisting{../test_release/test_Sort.m}
 
-\subsection{Function mexDisplayPatches}
+\subsection{Function displayPatches}
 Print to the screen a matrix containing as columns image patches.
 
 \subsection{Function mexCountPathsDAG}
@@ -960,7 +960,7 @@ appropriated smooth real-valued function of $\Real^n$,
              and $\psi$ one of the regularization functions we have introduced.
 
              Given a primal variable $\w$ in $\Real^p$ and a dual variable $\kappab$ in
-             $\Real^n$, we obtain using classical Fenchel duality rules~\cite{borwein}, 
+             $\Real^n$, we obtain using classical Fenchel duality rules~\cite{borwein},
              that the following quantity is a duality gap for problem~(\ref{software:eq:prb}):
                 \begin{displaymath}
                 \delta(\w,\kappab) \defin g(\w) + \tilde{f}^\ast(\kappab) + \lambda\psi^\ast(-\X\kappab / \lambda),
@@ -972,10 +972,10 @@ appropriated smooth real-valued function of $\Real^n$,
                 \begin{displaymath}
                 \delta(\w,\kappab) \geq  g(\w)-g(\w^\star) \geq 0.
                 \end{displaymath}
-                Similarly, we will consider pairs of primal-dual variables $(\W,\K)$ when 
+                Similarly, we will consider pairs of primal-dual variables $(\W,\K)$ when
                 dealing with matrices.
 
-                During the optimization, sequences of primal variables $\w$ are available, 
+                During the optimization, sequences of primal variables $\w$ are available,
                 and one wishes to exploit duality gaps for estimating the difference
                 $g(\w)-g(\w^\star)$. This requires the following components:
                 \begin{itemize}
@@ -990,7 +990,7 @@ appropriated smooth real-valued function of $\Real^n$,
                 choose $\kappab$ in general (details will also be given in the sequel).
 
                 Let us first consider the choice that associates with a primal variable $\w$, the
-                dual variable 
+                dual variable
                 \begin{equation}
                 \kappab(\w) \defin \nabla \tilde{f}(\X^\top\w), \label{software:eq:kappab}
                 \end{equation}
@@ -1000,7 +1000,7 @@ appropriated smooth real-valued function of $\Real^n$,
                 which gives
                 \begin{eqnarray}
                 \delta(\w,\kappab(\w)) &=& \tilde{f}(\X^\top \w) + \lambda \psi(\w) + \tilde{f}^\ast(\nabla\tilde{f}(\X^\top\w)) + \lambda\psi^\ast(-\X\nabla\tilde{f}(\X^\top\w)/ \lambda), \\
-                                         &=& \lambda \psi(\w) + \w^\top\X\nabla\tilde{f}(\X^\top\w) + \lambda\psi^\ast(-\X\nabla\tilde{f}(\X^\top\w)/ \lambda). 
+                                         &=& \lambda \psi(\w) + \w^\top\X\nabla\tilde{f}(\X^\top\w) + \lambda\psi^\ast(-\X\nabla\tilde{f}(\X^\top\w)/ \lambda).
                                          \end{eqnarray}
                                          We now use the classical Fenchel-Young inequality~(see, Proposition
                                                3.3.4 of \cite{borwein}) on the function $\psi$, which gives
@@ -1017,10 +1017,10 @@ appropriated smooth real-valued function of $\Real^n$,
                                          upperbounds $g(\w)-g(\w^\star)$ and satisfying $\delta(\w^\star,\kappab(\w^\star))=0$.
 
                                          This is however not a sufficient property to make it a good measure
-                                         of the quality of the optimization, and further work is required, 
+                                         of the quality of the optimization, and further work is required,
                                          that will be dependent on $\tilde{f}$ and $\psi$.
-                                         We have indeed proven that $\delta(\w^\star,\kappab(\w^\star))$ is always $0$. However, 
-                                         for $\w$ different than $\w^\star$, $\delta(\w^\star,\kappab(\w^\star))$ can be infinite, 
+                                         We have indeed proven that $\delta(\w^\star,\kappab(\w^\star))$ is always $0$. However,
+                                         for $\w$ different than $\w^\star$, $\delta(\w^\star,\kappab(\w^\star))$ can be infinite,
                                          making it a non-informative duality-gap. The reasons for this can be one of the following:
                                          \begin{itemize}
                                          \item The term $\psi^\ast(-\X\nabla\tilde{f}(\X^\top\w)/ \lambda)$ might have an infinite value.
@@ -1037,13 +1037,13 @@ appropriated smooth real-valued function of $\Real^n$,
                                          Let us show how to compute the Fenchel conjugate of the functions we have introduced.
                                          We now present the Fenchel conjugate of the loss functions $\tilde{f}$.
                                          \begin{itemize}
-                                         \item \textbf{The square loss} 
+                                         \item \textbf{The square loss}
                                          $$\begin{array}{l}
                                          \tilde{f}(\z)=\frac{1}{2n}\|\y-\z\|_2^2, \\
                                             \tilde{f}^\ast(\kappab)=\frac{n}{2}\|\kappab\|_2^2 + \kappab^\top\y.
                                             \end{array}
                                             $$
-                                            \item \textbf{The logistic loss} 
+                                            \item \textbf{The logistic loss}
                                             $$\begin{array}{l}
                                             \tilde{f}(\z)=\frac{1}{n}\sum_{i=1}^n \log(1+e^{-y_i\z_i}) \\
                                                \tilde{f}^\ast(\kappab)=\begin{cases}
@@ -1079,7 +1079,7 @@ appropriated smooth real-valued function of $\Real^n$,
                                                            \end{cases}
                                                            \end{displaymath}
 It turns out that for almost all the norms we have presented, there exists (i)
-   either a closed form for the dual-norm or (ii) there exists an 
+   either a closed form for the dual-norm or (ii) there exists an
    efficient algorithm evaluating it. The only one which does not conform to this
    statement is the tree-structured sum of $\ell_2$-norms, for which we do not know
    how to evaluate it efficiently.
@@ -1090,7 +1090,7 @@ It turns out that for almost all the norms we have presented, there exists (i)
    \begin{displaymath}
    \kappab(\w) \defin
    \min\Big(1,\frac{\lambda}{\|\X\nabla\tilde{f}(\X^\top\w)\|_\ast}\Big)\nabla
-   \tilde{f}(\X^\top\w), 
+   \tilde{f}(\X^\top\w),
    \end{displaymath}
    which is the one we have implemented.  With this new choice, it is easy to see
    that for all vectors $\w$ in $\Real^p$, we still have $\tilde{f}^\ast(\kappab) \neq + \infty$, and
@@ -1113,7 +1113,7 @@ It turns out that for almost all the norms we have presented, there exists (i)
    regularization function $\tilde{\psi}: \Real^{p+1} \to \Real$, such that for a
    vector~$\w$ in~$\Real^{p+1}$, $\tilde{\psi}(\w) \defin \psi(\w_{\InSet{p}})$,
    where $\psi: \Real^p \to \Real$ is one of the regularization function we have
-   introduced. Then, considering a primal variable $\w$, a dual variable $\kappab$, 
+   introduced. Then, considering a primal variable $\w$, a dual variable $\kappab$,
    and writing $\gammab\defin-\X\kappab/\lambda$, we are interested in computing
    \begin{displaymath}
    \tilde{\psi}^\ast(\gammab) = \begin{cases}
@@ -1139,7 +1139,7 @@ It turns out that for almost all the norms we have presented, there exists (i)
    \begin{itemize}
    \item \textbf{For the square loss}, we define another auxiliary function:
    \begin{displaymath}
-   \kappab''(\w) \defin \kappab'(\w) - \frac{1}{n}\1_{p+1}^\top\kappab'(\w)\1_{p+1} 
+   \kappab''(\w) \defin \kappab'(\w) - \frac{1}{n}\1_{p+1}^\top\kappab'(\w)\1_{p+1}
    \end{displaymath}
    where $\1_{p+1}$ is a vector of size $p+1$ filled with ones.  This step,
    ensures that $\sum_{i=1}^{p+1}\kappab''(\w)_i= 0$.
