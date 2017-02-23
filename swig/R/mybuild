@@ -19,9 +19,9 @@ usage() {
 }
 
 while [ $# -gt 0 ]; do
-    case $1 in 
-	-ns) nswg=1;; 
-	-nb) build=0;; 
+    case $1 in
+	-ns) nswg=1;;
+	-nb) build=0;;
 	-D)debug=1;;
 	-g) mkvar=Makevars-g;;
 	-*) echo "BAD OPTION $1";usage;;
@@ -33,6 +33,7 @@ nom=spams
 pkdir=pkg/$nom
 DATE=`date +%Y-%m-%d`
 VERSION=`cat ../Version`
+SWIG=`which swig`
 
 rfiles="zzz.R r_$nom.R ${nom}.R"
 if [ $debug -eq 0 ]; then
@@ -41,11 +42,11 @@ else
     OPT_DBG=-DDEBUG
     rfiles="$rfiles r_debug.R"
     export OPT_DBG
-fi    
+fi
 export PKG_LIBS="-lblas -llapack"
 rm -rf $pkdir
 if [ $nswg -eq 0 ]; then
-    /home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -r $OPT_DBG -o ${nom}.cpp $nom.i
+    $SWIG -c++ -r $OPT_DBG -o ${nom}.cpp $nom.i
     [ $? -ne 0 ] && exit 1
 fi
 [ -d $pkdir ] || mkdir -p $pkdir/R
