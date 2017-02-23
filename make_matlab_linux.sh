@@ -10,4 +10,12 @@ echo $DA
 VERSION=`cat swig/Version`
 TARGET=`uname -s`
 
-tar zcvf spams-matlab-precompiled-v$VERSION-$DA-$TARGET.tar.gz ./build/ ./src_release/ ./test_release/ ./README ./start_spams.m ./doc/doc_spams.pdf
+WDIR="spams-matlab-v$VERSION"
+
+mkdir $WDIR
+
+cp -r {./build/ ./src_release/ ./test_release/ ./README ./HOW_TO_INSTALL.txt ./HOW_TO_USE.txt ./start_spams.m ./doc/doc_spams.pdf ./doc/html} $WDIR
+
+tar zcvf spams-matlab-precompiled-v$VERSION-$DA-$TARGET.tar.gz $WDIR
+
+rm -r $WDIR
