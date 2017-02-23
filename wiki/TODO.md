@@ -6,9 +6,9 @@
 
 ### MATLAB
 
-`****` Error in doc: function `displayPatches` called `mexDisplayPatches`
+`DONE` Error in doc: function `displayPatches` called `mexDisplayPatches`
 
-`****` Build precompiled toolbox for MacOS
+`DONE` Build precompiled toolbox for MacOS
 
 `*` Build precompiled toolbox for Windows
 
