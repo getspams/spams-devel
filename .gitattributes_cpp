@@ -1,18 +1,32 @@
+./build export-ignore
+./dags export-ignore
+./src_release
+./test_release
 ./swig export-ignore
 ./wiki export-ignore
 
-.gitattributes export-ignore
+.gitattributes_matlab export-ignore
+.gitattributes_cpp export-ignore
 .gitignore export-ignore
 
+compile.m export-ignore
 compile_gcc.m export-ignore
 compile_intel.m export-ignore
+compile_octave.m export-ignore
 compile_mex_linux.m export-ignore
 compile_mex_macosx.m export-ignore
 
 export_matlab_src_git.sh export-ignore
 export_matlab_src_svn.sh export-ignore
+extract_matlab_src.sh export-ignore
+
+get_architecture.m export-ignore
+HOW_TO_INSTALL.txt export-ignore
+HOW_TO_USE.txt export-ignore
 
 make_matlab_linux.sh export-ignore
 make_matlab_macosx.sh export-ignore
+
+start_spams.m export-ignore
 
 TODO export-ignore
