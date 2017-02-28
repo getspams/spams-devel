@@ -19,14 +19,14 @@ SPAMS (SPArse Modeling Software) is an open-source optimization toolbox for
 sparse estimation with licence GPLv3. It implements algorithms for solving
 machine learning and signal processing problems involving sparse
 regularizations.</p><p>The library is coded in C++, is compatible with Linux, Mac, and Windows 32bits
-and 64bits Operating Systems. It is interfaced with Matlab, R and Python, but
+and 64bits Operating Systems. It is interfaced with Matlab, R and Python (2.x and 3.x), but
 can be called from any C++ application (by hacking the code a bit).</p><p>It requires an implementation of BLAS and LAPACK for performing linear algebra
 operations. The ones shipped with Matlab and R can be used, but also external
 libraries such as atlas, the netlib implementation, or the Intel Math Kernel
 Library can be used. It also exploits multi-core CPUs when this feature is
 supported by the compiler, through OpenMP.</p><p>The current licence is GPLv3, which is available at
 <span class="c004">http://www.gnu.org/licenses/gpl.html</span>. For other licensing possibilities
-allowing its use in proprietary softwares, please contact the author.</p><p>Version 2.6 of SPAMS is divided into several “toolboxes” and has a few
+allowing its use in proprietary softwares, please contact the author.</p><p>The porting to python3.x is based on <span class="c004">https://aur.archlinux.org/packages/python-spams-svn/</span>.</p><p>Version 2.6 of SPAMS is divided into several “toolboxes” and has a few
 additional miscellaneous functions:
 </p><ul class="itemize"><li class="li-itemize">
 The <span class="c010">Dictionary learning and matrix factorization toolbox</span>
