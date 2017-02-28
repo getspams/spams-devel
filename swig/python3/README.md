@@ -21,6 +21,8 @@ Available functions in python are defined in `spams.py` and documented (the doc 
 
 This file describes how to directly install the interface from sources.
 
+Porting to python3.x based on https://aur.archlinux.org/packages/python-spams-svn/
+
 ## INTERFACE INSTALLATION (python3.x) for LINUX and MacOS
 
 ### Installation
