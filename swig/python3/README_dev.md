@@ -19,7 +19,7 @@ You will find in `$inst`:
 ----------------------------------------
 ## Running test programs :
 ```
-PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+PYV=`python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 python3 test_spams.py -h # to get help
 python3 test_spams.py  # will run all the tests
