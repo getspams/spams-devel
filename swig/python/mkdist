@@ -60,6 +60,8 @@ cp -p ../extdata/boat.png ../extdata/lena.png $tmpd
 cp -p spams_wrap-windows.cpp $tmpd
 ../setRelease INSTALL-package.in >$tmpd/INSTALL-package
 ../setRelease INSTALL-windows.in >$tmpd/INSTALL-windows
+../setRelease README.md >$tmpd/README.md
+../setRelease README_dev.md >$tmpd/README_dev.md
 
 cp -p win-build.sh $tmpd
 # rm -f $tmpd/README
