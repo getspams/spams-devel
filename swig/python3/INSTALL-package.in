@@ -45,7 +45,7 @@ Windows 64bits :
 Testing the interface :
 
 - Linux or Mac :
-PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+PYV=`python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
 python3 test_spams.py -h : to get help
