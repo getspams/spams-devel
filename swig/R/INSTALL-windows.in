@@ -1,4 +1,4 @@
-Installation of the binary windows package 
+Installation of the binary windows package
 ==========================================
 
 This package is distributed as a .exe file and is suitable for 32 and 64 bits architectures :
@@ -22,10 +22,10 @@ privileges (right click on the icon)
 --------------------
 To run the given examples, open a "command" window and type :
 a) on a 32bits system :
-cd C:\Program Files\R\R-2.15.1\library\spams\test
+cd C:\Program Files\R\R-2.15.1\library\spams\inst\test
 ..\..\..\bin\Rscript test_spams.R -h
-..\..\..\bin\Rscript test_spams.R 
+..\..\..\bin\Rscript test_spams.R
 
 b) on a 64 bits system
 ..\..\..\bin\x64\Rscript test_spams.R -h
-..\..\..\bin\x64\Rscript test_spams.R 
+..\..\..\bin\x64\Rscript test_spams.R

@@ -23,7 +23,7 @@ Note : to run test_TrainDL and test_TrainDL_Memory you need the R package png
 
 We suppose that environment variable R_LIBS is set:
 ```
-cd $R_LIB/spams/test
+cd $R_LIB/spams/inst/test
 Rscript test_spams.R -help
 Rscript test_spams.R
 ```
