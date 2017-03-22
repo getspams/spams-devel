@@ -36,22 +36,26 @@ mkdir $wdir
 mkdir $dir
 [ -d $dir ] || die "cannot create $dir"
 pkdir=$dir/$nom
+SWIG=`which swig`
 
 ./docmatlab2R r_spams
 
 [ $mkdoc -ne 0 ] && /bin/rm -rf tmp-doc
 ../mkdoc
 doc=tmp-doc
-swig -c++ -r -o ${nom}.cpp $nom.i
+$SWIG -c++ -r -o ${nom}.cpp $nom.i
 #/home/bigimbaz/douze/bigimbaz_servers/swig/bin/swig -c++ -r -o ${nom}.cpp $nom.i
 [ $? -ne 0 ] && exit 1
 mkdir -p $pkdir/R $pkdir/src
 cp -p NAMESPACE  $pkdir
-../setRelease DESCRIPTION.in >$pkdir/DESCRIPTION 
+../setRelease DESCRIPTION.in >$pkdir/DESCRIPTION
 cp -p ../../COPYING $pkdir/LICENSE
 cp -a man $pkdir
 rfiles="zzz.R r_$nom.R ${nom}.R"
 cfiles="$nom.h ${nom}.cpp Makevars Makevars.win"
+###### HACK to avoid the class export issue ######
+sed -i -e 's/ans <\- new/\#ans <\- new/g' ${nom}.R
+##################################################
 cp $rfiles $pkdir/R
 cp $cfiles $pkdir/src
 mkdir -p $pkdir/inst/test $pkdir/inst/doc $pkdir/inst/extdata
@@ -81,4 +85,3 @@ tar zcf $tgz $pkg
 mv $tgz ../../../
 #cp -p $tgz ../${pkg}_svn.tar.gz
 exit 0
-
