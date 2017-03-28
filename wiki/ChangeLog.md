@@ -72,6 +72,38 @@
         * [swig/python/README_spams2.6_python3.x.md](swig/python/README_spams2.6_python3.x.md): for users
         * [swig/python/README_dev_spams2.6_python3.x.md](swig/python/README_dev_spams2.6_python3.x.md): for developpers
 
+* c26e4b649a5f56dd569b5ed17eae5ea5f5cdf4ce: Fix problem with 1 column matrix cast to Fortran-order: in [swig/python/numpy.i](swig/python/numpy.i) `PyArray_ISFORTRAN` is replaced by `PyArray_IS_F_CONTIGUOUS`, c.f. https://github.com/numpy/numpy/issues/6590 and following example:
+"""
+X = np.asfortranarray(np.array(np.random.normal(size=(64,1)), order='F'),dtype= myfloat)
+
+X.flags
+Out[21]:
+  C_CONTIGUOUS : True
+  F_CONTIGUOUS : True
+  OWNDATA : True
+  WRITEABLE : True
+  ALIGNED : True
+  UPDATEIFCOPY : False
+
+np.isfortran(X)
+Out[22]: False
+
+
+X = np.asfortranarray(np.array(np.random.normal(size=(64,2)), order='F'),dtype= myfloat)
+
+X.flags
+Out[23]:
+  C_CONTIGUOUS : False
+  F_CONTIGUOUS : True
+  OWNDATA : True
+  WRITEABLE : True
+  ALIGNED : True
+  UPDATEIFCOPY : False
+
+np.isfortran(X)
+Out[24]: True
+"""
+
 ### SWIG/R
 
 * ae3543ab08d018c610d5e5a9f335344ab05dc087: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` and in swig conf file [swig/R/R_typemaps.i](swig/R/R_typemaps.i)
