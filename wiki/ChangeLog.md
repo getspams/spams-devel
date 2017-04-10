@@ -105,7 +105,7 @@ np.isfortran(X)
 Out[24]: True
 ```
 
-* replace all tests `xx == None` by `xx is None` to fix the following warning: `FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.`
+* 2332cbdd82ec7d9827bf8996d88377431e38e27f: replace all tests `xx == None` by `xx is None` to fix the following warning `FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.`
 
 ### SWIG/R
 
