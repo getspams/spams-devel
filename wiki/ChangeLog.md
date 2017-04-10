@@ -73,7 +73,8 @@
         * [swig/python/README_dev_spams2.6_python3.x.md](swig/python/README_dev_spams2.6_python3.x.md): for developpers
 
 * c26e4b649a5f56dd569b5ed17eae5ea5f5cdf4ce: Fix problem with 1 column matrix cast to Fortran-order: in [swig/python/numpy.i](swig/python/numpy.i) `PyArray_ISFORTRAN` is replaced by `PyArray_IS_F_CONTIGUOUS`, c.f. https://github.com/numpy/numpy/issues/6590 and following example:
-"""
+
+```
 X = np.asfortranarray(np.array(np.random.normal(size=(64,1)), order='F'),dtype= myfloat)
 
 X.flags
@@ -102,7 +103,9 @@ Out[23]:
 
 np.isfortran(X)
 Out[24]: True
-"""
+```
+
+* replace all tests `xx == None` by `xx is None` to fix the following warning: `FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.`
 
 ### SWIG/R
 
