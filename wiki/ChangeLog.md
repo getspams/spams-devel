@@ -105,7 +105,9 @@ np.isfortran(X)
 Out[24]: True
 ```
 
-* 2332cbdd82ec7d9827bf8996d88377431e38e27f: replace all tests `xx == None` by `xx is None` to fix the following warning `FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.`
+* 2332cbdd82ec7d9827bf8996d88377431e38e27f: Replace all tests `xx == None` by `xx is None` to fix the following warning `FutureWarning: comparison to `None` will result in an elementwise object comparison in the future.` in [swig/python/spams.py](swig/python/spams.py) and [swig/python3/spams.py](swig/python3/spams.py)
+
+* 867750f7a8b314d72863382bf518208a528aa67c: Replace `nclasses` by `int(nclasses)` in `np.zeros` to force float to inst cast in table dimension in [swig/python/test_prox.py](swig/python/test_prox.py) and [swig/python3/spams.py](swig/python3/spams.py)
 
 ### SWIG/R
 
