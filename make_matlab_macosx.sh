@@ -14,10 +14,13 @@ WDIR="spams-matlab-v$VERSION"
 
 mkdir $WDIR
 mkdir $WDIR/doc
+mkdir $WDIR/build
+mkdir $WDIR/src_release
+mkdir $WDIR/test_release
 
-cp -r ./build/ $WDIR
-cp -r ./src_release/ $WDIR
-cp -r ./test_release/ $WDIR
+cp -r ./build/* $WDIR/build
+cp -r ./src_release/* $WDIR/src_release
+cp -r ./test_release/* $WDIR/test_release
 cp ./README $WDIR
 cp ./HOW_TO_INSTALL.txt $WDIR
 cp ./HOW_TO_USE.txt $WDIR
