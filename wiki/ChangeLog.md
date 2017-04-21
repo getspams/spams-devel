@@ -18,6 +18,8 @@
 * Creation of the precompiled package with [make_matlab_linux.sh](./make_matlab_linux.sh) for Linux or [make_matlab_macosx.sh](./make_matlab_macosx.sh) for MacOSX
 * Export of the source files with [export_matlab_src_git.sh](./export_matlab_src_git.sh) (with git) or [export_matlab_src_svn.sh](./export_matlab_src_svn.sh) (with svn), replace the former [make_matlab_package.sh] file.
 
+* 7bbe8cadc162bcda5f9832bb605e87aa801f1b38: Fix the cp bug in MacOS. When creating the tar.gz file with the precompiled matlab version for MacOS, `cp -r source_dir/ target_dir` did copy the content of `source_dir` into `target_dir` instead of `source_dir` directly.
+
 ### SWIG/python
 
 * Apply patch from https://aur.archlinux.org/packages/python-spams-svn for python3 compatibility
