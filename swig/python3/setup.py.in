@@ -11,13 +11,18 @@ import numpy
 incs = ['.'] + [os.path.join('spams',x) for x in [ 'linalg', 'prox', 'decomp', 'dictLearn']] + [numpy.get_include()] + [get_python_inc()]
 
 osname = distutils.util.get_platform()
+cc_name = os.environ['CC']
+cxx_name = os.environ['CXX']
 cc_flags = ['-fPIC', '-fopenmp']
 link_flags = ['-fopenmp', '-s' ]
 libs = ['stdc++', 'blas', 'lapack' ]
 libdirs = []
 
 if osname.startswith("macosx"):
-    cc_flags = ['-fPIC', '-fopenmp','-m32']
+    if 'clang' in cc_name + cxx_name:
+        cc_flags = ['-fPIC','-m32']
+    else:
+        cc_flags = ['-fPIC', '-fopenmp','-m32']
     link_flags = ['-m32', '-framework', 'Python']
 
 if osname.startswith("win32"):

@@ -6,17 +6,22 @@ import numpy
 
 # includes numpy : package numpy.distutils , numpy.get_include()
 # python setup.py build --inplace
-# python setup.py install --prefix=dist, 
+# python setup.py install --prefix=dist,
 incs = ['.'] + map(lambda x: os.path.join('spams',x),[ 'linalg', 'prox', 'decomp', 'dictLearn']) + [numpy.get_include()] + ['/usr/include/python2.7/']
 
 osname = distutils.util.get_platform()
+cc_name = os.environ['CC']
+cxx_name = os.environ['CXX']
 cc_flags = ['-fPIC', '-fopenmp']
 link_flags = ['-fopenmp', '-s' ]
 libs = ['stdc++', 'blas', 'lapack' ]
 libdirs = []
 
 if osname.startswith("macosx"):
-    cc_flags = ['-fPIC', '-fopenmp','-m32']
+    if 'clang' in cc_name + cxx_name:
+        cc_flags = ['-fPIC','-m32']
+    else:
+        cc_flags = ['-fPIC', '-fopenmp','-m32']
     link_flags = ['-m32', '-framework', 'Python']
 
 if osname.startswith("win32"):
@@ -78,7 +83,7 @@ setup (name = 'spams',
 #       scripts = ['test_spams.py'],
        data_files = [
         ('test',['test_spams.py', 'test_decomp.py', 'test_dictLearn.py', 'test_linalg.py', 'test_prox.py', 'test_utils.py']),
-        ('doc',['doc_spams.pdf', 'python-interface.pdf']), 
+        ('doc',['doc_spams.pdf', 'python-interface.pdf']),
         ('doc/sphinx/_sources',mkhtml('_sources')),
         ('doc/sphinx/_static',mkhtml('_static')),
         ('doc/sphinx',mkhtml()),
