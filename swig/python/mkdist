@@ -42,7 +42,9 @@ nom=spams
 /bin/rm -rf dist
 SWIG=swig
 $SWIG -c++ $PY_OPT -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
+patch -i ${nom}_wrap-windows.cpp.patch ${nom}_wrap-windows.cpp
 $SWIG -c++ $PY_OPT -python -o ${nom}_wrap.cpp $nom.i
+patch -i ${nom}_wrap.cpp.patch ${nom}_wrap.cpp
 $PYTHON setup.py sdist
 [ $? -eq 0 ] || die "setup error; cannot continue"
 cdir=`/bin/pwd`

@@ -108,6 +108,12 @@ for nom in $lst; do
     	src=${nom}_wrap.cpp
     	obj=${nom}_wrap.o
     fi
+
+    ## patch spams_wrap.cpp
+    if [ "${nom}" = "spams" ]; then
+        patch -i spams_wrap.cpp.patch spams_wrap.cpp
+    fi
+
     $CXX $OPTWIN $CCFLAGS $OMPFLAGS -c $optc -DUSE_BLAS_LIB  $OPT_DBG $INC_PYTHON $INC $src $XCCFLAGS
     err=$?;[ $err -eq 0 ] || break
     $CXX $OPTWIN $OMPFLAGS -shared $obj -o _${nom}_wrap.$EXTL -lstdc++ $LIBS $BLAS $XLINKFLAGS
