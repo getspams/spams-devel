@@ -1,7 +1,14 @@
 #!/bin/bash
-case $1 in -x) set -x;shift;;esac
+doc=""
+while [ $# -gt 0 ]; do
+    case $1 in
+        -x) set -x;shift;;
+        -f) doc="tmp-doc";;
+    esac
+    shift
+done
 
 nom=spams
 /bin/rm -f $nom.o ${nom}_wrap.o ${nom}_wrap.py $nom.pyc ${nom}_wrap.cpp ${nom}_wrap-windows.cpp _${nom}_wrap.so *.pyc
-/bin/rm -rf build dist tmp-doc spams.new.py spams-*.tar.gz spams-*.exe setup.py
+/bin/rm -rf build dist $doc spams.new.py spams-*.tar.gz spams-*.exe setup.py
 /bin/rm -f MANIFEST
