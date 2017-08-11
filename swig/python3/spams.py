@@ -112,7 +112,7 @@ def lasso(X,D= None,Q = None,q = None,return_reg_path = False,L= -1,lambda1= Non
 #                 ('mode', spams_wrap.PENALTY),('pos', False),('ols', False),('numThreads', -1),
 #                 ('max_length_path', -1),('verbose',True),('cholesky', False)]
 
-    if Q != None:
+    if Q is not None:
         if q is None:
             raise ValueError("lasso : q is needed when Q is given")
     else:
@@ -122,7 +122,7 @@ def lasso(X,D= None,Q = None,q = None,return_reg_path = False,L= -1,lambda1= Non
     if lambda1 is None:
         raise ValueError("lasso : lambda1 must be defined")
     path = None
-    if(q != None):
+    if(q is not None):
         if return_reg_path:
             ((indptr,indices,data,shape),path) = spams_wrap.lassoQq(X,Q,q,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
         else:
@@ -433,11 +433,11 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
     if tree is None and graph is None:
         eta_g = np.array([],dtype=X.dtype,order="F")
         groups = ssp.csc_matrix(np.array([[False],[False]],dtype=np.bool,order="F"))
-    if tree != None:
+    if tree is not None:
         if not ('eta_g' in tree and 'groups' in tree and
                 'own_variables' in tree and 'N_own_variables' in tree):
             raise ValueError("structTrainDL : incorrect tree structure")
-        if graph != None:
+        if graph is not None:
             raise ValueError("structTrainDL : only one of tree or graph can be given")
         eta_g = tree['eta_g']
         groups = tree['groups']
@@ -447,7 +447,7 @@ def __allTrainDL(X,return_model= None,model= None,in_memory= False,
         own_variables = np.array([],dtype=np.int32,order="F")
         N_own_variables = np.array([],dtype=np.int32,order="F")
 
-    if graph != None:
+    if graph is not None:
         if not ('eta_g' in graph and 'groups' in graph and 'groups_var' in graph):
             raise ValueError("structTrainDL : incorrect graph structure")
         eta_g = graph['eta_g']
@@ -595,6 +595,7 @@ def displayPatches(D):
     if int(sizeEdge) != sizeEdge:
         V = 3
         sizeEdge=np.sqrt(n/V)
+        sizeEdge = int(sizeEdge)
 
 
 #    for ii in xrange(0,D.shape[1]):
