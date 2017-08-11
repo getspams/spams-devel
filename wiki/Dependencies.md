@@ -4,5 +4,5 @@
 
 On Ubuntu:
 * hevea
-* python-sphynx or pyhton3-sphynx
+* python-sphinx or pyhton3-sphinx
 * python3-dev
