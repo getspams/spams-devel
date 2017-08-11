@@ -13,7 +13,8 @@ def test_fistaFlat():
              'L0' : 0.1, 'tol' : 1e-3, 'intercept' : False,
              'pos' : False}
     np.random.seed(0)
-    m = 100;n = 200
+    m = 100
+    n = 200
     X = np.asfortranarray(np.random.normal(size = (m,n)))
     X = np.asfortranarray(X - np.tile(np.mean(X,0),(X.shape[0],1)),dtype=myfloat)
     X = spams.normalize(X)
@@ -28,10 +29,11 @@ def test_fistaFlat():
     print('\nFISTA + Regression l1')
     param['loss'] = 'square'
     param['regul'] = 'l1'
-    # param.regul='group-lasso-l2';
-    # param.size_group=10;
+    # param.regul='group-lasso-l2'
+    # param.size_group=10
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
-##    print "XX %s" %str(optim_info.shape);return None
+##    print "XX %s" %str(optim_info.shape)
+##    return None
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:],0),np.mean(optim_info[2,:],0),np.mean(optim_info[3,:],0)))
 ###
     print('\nISTA + Regression l1')
@@ -61,7 +63,7 @@ def test_fistaFlat():
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f\n' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 ###
     print('\nFISTA + Regression l2 + sparse feature matrix')
-    param['regul'] = 'l2';
+    param['regul'] = 'l2'
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,ssp.csc_matrix(X),W0,True,**param)',locals())
     print('mean loss: %f, mean relative duality_gap: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[2,:]),np.mean(optim_info[3,:])))
 ###########
@@ -97,7 +99,7 @@ def test_fistaFlat():
     print('\nFISTA + Regression Fused-Lasso')
     param['regul'] = 'fused-lasso'
     param['lambda2'] = 0.1
-    param['lambda3'] = 0.1; #
+    param['lambda3'] = 0.1
     (W, optim_info) = Xtest1('spams','spams.fistaFlat(Y,X,W0,True,**param)',locals())
     print('mean loss: %f, number of iterations: %f' %(np.mean(optim_info[0,:]),np.mean(optim_info[3,:])))
 
@@ -457,7 +459,8 @@ def test_fistaTree():
              'L0' : 0.1, 'tol' : 1e-5, 'intercept' : False,
              'pos' : False}
     np.random.seed(0)
-    m = 100;n = 10
+    m = 100
+    n = 10
     X = np.asfortranarray(np.random.normal(size = (m,n)))
     X = np.asfortranarray(X - np.tile(np.mean(X,0),(X.shape[0],1)),dtype=myfloat)
     X = spams.normalize(X)
@@ -545,7 +548,7 @@ def test_fistaTree():
     Y = np.asfortranarray(Y - np.tile(np.mean(Y,0),(Y.shape[0],1)),dtype=myfloat)
     Y = spams.normalize(Y)
     param['compute_gram'] = False
-    param['verbose'] = True;   # verbosity, False by default
+    param['verbose'] = True   # verbosity, False by default
     W0 = np.zeros((X.shape[1],Y.shape[1]),dtype=myfloat,order="F")
     param['loss'] = 'square'
     print('\nFISTA + Regression  multi-task-tree')
@@ -587,7 +590,8 @@ def test_fistaTree():
 def test_proximalFlat():
     param = {'numThreads' : -1,'verbose' : True,
              'lambda1' : 0.1 }
-    m = 100;n = 1000
+    m = 100
+    n = 1000
     U = np.asfortranarray(np.random.normal(size = (m,n)),dtype=myfloat)
 
     # test L0
@@ -738,7 +742,8 @@ def test_proximalGraph():
 def test_proximalTree():
     param = {'numThreads' : -1,'verbose' : True,
              'pos' : False, 'intercept' : False, 'lambda1' : 0.1 }
-    m = 10;n = 1000
+    m = 10
+    n = 1000
     U = np.asfortranarray(np.random.normal(size = (m,n)),dtype=myfloat)
     print('First tree example')
     # Example 1 of tree structure
@@ -771,14 +776,14 @@ def test_proximalTree():
     print('Second tree example')
 # Example 2 of tree structure
 # tree structured groups:
-# g1= {0 1 2 3 4 5 6 7 8 9}    root(g1) = { };
-# g2= {0 1 2 3 4 5}            root(g2) = {0 1 2};
-# g3= {3 4}                    root(g3) = {3 4};
-# g4= {5}                      root(g4) = {5};
-# g5= {6 7 8 9}                root(g5) = { };
-# g6= {6 7}                    root(g6) = {6 7};
-# g7= {8 9}                    root(g7) = {8};
-# g8 = {9}                     root(g8) = {9};
+# g1= {0 1 2 3 4 5 6 7 8 9}    root(g1) = { }
+# g2= {0 1 2 3 4 5}            root(g2) = {0 1 2}
+# g3= {3 4}                    root(g3) = {3 4}
+# g4= {5}                      root(g4) = {5}
+# g5= {6 7 8 9}                root(g5) = { }
+# g6= {6 7}                    root(g6) = {6 7}
+# g7= {8 9}                    root(g7) = {8}
+# g8 = {9}                     root(g8) = {9}
     own_variables =  np.array([0, 0, 3, 5, 6, 6, 8, 9],dtype=np.int32)
     N_own_variables =  np.array([0,3,2,1,0,2,1,1],dtype=np.int32)
     eta_g = np.array([1,1,1,2,2,2,2.5,2.5],dtype=myfloat)
