@@ -9,4 +9,4 @@
 ./mkpy spams
 
 # Tests:
-python test_spams.py test_prox
+python test_spams.py
