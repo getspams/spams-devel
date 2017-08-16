@@ -15,3 +15,4 @@ index 891b4e7..af27104 100644
 
 
    /* Given a PyObject, return a string describing its type.
+   /* Patch imported from https://github.com/conda-forge/python-spams-feedstock
