@@ -92,10 +92,10 @@ fi
 
 err=0
 PY_OPT=""
-if [[ $PYTHON =~ "python3" ]];
-then
-    PY_OPT="-py3"
-fi
+# if [[ $PYTHON =~ "python3" ]];
+# then
+#     PY_OPT="-py3"
+# fi
 for nom in $lst; do
     [ $flg_swig -ne 0 ] && {
     	swig -c++ $PY_OPT -python $OPT_DBG -o ${nom}_wrap.cpp $nom.i
@@ -110,9 +110,10 @@ for nom in $lst; do
     fi
 
     ## patch spams_wrap.cpp
-    if [ "${nom}" = "spams" ]; then
-        patch -i spams_wrap.cpp.patch spams_wrap.cpp
-    fi
+    # if [ "${nom}" = "spams" ]; then
+    #     patch -i spams_wrap.cpp.patch spams_wrap.cpp
+    #     # patch -i spams_wrap.py.patch spams_wrap.py
+    # fi
 
     $CXX $OPTWIN $CCFLAGS $OMPFLAGS -c $optc -DUSE_BLAS_LIB  $OPT_DBG $INC_PYTHON $INC $src $XCCFLAGS
     err=$?;[ $err -eq 0 ] || break
