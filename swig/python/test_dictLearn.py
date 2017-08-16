@@ -41,9 +41,9 @@ def _objective(X,D,param,imgname = None):
         x = np.uint8(img[:,:,0] * 255.)
         image = Image.fromarray(x,mode = 'L')
         image.save("%s.png" %imgname)
-    
+
 def test_trainDL():
-    img_file = 'boat.png'
+    img_file = 'extdata/boat.png'
     try:
         img = Image.open(img_file)
     except:
@@ -57,7 +57,8 @@ def test_trainDL():
         A = np.asfortranarray(I)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
@@ -130,11 +131,11 @@ def test_trainDL():
     t = tac - tic
     print 'time of computation for Dictionary Learning: %f' %t
     _objective(X,D,param)
-    
+
     return None
 
 def test_trainDL_Memory():
-    img_file = 'lena.png'
+    img_file = 'extdata/lena.png'
     try:
         img = Image.open(img_file)
     except:
@@ -148,7 +149,8 @@ def test_trainDL_Memory():
         A = np.asfortranarray(I)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
@@ -191,7 +193,7 @@ def test_trainDL_Memory():
     return None
 
 def test_structTrainDL():
-    img_file = 'lena.png'
+    img_file = 'extdata/lena.png'
     try:
         img = Image.open(img_file)
     except Exception as e:
@@ -205,7 +207,8 @@ def test_structTrainDL():
         A = np.asfortranarray(I,dtype = myfloat)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
@@ -225,7 +228,7 @@ def test_structTrainDL():
     print 'time of computation for Dictionary Learning: %f' %t
     _objective(X,D,param)
 
-#    
+#
     param['regul'] = 'l2'
     print "with Fista Regression %s" %param['regul']
     tic = time.time()
@@ -236,7 +239,7 @@ def test_structTrainDL():
 
     _objective(X,D,param)
 
-#    
+#
     param['regul'] = 'elastic-net'
     print "with Fista %s" %param['regul']
     param['lambda2'] = 0.1
@@ -349,7 +352,7 @@ def test_structTrainDL():
     print 'time of computation for Dictionary Learning: %f' %t
 
     _objective(X,D,param)
-    
+
     param['regul'] = 'tree-linf'
     print "with Fista %s" %param['regul']
     tic = time.time()
@@ -362,7 +365,7 @@ def test_structTrainDL():
 
 
 def test_nmf():
-    img_file = 'boat.png'
+    img_file = 'extdata/boat.png'
     try:
         img = Image.open(img_file)
     except:
@@ -376,7 +379,8 @@ def test_nmf():
         A = np.asfortranarray(I,dtype = myfloat)
         rgb = False
 
-    m = 16;n = 16;
+    m = 16
+    n = 16
     X = spams.im2col_sliding(A,m,n,rgb)
     X = X[:,::10]
     X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)),dtype = myfloat)
@@ -394,9 +398,9 @@ def test_nmf():
     return None
 
 
-# Archetypal Analysis, run first steps with FISTA and run last steps with activeSet, 
+# Archetypal Analysis, run first steps with FISTA and run last steps with activeSet,
 def test_archetypalAnalysis():
-    img_file = 'lena.png'
+    img_file = 'extdata/lena.png'
     try:
         img = Image.open(img_file)
     except Exception as e:
@@ -410,7 +414,8 @@ def test_archetypalAnalysis():
         A = np.asfortranarray(I,dtype = myfloat)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
@@ -424,7 +429,7 @@ def test_archetypalAnalysis():
     # remember that we are not guarantee to descent in FISTA step if 50 is too small
     stepsAS = 10 # 7 alternations by activeSet, default parameter(50)
     randominit = True # random initilazation, default parameter(True)
-    
+
     ############# FIRST EXPERIMENT  ##################
     tic = time.time()
     # learn archetypes using activeSet method for each convex sub-problem
