@@ -1,3 +1,6 @@
+from __future__ import absolute_import, division, \
+    print_function, unicode_literals
+
 import sys
 import numpy as np
 import scipy
@@ -57,7 +60,8 @@ def test_trainDL():
         A = np.asfortranarray(I)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
@@ -148,7 +152,8 @@ def test_trainDL_Memory():
         A = np.asfortranarray(I)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
@@ -205,7 +210,8 @@ def test_structTrainDL():
         A = np.asfortranarray(I,dtype = myfloat)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))
@@ -376,7 +382,8 @@ def test_nmf():
         A = np.asfortranarray(I,dtype = myfloat)
         rgb = False
 
-    m = 16;n = 16;
+    m = 16
+    n = 16
     X = spams.im2col_sliding(A,m,n,rgb)
     X = X[:,::10]
     X = np.asfortranarray(X / np.tile(np.sqrt((X * X).sum(axis=0)),(X.shape[0],1)),dtype = myfloat)
@@ -410,7 +417,8 @@ def test_archetypalAnalysis():
         A = np.asfortranarray(I,dtype = myfloat)
         rgb = False
 
-    m = 8;n = 8;
+    m = 8
+    n = 8
     X = spams.im2col_sliding(A,m,n,rgb)
 
     X = X - np.tile(np.mean(X,0),(X.shape[0],1))

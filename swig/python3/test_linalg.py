@@ -1,3 +1,7 @@
+from __future__ import absolute_import, division, \
+    print_function, unicode_literals
+import six.moves
+
 import sys
 import numpy as np
 import scipy
@@ -22,12 +26,16 @@ def test_calcAAt():
     """
     test A * A'
     """
-    m=200; n = 200000; d= 0.05
+    m=200
+    n = 200000
+    d= 0.05
     A = ssprand(m,n,density=d,format='csc',dtype=myfloat)
     return Xtest('A * A.T','spams.calcAAt(A)',locals())
 
 def test_calcXAt():
-    m=200; n = 200000; d= 0.05
+    m=200
+    n = 200000
+    d= 0.05
     A = ssprand(m,n,density=d,format='csc',dtype=myfloat)
     X = np.asfortranarray(np.random.normal(size = (64,n)),dtype=myfloat)
 
@@ -67,7 +75,7 @@ def test_conjGrad():
     itermax = int(0.5 * len(b))
 
     tic = time.time()
-    for i in range(0,20):
+    for i in six.moves.xrange(0,20):
         y1 = np.linalg.solve(A,b)
     tac = time.time()
     print("  Time (numpy): ", tac - tic)
@@ -75,7 +83,7 @@ def test_conjGrad():
     print("Mean error on b : %f" %(x1.sum() / b.shape[0]))
 
     tic = time.time()
-    for i in range(0,20):
+    for i in six.moves.xrange(0,20):
         y2 = spams.conjGrad(A,b,x0,tol,itermax)
 #*        y2 = spams.conjGrad(A,b)
     tac = time.time()

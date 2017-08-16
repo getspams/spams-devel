@@ -1,3 +1,7 @@
+from __future__ import absolute_import, division, \
+    print_function, unicode_literals
+import six.moves
+
 import sys
 import numpy as np
 import scipy
@@ -10,7 +14,7 @@ from test_utils import *
 def test_sparseProject():
     np.random.seed(0)
     X = np.asfortranarray(np.random.normal(size = (20000,100)),dtype=myfloat)
-    #* matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    #* matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1])
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)),dtype=myfloat)
     param = {'numThreads' : -1, # number of processors/cores to use (-1 => all cores)
              'pos' : False,
@@ -46,7 +50,7 @@ def test_sparseProject():
     param['lambda2'] = 0.7
     param['lambda3'] = 1.0
     X = np.asfortranarray(np.random.random(size = (2000,100)))
-    #* matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    #* matlab : X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1])
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)),dtype=myfloat)
     tic = time.time()
     X1 = spams.sparseProject(X,**param)
@@ -98,7 +102,7 @@ def test_l1L2BCD():
     X = np.asfortranarray(np.random.normal(size = (64,100)),dtype=myfloat)
     D = np.asfortranarray(np.random.normal(size = (64,200)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)),dtype=myfloat)
-    ind_groups = np.array(range(0,X.shape[1],10),dtype=np.int32) #indices of the first signals in each group
+    ind_groups = np.array(six.moves.xrange(0,X.shape[1],10),dtype=np.int32) #indices of the first signals in each group
     # parameters of the optimization procedure are chosen
     itermax = 100
     tol = 1e-3
@@ -123,15 +127,15 @@ def test_lasso():
 ##############################################
 # data generation
     X = np.asfortranarray(np.random.normal(size=(100,100000)))
-    #* X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    #* X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1])
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)),dtype= myfloat)
     D = np.asfortranarray(np.random.normal(size=(100,200)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)),dtype= myfloat)
     # parameter of the optimization procedure are chosen
-#param.L=20; # not more than 20 non-zeros coefficients (default: min(size(D,1),size(D,2)))
+#param.L=20 # not more than 20 non-zeros coefficients (default: min(size(D,1),size(D,2)))
     param = {
         'lambda1' : 0.15, # not more than 20 non-zeros coefficients
-        'numThreads' : -1, # number of processors/cores to use; the default choice is -1
+        'numThreads' : -1, # number of processors/cores to use the default choice is -1
         # and uses all the cores of the machine
         'mode' : spams.PENALTY}        # penalized formulation
 
@@ -157,14 +161,14 @@ def test_lassoMask():
 ##############################################
 # data generation
     X = np.asfortranarray(np.random.normal(size=(300,300)))
-    # X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1]);
+    # X=X./repmat(sqrt(sum(X.^2)),[size(X,1) 1])
     X = np.asfortranarray(X / np.tile(np.sqrt((X*X).sum(axis=0)),(X.shape[0],1)),dtype= myfloat)
     D = np.asfortranarray(np.random.normal(size=(300,50)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)),dtype= myfloat)
     mask = np.asfortranarray((X > 0))  # generating a binary mask
     param = {
         'lambda1' : 0.15, # not more than 20 non-zeros coefficients
-        'numThreads' : -1, # number of processors/cores to use; the default choice is -1
+        'numThreads' : -1, # number of processors/cores to use the default choice is -1
         # and uses all the cores of the machine
         'mode' : spams.PENALTY}        # penalized formulation
     tic = time.time()
@@ -249,7 +253,7 @@ def test_somp():
     X = np.asfortranarray(np.random.normal(size = (64,10000)),dtype=myfloat)
     D = np.asfortranarray(np.random.normal(size = (64,200)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)),dtype=myfloat)
-    ind_groups = np.array(range(0,10000,10),dtype=np.int32)
+    ind_groups = np.array(six.moves.xrange(0,10000,10),dtype=np.int32)
     tic = time.time()
     alpha = spams.somp(X,D,ind_groups,L = 10,eps = 0.1,numThreads=-1)
     tac = time.time()

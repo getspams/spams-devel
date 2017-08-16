@@ -3,6 +3,10 @@ This module makes some functions of the SPAMS library usable
 with numpy and scipy.
 """
 
+from __future__ import absolute_import, division, \
+    print_function, unicode_literals
+import six.moves
+
 import spams_wrap
 import numpy as np
 import scipy.sparse as ssp
@@ -95,8 +99,8 @@ PENALTY2 = spams_wrap.PENALTY2
 
 def  sparseProject(U,thrs = 1.0,mode = 1,lambda1 = 0.0,lambda2 = 0.0,
                    lambda3 = 0.0,pos = 0,numThreads = -1):
-    m = U.shape[0];
-    n = U.shape[1];
+    m = U.shape[0]
+    n = U.shape[1]
 #    paramlist = [('thrs',1.0),('mode',1),('lambda1',0.0),('lambda2',0.0),('lambda3',0.0),('pos',0),('numThreads',-1)]
     V = np.empty((m,n),dtype=U.dtype,order="F")
     params = (thrs,mode,lambda1,lambda2,lambda3,pos,numThreads)
@@ -622,8 +626,8 @@ def displayPatches(D):
     tmp = np.zeros(((sizeEdge+1)*nBins+1,(sizeEdge+1)*nBins+1,V),order = 'F')
 #    patch = np.zeros(sizeEdge,sizeEdge)
     mm = sizeEdge * sizeEdge
-    for ii in range(0,nBins):
-        for jj in range(0,nBins):
+    for ii in six.moves.xrange(0,nBins):
+        for jj in six.moves.xrange(0,nBins):
             io = ii
             jo = jj
             offsetx = 0
