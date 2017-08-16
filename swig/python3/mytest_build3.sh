@@ -9,4 +9,4 @@
 ./mkpy -py3 spams
 
 # Tests:
-python3 test_spams.py linalg
+python3 test_spams.py
