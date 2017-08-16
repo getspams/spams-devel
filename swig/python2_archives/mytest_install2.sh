@@ -13,6 +13,6 @@ PYV=`python2 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 
 cd $inst/test
-python test_spams.py dictLearn
+python2 test_spams.py
 
 cd $WDIR
