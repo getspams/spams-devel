@@ -14,3 +14,4 @@ nom=spams
 /bin/rm -f MANIFEST
 /bin/rm -f INSTALL-package INSTALL-windows README
 /bin/rm -f dict.png dict1.png dict2.png
+/bin/rm -rf python2-install python3-install
