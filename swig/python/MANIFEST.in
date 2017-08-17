@@ -1,0 +1,4 @@
+include INSTALL-package
+include spams.py spams_wrap.cpp spams_wrap.py test_*.py
+recursive-include spams *.h
+recursive-include extdata *.png
