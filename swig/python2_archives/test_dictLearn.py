@@ -43,7 +43,7 @@ def _objective(X,D,param,imgname = None):
         image.save("%s.png" %imgname)
 
 def test_trainDL():
-    img_file = 'extdata/boat.png'
+    img_file = 'boat.png'
     try:
         img = Image.open(img_file)
     except:
@@ -135,7 +135,7 @@ def test_trainDL():
     return None
 
 def test_trainDL_Memory():
-    img_file = 'extdata/lena.png'
+    img_file = 'lena.png'
     try:
         img = Image.open(img_file)
     except:
@@ -193,7 +193,7 @@ def test_trainDL_Memory():
     return None
 
 def test_structTrainDL():
-    img_file = 'extdata/lena.png'
+    img_file = 'lena.png'
     try:
         img = Image.open(img_file)
     except Exception as e:
@@ -365,7 +365,7 @@ def test_structTrainDL():
 
 
 def test_nmf():
-    img_file = 'extdata/boat.png'
+    img_file = 'boat.png'
     try:
         img = Image.open(img_file)
     except:
@@ -400,7 +400,7 @@ def test_nmf():
 
 # Archetypal Analysis, run first steps with FISTA and run last steps with activeSet,
 def test_archetypalAnalysis():
-    img_file = 'extdata/lena.png'
+    img_file = 'lena.png'
     try:
         img = Image.open(img_file)
     except Exception as e:
