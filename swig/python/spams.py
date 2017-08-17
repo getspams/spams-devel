@@ -3,8 +3,7 @@ This module makes some functions of the SPAMS library usable
 with numpy and scipy.
 """
 
-from __future__ import absolute_import, division, \
-    print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 import six.moves
 
 import spams_wrap
@@ -126,7 +125,7 @@ def lasso(X,D= None,Q = None,q = None,return_reg_path = False,L= -1,lambda1= Non
     if lambda1 is None:
         raise ValueError("lasso : lambda1 must be defined")
     path = None
-    if(q is not None):
+    if q is not None:
         if return_reg_path:
             ((indptr,indices,data,shape),path) = spams_wrap.lassoQq(X,Q,q,return_reg_path,L,lambda1,lambda2,mode,pos,ols,numThreads,max_length_path,verbose,cholesky)
         else:
@@ -627,7 +626,7 @@ def displayPatches(D):
 #    patch = np.zeros(sizeEdge,sizeEdge)
     mm = sizeEdge * sizeEdge
     for ii in six.moves.xrange(0,nBins):
-        for jj in six.moves.xrange(0,nBins):
+        for jj in six.move.xrange(0,nBins):
             io = ii
             jo = jj
             offsetx = 0

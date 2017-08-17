@@ -1,5 +1,4 @@
-from __future__ import absolute_import, division, \
-    print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 import six.moves
 
 import sys
@@ -56,7 +55,7 @@ def main(argv):
             l.append("%s :" %m)
             # exec('lstm = test_%s.tests' %m)
             lstm = locals()['test_%s' %m].tests
-            l.append('  %s' %(' '.join([ lstm[i] for i in six.moves.xrange(0,len(lstm),2)])))
+            l.append('  %s' %(' '.join([ lstm[i] for i in range(0,len(lstm),2)])))
         usage(l)
     if(len(lst) == 0):
         lst = modules
