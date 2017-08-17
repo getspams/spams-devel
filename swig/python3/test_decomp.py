@@ -102,13 +102,13 @@ def test_l1L2BCD():
     X = np.asfortranarray(np.random.normal(size = (64,100)),dtype=myfloat)
     D = np.asfortranarray(np.random.normal(size = (64,200)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)),dtype=myfloat)
-    ind_groups = np.array(six.moves.xrange(0,X.shape[1],10),dtype=np.int32) #indices of the first signals in each group
+    ind_groups = np.array(range(0,X.shape[1],10),dtype=np.int32) #indices of the first signals in each group
     # parameters of the optimization procedure are chosen
     itermax = 100
     tol = 1e-3
     mode = spams.PENALTY
     lambda1 = 0.15 # squared norm of the residual should be less than 0.1
-    numThreads = -1 # number of processors/cores to use the default choice is -1
+    numThreads = -1 # number of processors/cores to use, the default choice is -1
                     # and uses all the cores of the machine
     alpha0 = np.zeros((D.shape[1],X.shape[1]),dtype= myfloat,order="F")
     tic = time.time()
@@ -135,7 +135,7 @@ def test_lasso():
 #param.L=20 # not more than 20 non-zeros coefficients (default: min(size(D,1),size(D,2)))
     param = {
         'lambda1' : 0.15, # not more than 20 non-zeros coefficients
-        'numThreads' : -1, # number of processors/cores to use the default choice is -1
+        'numThreads' : -1, # number of processors/cores to use, the default choice is -1
         # and uses all the cores of the machine
         'mode' : spams.PENALTY}        # penalized formulation
 
@@ -168,7 +168,7 @@ def test_lassoMask():
     mask = np.asfortranarray((X > 0))  # generating a binary mask
     param = {
         'lambda1' : 0.15, # not more than 20 non-zeros coefficients
-        'numThreads' : -1, # number of processors/cores to use the default choice is -1
+        'numThreads' : -1, # number of processors/cores to use, the default choice is -1
         # and uses all the cores of the machine
         'mode' : spams.PENALTY}        # penalized formulation
     tic = time.time()
@@ -253,7 +253,7 @@ def test_somp():
     X = np.asfortranarray(np.random.normal(size = (64,10000)),dtype=myfloat)
     D = np.asfortranarray(np.random.normal(size = (64,200)))
     D = np.asfortranarray(D / np.tile(np.sqrt((D*D).sum(axis=0)),(D.shape[0],1)),dtype=myfloat)
-    ind_groups = np.array(six.moves.xrange(0,10000,10),dtype=np.int32)
+    ind_groups = np.array(range(0,10000,10),dtype=np.int32)
     tic = time.time()
     alpha = spams.somp(X,D,ind_groups,L = 10,eps = 0.1,numThreads=-1)
     tac = time.time()
