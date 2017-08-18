@@ -626,7 +626,7 @@ def displayPatches(D):
 #    patch = np.zeros(sizeEdge,sizeEdge)
     mm = sizeEdge * sizeEdge
     for ii in six.moves.xrange(0,nBins):
-        for jj in six.move.xrange(0,nBins):
+        for jj in six.moves.xrange(0,nBins):
             io = ii
             jo = jj
             offsetx = 0
