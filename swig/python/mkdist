@@ -16,7 +16,7 @@ usage() {
 }
 
 rmdoc=1
-PYTHON=$(which python)
+PYTHON=$(which python2)
 while [ $# -gt 0 ]; do
     case $1 in
         -f) rmdoc=0;shift;;
@@ -25,6 +25,11 @@ while [ $# -gt 0 ]; do
     shift
 done
 [ $# -gt 0 ] && usage
+
+WDIR=$(pwd)
+CP=/bin/cp
+MV=/bin/mv
+RM=/bin/rm
 
 [ -x ./mkdist ] || die "You must be in the directory containing mkdist"
 [ -x ../mkRelease ] || die "No prog ../mkRelease"
@@ -37,24 +42,32 @@ fullvers=`../mkRelease -f`
 ../setRelease INSTALL-windows.in > INSTALL-windows
 
 PY_OPT=""
-if [[ $PYTHON =~ "python3" ]];
-then
-    PY_OPT="-py3"
-fi
+# if [[ $PYTHON =~ "python3" ]];
+# then
+#     PY_OPT="-py3"
+# fi
 
-nom=spams
+name=spams
 /bin/rm -rf dist
+
+## create of copy of ../spams.h
+$MV ${name}.h ${name}.h.bak
+$CP $(readlink ${name}.h.bak) .
 
 ## create ./dist and copy before creating the interface with swig
 
 
 SWIG=swig
-$SWIG -c++ $PY_OPT -python -DWINDOWS -o ${nom}_wrap-windows.cpp $nom.i
-patch -i ${nom}_wrap-windows.cpp.patch ${nom}_wrap-windows.cpp
-$SWIG -c++ $PY_OPT -python -o ${nom}_wrap.cpp $nom.i
-patch -i ${nom}_wrap.cpp.patch ${nom}_wrap.cpp
+$SWIG -c++ $PY_OPT -python -DWINDOWS -o ${name}_wrap-windows.cpp ${name}.i
+patch -i ${name}_wrap-windows.cpp.patch ${name}_wrap-windows.cpp
+$SWIG -c++ $PY_OPT -python -o ${name}_wrap.cpp ${name}.i
+patch -i ${name}_wrap.cpp.patch ${name}_wrap.cpp
 $PYTHON setup.py sdist
 [ $? -eq 0 ] || die "setup error; cannot continue"
+
+$RM ${name}.h
+$MV ${name}.h.bak ${name}.h
+
 cdir=`/bin/pwd`
 cd dist
 tar zxf *.tar.gz
