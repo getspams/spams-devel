@@ -1,11 +1,12 @@
 #!/bin/bash
+set -x
 
-## build python pkg
+## build and install python3.x pkg
 
 ./clean
-./mkdist -x
+./mkdist -x -py3
 WDIR=$(pwd)
-cd dist/spams-python
+cd dist/spams-$(cat ../Version)
 inst=$WDIR/python3-install
 python3 setup.py install --prefix=$inst
 

@@ -1,12 +1,13 @@
 #!/bin/bash
+set -x
 
-## build python pkg
+## build and install python2.x pkg
 
 ./clean
-./mkdist -x
+./mkdist -x -py3
 WDIR=$(pwd)
-cd dist/spams-python
-inst=$WDIR/python3-install
+cd dist/spams-$(cat ../Version)
+inst=$WDIR/python2-install
 python2 setup.py install --prefix=$inst
 
 PYV=`python2 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
