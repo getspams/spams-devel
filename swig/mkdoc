@@ -19,14 +19,15 @@ flg_doc=0  # 0 = all, 1 = sphinx, 2 = tex
 cdir=`/bin/pwd`
 doc=tmp-doc
 
-if [ -d $doc ]; then
-    exit 0
-fi
+# if [ -d $doc ]; then
+#     exit 0
+# fi
 
 case $cdir in
     */R) r_mode=1;lang=R;dprog="./docmatlab2R -tex $doc r_spams";;
     */python) r_mode=0;lang=python;dprog="./docmatlab2python -tex $doc spams";;
-    */python3) r_mode=0;lang=python;dprog="./docmatlab2python -tex $doc spams";;
+    */python2_archives) r_mode=0;lang=python;dprog="./docmatlab2python -tex $doc spams";;
+    */python3_archives) r_mode=0;lang=python;dprog="./docmatlab2python -tex $doc spams";;
     *) die "Unexpected current dir";;
 esac
 
