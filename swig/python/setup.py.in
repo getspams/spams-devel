@@ -76,11 +76,11 @@ setup ( name = 'spams',
         # scripts = ['test_spams.py'],
         data_files = [
         ('test',['test_spams.py', 'test_decomp.py', 'test_dictLearn.py', 'test_linalg.py', 'test_prox.py', 'test_utils.py']),
-        # ('doc',['doc_spams.pdf', 'python-interface.pdf']),
-        # ('doc/sphinx/_sources',mkhtml('_sources')),
-        # ('doc/sphinx/_static',mkhtml('_static')),
-        # ('doc/sphinx',mkhtml()),
-        # ('doc/html',mkhtml(base = 'html')),
+        ('doc',['doc/doc_spams.pdf', 'doc/python-interface.pdf']),
+        ('doc/sphinx/_sources',mkhtml(d = '_sources', base = 'doc/sphinx')),
+        ('doc/sphinx/_static',mkhtml(d = '_static', base = 'doc/sphinx')),
+        ('doc/sphinx',mkhtml(base = 'doc/sphinx')),
+        ('doc/html',mkhtml(base = 'doc/html')),
         ('test',['extdata/boat.png', 'extdata/lena.png'])
         ],
 )
