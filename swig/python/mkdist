@@ -92,7 +92,7 @@ tar zxf *.tar.gz
 
 package_name=spams-python
 tgz=${package_name}-${fullvers}.tar.gz
-cp ${name}-$(cat ../Version).tar.gz $tgz
+cp ${name}-$(cat ../../Version).tar.gz $tgz
 mv $tgz ../../../
 
 cd $WDIR
