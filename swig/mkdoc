@@ -44,7 +44,7 @@ else
     flg_doc=2
 fi
 
-#/bin/rm -rf $doc
+# /bin/rm -rf $doc
 if [ $flg_doc -ne 1 ]; then
     if [ -r $doc/html/doc_spams.html -a -r $doc/doc_spams.pdf ]; then
 	echo "tex doc already made :"
@@ -84,7 +84,7 @@ cd doc-src
 cp Makefile make.bat $cdir/$doc
 cp conf.py $cdir/$doc/source
 cd $cdir
-./mkpy spams
+# ./mkpy spams
 ./docmatlab2python -sphinx $doc spams
 cp spams_wrap.py _spams_wrap.so $doc
 cd $doc
