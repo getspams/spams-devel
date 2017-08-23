@@ -1,5 +1,8 @@
 include INSTALL-package
 include INSTALL-windows
+include README
+include COPYING
 include spams.py spams.h spams_wrap.cpp spams_wrap.py test_*.py
 recursive-include spams *.h
 recursive-include extdata *.png
+recursive-include doc *
