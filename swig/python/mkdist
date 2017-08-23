@@ -84,17 +84,17 @@ $PYTHON setup.py sdist
 
 $RM ${name}.h
 $MV ${name}.h.bak ${name}.h
-# $RM ${name}.py
-# $MV ${name}.py.bak ${name}.py
+$RM ${name}.py
+$MV ${name}.py.bak ${name}.py
 
-# cd dist
-# tar zxf *.tar.gz
-#
-# package_name=spams-python
-# tgz=${package_name}-${fullvers}.tar.gz
-# cp ${name}-$(cat ../Version).tar.gz $tgz
-# mv $tgz ../../../
-#
-# cd $WDIR
+cd dist
+tar zxf *.tar.gz
+
+package_name=spams-python
+tgz=${package_name}-${fullvers}.tar.gz
+cp ${name}-$(cat ../Version).tar.gz $tgz
+mv $tgz ../../../
+
+cd $WDIR
 
 exit 0
