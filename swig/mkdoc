@@ -84,7 +84,7 @@ cd doc-src
 cp Makefile make.bat $cdir/$doc
 cp conf.py $cdir/$doc/source
 cd $cdir
-# ./mkpy spams
+./mkpy spams
 ./docmatlab2python -sphinx $doc spams
 cp spams_wrap.py _spams_wrap.so $doc
 cd $doc
