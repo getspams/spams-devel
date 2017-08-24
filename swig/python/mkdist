@@ -51,6 +51,9 @@ PY_OPT=""
 name=spams
 /bin/rm -rf dist
 
+## create copy of license file
+$CP $(readlink COPYING) LICENSE.txt
+
 ## create of copy of ../spams.h
 $MV ${name}.h ${name}.h.bak
 $CP $(readlink ${name}.h.bak) $WDIR
@@ -71,7 +74,7 @@ $MV ${name}.new.py ${name}.py
 ../mkdoc -x
 src_doc=tmp-doc
 doc=doc
-mkdir ${doc}/sphinx
+mkdir -p ${doc}/sphinx
 cp -a ${src_doc}/build/html/* ${doc}/sphinx
 cp -a ${src_doc}/html ${doc}
 cp -p ${src_doc}/doc_spams.pdf ${doc}
