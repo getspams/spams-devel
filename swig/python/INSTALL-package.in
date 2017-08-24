@@ -1,7 +1,7 @@
 This directory contains files to build the python interfaces
 to the functions of V%VERSION% SPAMS library already interfaced with matlab.
 
-This version is compatible with python3.x
+This version is compatible with python2.7 and python3.x
 
 The interface consists of 4 files : spams.py myscipy_rand.py spams_wrap.py _spams_wrap.so
 Note: myscipy_rand.py supplies a random generator for sparse matrix
@@ -10,14 +10,14 @@ WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
 ########################################
 Interface building
 
-Packages required: python3-numpy, python3-scipy, blas + lapack (preferably from atlas).
+Packages required: numpy, scipy, blas + lapack (preferably from atlas).
 
-tar zxf spams-python3-%FULLVERSION%.tar.gz
-cd spams-python3
-python3 setup.py build
+tar zxf spams-python-%FULLVERSION%.tar.gz
+cd spams-%VERSION%
+python setup.py build
 
 inst=<your-python-install-dir>
-python3 setup.py install --prefix=$inst
+python setup.py install --prefix=$inst
 
 Two documentations are installed in $inst/doc
   - doc_spams.pdf and html/index.html : the detailed user documentation
@@ -25,14 +25,27 @@ Two documentations are installed in $inst/doc
 
 ################################
 Linux :
-      carefully install atlas. For example on my ubuntu I had to do
-      apt-get install libatlas-dev libatlas3gf-base libatlas-3gf.so
-      If you don't have libblas.so and liblapack.so in /lib or /usr/lib,
-      you need to edit setup.py
+    carefully install atlas. For example on my ubuntu I had to do
+    apt-get install libatlas-dev libatlas3gf-base libatlas-3gf.so
+    If you don't have libblas.so and liblapack.so in /lib or /usr/lib,
+    you need to edit setup.py
 
 MacOS:
-	TODO
+	Tested on MacOS
 
+```
+pip install numpy
+pip install scipy
+
+brew install gcc
+export CC=/usr/local/bin/gcc-<version>
+CXX=/usr/local/bin/g++-<version>
+```
+
+```
+brew install clang-omp
+brew reinstall gcc --without-multilib
+```
 
 
 Windows 32bits:
@@ -45,13 +58,15 @@ Windows 64bits :
 Testing the interface :
 
 - Linux or Mac :
+```
 PYV=`python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
-python3 test_spams.py -h : to get help
-python3 test_spams.py  : will run all the tests
-python3 test_spams.py linalg : test of linalg functions
-python3 test_spams.py name1 name2 ... : run named tests
+python3 test_spams.py -h # to get help
+python3 test_spams.py  # will run all the tests
+python3 test_spams.py linalg # test of linalg functions
+python3 test_spams.py <name1> <name2> ... # run named tests
+```
 
 - Windows (binary install) :
   TODO
