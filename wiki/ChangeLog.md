@@ -111,6 +111,12 @@ Out[24]: True
 
 * 867750f7a8b314d72863382bf518208a528aa67c: Replace `nclasses` by `int(nclasses)` in `np.zeros` to force float to inst cast in table dimension in [swig/python/test_prox.py](swig/python/test_prox.py) and [swig/python3/spams.py](swig/python3/spams.py)
 
+* between commit 723ba995d5f2b335f6b228c48a92cac489c44b71 and d9378a8dd55dd8cc2323fb3a7305d5e6858d79e3:
+** reunified python source based on modules __future__ and six
+** new 'setup.py' files with numpy flags
+** new mkdist file organization
+
+
 ### SWIG/R
 
 * ae3543ab08d018c610d5e5a9f335344ab05dc087: Fix compilation error because of unknown SWIG preprocessor directive (because of comment char): `# test argout` replaced by `//# test argout` and in swig conf file [swig/R/R_typemaps.i](swig/R/R_typemaps.i)
