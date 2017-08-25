@@ -82,13 +82,16 @@ cp -p ${src_doc}/build/latex/SPAMS.pdf ${doc}/python-interface.pdf
 
 ## generate the package
 $PYTHON setup.py sdist
-[ $? -eq 0 ] || die "setup error; cannot continue"
+ERR=$?
+[ $ERR -eq 0 ] || echo "setup error"
 
 
 $RM ${name}.h
 $MV ${name}.h.bak ${name}.h
 $RM ${name}.py
 $MV ${name}.py.bak ${name}.py
+
+[ $ERR -eq 0 ] || die "setup error; cannot continue"
 
 cd dist
 tar zxf *.tar.gz
