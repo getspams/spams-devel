@@ -3,4 +3,4 @@
 ## build python pkg
 
 ./clean
-./mkdist -py3
+./mkdist -x -py3
