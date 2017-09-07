@@ -1,12 +1,3 @@
-TODO
-
-
-
-check https://www.scipy.org/scipylib/building/windows.html
-
-
-
-
-Mingw-w64 (http://mingw-w64.org/doku.php/)
-
-ATLAS build https://github.com/numpy/windows-wheel-builder/tree/master/atlas-builds
+You can check the Scipy webpage dedicated to Windows install, where you can
+find some information about installing a compiler, and the BLAS library.
+See https://www.scipy.org/scipylib/building/windows.html

@@ -10,7 +10,7 @@ WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
 ########################################
 Interface building and installation
 
-Packages required: numpy, scipy, blas + lapack (preferably from atlas).
+Packages required: numpy, scipy, six, blas + lapack (preferably from atlas).
 
 For python 2.7:
 ```
@@ -37,6 +37,18 @@ Two documentations are installed in $inst/doc
   - sphinx/index.html : the documentation of python function extracted by sphinx
 
 ################################
+Install from PyPI website (at the moment from the testing site):
+
+```
+pip install --index-url https://test.pypi.org/simple/ spams ## or 'pip3' for Python3.x
+```
+
+On MacOS, it may not work for the moment and you may have to use:
+```
+env CC=/usr/local/bin/gcc-5 CXX=/usr/local/bin/g++-5 pip3 install --index-url https://test.pypi.org/simple/ spams
+```
+
+################################
 Linux: tested on Ubuntu 16.04 with python2.7.12 and python3.5.2
     carefully install atlas. For example on my ubuntu I had to do
     apt-get install libatlas-dev libatlas3gf-base libatlas-3gf.so
@@ -46,17 +58,15 @@ Linux: tested on Ubuntu 16.04 with python2.7.12 and python3.5.2
 MacOS: tested on MacOS 10.9.5
 
 ```
-pip install numpy
-pip install scipy
+pip install numpy ## or 'pip3'
+pip install scipy ## or 'pip3'
 
-brew install gcc
-export CC=/usr/local/bin/gcc-<version>
-export CXX=/usr/local/bin/g++-<version>
-```
-
-```
 brew install clang-omp
 brew reinstall gcc --without-multilib
+
+## replace <version> by your gcc version
+export CC=/usr/local/bin/gcc-<version>
+export CXX=/usr/local/bin/g++-<version>
 ```
 
 Windows 32bits:
@@ -106,7 +116,7 @@ import spams
 The spams functions accept only numpy dense vectors or "Fortran" matrices and
 scipy sparce matrices of csc type.
 
-Examples :
+Examples:
 
 ```
 import numpy as np
