@@ -4,7 +4,7 @@ set -x
 ## build and install python2.x pkg
 
 ./clean
-./mkdist -x -py3
+./mkdist -x -f -m anaconda -py3
 WDIR=$(pwd)
 cd dist/spams-$(cat ../Version)
 inst=$WDIR/python2-install
