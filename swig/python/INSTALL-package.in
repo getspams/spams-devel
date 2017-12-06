@@ -1,5 +1,5 @@
-This directory contains files to build the python interfaces
-to the functions of V%VERSION% SPAMS library already interfaced with matlab.
+This directory contains files to build and install the python interfaces
+to the functions of V%VERSION% SPAMS library.
 
 This version is compatible with python2.7 and python3.x
 
@@ -13,17 +13,17 @@ Interface building and installation
 Packages required: numpy, scipy, six, blas + lapack (preferably from atlas).
 
 For python 2.7:
-```
+```bash
 tar zxf spams-python-%FULLVERSION%.tar.gz
 cd spams-%VERSION%
-python setup.py build
+python2 setup.py build
 
 inst=<your-python-install-dir>
-python setup.py install --prefix=$inst
+python2 setup.py install --prefix=$inst
 ```
 
 For python 3.x:
-```
+```bash
 tar zxf spams-python-%FULLVERSION%.tar.gz
 cd spams-%VERSION%
 python3 setup.py build
@@ -39,12 +39,12 @@ Two documentations are installed in $inst/doc
 ################################
 Install from PyPI website (at the moment from the testing site):
 
-```
+```bash
 pip install --index-url https://test.pypi.org/simple/ spams ## or 'pip3' for Python3.x
 ```
 
 On MacOS, it may not work for the moment and you may have to use:
-```
+```bash
 env CC=/usr/local/bin/gcc-5 CXX=/usr/local/bin/g++-5 pip3 install --index-url https://test.pypi.org/simple/ spams
 ```
 
@@ -82,13 +82,13 @@ Testing the interface :
 
 For python2.7:
 ```
-PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+PYV=`python2 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
-python test_spams.py -h # to get help
-python test_spams.py  # will run all the tests
-python test_spams.py linalg # test of linalg functions
-python test_spams.py <name1> <name2> ... # run named tests
+python2 test_spams.py -h # to get help
+python2 test_spams.py  # will run all the tests
+python2 test_spams.py linalg # test of linalg functions
+python2 test_spams.py <name1> <name2> ... # run named tests
 ```
 
 For python3.x:
@@ -118,7 +118,7 @@ scipy sparce matrices of csc type.
 
 Examples:
 
-```
+```python
 import numpy as np
 import spams
 X = np.asfortranarray(np.random.random((64,200)))
@@ -126,7 +126,7 @@ Y = np.asfortranarray(np.random.random((200,20000)))
 Z = spams.CalcXY(X,Y)
 ```
 -----
-```
+```python
 import numpy as np
 import scipy
 import scipy.sparse

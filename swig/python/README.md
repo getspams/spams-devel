@@ -1,4 +1,4 @@
-# SPAMS 2.6 and python3.x
+# SPAMS 2.6.1 and python
 
 This directory contains files to install and use (at the end) the python interfaces to the functions of SPAMS library already interfaced with matlab.
 
@@ -23,19 +23,19 @@ This file describes how to directly install the interface from sources.
 
 Porting to python3.x based on https://aur.archlinux.org/packages/python-spams-svn/
 
-## INTERFACE INSTALLATION (python3.x) for LINUX and MacOS
+## INTERFACE INSTALLATION for LINUX and MacOS
 
 ### Installation
 
-Packages required: python3-numpy, python3-scipy, blas + lapack (preferably from atlas).
+Packages required: python-numpy, python-scipy, blas + lapack (preferably from atlas).
 
-```
-tar zxf spams-python3-%FULLVERSION%.tar.gz
-cd spams-python3
-python3 setup.py build
+```bash
+tar zxf spams-python-%FULLVERSION%.tar.gz
+cd spams-%VERSION%
+python setup.py build
 
 inst=<your-python-install-dir>
-python3 setup.py install --prefix=$inst
+python setup.py install --prefix=$inst
 ```
 
 Two documentations are installed in `$inst/doc`:
@@ -44,14 +44,14 @@ Two documentations are installed in `$inst/doc`:
 
 ### Testing the interface :
 
-```
-PYV=`python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
+```bash
+PYV=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
-python3 test_spams.py -h # to get help
-python3 test_spams.py  # will run all the tests
-python3 test_spams.py linalg # test of linalg functions
-python3 test_spams.py name1 name2 ... # run named tests
+python test_spams.py -h # to get help
+python test_spams.py  # will run all the tests
+python test_spams.py linalg # test of linalg functions
+python test_spams.py name1 name2 ... # run named tests
 ```
 
 ### Comments
@@ -72,9 +72,10 @@ export CC=/opt/local/bin/gcc-mp-4.3;export CXX=/opt/local/bin/g++-mp-4.3
 ``` -->
 
 ## INTERFACE INSTALLATION (python2.x) for Windows
-
 TODO
 
 ### Installation of the binary windows packages
+TODO
 
 ### Testing the interface (binary install)
+TODO
