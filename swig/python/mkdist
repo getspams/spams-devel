@@ -8,38 +8,58 @@ die () {
 }
 
 usage() {
-    echo "Usage: $0 [-f]"
+    echo "Usage: $0 [-h] [-f] [-py3] [-m <mode>]"
     echo " prepare a spams-python/ for distribution in ./dist/"
+    echo "  -h : show help"
     echo "  -f : do not rebuild the doc from scratch"
     echo "  -py3 : for python3 compatibility (to do in swig/python3 directory)"
+    echo "  -m <mode>: building mode (standard, pypi or anaconda), default is standard"
     exit 1
 }
 
+check_mode() {
+    case $MODE in
+        standard|pypi|anaconda) ;;
+        *) echo "Issue with -m <mode>: <mode> should be 'standard', 'pypi' or 'anaconda'" && echo "Example: $0 -m standard" && die;;
+    esac
+}
+
+[ ! $# -gt 0 ] && usage && die
+
 rmdoc=1
 PYTHON=$(which python2)
+MODE="standard"
 while [ $# -gt 0 ]; do
     case $1 in
-        -f) rmdoc=0;shift;;
+        -h) usage; die;;
+        -f) rmdoc=0;;
         -py3) PYTHON=$(which python3); if [ -z $PYTHON ]; then PYTHON=$(which python); fi;;
+        -m) shift; MODE=$1 && check_mode;;
     esac
     shift
 done
-[ $# -gt 0 ] && usage
 
 WDIR=$(pwd)
 CP=/bin/cp
 MV=/bin/mv
 RM=/bin/rm
 
+case $MODE in
+    standard) MODE_OPT="";;
+    pypi) MODE_OPT=".pypi";;
+    anaconda) MODE_OPT=".anaconda";;
+esac
+
 [ -x ./mkdist ] || die "You must be in the directory containing mkdist"
 [ -x ../mkRelease ] || die "No prog ../mkRelease"
 [ -x ../setRelease ] || die "No prog ../setRelease"
 fullvers=`../mkRelease -f`
 echo "${fullvers}" > Release-name
-../setRelease setup.py.in > setup.py
 
-../setRelease README.md > README
-../setRelease INSTALL-package.in > INSTALL-package
+../setRelease setup.py.in${MODE_OPT} > setup.py
+
+../setRelease README${MODE_OPT}.md > README
+../setRelease INSTALL-package.in${MODE_OPT} > INSTALL-package
 ../setRelease INSTALL-windows.in > INSTALL-windows
 
 PY_OPT=""
@@ -97,7 +117,7 @@ cd dist
 tar zxf *.tar.gz
 
 package_name=spams-python
-tgz=${package_name}-${fullvers}.tar.gz
+tgz=${package_name}${MODE_OPT}-${fullvers}.tar.gz
 cp ${name}-$(cat ../../Version).tar.gz $tgz
 mv $tgz ../../../
 
