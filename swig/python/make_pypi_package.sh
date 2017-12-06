@@ -3,7 +3,7 @@
 ## build python pkg
 
 ./clean
-./mkdist_pypi -x -py3
+./mkdist -x -m pypi -py3
 
 
 echo "To upload the package: twine upload -r <repos> dist/*"
