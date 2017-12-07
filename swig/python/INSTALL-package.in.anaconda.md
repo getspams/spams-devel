@@ -17,6 +17,7 @@ Create a virtual environment and install required packages with conda:
 ```bash
 conda create -n spams
 source activate spams
+conda install -c intel mkl # generally not necessary because already included in anaconda
 conda install numpy scipy six
 ```
 

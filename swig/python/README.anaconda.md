@@ -36,6 +36,7 @@ Create a virtual environment and install required packages with conda:
 ```bash
 conda create -n spams
 source activate spams
+conda install -c intel mkl # generally not necessary because already included in anaconda
 conda install numpy scipy six
 ```
 
@@ -66,13 +67,14 @@ python test_spams.py name1 name2 ... # run named tests
 ```
 
 ### Comments
+
 #### Linux:
 Tested with Anaconda2-5.0.1 and Anaconda3-5.0.1
 
 #### MacOS:
 TODO
 
-## INTERFACE INSTALLATION (python2.x) for Windows
+## INTERFACE INSTALLATION for Windows
 TODO
 
 ### Installation of the binary windows packages
