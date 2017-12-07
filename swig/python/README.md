@@ -25,6 +25,10 @@ Porting to python3.x based on https://aur.archlinux.org/packages/python-spams-sv
 
 ## INTERFACE INSTALLATION for LINUX and MacOS
 
+We recommend to use the version of SPAMS designed to run with the Anaconda Python distribution
+available at <http://spams-devel.gforge.inria.fr/downloads.html>, especially to benefit from
+the MKL Intel library.
+
 ### Installation
 
 Packages required: python-numpy, python-scipy, blas + lapack (preferably from atlas).
@@ -41,6 +45,19 @@ python setup.py install --prefix=$inst
 Two documentations are installed in `$inst/doc`:
 * doc_spams.pdf and html/index.html : the detailed user documentation
 * sphinx/index.html : the documentation of python function extracted by sphinx
+
+### PyPI version
+
+Install from PyPI website (at the moment from the testing site):
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ spams ## or 'pip3' for Python3.x
+```
+
+On MacOS, it may not work for the moment and you may have to use:
+```bash
+env CC=/usr/local/bin/gcc-5 CXX=/usr/local/bin/g++-5 pip3 install --index-url https://test.pypi.org/simple/ spams
+```
 
 ### Testing the interface :
 
@@ -71,7 +88,7 @@ Maybe necessary to add `/opt/local/bin` to `PATH` and specified the compiler by 
 export CC=/opt/local/bin/gcc-mp-4.3;export CXX=/opt/local/bin/g++-mp-4.3
 ``` -->
 
-## INTERFACE INSTALLATION (python2.x) for Windows
+## INTERFACE INSTALLATION for Windows
 TODO
 
 ### Installation of the binary windows packages

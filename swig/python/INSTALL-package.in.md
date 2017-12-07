@@ -57,7 +57,7 @@ Linux: tested on Ubuntu 16.04 with python2.7.12 and python3.5.2
 
 MacOS: tested on MacOS 10.9.5
 
-```
+```bash
 pip install numpy ## or 'pip3'
 pip install scipy ## or 'pip3'
 
