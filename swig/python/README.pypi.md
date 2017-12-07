@@ -31,25 +31,9 @@ the MKL Intel library.
 
 ### Installation
 
-Packages required: python-numpy, python-scipy, blas + lapack (preferably from atlas).
-
-```bash
-tar zxf spams-python-%FULLVERSION%.tar.gz
-cd spams-%VERSION%
-python setup.py build
-
-inst=<your-python-install-dir>
-python setup.py install --prefix=$inst
-```
-
-Two documentations are installed in `$inst/doc`:
-* doc_spams.pdf and html/index.html : the detailed user documentation
-* sphinx/index.html : the documentation of python function extracted by sphinx
-
-### PyPI version
+Packages required: python-numpy, python-scipy, blas + lapack (preferably from atlas). <br>
 
 Install from PyPI website (at the moment from the testing site):
-
 ```bash
 pip install --index-url https://test.pypi.org/simple/ spams ## or 'pip3' for Python3.x
 ```
@@ -58,6 +42,10 @@ On MacOS, it may not work for the moment and you may have to use:
 ```bash
 env CC=/usr/local/bin/gcc-5 CXX=/usr/local/bin/g++-5 pip3 install --index-url https://test.pypi.org/simple/ spams
 ```
+
+Two documentations are installed in `$inst/doc`:
+* doc_spams.pdf and html/index.html : the detailed user documentation
+* sphinx/index.html : the documentation of python function extracted by sphinx
 
 ### Testing the interface :
 
