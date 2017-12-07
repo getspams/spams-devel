@@ -59,8 +59,8 @@ echo "${fullvers}" > Release-name
 ../setRelease setup.py.in${MODE_OPT} > setup.py
 
 ../setRelease README${MODE_OPT}.md > README
-../setRelease INSTALL-package.in${MODE_OPT} > INSTALL-package
-../setRelease INSTALL-windows.in > INSTALL-windows
+../setRelease INSTALL-package.in${MODE_OPT}.md > INSTALL-package
+../setRelease INSTALL-windows.in.md > INSTALL-windows
 
 PY_OPT=""
 # if [[ $PYTHON =~ "python3" ]];
