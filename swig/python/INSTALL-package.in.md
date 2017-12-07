@@ -81,7 +81,7 @@ Testing the interface :
 * Linux or Mac :
 
 For python2.7:
-```
+```bash
 PYV=`python2 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
@@ -92,7 +92,7 @@ python2 test_spams.py <name1> <name2> ... # run named tests
 ```
 
 For python3.x:
-```
+```bash
 PYV=`python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";` # get python current version
 export PYTHONPATH=$inst/lib/python${PYV}/site-packages
 cd $inst/test
@@ -109,7 +109,7 @@ python3 test_spams.py <name1> <name2> ... # run named tests
 Using the interface :
 setup your PYTHONPATH (c.f. previously)
 
-```
+```python
 import spams
 ```
 

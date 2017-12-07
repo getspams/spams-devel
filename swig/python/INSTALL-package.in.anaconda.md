@@ -86,7 +86,7 @@ Y = np.asfortranarray(np.random.random((200,20000)))
 Z = spams.CalcXY(X,Y)
 ```
 -----
-```
+```python
 import numpy as np
 import scipy
 import scipy.sparse
