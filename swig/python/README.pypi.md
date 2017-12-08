@@ -1,6 +1,28 @@
 # SPAMS 2.6.1 and python
 
-This directory contains files to install and use (at the end) the python interfaces to the functions of SPAMS library already interfaced with matlab.
+This directory contains files to install and use (at the end) the python interfaces
+to the functions of the SPAMS library (originally interfaced with Matlab).
+
+---
+
+Author:
+* Julien Mairal (Inria) with the collaboration of Francis Bach (Inria),
+  Jean Ponce (Ecole Normale Sup\'erieure), Guillermo Sapiro
+  (University of Minnesota), Guillaume Obozinski (Inria) and
+  Rodolphe Jenatton (Inria).
+
+Credit:
+* R and Python interfaces by Jean-Paul Chieze (Inria).
+* Archetypal analysis implementation by Yuansi Chen (internship at Inria),
+  with the collaboration of Zaid Harchaoui.
+
+Maintenance:
+* Starting from version 2.6 (especially porting to R-3.x and Python-3.x),
+development and maintenance are done by Ghislain Durif (Inria).
+
+Licence: GPL v3
+
+---
 
 Manipulated objects are imported from numpy and scipy. Matrices should be stored by columns, and sparse matrices should be "column compressed".
 
