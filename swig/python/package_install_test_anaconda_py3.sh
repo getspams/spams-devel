@@ -4,7 +4,7 @@ set -x
 ## build and install python3.x pkg
 
 ./clean
-./mkdist -x -f -m standard -py3
+./mkdist -x -f -nd -m anaconda -py3
 WDIR=$(pwd)
 cd dist/spams-$(cat ../Version)
 inst=$WDIR/python3-install
