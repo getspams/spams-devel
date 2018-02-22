@@ -598,7 +598,8 @@ def displayPatches(D):
     if int(sizeEdge) != sizeEdge:
         V = 3
         sizeEdge=np.sqrt(n/V)
-        sizeEdge = int(sizeEdge)
+
+    sizeEdge = int(sizeEdge)
 
 
 #    for ii in xrange(0,D.shape[1]):
