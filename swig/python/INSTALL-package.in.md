@@ -7,8 +7,27 @@ The interface consists of 4 files : spams.py myscipy_rand.py spams_wrap.py _spam
 Note: myscipy_rand.py supplies a random generator for sparse matrix
       for some old scipy distributions
 WARNING : the API of spams.OMP and spams.OMPMask has changed since version V2.2
+
 ########################################
-Interface building and installation
+Installation from PyPI:
+
+The standard installation uses the BLAS and LAPACK libraries used by Numpy:
+```bash
+pip install spams ## or pip3 for Python3
+```
+
+To install the version of SPAMS designed for the MKL Intel library, you can do:
+```bash
+pip install spams_mkl ## or pip3 for Python3
+```
+
+On MacOS, you may have to use:
+```bash
+env CC=/usr/local/bin/gcc-5 CXX=/usr/local/bin/g++-5 pip install spams ## or pip3 for Python3
+```
+
+########################################
+Interface building and installation from sources
 
 Packages required: numpy, scipy, six, blas + lapack (preferably from atlas).
 
@@ -35,18 +54,6 @@ python3 setup.py install --prefix=$inst
 Two documentations are installed in $inst/doc
   - doc_spams.pdf and html/index.html : the detailed user documentation
   - sphinx/index.html : the documentation of python function extracted by sphinx
-
-################################
-Install from PyPI website (at the moment from the testing site):
-
-```bash
-pip install --index-url https://test.pypi.org/simple/ spams ## or 'pip3' for Python3.x
-```
-
-On MacOS, it may not work for the moment and you may have to use:
-```bash
-env CC=/usr/local/bin/gcc-5 CXX=/usr/local/bin/g++-5 pip3 install --index-url https://test.pypi.org/simple/ spams
-```
 
 ################################
 Linux: tested on Ubuntu 16.04 with python2.7.12 and python3.5.2

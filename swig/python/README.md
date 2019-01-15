@@ -47,11 +47,29 @@ Porting to python3.x based on https://aur.archlinux.org/packages/python-spams-sv
 
 ## INTERFACE INSTALLATION for LINUX and MacOS
 
-We recommend to use the version of SPAMS designed to run with the Anaconda Python distribution
-available at <http://spams-devel.gforge.inria.fr/downloads.html>, especially to benefit from
+We recommend to use the version of SPAMS available on PyPI (c.f. below), or the version 
+designed to run with the Anaconda Python distribution available at 
+<http://spams-devel.gforge.inria.fr/downloads.html>, especially to benefit from
 the MKL Intel library.
 
-### Installation
+### Installation from PyPI:
+
+The standard installation uses the BLAS and LAPACK libraries used by Numpy:
+```bash
+pip install spams ## or pip3 for Python3
+```
+
+To install the version of SPAMS designed for the MKL Intel library, you can do:
+```bash
+pip install spams_mkl ## or pip3 for Python3
+```
+
+On MacOS, you may have to use:
+```bash   
+env CC=/usr/local/bin/gcc-5 CXX=/usr/local/bin/g++-5 pip install spams ## or pip3 for Python3
+```
+
+### Installation from sources
 
 Packages required: python-numpy, python-scipy, blas + lapack (preferably from atlas).
 

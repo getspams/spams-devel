@@ -13,14 +13,14 @@ usage() {
     echo "  -h : show help"
     echo "  -f : do not rebuild the doc from scratch"
     echo "  -py3 : for python3 compatibility (to do in swig/python3 directory)"
-    echo "  -m <mode>: building mode (standard, pypi or anaconda), default is standard"
+    echo "  -m <mode>: building mode (standard, pypi, pypi_mkl or anaconda), default is standard"
     exit 1
 }
 
 check_mode() {
     case $MODE in
-        standard|pypi|anaconda) ;;
-        *) echo "Issue with -m <mode>: <mode> should be 'standard', 'pypi' or 'anaconda'" && echo "Example: $0 -m standard" && die;;
+        standard|pypi|pypi_mkl|anaconda) ;;
+        *) echo "Issue with -m <mode>: <mode> should be 'standard', 'pypi', 'pypi_mkl' or 'anaconda'" && echo "Example: $0 -m standard" && die;;
     esac
 }
 
@@ -47,6 +47,7 @@ RM=/bin/rm
 case $MODE in
     standard) MODE_OPT="";;
     pypi) MODE_OPT=".pypi";;
+    pypi_mkl) MODE_OPT=".pypi_mkl";;
     anaconda) MODE_OPT=".anaconda";;
 esac
 
