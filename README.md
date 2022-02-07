@@ -16,6 +16,11 @@ There are several possible configurations. In particular,
 - [R specific project](https://github.com/getspams/spams-R) (available with `remotes::install_github("getspams/spams-R")`)
 - [Original C++ project](https://github.com/getspams/spams-devel)
 
+> SPAMS-related git repositories are also available on [Inria](https://www.inria.fr/) [gitlab](https://gitlab.inria.fr/):
+  - [Original C++ project](https://gitlab.inria.fr/thoth/spams-devel)
+  - [Python specific project](https://gitlab.inria.fr/thoth/spams-python)
+
+
 ## Contact
 
 Regarding SPAMS **Python** package: you can open an issue on the dedicated git project at <https://github.com/getspams/spams-python>
