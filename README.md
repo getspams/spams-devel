@@ -48,7 +48,7 @@ It is coded in C++ with a Matlab interface. Interfaces for R and Python have bee
 
 Release of version 2.6/2.6.1 and porting to R-3.x and Python3.x was done by [Ghislain Durif](https://gdurif.perso.math.cnrs.fr/) (Inria). The original porting to Python3.x is based on [this patch](https://aur.archlinux.org/packages/python-spams-svn/) and on the work of John Kirkham available [here](https://github.com/conda-forge/python-spams-feedstock).
 
-Version 2.6.2 (Python only) updates are based on contributions by [François Rheault](https://github.com/frheault) and [Samuel Saint-Jean](http://samuelstjean.github.io/).
+Version 2.6.2 (Python only) update is based on contributions by [François Rheault](https://github.com/frheault) and [Samuel Saint-Jean](http://samuelstjean.github.io/).
 
 ### Maintenance
 
