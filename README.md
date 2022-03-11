@@ -69,54 +69,23 @@ Version 2.1 and later are open-source under [GPLv3 licence](http://www.gnu.org/l
 
 ---
 
-## References
-
-### A monograph about sparse estimation
-
-We encourage the users of SPAMS to read the following monograph, which contains numerous applications of dictionary learning, an introduction to sparse modeling, and many practical advices.
-
-- J. Mairal, F. Bach and J. Ponce. [Sparse Modeling for Image and Visio Processing](http://lear.inrialpes.fr/people/mairal/resources/pdf/review_sparse_arxiv.pdf). Foundations and Trends in Computer Graphics and Vision. vol 8. number 2-3. pages 85--283. 2014
-
-### Related publications
-
-You can find here some publications at the origin of this software.
-
-The "matrix factorization" and "sparse decomposition" modules were developed for the following papers:
-
-- J. Mairal, F. Bach, J. Ponce and G. Sapiro. [Online Learning for Matrix Factorization and Sparse Coding](https://www.jmlr.org/papers/volume11/mairal10a/mairal10a.pdf). Journal of Machine Learning Research, volume 11, pages 19-60. 2010.
-- J. Mairal, F. Bach, J. Ponce and G. Sapiro. [Online Dictionary Learning for Sparse Coding](http://www.di.ens.fr/willow/pdfs/icml09.pdf). International Conference on Machine Learning, Montreal, Canada, 2009
-
-The "proximal" module was developed for the following papers:
-
-- J. Mairal, R. Jenatton, G. Obozinski and F. Bach. [Network Flow Algorithms for Structured Sparsity](http://books.nips.cc/papers/files/nips23/NIPS2010_1040.pdf). Adv. Neural Information Processing Systems (NIPS). 2010.
-- R. Jenatton, J. Mairal, G. Obozinski and F. Bach. [Proximal Methods for Sparse Hierarchical Dictionary Learning](http://www.di.ens.fr/willow/pdfs/icml2010a.pdf). International Conference on Machine Learning. 2010.
-
-The feature selection tools for graphs were developed for:
-
-- J. Mairal and B. Yu. [Supervised Feature Selection in Graphs with Path Coding Penalties and Network Flows](http://arxiv.org/abs/1204.4539). JMLR. 2013.
-
-The incremental and stochastic proximal gradient algorithm correspond to the following papers:
-
-- J. Mairal. [Stochastic Majorization-Minimization Algorithms for Large-Scale Optimization](http://hal.inria.fr/docs/00/86/02/68/PDF/main_with_appendices.pdf). NIPS. 2013.
-- J. Mairal. [Optimization with First-Order Surrogate Functions](http://hal.inria.fr/docs/00/82/22/29/PDF/main.pdf). International Conference on Machine Learning. 2013.
-
----
-
 ## News
 
-- 03/02/2022: Python SPAMS v2.6.3 is released (source and PyPI).
-- 03/09/2020: Python SPAMS v2.6.2 is released (source and PyPI).
-- 15/01/2019: Python SPAMS v2.6.1 is available on PyPI).
-- 08/12/2017: Python SPAMS v2.6.1 for Anaconda (with MKL support) is released.
-- 24/08/2017: Python SPAMS v2.6.1 is released (a single source code for Python 3 and 2).
-- 27/02/2017: SPAMS v2.6 is released, including precompiled Matlab packages, R-3.x and Python3.x compatibility.
-- 25/05/2014: SPAMS v2.5 is released.
-- 12/05/2013: SPAMS v2.4 is released.
-- 05/23/2012: SPAMS v2.3 is released.
-- 03/24/2012: SPAMS v2.2 is released with a Python and R interface, and new compilation scripts for a better Windows/Mac OS compatibility.
+- 14/02/2022: Python SPAMS is now officially hosted on [Github](https://github.com/getspams/spams-python)
+- 07/02/2022: [SPAMS C++ project](https://github.com/getspams/spams-devel) and [SPAMS for R](https://github.com/getspams/spams-R) are now officially hosted on Github
+- 03/02/2022: Python SPAMS v2.6.3 is released (source and PyPI)
+- 03/09/2020: Python SPAMS v2.6.2 is released (source and PyPI)
+- 15/01/2019: Python SPAMS v2.6.1 is available on PyPI)
+- 08/12/2017: Python SPAMS v2.6.1 for Anaconda (with MKL support) is released
+- 24/08/2017: Python SPAMS v2.6.1 is released (a single source code for Python 3 and 2)
+- 27/02/2017: SPAMS v2.6 is released, including precompiled Matlab packages, R-3.x and Python3.x compatibility
+- 25/05/2014: SPAMS v2.5 is released
+- 12/05/2013: SPAMS v2.4 is released
+- 05/23/2012: SPAMS v2.3 is released
+- 03/24/2012: SPAMS v2.2 is released with a Python and R interface, and new compilation scripts for a better Windows/Mac OS compatibility
 - 06/30/2011: SPAMS v2.1 goes open-source!
 - 11/04/2010: SPAMS v2.0 is out for Linux and Mac OS!
-- 02/23/2010: Windows 32 bits version available! Elastic-Net is implemented.
+- 02/23/2010: Windows 32 bits version available! Elastic-Net is implemented
 - 10/26/2009: Mac OS, 64 bits version available!
 
 ---
@@ -172,3 +141,37 @@ at least for the Linux and/or Mac OS version. Depending on your configuration,
 it might be necessary to launch Matlab with the script in order to use the
 toolbox (in order to preload multi-threading libraries).
 Otherwise, just type "start_spams;" and use the SPAMS library.
+
+---
+
+## References
+
+### A monograph about sparse estimation
+
+We encourage the users of SPAMS to read the following monograph, which contains numerous applications of dictionary learning, an introduction to sparse modeling, and many practical advices.
+
+- J. Mairal, F. Bach and J. Ponce. [Sparse Modeling for Image and Visio Processing](http://lear.inrialpes.fr/people/mairal/resources/pdf/review_sparse_arxiv.pdf). Foundations and Trends in Computer Graphics and Vision. vol 8. number 2-3. pages 85--283. 2014
+
+### Related publications
+
+You can find here some publications at the origin of this software.
+
+The "matrix factorization" and "sparse decomposition" modules were developed for the following papers:
+
+- J. Mairal, F. Bach, J. Ponce and G. Sapiro. [Online Learning for Matrix Factorization and Sparse Coding](https://www.jmlr.org/papers/volume11/mairal10a/mairal10a.pdf). Journal of Machine Learning Research, volume 11, pages 19-60. 2010.
+- J. Mairal, F. Bach, J. Ponce and G. Sapiro. [Online Dictionary Learning for Sparse Coding](http://www.di.ens.fr/willow/pdfs/icml09.pdf). International Conference on Machine Learning, Montreal, Canada, 2009
+
+The "proximal" module was developed for the following papers:
+
+- J. Mairal, R. Jenatton, G. Obozinski and F. Bach. [Network Flow Algorithms for Structured Sparsity](http://books.nips.cc/papers/files/nips23/NIPS2010_1040.pdf). Adv. Neural Information Processing Systems (NIPS). 2010.
+- R. Jenatton, J. Mairal, G. Obozinski and F. Bach. [Proximal Methods for Sparse Hierarchical Dictionary Learning](http://www.di.ens.fr/willow/pdfs/icml2010a.pdf). International Conference on Machine Learning. 2010.
+
+The feature selection tools for graphs were developed for:
+
+- J. Mairal and B. Yu. [Supervised Feature Selection in Graphs with Path Coding Penalties and Network Flows](http://arxiv.org/abs/1204.4539). JMLR. 2013.
+
+The incremental and stochastic proximal gradient algorithm correspond to the following papers:
+
+- J. Mairal. [Stochastic Majorization-Minimization Algorithms for Large-Scale Optimization](http://hal.inria.fr/docs/00/86/02/68/PDF/main_with_appendices.pdf). NIPS. 2013.
+- J. Mairal. [Optimization with First-Order Surrogate Functions](http://hal.inria.fr/docs/00/82/22/29/PDF/main.pdf). International Conference on Machine Learning. 2013.
+
